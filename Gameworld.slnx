@@ -6,4 +6,8 @@
   <Folder Name="/src/domain/">
     <Project Path="src/domain/Gameworld.Domain.csproj" />
   </Folder>
+  <Folder Name="/test/" />
+  <Folder Name="/test/domain/">
+    <Project Path="test/domain/Gameworld.Domain.Tests.csproj" />
+  </Folder>
 </Solution>

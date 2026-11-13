@@ -86,11 +86,12 @@ Sited is not a state a region is in. It needs only the seed, so it is a pure fun
 
 | Stage | Contains | Needs |
 |---|---|---|
-| Sited | Region, Zone and Patch cell location, Zones initial type and bedrock. Ocean seeds, Determined number of links, expansions and mergers | Seed only |
+| Sited | Region, Zone and Patch cell location, Zones initial type and bedrock. Ocean seeds, Determined number of links, expansions and mergers | foundation only |
 | Outlined | Zones linked, expanded and merged. Sea access | All regions within two rings Sited |
 | Detailed | Patch mergers, rivers | All bordering regions Outlined |
 | Elevated | heights, biomes, resources | All bordering regions Detailed |
-| Settled | Prospects, and Stubs for cities and factions | The region Detailed |
+| Planned | Factions and Prospects for cities and towns | The region Detailed |
+| Settled | Actual Cities and towns, families and important persons | The region Planned |
 
 Region sites come from a seed-hashed jittered grid, so the cell of any region and its neighbours can be computed locally without generating the rest of the world.
 
@@ -108,7 +109,8 @@ Stub → Pending → Realised
 Text and portrait are tracked separately, so a person can be shown with a name and biography before the picture arrives. A city can exist with a population count long before any individual in it is authored.
 
 #### Migration
-A migration maps an old foundation to a new foundation with the same seed (phase 4). Regions the player has reached Detailed are frozen: they keep the foundation they were generated under, so nothing the player has seen moves. Regions that have not reached Detailed regenerate under the new foundation. Each region therefore records which foundation it was generated under.
+
+Migration is not coved yet
 
 #### Region
 The map is structured in large regions the size of Middle Ages European kingdoms (approximately 100-200km x 100-200km). The regions are divided into zones (approximately 8-12 zones per region). The zones are divided into patches (approximately 8-18 patches per zone).
@@ -189,7 +191,7 @@ Rivers are calculated with a space-colonization algorithm, and it is the rivers 
 
 Rivers never cross region borders. A landlocked region only gets some lakes and small rivers, and it has no access to ocean sailing.
 
-#### Preconditions
+#### Fields
 Perlin Noise Maps that are used to drive climate, biomes and resources. They are Fields: stateless functions of foundation and coordinate that can be sampled anywhere at any time. Fields are never stored and have no generation stage - a stage only records the values it sampled.
 * Precipitation
 * Initial Temperature
@@ -266,7 +268,7 @@ Example table (not sufficient)
 A potential location for a City or Town. Has information about resources, travel options etc.
     
 #### Faction
-A group of people. A political grouping. Could be a Kingdom, a thieves guild or a tribe of people.
+A group of people in one region. A political grouping. Could be a Kingdom, a thieves guild or a tribe of people.
 
 #### Family
 A family of NPCs. Typically living together in a household. Can include servants or slaves.
