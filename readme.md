@@ -86,10 +86,10 @@ Sited is not a state a region is in. It needs only the seed, so it is a pure fun
 
 | Stage | Contains | Needs |
 |---|---|---|
-| Sited | Region, Zone and Patch cell location, Zones initial type and bedrock. Ocean seeds, Determinated number of links, expansions and mergers | Seed only |
-| Outlined | Zones linked, expaned and merged. Sea access | All regions within two rings Sited |
-| Detailed | Patch mergers, rivers | All regions within two rings Sited |
-| Elevated | heights, biomes, resources | All bordering regions Outlined |
+| Sited | Region, Zone and Patch cell location, Zones initial type and bedrock. Ocean seeds, Determined number of links, expansions and mergers | Seed only |
+| Outlined | Zones linked, expanded and merged. Sea access | All regions within two rings Sited |
+| Detailed | Patch mergers, rivers | All bordering regions Outlined |
+| Elevated | heights, biomes, resources | All bordering regions Detailed |
 | Settled | Prospects, and Stubs for cities and factions | The region Detailed |
 
 Region sites come from a seed-hashed jittered grid, so the cell of any region and its neighbours can be computed locally without generating the rest of the world.
@@ -122,7 +122,7 @@ A Region is the top level of three levels of nested Voronoi cells.
 #### Zone
 Zones have an elevation type: Ocean, Flat Land, Lowland, Hills or Mountains. And zones also have a bedrock type that drives mined resources in its patches
 
-The elevation type is the authoritative elevation class of the zone, and it is an input to river generation. The actual height is calculated in the Detailed stage from the rivers, and it stays within the band the elevation type allows. Ocean zones are never touched by river-driven height.
+The elevation type is the authoritative elevation class of the zone, and it is an input to river generation. The actual height is calculated in the Elevated stage from the rivers, and it stays within the band the elevation type allows. Ocean zones are never touched by river-driven height.
 
 A zone is the middle level of three levels of nested Voronoi cells. 
 
@@ -132,26 +132,26 @@ Patches have one biome associated with them. The biome drives the patch flora an
 A patch is the bottom level of three levels of nested Voronoi cells. The patch level of Voronoi cells has its borders warped - to give the map a more natural aesthetic.
 
 #### Zone and Patch transformation
-To give greater variation in zone and patch size and to give lager oceans - zones and patchs undergo mergers.
-When a region is initialised a number of its zones are determend to be of the ocean type - these initial ocean zones are marked as ocean seeds
+To give greater variation in zone and patch size and to give larger oceans - zones and patches undergo mergers.
+When a region is initialised a number of its zones are determined to be of the ocean type - these initial ocean zones are marked as ocean seeds.
 
-The first step in the transformation is ocean linking. For this step all neighboring regions and there zones and ocean seeds must be known.
-When linking each ocean seed in a region has a configures changes of linking to it nearest ocean seed. when linking all zones in a streaght line between the to ocean seeds are changed to ocean type zones.
+The first step in the transformation is ocean linking. For this step all neighboring regions and their zones and ocean seeds must be known.
+When linking, each ocean seed in a region has a configured chance of linking to its nearest ocean seed. When linking, all zones in a straight line between the two ocean seeds are changed to ocean type zones.
 
 * The nearest ocean seed of a seed in a bordering region can be two regions away. So all regions within two rings must be Sited before a region can be Outlined.
 * A link only converts zones in the two regions that own the two ocean seeds. A zone of a third region under the line is left alone.
 * There is a configured maximum link distance. An ocean seed with no other seed within that distance does not link.
 
-The second step is ocean expansion. In each region a configured number of expansions are determend per ocean seed, for each the ocean seeds nearest land zones (in the same region) are converted to ocean zones.
+The second step is ocean expansion. In each region a configured number of expansions are determined per ocean seed, for each the ocean seeds nearest land zones (in the same region) are converted to ocean zones.
 
-The third step is merges. In each region a configured number of merges are determend. that number of zones is randomly chosen and merged with is nearest neighbor in the same region. only land-land or ocean-ocean mergers are allowed - so some mergers can not be completed (but still counts).
+The third step is merges. In each region a configured number of merges are determined. That number of zones is randomly chosen and merged with its nearest neighbor in the same region. Only land-land or ocean-ocean mergers are allowed - so some mergers can not be completed (but still counts).
 
 The randomly chosen zone is the survivor of a merger. It keeps its own elevation type and bedrock, and the absorbed zone takes them over. Apart from this and the conversion to ocean, the elevation type a zone got when Sited is final.
 
 These three steps make the region Outlined.
 
 The fourth step is patch merger.
-A number of patches in each zones merges with a naiboring patch in the same zone - This is to give greater variation in patch size and form.
+A number of patches in each zone merge with a neighboring patch in the same zone - This is to give greater variation in patch size and form.
 
 The patch merger is the first step of the Detailed stage. It runs when the zones are final, and only within a zone as it is after the zone mergers. Ocean zones keep their patch cells, but they skip patch merger, biomes and land resources - their patches only carry sea resources (e.g. fish).
 
