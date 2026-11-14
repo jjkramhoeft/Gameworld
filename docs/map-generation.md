@@ -1521,8 +1521,8 @@ the pixel's world position with `cellAt` and colour it.
 
 - **Base colour** ("Map" mode): the elevation type colour (section 8), with the lightness
   varied by ±8 % per patch from a hash so the patches read. Ocean: its colour varied ±7 %
-  per zone and ±3 % per patch. "Biomes" mode: the biome colour (13.3) varied ±5 % per
-  patch.
+  per zone and ±3 % per patch. "Biomes" mode: the exact biome colour (13.3), not
+  varied, so a patch can be matched against a legend.
 - **Borders**, found by comparing each pixel with its left and upper neighbour: coastline
   in near-black (14, 20, 30); region borders as a dotted red line (235, 28, 36): a 3 px dot on every point of a 6 px
   lattice, anchored to world pixels, that the border passes within 3 px of;

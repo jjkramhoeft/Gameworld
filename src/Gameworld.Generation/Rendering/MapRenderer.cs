@@ -142,7 +142,7 @@ public static partial class MapRenderer
             if (biome is { } b)
             {
                 var (r, g, bl) = BiomeRules.Colour(b);
-                return new Rgb(r, g, bl).Scale(Vary(3, c.Patch, 0.05));
+                return new Rgb(r, g, bl); // exact, so a patch can be matched against the legend
             }
         }
         return ElevationColour(world.Cells.ZoneType(c.Zone)).Scale(Vary(4, c.Patch, 0.08));

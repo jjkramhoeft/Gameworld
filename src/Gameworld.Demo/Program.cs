@@ -54,6 +54,13 @@ app.MapGet("/api/tiles/{version:int}/{z:int}/{x:int}/{y:int}.png",
         return Results.Bytes(png, "image/png");
     });
 
+// The legend of the Biomes base map: every biome with the colour the renderer draws it in.
+app.MapGet("/api/biomes", () => Results.Json(Enum.GetValues<Biome>().Select(b =>
+{
+    var (r, g, bl) = Gameworld.Generation.Biomes.BiomeRules.Colour(b);
+    return new { Biome = b.ToString(), Colour = $"#{r:x2}{g:x2}{bl:x2}" };
+}), new JsonSerializerOptions()));
+
 app.MapGet("/api/inspect", (double x, double y, WorldHost host) => Json(host.Inspect(new WorldPoint(x, y))));
 
 app.MapGet("/api/regions/{i:int}/{j:int}", (int i, int j, string? stage, WorldHost host) =>
