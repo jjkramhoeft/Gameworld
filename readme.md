@@ -315,3 +315,76 @@ A family of NPCs. Typically living together in a household. Can include servants
 
 #### Person
 An NPC in the game. A person.
+
+## Setup and run
+
+The code is one .NET solution, `Gameworld.slnx`. It needs the .NET 11 SDK and nothing else: no database and no external services. The NuGet packages of the test project are restored on the first build.
+
+| Project | What it is |
+|---|---|
+| `src/Gameworld.Domain` | The domain model of this readme |
+| `src/Gameworld.Generation` | The generation algorithms of [docs/map-generation.md](docs/map-generation.md) and the map renderer |
+| `src/Gameworld.MapGenerator` | The map generation app (console) |
+| `src/Gameworld.Demo` | The demo app (web map viewer) |
+| `tests/Gameworld.Tests` | The tests |
+
+Run the commands from the repository root.
+
+### Build and test
+
+```bash
+dotnet build Gameworld.slnx -c Release
+```
+
+```bash
+dotnet test Gameworld.slnx -c Release
+```
+
+### Map generation app
+
+Generates a block of regions of one foundation up to a stage and writes the result to a folder: `map.png`, `biomes.png` and `height.png`, the foundation as `foundation.json` and each region as `regions/<i>_<j>.json`.
+
+```bash
+dotnet run --project src/Gameworld.MapGenerator -c Release
+```
+
+Without options it takes the 3 × 3 regions around region (0, 0) of the seed `cellgen` to the Settled stage with the default Parameter Set, and writes to `out/`. Options go after `--`:
+
+```bash
+dotnet run --project src/Gameworld.MapGenerator -c Release -- --seed atlas --region 2,2 --rings 2 --out out/atlas
+```
+
+| Option | Meaning | Default |
+|---|---|---|
+| `--seed <text>` | The seed text of the foundation | `cellgen` |
+| `--parameters <file.json>` | The Parameter Set | the built-in defaults |
+| `--region <i,j>` | The centre region | `0,0` |
+| `--rings <n>` | Rings of regions around the centre (1 gives 3 × 3 regions) | `1` |
+| `--stage <stage>` | Outlined, Detailed, Elevated, Planned or Settled | `Settled` |
+| `--out <folder>` | Where to write | `out` |
+| `--scale <m/px>` | Metres per pixel of the maps | `250` |
+| `--modes <list>` | Which maps to draw: `map`, `biomes`, `height` | all three |
+| `--no-regions` | Do not write the regions as json | |
+| `--export-parameters <file>` | Write the default Parameter Set to a json file and stop | |
+
+To try other parameters, export the defaults, edit the file and pass it back:
+
+```bash
+dotnet run --project src/Gameworld.MapGenerator -c Release -- --export-parameters my-parameters.json
+```
+
+```bash
+dotnet run --project src/Gameworld.MapGenerator -c Release -- --parameters my-parameters.json --out out/mine
+```
+
+### Demo app
+
+A map viewer in the browser, on top of the same generator.
+
+```bash
+dotnet run --project src/Gameworld.Demo -c Release
+```
+
+Then open http://localhost:5062. Drag to pan, scroll to zoom, and click the map to see the region, zone and patch at that point. The side panel switches the base map (elevation types, biomes, height) and the layers, and it replaces the foundation: a new seed, or an edited Parameter Set under "Parameter Set (json)". Replacing the foundation discards all derived data.
+
+Regions are generated when they come into view, so the first view of an area takes longer than the next. The Prospects and travel layers take the regions through the Elevated stage first, which builds their height maps.
