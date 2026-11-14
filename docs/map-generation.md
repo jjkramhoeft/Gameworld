@@ -1110,15 +1110,15 @@ which the lakes use to rule out deserts without needing the height map.
 
 | Biome | RGB | Biome | RGB |
 |---|---|---|---|
-| Ocean | 38, 84, 132 | Temperate broadleaf forest | 90, 140, 64 |
-| Ice & snow | 234, 239, 243 | Temperate rain forest | 40, 102, 80 |
-| Tundra | 146, 154, 138 | Hot desert | 229, 200, 138 |
-| Cold steppe | 178, 171, 132 | Thorn scrub | 198, 166, 100 |
-| Boreal forest | 56, 94, 78 | Savanna | 190, 176, 80 |
-| Cold desert | 204, 189, 152 | Tropical dry forest | 122, 144, 58 |
-| Temperate grassland | 186, 186, 112 | Tropical rain forest | 28, 94, 44 |
-| Woodland & shrubland | 144, 152, 90 | Mangrove | 66, 132, 118 |
-| Temperate mixed forest | 68, 114, 72 | | |
+| Ocean | 38, 84, 132 | Temperate broadleaf forest | 96, 190, 56 |
+| Ice & snow | 242, 246, 250 | Temperate rain forest | 0, 176, 170 |
+| Tundra | 168, 160, 208 | Hot desert | 255, 234, 150 |
+| Cold steppe | 176, 170, 130 | Thorn scrub | 214, 112, 48 |
+| Boreal forest | 20, 88, 80 | Savanna | 240, 176, 40 |
+| Cold desert | 216, 184, 184 | Tropical dry forest | 136, 136, 24 |
+| Temperate grassland | 184, 222, 84 | Tropical rain forest | 0, 92, 36 |
+| Woodland & shrubland | 150, 104, 70 | Mangrove | 168, 70, 150 |
+| Temperate mixed forest | 76, 148, 84 | | |
 
 ---
 
