@@ -11,7 +11,8 @@ facts needed to place it in the biomes and to draw vocations and factions from i
 This document is a proposal. It does not change the default list of
 [map-generation.md](map-generation.md) Appendix E, the Parameter Set or the code.
 [adding-a-race.md](adding-a-race.md) lists what must change when a race is adopted.
-The biome weights are judgement, not measured: no region has been generated with this list.
+The biome weights are judgement. The shares they give are measured on 50 regions (see
+Measured shares), and the weights have not been tuned afterwards.
 
 ## How to read an entry
 
@@ -2546,6 +2547,99 @@ and 0.5 when it lives scattered among others or is rare by its nature. The human
 races sum to 27, against 10 for the single `human` of the default list, so humans
 weigh more against the other races here than they do there.
 
+## Measured shares
+
+The 32 races as a Parameter Set file:
+[races-basis-parameter-set.json](races-basis-parameter-set.json). It holds only the
+`Races` list, so every other parameter keeps its default.
+
+Measured on 50 regions: the 25 regions around region (0, 0) of the seeds `cellgen` and
+`gameworld`, taken to the Planned stage with that file. The 50 regions hold 1,824,338
+persons, 35,159 in a median region. The shares are sums of the potential population
+per race of the region files.
+
+| # | Race | Group | Share of all persons | Persons in a median region | Regions with 1 % or more (of 50) | Largest race in |
+|---|---|---|---|---|---|---|
+| 1 | Northmen | Human | 5.19 % | 1,788 | 47 | 3 |
+| 2 | Midlanders | Human | 10.52 % | 3,810 | 50 | 12 |
+| 3 | Saltroad folk | Human | 8.90 % | 2,834 | 49 | 7 |
+| 4 | Sunlanders | Human | 9.62 % | 3,002 | 49 | 10 |
+| 5 | Grass riders | Human | 4.30 % | 1,372 | 50 | 0 |
+| 6 | Rainkeepers | Human | 8.13 % | 2,382 | 48 | 0 |
+| 7 | Canal folk | Human | 12.07 % | 4,288 | 50 | 18 |
+| 8 | Elves | Classic | 3.15 % | 1,040 | 47 | 0 |
+| 9 | Dwarves | Classic | 1.32 % | 484 | 36 | 0 |
+| 10 | Halflings | Classic | 5.31 % | 1,778 | 50 | 0 |
+| 11 | Gnomes | Classic | 2.95 % | 1,052 | 50 | 0 |
+| 12 | Orcs | Classic | 6.92 % | 2,264 | 50 | 0 |
+| 13 | Hoarkin | New | 0.45 % | 150 | 7 | 0 |
+| 14 | Tinefolk | New | 0.87 % | 294 | 15 | 0 |
+| 15 | Hearthbloods | New | 0.29 % | 104 | 2 | 0 |
+| 16 | Widegaze | New | 1.11 % | 327 | 25 | 0 |
+| 17 | Amberbloods | New | 1.60 % | 568 | 41 | 0 |
+| 18 | Brinefolk | New | 1.32 % | 413 | 26 | 0 |
+| 19 | Duskreaders | New | 1.68 % | 484 | 32 | 0 |
+| 20 | Noonfolk | New | 2.37 % | 734 | 45 | 0 |
+| 21 | Boughwalkers | New | 1.01 % | 300 | 23 | 0 |
+| 22 | Shoalfolk | New | 0.21 % | 55 | 0 | 0 |
+| 23 | Hushfolk | New | 1.11 % | 395 | 31 | 0 |
+| 24 | Swiftborn | New | 1.95 % | 654 | 49 | 0 |
+| 25 | Flinchless | New | 0.77 % | 246 | 6 | 0 |
+| 26 | Longsleepers | New | 0.82 % | 295 | 13 | 0 |
+| 27 | Eyrie folk | New | 0.26 % | 72 | 1 | 0 |
+| 28 | Lanternkin | New | 0.98 % | 340 | 18 | 0 |
+| 29 | Stillfaces | New | 1.60 % | 588 | 41 | 0 |
+| 30 | Lineminds | New | 1.01 % | 348 | 24 | 0 |
+| 31 | Twofold | New | 1.73 % | 510 | 38 | 0 |
+| 32 | Bitterbloods | New | 0.48 % | 160 | 4 | 0 |
+
+| Group | Share of all persons | Seed `cellgen` | Seed `gameworld` |
+|---|---|---|---|
+| Human races (7) | 58.7 % | 58.2 % | 59.3 % |
+| Classic races (5) | 19.7 % | 19.9 % | 19.4 % |
+| New races (20) | 21.6 % | 21.9 % | 21.4 % |
+
+| Per region | Lowest | Median | Highest |
+|---|---|---|---|
+| Races with 1 % or more of the persons | 15 | 21 | 23 |
+| Share of the largest race | 10 % | 14 % | 20 % |
+
+What the numbers show:
+
+- **Humans hold 58.7 %.** The default list gives its single `human` 66 %. Here the
+  seven human races share less, since 20 more races are on.
+- **No region has a homeland race.** No race has a majority in any region, the largest
+  race of a median region has 14 %, and a median region holds 21 races at 1 % or
+  more. The rule shares each patch by its biome, and a region has many biomes. A
+  Canal folk kingdom or a Brinefolk pan town needs something the rule does not have:
+  a presence per race and region. This is the open topic of
+  [map-generation-research.md](map-generation-research.md) section 10.7.
+- **Grass riders and Rainkeepers are never the largest race of a region.** Grass riders
+  are native to Cold steppe and Temperate grassland, which are 3 % and 4.5 % of the
+  land, and in the grassland the Midlanders outweigh them 15 to 9. Rainkeepers share
+  five of their six biomes with the Sunlanders, at an equal or lower frequency
+  everywhere except Mangrove, which is 2 % of the land.
+- **Orcs (6.9 %) outnumber Northmen and Grass riders.** They have a weight of 2 in six
+  biomes and live in 13 of the 16. Halflings (5.3 %) are level with Northmen for a
+  like reason. Both keep the weights of the default list, where they stood against
+  one human race with `common` 10.
+- **Three races are close to absent.** Shoalfolk (0.21 %) reach 1 % in no region:
+  only 15 % of the land lies below 50 m, and the modifier does not ask for a coast.
+  Eyrie folk (0.26 %) reach 1 % in one region: 8 % of the land lies above 500 m.
+  Hearthbloods (0.29 %) have `common` 0.5 in the cold, thinly peopled biomes.
+- **The new races are minorities, as meant.** Together they hold 21.6 %, and the
+  largest of them, the Noonfolk, 2.4 %.
+
+To repeat the measurement:
+
+```bash
+dotnet run --project src/Gameworld.MapGenerator -c Release -- --seed cellgen --parameters docs/races-basis-parameter-set.json --rings 2 --stage Planned --modes biomes --out out/races-basis/cellgen
+```
+
+```bash
+dotnet run --project src/Gameworld.MapGenerator -c Release -- --seed gameworld --parameters docs/races-basis-parameter-set.json --rings 2 --stage Planned --modes biomes --out out/races-basis/gameworld
+```
+
 ## What the entries ask for that a race cannot say yet
 
 A race is an id, a name, a toggle, a frequency per biome and a height modifier. The
@@ -2571,9 +2665,8 @@ years of seasoning.
 
 ## Not done
 
-- Nothing is measured. The weights and `common` values are a first proposal, and no
-  region has been generated with them.
+- The weights and `common` values are a first proposal. They are measured (see
+  Measured shares) and have not been tuned after the measurement.
 - The default list, the Parameter Set, the readme and the tests are unchanged.
 - The names have not been searched for earlier use.
-- The seven human races are built on real peoples. Authored text and portraits made
-  from them should be reviewed for stereotype.
+- The seven human races are built on real peoples.
