@@ -88,7 +88,7 @@ Zones and patches are built from cells and take their identity from them:
 This lets player state and authored data point at derived data that may be evicted and recomputed, and it makes a Stub addressable before it is Realised.
 
 #### Region Generation Stages
-A region moves through the stages below. Stages only advance - a region never moves backwards. Evicting derived data from storage and recomputing it is not a stage change.
+A region moves through the stages below, in the order of the table and one stage at a time. No stage is skipped: a region is Elevated before it is Planned. Stages only advance - a region never moves backwards. Evicting derived data from storage and recomputing it is not a stage change.
 
 Sited is not a state a region is in. It needs only the seed, so it is a pure function that can be calculated for any region at any time, and it is never persisted. Stored regions start at Outlined. The Sited row describes what the function yields.
 
@@ -98,12 +98,12 @@ Sited is not a state a region is in. It needs only the seed, so it is a pure fun
 | Outlined | Zones linked, expanded and merged. Sea access | All regions within the link range + 5 rings Sited (7 rings at the defaults) |
 | Detailed | Patch mergers, rivers, lakes. Estimated biomes and resources | All bordering regions Outlined |
 | Elevated | Height map. Final biomes and resources | All bordering regions Detailed |
-| Planned | Factions and Prospects for cities and towns | The region Detailed |
+| Planned | Factions and Prospects for cities and towns | The region Elevated |
 | Settled | Travel network. Actual Cities and towns, families and important persons | The region and all bordering regions Planned |
 
 The sites of all three levels come from seed-hashed jittered grids, so the cell of any region, zone or patch and its neighbours can be computed locally without generating the rest of the world.
 
-Biomes and resources exist in two forms. The estimated form is calculated in the Detailed stage with a typical height per elevation type instead of the real height. The final form is calculated in the Elevated stage with the height from the height map. Lakes, Prospects and the travel network only read the estimated form, so they never depend on the height map and never change when a region becomes Elevated.
+Biomes and resources exist in two forms. The estimated form is calculated in the Detailed stage with a typical height per elevation type instead of the real height. The final form is calculated in the Elevated stage with the height from the height map. Lakes, Prospects and the travel network only read the estimated form, so they never depend on the height map. The region is still Elevated before it is Planned: the Planned stage reads the Detailed data, but it does not come before the Elevated stage.
 
 The policy for when a region advances (e.g. Detailed within some distance of the player) is not part of the domain model. The model only knows the stage and its preconditions.
 

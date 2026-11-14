@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gameworld map demo</title>
+<style>
+  :root {
+    --bg: #f4f2ec; --panel: #fbfaf6; --ink: #1f2328; --muted: #646b73; --line: #d9d5c9;
+    --accent: #2f6f4f; --accent-ink: #ffffff; --field: #ffffff; --warn: #9a3412; --map-bg: #1d3550;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #15181c; --panel: #1c2026; --ink: #e6e3da; --muted: #9aa1a9; --line: #313741;
+      --accent: #6fbf94; --accent-ink: #10231a; --field: #12151a; --warn: #f0a070; --map-bg: #0e1b2a;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body { display: grid; grid-template-columns: 340px 1fr; background: var(--bg); color: var(--ink);
+         font: 14px/1.45 system-ui, "Segoe UI", sans-serif; }
+  aside { background: var(--panel); border-right: 1px solid var(--line); overflow-y: auto; padding: 16px; }
+  h1 { font-size: 17px; margin: 0 0 2px; letter-spacing: .01em; }
+  h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 20px 0 8px; }
+  p.sub { margin: 0; color: var(--muted); font-size: 12.5px; }
+  label { display: block; }
+  input[type=text], textarea { width: 100%; background: var(--field); color: var(--ink); border: 1px solid var(--line);
+         border-radius: 6px; padding: 7px 9px; font: inherit; }
+  textarea { font: 12px/1.4 ui-monospace, Consolas, monospace; height: 260px; resize: vertical; white-space: pre; }
+  button { font: inherit; border: 1px solid var(--line); background: var(--field); color: var(--ink); border-radius: 6px;
+           padding: 6px 12px; cursor: pointer; }
+  button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+  button:focus-visible, input:focus-visible, textarea:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .row { display: flex; gap: 8px; align-items: center; }
+  .row > input { flex: 1; }
+  .segmented { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+  .segmented label { text-align: center; padding: 6px 0; cursor: pointer; background: var(--field); border-right: 1px solid var(--line); }
+  .segmented label:last-child { border-right: 0; }
+  .segmented input { position: absolute; opacity: 0; }
+  .segmented label:has(input:checked) { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+  .segmented label:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .checks { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; }
+  .checks label { display: flex; gap: 6px; align-items: center; cursor: pointer; }
+  .note { color: var(--muted); font-size: 12px; margin: 6px 0 0; }
+  .error { color: var(--warn); font-size: 12.5px; margin: 6px 0 0; min-height: 1em; white-space: pre-wrap; }
+  details summary { cursor: pointer; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; margin: 20px 0 8px; }
+  dl { display: grid; grid-template-columns: 110px 1fr; gap: 3px 10px; margin: 0; font-size: 13px; }
+  dt { color: var(--muted); }
+  dd { margin: 0; overflow-wrap: anywhere; }
+  .res { margin: 6px 0 0; padding: 0; list-style: none; font-size: 13px; }
+  .res li { display: grid; grid-template-columns: 1fr 44px; gap: 8px; padding: 2px 0; border-top: 1px solid var(--line); }
+  .res small { color: var(--muted); }
+  .res .amt { text-align: right; font-variant-numeric: tabular-nums; }
+  main { position: relative; overflow: hidden; background: var(--map-bg); cursor: grab; touch-action: none; }
+  main.dragging { cursor: grabbing; }
+  #tiles { position: absolute; inset: 0; }
+  #tiles img { position: absolute; width: 256px; height: 256px; user-select: none; -webkit-user-drag: none; image-rendering: auto; }
+  #pin { position: absolute; width: 14px; height: 14px; margin: -7px 0 0 -7px; border: 2px solid #fff; border-radius: 50%;
+         box-shadow: 0 0 0 2px #000a; pointer-events: none; display: none; }
+  #status { position: absolute; left: 10px; bottom: 10px; background: #000a; color: #fff; padding: 4px 9px; border-radius: 6px;
+            font: 12px ui-monospace, Consolas, monospace; pointer-events: none; }
+  #zoom { position: absolute; right: 10px; top: 10px; display: grid; gap: 4px; }
+  #zoom button { width: 34px; height: 34px; padding: 0; font-size: 18px; background: #fffd; color: #111; border-color: #0003; }
+  #scale { position: absolute; right: 10px; bottom: 10px; color: #fff; font: 12px ui-monospace, Consolas, monospace; text-align: center; pointer-events: none; }
+  #scale div { height: 6px; border: 2px solid #fff; border-top: 0; margin-top: 2px; box-shadow: 0 1px 0 #0008; }
+  @media (max-width: 760px) { body { grid-template-columns: 1fr; grid-template-rows: 46vh 1fr; } aside { order: 2; border-right: 0; border-top: 1px solid var(--line); } }
+</style>
+</head>
+<body>
+<aside>
+  <h1>Gameworld map demo</h1>
+  <p class="sub" id="foundation">Loading the foundation…</p>
+
+  <h2>Foundation</h2>
+  <form id="seed-form" class="row">
+    <input type="text" id="seed" aria-label="Seed text" autocomplete="off" spellcheck="false">
+    <button class="primary" type="submit">Generate</button>
+  </form>
+  <p class="note">Changing the seed or the parameters replaces the foundation. All derived data is discarded and recomputed.</p>
+
+  <h2>Base map</h2>
+  <div class="segmented" role="radiogroup" aria-label="Base map">
+    <label><input type="radio" name="mode" value="map" checked>Map</label>
+    <label><input type="radio" name="mode" value="biomes">Biomes</label>
+    <label><input type="radio" name="mode" value="height">Height</label>
+  </div>
+  <p class="note" id="mode-note"></p>
+
+  <h2>Layers</h2>
+  <div class="checks" id="layers">
+    <label><input type="checkbox" value="borders" checked>Borders</label>
+    <label><input type="checkbox" value="rivers" checked>Rivers</label>
+    <label><input type="checkbox" value="lakes" checked>Lakes</label>
+    <label><input type="checkbox" value="prospects">Prospects</label>
+    <label><input type="checkbox" value="travel">Travel network</label>
+    <label><input type="checkbox" value="hillshade">Hillshade</label>
+    <label><input type="checkbox" value="final">Final biomes</label>
+  </div>
+  <p class="note">The stages are linear. Prospects take the regions in view to Planned and the travel network to Settled, both through Elevated, so the height maps are built first. Hillshade and final biomes need Elevated too.</p>
+
+  <h2>Under the pointer</h2>
+  <div id="inspect"><p class="note">Click the map to see the region, zone and patch at that point.</p></div>
+
+  <details>
+    <summary>Parameter Set (json)</summary>
+    <textarea id="parameters" spellcheck="false" aria-label="Parameter Set json"></textarea>
+    <div class="row" style="margin-top:8px">
+      <button class="primary" id="apply-parameters" type="button">Apply</button>
+      <button id="reset-parameters" type="button">Defaults</button>
+    </div>
+    <p class="error" id="parameter-error" role="alert"></p>
+  </details>
+</aside>
+
+<main id="map" aria-label="Map">
+  <div id="tiles"></div>
+  <div id="pin"></div>
+  <div id="zoom"><button id="zoom-in" type="button" aria-label="Zoom in">+</button><button id="zoom-out" type="button" aria-label="Zoom out">−</button></div>
+  <div id="scale"><span></span><div></div></div>
+  <div id="status"></div>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const map = $('map'), tilesEl = $('tiles');
+const state = { version: 0, tile: 256, baseMpp: 2000, maxZoom: 6, regionSize: 128000,
+                zoom: 2, cx: 192000, cy: 192000, mode: 'map', pinned: null, defaults: '' };
+const tiles = new Map();
+
+const mpp = () => state.baseMpp / 2 ** state.zoom;
+const layers = () => [...document.querySelectorAll('#layers input:checked')].map(i => i.value).join(',');
+
+function draw() {
+  const w = map.clientWidth, h = map.clientHeight, m = mpp(), span = state.tile * m;
+  const left = state.cx - w / 2 * m, top = state.cy - h / 2 * m;
+  const query = `?mode=${state.mode}&layers=${layers()}`;
+  const wanted = new Set();
+  for (let ty = Math.floor(top / span); ty <= Math.floor((top + h * m) / span); ty++)
+    for (let tx = Math.floor(left / span); tx <= Math.floor((left + w * m) / span); tx++) {
+      const key = `${state.version}/${state.zoom}/${tx}/${ty}.png${query}`;
+      wanted.add(key);
+      let img = tiles.get(key);
+      if (!img) {
+        img = new Image();
+        img.alt = '';
+        img.draggable = false;
+        img.src = `/api/tiles/${key}`;
+        tiles.set(key, img);
+        tilesEl.appendChild(img);
+      }
+      img.style.left = Math.round((tx * span - left) / m) + 'px';
+      img.style.top = Math.round((ty * span - top) / m) + 'px';
+    }
+  for (const [key, img] of tiles)
+    if (!wanted.has(key)) { img.src = ''; img.remove(); tiles.delete(key); }
+
+  const pin = $('pin');
+  if (state.pinned) {
+    pin.style.display = 'block';
+    pin.style.left = (state.pinned.x - left) / m + 'px';
+    pin.style.top = (state.pinned.y - top) / m + 'px';
+  } else pin.style.display = 'none';
+
+  // A scale bar of a round number of kilometres, about 120 px wide.
+  const km = [1, 2, 5, 10, 20, 50, 100, 200].find(k => k * 1000 / m >= 90) ?? 200;
+  $('scale').firstElementChild.textContent = km + ' km';
+  $('scale').lastElementChild.style.width = km * 1000 / m + 'px';
+}
+
+function status(x, y) {
+  const r = state.regionSize;
+  $('status').textContent = `${(x / 1000).toFixed(1)} km E, ${(y / 1000).toFixed(1)} km S · grid square (${Math.floor(x / r)}, ${Math.floor(y / r)}) · ${mpp()} m/px`;
+}
+
+function toWorld(ev) {
+  const rect = map.getBoundingClientRect(), m = mpp();
+  return { x: state.cx + (ev.clientX - rect.left - rect.width / 2) * m, y: state.cy + (ev.clientY - rect.top - rect.height / 2) * m };
+}
+
+function setZoom(z, anchor) {
+  z = Math.max(0, Math.min(state.maxZoom, z));
+  if (z === state.zoom) return;
+  if (anchor) {
+    // Keep the world point under the pointer where it is.
+    const before = mpp(), after = state.baseMpp / 2 ** z;
+    state.cx = anchor.x - (anchor.x - state.cx) * after / before;
+    state.cy = anchor.y - (anchor.y - state.cy) * after / before;
+  }
+  state.zoom = z;
+  draw();
+}
+
+// Pan, zoom and click.
+let drag = null;
+map.addEventListener('pointerdown', ev => {
+  if (ev.target.closest('#zoom')) return;
+  map.setPointerCapture(ev.pointerId);
+  drag = { x: ev.clientX, y: ev.clientY, cx: state.cx, cy: state.cy, moved: false };
+  map.classList.add('dragging');
+});
+map.addEventListener('pointermove', ev => {
+  const p = toWorld(ev);
+  status(p.x, p.y);
+  if (!drag) return;
+  const dx = ev.clientX - drag.x, dy = ev.clientY - drag.y;
+  if (Math.abs(dx) + Math.abs(dy) > 4) drag.moved = true;
+  state.cx = drag.cx - dx * mpp();
+  state.cy = drag.cy - dy * mpp();
+  draw();
+});
+map.addEventListener('pointerup', ev => {
+  map.classList.remove('dragging');
+  if (drag && !drag.moved) inspect(toWorld(ev));
+  drag = null;
+});
+map.addEventListener('wheel', ev => {
+  ev.preventDefault();
+  setZoom(state.zoom + (ev.deltaY < 0 ? 1 : -1), toWorld(ev));
+}, { passive: false });
+$('zoom-in').addEventListener('click', () => setZoom(state.zoom + 1));
+$('zoom-out').addEventListener('click', () => setZoom(state.zoom - 1));
+window.addEventListener('resize', draw);
+
+// Mode and layers.
+const modeNotes = {
+  map: 'The elevation type of the zones. Rivers and lakes take the regions in view to Detailed.',
+  biomes: 'The biome of each patch: estimated (Detailed stage), or final with the "Final biomes" layer (Elevated stage).',
+  height: 'The height map. Each region in view is taken to the Elevated stage first, which takes a moment.',
+};
+function modeChanged() {
+  state.mode = document.querySelector('input[name=mode]:checked').value;
+  $('mode-note').textContent = modeNotes[state.mode];
+  draw();
+}
+document.querySelectorAll('input[name=mode]').forEach(i => i.addEventListener('change', modeChanged));
+$('layers').addEventListener('change', draw);
+
+// Inspect.
+const words = s => String(s).replace(/([a-z])([A-Z])/g, '$1 $2').replace(/ And /g, ' & ');
+const num = (v, d = 2) => v == null ? '–' : Number(v).toFixed(d);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+async function inspect(p) {
+  state.pinned = p;
+  draw();
+  const box = $('inspect');
+  box.innerHTML = '<p class="note">Looking…</p>';
+  try {
+    const r = await fetch(`/api/inspect?x=${p.x}&y=${p.y}`);
+    if (!r.ok) throw new Error(await r.text());
+    const d = await r.json();
+    const rows = [];
+    const row = (k, v) => rows.push(`<dt>${esc(k)}</dt><dd>${v}</dd>`);
+    row('Region', `(${d.Region[0]}, ${d.Region[1]}) · ${d.Stage} · ${d.RegionHasSeaAccess ? 'sea access' : 'landlocked'}`);
+    row('Zone', `(${d.Zone.Id[0]}, ${d.Zone.Id[1]}) · ${words(d.Zone.ElevationType)} · ${d.Zone.Cells} cell${d.Zone.Cells > 1 ? 's' : ''}`);
+    if (d.Zone.BedrockName) row('Bedrock', esc(d.Zone.BedrockName));
+    if (d.Zone.RiverPoor) row('', 'river-poor flat zone');
+    const patch = d.Patch;
+    let resources = '';
+    if (patch) {
+      row('Patch', `(${patch.Id[0]}, ${patch.Id[1]}) · ${patch.Cells} cell${patch.Cells > 1 ? 's' : ''}${patch.Coastal ? ' · coastal' : ''}`);
+      const b = patch.EstimatedBiome;
+      if (b) {
+        row('Biome', `${words(b.Biome)}${patch.FinalBiome && patch.FinalBiome.Biome !== b.Biome ? ' → ' + words(patch.FinalBiome.Biome) + ' (final)' : ''}`);
+        row('Climate', `${num(b.TemperatureC, 1)} °C · ${num(b.PrecipitationMm, 0)} mm · aridity ${num(b.Aridity)} · ${b.Belt}`);
+      }
+      if (d.HeightM != null) row('Height', `${num(d.HeightM, 0)} m${patch.MeanHeightM != null ? ' · patch mean ' + num(patch.MeanHeightM, 0) + ' m' : ''}`);
+      if (patch.River != null) {
+        const water = [];
+        if (patch.River > 0) water.push(`river ${num(patch.River, 1)}${patch.River >= 80 ? ' (large)' : patch.River >= 8 ? ' (navigable)' : ''}`);
+        if (patch.Mouth > 0) water.push(`mouth ${num(patch.Mouth, 1)}`);
+        if (patch.LakeAreaKm2 > 0) water.push(`lake ${num(patch.LakeAreaKm2, 1)} km²`);
+        if (patch.Harbour) water.push('harbour');
+        row('Water', water.length ? water.join(' · ') : 'none');
+        row('Food · wealth', `${num(patch.Food)} · ${num(patch.Wealth)}`);
+      }
+      if (patch.Score != null) {
+        const f = patch.Factors;
+        row('Score', `${num(patch.Score, 1)}${d.Prospect ? ' · Prospect for a ' + (d.Prospect.ForCity ? 'city' : 'town') : ''}`);
+        row('Factors', `resources ${num(f.Resources)} · geography ${num(f.Geography)} · trade ${num(f.Trade)} · climate ${num(f.Climate)} · prosperity ${num(f.Prosperity)}`);
+      }
+      if (patch.Resources.length)
+        resources = '<ul class="res">' + patch.Resources.map(x =>
+          `<li><span>${esc(words(x.Resource))} <small>${esc(x.Variant ?? '')} · ${x.Group}${x.Origin === 'Deposit' ? ' · deposit' : ''}</small></span><span class="amt">${num(x.Amount)}</span></li>`).join('') + '</ul>';
+    }
+    box.innerHTML = `<dl>${rows.join('')}</dl>${resources}`;
+  } catch (e) {
+    box.innerHTML = `<p class="error">${esc(e.message)}</p>`;
+  }
+}
+
+// Foundation.
+function show(f) {
+  state.version = f.Version; state.tile = f.TileSize; state.baseMpp = f.BaseMetresPerPixel;
+  state.maxZoom = f.MaxZoom; state.regionSize = f.RegionSizeM;
+  state.defaults = JSON.stringify(f.DefaultParameters, null, 2);
+  $('seed').value = f.Seed;
+  $('parameters').value = JSON.stringify(f.Parameters, null, 2);
+  $('foundation').textContent = `Seed "${f.Seed}" (${f.SeedValue}) · generator version ${f.GeneratorVersion}`;
+  for (const img of tiles.values()) { img.src = ''; img.remove(); }
+  tiles.clear();
+  state.pinned = null;
+  $('inspect').innerHTML = '<p class="note">Click the map to see the region, zone and patch at that point.</p>';
+  draw();
+}
+
+async function replaceFoundation() {
+  const error = $('parameter-error');
+  error.textContent = '';
+  let parameters;
+  try { parameters = JSON.parse($('parameters').value); }
+  catch (e) { error.textContent = 'The parameters are not valid json: ' + e.message; document.querySelector('details').open = true; return; }
+  const r = await fetch('/api/foundation', { method: 'PUT', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ Seed: $('seed').value, Parameters: parameters }) });
+  if (!r.ok) { error.textContent = (await r.json().catch(() => ({}))).error ?? 'The foundation was not accepted.'; document.querySelector('details').open = true; return; }
+  show(await r.json());
+}
+$('seed-form').addEventListener('submit', ev => { ev.preventDefault(); replaceFoundation(); });
+$('apply-parameters').addEventListener('click', replaceFoundation);
+$('reset-parameters').addEventListener('click', () => { $('parameters').value = state.defaults; });
+
+$('mode-note').textContent = modeNotes.map;
+fetch('/api/foundation').then(r => r.json()).then(show).catch(e => { $('foundation').textContent = 'The backend did not answer: ' + e.message; });
+</script>
+</body>
+</html>

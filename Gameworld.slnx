@@ -1,2 +1,11 @@
 <Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Gameworld.Demo/Gameworld.Demo.csproj" />
+    <Project Path="src/Gameworld.Domain/Gameworld.Domain.csproj" />
+    <Project Path="src/Gameworld.Generation/Gameworld.Generation.csproj" />
+    <Project Path="src/Gameworld.MapGenerator/Gameworld.MapGenerator.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Gameworld.Tests/Gameworld.Tests.csproj" />
+  </Folder>
 </Solution>

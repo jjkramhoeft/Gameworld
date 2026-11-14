@@ -12,3 +12,15 @@
 ## Authority
 
 The readme decides the domain model and the names. map-generation.md decides the generation rules. When the two disagree, report it to the user before changing either.
+
+## Code
+
+.NET 11, one solution: `Gameworld.slnx`.
+
+- `src/Gameworld.Domain`: the domain model of the readme. No generation logic. `ParameterSet.Default` must equal docs/default-parameter-set.json (a test checks it).
+- `src/Gameworld.Generation`: the algorithms of map-generation.md, one folder per layer. `World` is the entry point: it holds one foundation and computes and caches every layer on demand.
+- `src/Gameworld.MapGenerator`: the map generation app (console). `dotnet run --project src/Gameworld.MapGenerator -c Release -- --help`. It writes maps and regions to `out/`.
+- `src/Gameworld.Demo`: the demo app (web map viewer). `dotnet run --project src/Gameworld.Demo -c Release`, then open http://localhost:5062.
+- `tests/Gameworld.Tests`: `dotnet test -c Release`.
+
+Generation code must stay a pure function of the foundation: every random choice goes through `Hashing` with the purpose number the doc gives, and no step may depend on the order regions are generated in (a test checks that too).

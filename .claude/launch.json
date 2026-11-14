@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "gameworld-demo",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--project", "src/Gameworld.Demo", "-c", "Release", "--no-launch-profile", "--urls", "http://localhost:5062"],
+      "port": 5062
+    }
+  ]
+}
