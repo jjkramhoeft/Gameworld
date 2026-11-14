@@ -31,12 +31,16 @@ public sealed class PlanWork
     /// <summary>The sum of the scores of the Prospects: it decides how many of them are on show.</summary>
     public double ScoreSum => Prospects.Sum(p => p.Score);
 
-    public RegionPlan ToDomain() => new(Prospects);
+    /// <summary>The potential population of the region, per race that is on.</summary>
+    public required PotentialPopulation Population { get; init; }
+
+    public RegionPlan ToDomain() => new(Prospects, Population);
 }
 
 /// <summary>
-/// Prospects for cities and towns (map-generation.md section 15). All inputs use the estimated
-/// biomes and resources, so Prospects never depend on the height map.
+/// Prospects for cities and towns (map-generation.md section 15) and the potential population
+/// (section 19). All inputs use the estimated biomes and resources, so neither depends on the
+/// height map.
 /// </summary>
 internal static class PlanBuilder
 {
@@ -237,11 +241,17 @@ internal static class PlanBuilder
             };
         }
 
+        // 19.3 Potential population: every land patch of the region, in key order.
+        var patchKm = cells.PatchSize / 1000;
+        var population = world.PopulationRules.Region(land.Select(x =>
+            (x.Biome!.Biome, x.Shape.Cells.Length * patchKm * patchKm, x.Resources, x.Prosperity)));
+
         return new PlanWork
         {
             Region = region,
             Scores = scores,
             Prospects = Select(world, scores),
+            Population = population,
         };
     }
 

@@ -155,7 +155,11 @@
     "OneOnShowScoreSum": 700,
     "AllOnShowScoreSum": 1500,
     "RichScore": 75,
-    "PoorScore": 62
+    "PoorScore": 62,
+    "Population": {
+      "PersonsPerKm2": 5,
+      "ProsperityEffect": 0.5
+    }
   },
   "Fields": {
     "Precipitation": {
@@ -347,6 +351,455 @@
         "Lowland": 40,
         "Hills": 0,
         "Mountains": 0
+      }
+    }
+  ],
+  "Races": [
+    {
+      "Id": "human",
+      "Name": "Human",
+      "Enabled": true,
+      "BiomeFrequency": {
+        "Tundra": 10,
+        "ColdSteppe": 20,
+        "BorealForest": 20,
+        "TemperateGrassland": 30,
+        "WoodlandAndShrubland": 30,
+        "TemperateMixedForest": 30,
+        "TemperateBroadleafForest": 30,
+        "TemperateRainForest": 20,
+        "ThornScrub": 10,
+        "Savanna": 20,
+        "TropicalDryForest": 20,
+        "TropicalRainForest": 10,
+        "Mangrove": 10
+      }
+    },
+    {
+      "Id": "elf",
+      "Name": "Elf",
+      "Enabled": true,
+      "BiomeFrequency": {
+        "BorealForest": 8,
+        "TemperateGrassland": 2,
+        "WoodlandAndShrubland": 2,
+        "TemperateMixedForest": 7,
+        "TemperateBroadleafForest": 7,
+        "TemperateRainForest": 6,
+        "TropicalDryForest": 3,
+        "TropicalRainForest": 4
+      }
+    },
+    {
+      "Id": "darkElf",
+      "Name": "Dark elf",
+      "Enabled": false,
+      "BiomeFrequency": {
+        "Tundra": 2,
+        "ColdSteppe": 2,
+        "BorealForest": 1,
+        "TemperateGrassland": 1,
+        "WoodlandAndShrubland": 1,
+        "TemperateMixedForest": 1,
+        "TemperateBroadleafForest": 1,
+        "TemperateRainForest": 1,
+        "ThornScrub": 1,
+        "TropicalDryForest": 1,
+        "TropicalRainForest": 1,
+        "Mangrove": 1
+      }
+    },
+    {
+      "Id": "dwarf",
+      "Name": "Dwarf",
+      "Enabled": true,
+      "BiomeFrequency": {
+        "IceAndSnow": 2,
+        "Tundra": 4,
+        "ColdSteppe": 2,
+        "BorealForest": 4,
+        "ColdDesert": 2,
+        "TemperateGrassland": 2,
+        "WoodlandAndShrubland": 2,
+        "TemperateMixedForest": 4,
+        "TemperateBroadleafForest": 2,
+        "TemperateRainForest": 2
+      }
+    },
+    {
+      "Id": "halfling",
+      "Name": "Halfling",
+      "Enabled": true,
+      "BiomeFrequency": {
+        "ColdSteppe": 2,
+        "BorealForest": 2,
+        "TemperateGrassland": 6,
+        "WoodlandAndShrubland": 6,
+        "TemperateMixedForest": 4,
+        "TemperateBroadleafForest": 4,
+        "TemperateRainForest": 2,
+        "Savanna": 2,
+        "TropicalDryForest": 2,
+        "TropicalRainForest": 2
+      }
+    },
+    {
+      "Id": "gnome",
+      "Name": "Gnome",
+      "Enabled": false,
+      "BiomeFrequency": {
+        "Tundra": 1,
+        "ColdSteppe": 1,
+        "BorealForest": 2,
+        "ColdDesert": 1,
+        "TemperateGrassland": 1,
+        "WoodlandAndShrubland": 2,
+        "TemperateMixedForest": 2,
+        "TemperateBroadleafForest": 3,
+        "TemperateRainForest": 1,
+        "ThornScrub": 1,
+        "Savanna": 1,
+        "TropicalDryForest": 1
+      }
+    },
+    {
+      "Id": "orc",
+      "Name": "Orc",
+      "Enabled": true,
+      "BiomeFrequency": {
+        "Tundra": 2,
+        "ColdSteppe": 6,
+        "BorealForest": 2,
+        "ColdDesert": 4,
+        "TemperateGrassland": 4,
+        "WoodlandAndShrubland": 4,
+        "TemperateMixedForest": 2,
+        "TemperateBroadleafForest": 2,
+        "TemperateRainForest": 2,
+        "HotDesert": 4,
+        "ThornScrub": 4,
+        "Savanna": 4,
+        "TropicalDryForest": 2
+      }
+    },
+    {
+      "Id": "goblin",
+      "Name": "Goblin",
+      "Enabled": true,
+      "BiomeFrequency": {
+        "Tundra": 2,
+        "ColdSteppe": 2,
+        "TemperateGrassland": 4,
+        "WoodlandAndShrubland": 4,
+        "TemperateMixedForest": 4,
+        "TemperateBroadleafForest": 4,
+        "TemperateRainForest": 2,
+        "HotDesert": 2,
+        "ThornScrub": 4,
+        "Savanna": 2,
+        "TropicalDryForest": 2,
+        "TropicalRainForest": 2
+      }
+    },
+    {
+      "Id": "hobgoblin",
+      "Name": "Hobgoblin",
+      "Enabled": false,
+      "BiomeFrequency": {
+        "Tundra": 1,
+        "ColdSteppe": 2,
+        "BorealForest": 1,
+        "ColdDesert": 1,
+        "TemperateGrassland": 2,
+        "WoodlandAndShrubland": 2,
+        "TemperateMixedForest": 2,
+        "TemperateBroadleafForest": 1,
+        "TemperateRainForest": 1,
+        "HotDesert": 1,
+        "ThornScrub": 1,
+        "Savanna": 1,
+        "TropicalDryForest": 1
+      }
+    },
+    {
+      "Id": "kobold",
+      "Name": "Kobold",
+      "Enabled": false,
+      "BiomeFrequency": {
+        "Tundra": 1,
+        "ColdSteppe": 1,
+        "BorealForest": 1,
+        "ColdDesert": 1,
+        "TemperateGrassland": 1,
+        "WoodlandAndShrubland": 1,
+        "TemperateMixedForest": 1,
+        "TemperateBroadleafForest": 1,
+        "TemperateRainForest": 1,
+        "HotDesert": 1,
+        "ThornScrub": 1,
+        "Savanna": 1,
+        "TropicalDryForest": 1,
+        "TropicalRainForest": 1,
+        "Mangrove": 1
+      }
+    },
+    {
+      "Id": "gnoll",
+      "Name": "Gnoll",
+      "Enabled": false,
+      "BiomeFrequency": {
+        "ColdSteppe": 2,
+        "BorealForest": 1,
+        "ColdDesert": 1,
+        "TemperateGrassland": 2,
+        "WoodlandAndShrubland": 2,
+        "TemperateMixedForest": 1,
+        "TemperateBroadleafForest": 1,
+        "HotDesert": 2,
+        "ThornScrub": 3,
+        "Savanna": 3,
+        "TropicalDryForest": 1
+      }
+    },
+    {
+      "Id": "giantBlooded",
+      "Name": "Giant-blooded",
+      "Enabled": false,
+      "BiomeFrequency": {
+        "IceAndSnow": 0.5,
+        "Tundra": 1,
+        "ColdSteppe": 1,
+        "BorealForest": 1,
+        "ColdDesert": 0.5,
+        "TemperateGrassland": 0.5,
+        "WoodlandAndShrubland": 0.5,
+        "TemperateMixedForest": 0.5,
+        "TemperateBroadleafForest": 0.5,
+        "TemperateRainForest": 0.5,
+        "ThornScrub": 0.5,
+        "Savanna": 0.5,
+        "TropicalDryForest": 0.5
+      }
+    },
+    {
+      "Id": "ogre",
+      "Name": "Ogre",
+      "Enabled": false,
+      "BiomeFrequency": {
+        "IceAndSnow": 0.5,
+        "Tundra": 1,
+        "ColdSteppe": 1,
+        "BorealForest": 1,
+        "ColdDesert": 0.5,
+        "TemperateGrassland": 0.5,
+        "WoodlandAndShrubland": 1,
+        "TemperateMixedForest": 0.5,
+        "TemperateBroadleafForest": 0.5,
+        "TemperateRainForest": 0.5,
+        "HotDesert": 0.5,
+        "ThornScrub": 0.5,
+        "Savanna": 0.5,
+        "TropicalDryForest": 0.5
+      }
+    },
+    {
+      "Id": "troll",
+      "Name": "Troll",
+      "Enabled": false,
+      "BiomeFrequency": {
+        "IceAndSnow": 1,
+        "Tundra": 1,
+        "ColdSteppe": 0.5,
+        "BorealForest": 1,
+        "ColdDesert": 0.5,
+        "TemperateGrassland": 0.5,
+        "WoodlandAndShrubland": 0.5,
+        "TemperateMixedForest": 1,
+        "TemperateBroadleafForest": 1,
+        "TemperateRainForest": 1,
+        "HotDesert": 1,
+        "ThornScrub": 1,
+        "Savanna": 0.5,
+        "TropicalDryForest": 1,
+        "TropicalRainForest": 1,
+        "Mangrove": 1
+      }
+    },
+    {
+      "Id": "lizardfolk",
+      "Name": "Lizardfolk",
+      "Enabled": false,
+      "BiomeFrequency": {
+        "TemperateGrassland": 1,
+        "WoodlandAndShrubland": 1,
+        "TemperateMixedForest": 1,
+        "TemperateBroadleafForest": 1,
+        "TemperateRainForest": 2,
+        "HotDesert": 1,
+        "ThornScrub": 1,
+        "Savanna": 1,
+        "TropicalDryForest": 2,
+        "TropicalRainForest": 3,
+        "Mangrove": 3
+      }
+    },
+    {
+      "Id": "catfolk",
+      "Name": "Catfolk",
+      "Enabled": false,
+      "BiomeFrequency": {
+        "ColdSteppe": 1,
+        "ColdDesert": 1,
+        "TemperateGrassland": 2,
+        "WoodlandAndShrubland": 1,
+        "TemperateMixedForest": 1,
+        "TemperateBroadleafForest": 1,
+        "TemperateRainForest": 1,
+        "HotDesert": 2,
+        "ThornScrub": 2,
+        "Savanna": 3,
+        "TropicalDryForest": 2,
+        "TropicalRainForest": 2,
+        "Mangrove": 1
+      }
+    },
+    {
+      "Id": "ratfolk",
+      "Name": "Ratfolk",
+      "Enabled": false,
+      "BiomeFrequency": {
+        "Tundra": 1,
+        "ColdSteppe": 1,
+        "BorealForest": 1,
+        "ColdDesert": 1,
+        "TemperateGrassland": 1,
+        "WoodlandAndShrubland": 1,
+        "TemperateMixedForest": 1,
+        "TemperateBroadleafForest": 1,
+        "TemperateRainForest": 1,
+        "HotDesert": 1,
+        "ThornScrub": 1,
+        "Savanna": 1,
+        "TropicalDryForest": 1,
+        "TropicalRainForest": 1,
+        "Mangrove": 1
+      }
+    },
+    {
+      "Id": "birdfolk",
+      "Name": "Birdfolk",
+      "Enabled": false,
+      "BiomeFrequency": {
+        "Tundra": 1,
+        "ColdSteppe": 1,
+        "BorealForest": 1,
+        "ColdDesert": 1,
+        "TemperateGrassland": 1,
+        "WoodlandAndShrubland": 1,
+        "TemperateMixedForest": 1,
+        "TemperateBroadleafForest": 1,
+        "TemperateRainForest": 1,
+        "HotDesert": 1,
+        "ThornScrub": 1,
+        "Savanna": 1,
+        "TropicalDryForest": 1,
+        "TropicalRainForest": 1,
+        "Mangrove": 1
+      }
+    },
+    {
+      "Id": "bullFolk",
+      "Name": "Bull-folk",
+      "Enabled": false,
+      "BiomeFrequency": {
+        "Tundra": 1,
+        "ColdSteppe": 2,
+        "BorealForest": 1,
+        "ColdDesert": 1,
+        "TemperateGrassland": 3,
+        "WoodlandAndShrubland": 2,
+        "TemperateMixedForest": 1,
+        "TemperateBroadleafForest": 1,
+        "TemperateRainForest": 1,
+        "HotDesert": 1,
+        "ThornScrub": 1,
+        "Savanna": 3,
+        "TropicalDryForest": 1
+      }
+    },
+    {
+      "Id": "centaur",
+      "Name": "Centaur",
+      "Enabled": false,
+      "BiomeFrequency": {
+        "ColdSteppe": 3,
+        "BorealForest": 1,
+        "ColdDesert": 1,
+        "TemperateGrassland": 3,
+        "WoodlandAndShrubland": 2,
+        "TemperateMixedForest": 2,
+        "TemperateBroadleafForest": 2,
+        "TemperateRainForest": 1,
+        "HotDesert": 1,
+        "ThornScrub": 1,
+        "Savanna": 3,
+        "TropicalDryForest": 1
+      }
+    },
+    {
+      "Id": "dragonkin",
+      "Name": "Dragonkin",
+      "Enabled": false,
+      "BiomeFrequency": {
+        "ColdSteppe": 0.5,
+        "BorealForest": 0.5,
+        "ColdDesert": 1,
+        "TemperateGrassland": 0.5,
+        "WoodlandAndShrubland": 0.5,
+        "TemperateMixedForest": 0.5,
+        "TemperateBroadleafForest": 0.5,
+        "TemperateRainForest": 0.5,
+        "HotDesert": 1,
+        "ThornScrub": 1,
+        "Savanna": 1,
+        "TropicalDryForest": 0.5,
+        "TropicalRainForest": 0.5,
+        "Mangrove": 0.5
+      }
+    },
+    {
+      "Id": "undead",
+      "Name": "Undead",
+      "Enabled": false,
+      "BiomeFrequency": {
+        "IceAndSnow": 0.5,
+        "Tundra": 1,
+        "ColdSteppe": 0.5,
+        "BorealForest": 0.5,
+        "ColdDesert": 1,
+        "TemperateGrassland": 0.5,
+        "WoodlandAndShrubland": 0.5,
+        "TemperateMixedForest": 0.5,
+        "TemperateBroadleafForest": 0.5,
+        "TemperateRainForest": 0.5,
+        "HotDesert": 1,
+        "ThornScrub": 0.5,
+        "Savanna": 0.5,
+        "TropicalDryForest": 0.5,
+        "TropicalRainForest": 0.5,
+        "Mangrove": 0.5
+      }
+    },
+    {
+      "Id": "frostFolk",
+      "Name": "Frost folk",
+      "Enabled": false,
+      "BiomeFrequency": {
+        "IceAndSnow": 3,
+        "Tundra": 3,
+        "ColdSteppe": 1,
+        "BorealForest": 1,
+        "ColdDesert": 1
       }
     }
   ]

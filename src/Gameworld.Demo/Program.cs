@@ -315,6 +315,10 @@ namespace Gameworld.Demo
                     world.Advance(regionId, RegionStage.Outlined).Outline.HasSeaAccess,
                     plan is null ? null : ProspectCount.Of(plan.Prospects),
                     plan?.ScoreSum,
+                    plan?.Population.Races
+                        .Select(r => new RacePopulationInfo(
+                            r.Race, world.Parameters.Races.FirstOrDefault(x => x.Id == r.Race)?.Name ?? r.Race, r.Persons))
+                        .ToArray(),
                     info.Ocean,
                     new ZoneInfo(
                         new ZoneId(new ZoneCellId(info.Zone)),
@@ -392,8 +396,12 @@ namespace Gameworld.Demo
     /// <param name="ZonesWithCity">How many of the zones hold a city Prospect on show.</param>
     public sealed record ZoneBin(int Prospects, int Zones, int ZonesWithCity);
 
+    /// <summary>The potential population of one race in a region, with the name of the race.</summary>
+    public sealed record RacePopulationInfo(string Race, string Name, long Persons);
+
     /// <param name="RegionProspects">Null until the region is Planned.</param>
     /// <param name="RegionScoreSum">The sum of the scores of the region's Prospects, which decides how many are on show. Null until the region is Planned.</param>
+    /// <param name="RegionPopulation">The potential population of the region per race that is on, in the order of the Parameter Set. Null until the region is Planned.</param>
     public sealed record PointInfo(
         WorldPoint Point,
         RegionId Region,
@@ -401,6 +409,7 @@ namespace Gameworld.Demo
         bool RegionHasSeaAccess,
         ProspectCount? RegionProspects,
         double? RegionScoreSum,
+        RacePopulationInfo[]? RegionPopulation,
         bool Ocean,
         ZoneInfo Zone,
         PatchInfo? Patch,

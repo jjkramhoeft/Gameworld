@@ -4,7 +4,7 @@
 
 ## Docs
 
-- [docs/map-generation.md](docs/map-generation.md): the generation rules. Read the section for the layer at hand; each section states its region generation stage. Sections 1 and 3-8 hold the structure. Appendices B-D are crop and resource data tables.
+- [docs/map-generation.md](docs/map-generation.md): the generation rules. Read the section for the layer at hand; each section states its region generation stage. Sections 1 and 3-8 hold the structure. Section 19 is the races and the potential population. Appendices B-D are crop and resource data tables, and Appendix E is the default race list.
 - [docs/default-parameter-set.json](docs/default-parameter-set.json): the default Parameter Set, grouped by region generation stage. map-generation.md quotes the same defaults in its text; change both together.
 - [docs/parameter-set.schema.json](docs/parameter-set.schema.json): generated, do not edit. It is the JSON Schema of a Parameter Set file: the description, default and range of every parameter. The descriptions live in `[Description]` attributes in `src/Gameworld.Domain/ParameterSet.cs`; give every new parameter one, then regenerate with `dotnet run --project src/Gameworld.MapGenerator -c Release -- --export-schema docs/parameter-set.schema.json`.
 - [docs/map-generation-research.md](docs/map-generation-research.md): why a rule is as it is, what was weighed against it and what is still open. Read it when a rule is questioned or changed.

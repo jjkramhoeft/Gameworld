@@ -1,6 +1,7 @@
 using Gameworld.Domain;
 using Gameworld.Generation.Biomes;
 using Gameworld.Generation.Cells;
+using Gameworld.Generation.Races;
 using Gameworld.Generation.Resources;
 using Gameworld.Generation.Rivers;
 using Gameworld.Generation.Stages;
@@ -32,6 +33,7 @@ public sealed partial class World
         Cells = new CellMap(foundation);
         Fields = new Fields(foundation);
         BiomeRules = new BiomeRules(foundation.Parameters.Elevation.Biomes);
+        PopulationRules = new PopulationRules(foundation.Parameters);
     }
 
     /// <summary>A world for a seed text and a Parameter Set, at the current generator version.</summary>
@@ -43,6 +45,7 @@ public sealed partial class World
     public CellMap Cells { get; }
     public Fields Fields { get; }
     public BiomeRules BiomeRules { get; }
+    public PopulationRules PopulationRules { get; }
 
     /// <summary>
     /// A river-poor flat zone: a flat zone whose site (the site of its root cell) gets less

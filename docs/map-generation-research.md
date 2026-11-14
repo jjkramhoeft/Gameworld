@@ -51,6 +51,12 @@ The names in this document follow the [readme](../readme.md). The notes themselv
 | TRADE | [game-resources-and-trade.md](research/game-resources-and-trade.md) | 2026-11-10 | How games choose, place and trade resources; trade theory; a 39-resource set; price and flow models | §9, §11 |
 | SITES | [settlement-siting.md](research/settlement-siting.md) | 2026-11-10 | Where settlements form; suitability methods; how generators and games place cities; a siting design | §10, §11 |
 
+One later note is used in §10.7 only. It is not part of the compilation above, and it follows the names of the readme:
+
+| Key | Note | Date | Covers | Used in |
+|---|---|---|---|---|
+| RACES | [races.md](research/races.md) | 2026-11-14 | The peoples that RPGs, fantasy settings and strategy games use again and again, as 41 race archetypes; a race × biome and race × terrain matrix; what a generator needs per race | §10.7 |
+
 ---
 
 ## 2. Summary: decisions and their research
@@ -863,6 +869,38 @@ The generator uses Tier M "in a first, simpler form": a ranked list of scored si
 | Tier T: site refinement by HAND, slope and domination; pass towns | Open |
 | Settlement potential replacing the prosperity noise | Open (prosperity is an input instead) |
 
+### 10.7 Races and potential population
+
+This section rests on a later note, RACES (see §1). It was added on 2026-11-14 with the rule of [map-generation.md](map-generation.md) section 19.
+
+**What the note found.** The core roster is stable: humans are in all 20 surveyed rosters, elves and dwarves in 17, orcs in 12, goblins in 10 and halflings in 9 (RACES §1.3). The strategy games make habitat a rule: each race has terrain or climate it likes, dislikes or cannot live in (RACES §1.4). The note turns that into a table of habitat weights from 0 to 3 for 23 races and the 16 biomes (RACES §4.1). The weights are the note's own judgement, anchored on sourced claims.
+
+**Design** (decided with the user, 2026-11-14):
+
+| Question | Adopted | Weighed against it |
+|---|---|---|
+| Where the races live | A list in the Parameter Set, like the bedrock types. Each race has an id, a name, a toggle and a frequency per biome | A catalogue in the code with only the toggles in the Parameter Set: a tweak would need a new generator version. A race file beside the Parameter Set: the foundation would reference two things |
+| Tweaks after phase 1 | A changed list is a new Parameter Set and a new foundation | Reopening the Parameter Set of an existing foundation: it would break "derived data is a pure function of the foundation" |
+| Which races | All 23 of RACES §4.1 are listed. The six most common are on: human, elf, dwarf, halfling, orc, goblin | Only the six in the list; all 23 on; humans only on |
+| From frequency to persons | The land has one capacity per patch, and the races that are on share it by their frequency in the biome | Each race on its own (frequency × food × Prosperity): the total of a region would grow with every race that is toggled on, so the toggles would also tune the size of the world |
+| Capacity | Area × 60 persons per km² × food supply × a Prosperity factor of 0.5 to 1.5 | The calibrated density per biome and elevation type of SITES §6 (the K term): the resource layer already holds the food, as for the Prospect scores (§10.6) |
+| Biomes read | The estimated ones, as the Prospects do | The final ones: the region is Elevated when it is Planned, so they are there. The estimated ones keep the Prospects and the population on the same inputs |
+
+**The default frequencies.** A frequency is the habitat weight of RACES §4.1 times how common the race is: 10 for humans, 2 for the other five that are on, and 1 or 0.5 for the rest. The habitat weight alone would give humans a quarter of a temperate grassland, level with halflings. The six weights for "common" are my own judgement and are not sourced. They give 63 % humans over 50 measured regions.
+
+**The density.** 60 persons per km² at a food supply of 1 gives a median region of about 357,000 persons. SITES §6 expects about 330,000 for a temperate region.
+
+| Topic | Status |
+|---|---|
+| A list of races in the Parameter Set, toggled per race | Adopted |
+| Potential population per region and race from biome frequency, food and Prosperity | Adopted |
+| Elevation type, bedrock, water and Supernatural weights per race (RACES §4.2, §5.2) | Open |
+| A presence field per race, so that a race clusters in some regions and is absent from others (RACES §5.4) | Open |
+| Variants of a race picked by the biome (RACES §5.3) | Open |
+| The race of a faction, a family and a person; mixed families (RACES §5.4, §5.5) | Open |
+| Size, lifespan and fertility per race, and a density that follows from them (RACES §5.1) | Open |
+| Underground and sea peoples (RACES §5.6) | Open |
+
 ---
 
 ## 11. Travel and trade
@@ -985,6 +1023,11 @@ Collected from the notes; questions that have since been settled are left out.
 - Should passes feed the travel graph as cheap land edges (SITES §6.14)?
 - Should county towns seed faction capitals? Zones are "also meant for factions" (SITES §6.14).
 - Which Christaller distance series is right, the 4 km or the 7 km one? The translation that would settle it was not reachable (SITES §2.5).
+
+**Races**
+- Is race a Stub fact of a person and a family, a fact of a faction, or a "people" layer under the factions (RACES §5.6)?
+- Should a race have one number for how common it is, apart from its frequency per biome? Today the default frequencies carry both (§10.7).
+- A dwarven region scores low on food. Should a race change the capacity of the land, or only its share of it (RACES §5.6)?
 
 ---
 

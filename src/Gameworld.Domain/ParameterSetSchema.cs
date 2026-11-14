@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Schema;
+using System.Text.Json.Serialization;
 
 namespace Gameworld.Domain;
 
@@ -77,6 +78,19 @@ public static class ParameterSetSchema
             source?.GetCustomAttributes(typeof(DescriptionAttribute), inherit: false).FirstOrDefault() as DescriptionAttribute
             ?? (context.PropertyInfo is null ? context.TypeInfo.Type.GetCustomAttribute<DescriptionAttribute>() : null);
         if (description != null) schema.Insert(0, "description", description.Description);
+
+        // A value that is left out of the file when it is the default (the frequency of a race
+        // in a biome it does not live in) may be left out by hand too.
+        if (schema["required"] is JsonArray required)
+        {
+            var optional = context.TypeInfo.Properties
+                .Where(p => p.AttributeProvider?.GetCustomAttributes(typeof(JsonIgnoreAttribute), inherit: false)
+                    .OfType<JsonIgnoreAttribute>().Any(a => a.Condition == JsonIgnoreCondition.WhenWritingDefault) == true)
+                .Select(p => p.Name)
+                .ToHashSet();
+            foreach (var name in required.Where(n => optional.Contains(n!.GetValue<string>())).ToArray()) required.Remove(name);
+            if (required.Count == 0) schema.Remove("required");
+        }
 
         // A name that is not a parameter is most likely a typo.
         if (schema["properties"] is JsonObject) schema["additionalProperties"] = false;

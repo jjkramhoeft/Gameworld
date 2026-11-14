@@ -26,9 +26,32 @@ public sealed record PatchElevation(PatchId Patch, double? MeanHeightM, BiomeRec
 /// <summary>What the Elevated stage adds: the height map and the final biomes and resources.</summary>
 public sealed record RegionElevation(HeightMap HeightMap, IReadOnlyList<PatchElevation> Patches);
 
-/// <summary>What the Planned stage adds: the Prospects for cities and towns.</summary>
+/// <summary>The potential population of one race in a region.</summary>
+/// <param name="Race">The id of the race in the Parameter Set.</param>
+/// <param name="Persons">How many persons of the race the land of the region can feed.</param>
+public sealed record RacePopulation(string Race, long Persons);
+
+/// <summary>
+/// The potential population of a region: how many persons its land can feed, by its food
+/// resources and the Prosperity field, shared between the races that are on by their frequency
+/// in the biome of each patch. It is an estimate of what the land can carry, not a count of
+/// people that exist.
+/// </summary>
+/// <param name="Races">One entry for every race that is on, in the order of the Parameter Set. A race that finds no land to live on has 0 persons.</param>
+public sealed record PotentialPopulation(IReadOnlyList<RacePopulation> Races)
+{
+    public static PotentialPopulation None { get; } = new([]);
+
+    /// <summary>The potential population of all races together.</summary>
+    public long Total => Races.Sum(r => r.Persons);
+
+    /// <summary>The potential population of one race; 0 for a race that is off or not in the Parameter Set.</summary>
+    public long Of(string race) => Races.FirstOrDefault(r => r.Race == race)?.Persons ?? 0;
+}
+
+/// <summary>What the Planned stage adds: the Prospects for cities and towns, and the potential population per race.</summary>
 /// <remarks>Factions belong to this stage too. The readme does not yet say what a faction holds, so they are not modelled.</remarks>
-public sealed record RegionPlan(IReadOnlyList<Prospect> Prospects);
+public sealed record RegionPlan(IReadOnlyList<Prospect> Prospects, PotentialPopulation Population);
 
 /// <summary>What the Settled stage adds: the travel network.</summary>
 /// <remarks>Actual cities and towns, families and important persons belong to this stage too and are not modelled yet.</remarks>

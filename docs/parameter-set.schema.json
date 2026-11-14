@@ -559,7 +559,7 @@
       "additionalProperties": false
     },
     "Planning": {
-      "description": "Planned stage: Prospects for cities and towns, and which of them are on show (§15). The Settled stage has no parameters of its own: the travel network connects the Prospects on show (§16).",
+      "description": "Planned stage: Prospects for cities and towns, which of them are on show (§15), and the potential population (§19). The Settled stage has no parameters of its own: the travel network connects the Prospects on show (§16).",
       "type": "object",
       "properties": {
         "ProspectsPerRegion": {
@@ -636,6 +636,26 @@
           "minimum": 0,
           "maximum": 100,
           "default": 62
+        },
+        "Population": {
+          "description": "The potential population of a region: how many persons its land can feed. The races that are on share it (§19).",
+          "type": "object",
+          "properties": {
+            "PersonsPerKm2": {
+              "description": "Persons per km² on land with a food supply of 1 at a middling Prosperity. The potential population of a patch is its area × this × its food supply × its Prosperity factor (§19.1).",
+              "type": "number",
+              "minimum": 0,
+              "default": 60
+            },
+            "ProsperityEffect": {
+              "description": "How much the Prosperity field moves the potential population of a patch: the factor runs from 1 − this at the lowest Prosperity to 1 + this at the highest. 0 turns the effect of Prosperity off (§19.1).",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.5
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
@@ -805,7 +825,7 @@
           "additionalProperties": false
         },
         "Prosperity": {
-          "description": "Prosperity index, on a linear scale. Feeds the resources (it boosts the valuable ones) and the Prospect scores (§9).",
+          "description": "Prosperity index, on a linear scale. Feeds the resources (it boosts the valuable ones), the Prospect scores and the potential population (§9, §19.1).",
           "type": "object",
           "properties": {
             "FeatureSizeKm": {
@@ -1017,6 +1037,106 @@
           "Id",
           "Name",
           "Weights"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "Races": {
+      "description": "The races: the peoples that can live in the world. Add a race by adding an entry, and switch a race on or off with Enabled. The potential population of a region is shared between the races that are on, by their frequency in the biome of each patch (§19). A file that gives this list replaces the whole default list.",
+      "type": "array",
+      "items": {
+        "description": "A race: a people that can live in the world, and how frequent it is in each biome.",
+        "type": "object",
+        "properties": {
+          "Id": {
+            "description": "The id the generated data knows the race by. Unique in the list; keep it when the name changes.",
+            "type": "string"
+          },
+          "Name": {
+            "description": "The name shown for the race.",
+            "type": "string"
+          },
+          "Enabled": {
+            "description": "Whether the race lives in the world. A race that is off gets no population, and the races that are on share the land without it.",
+            "type": "boolean"
+          },
+          "BiomeFrequency": {
+            "description": "How frequent the race is in each biome, relative to the other races. The potential population of a patch is shared between the races that are on in proportion to these numbers, so only the proportions between the races within one biome matter. List only the biomes the race lives in: a biome that is left out has the frequency 0, and a frequency of 0 is not written to the file. A negative number counts as 0 (§19.2).",
+            "type": "object",
+            "properties": {
+              "IceAndSnow": {
+                "description": "Value for Ice & snow patches.",
+                "type": "number"
+              },
+              "Tundra": {
+                "description": "Value for Tundra patches.",
+                "type": "number"
+              },
+              "ColdSteppe": {
+                "description": "Value for Cold steppe patches.",
+                "type": "number"
+              },
+              "BorealForest": {
+                "description": "Value for Boreal forest patches.",
+                "type": "number"
+              },
+              "ColdDesert": {
+                "description": "Value for Cold desert patches.",
+                "type": "number"
+              },
+              "TemperateGrassland": {
+                "description": "Value for Temperate grassland patches.",
+                "type": "number"
+              },
+              "WoodlandAndShrubland": {
+                "description": "Value for Woodland & shrubland patches.",
+                "type": "number"
+              },
+              "TemperateMixedForest": {
+                "description": "Value for Temperate mixed forest patches.",
+                "type": "number"
+              },
+              "TemperateBroadleafForest": {
+                "description": "Value for Temperate broadleaf forest patches.",
+                "type": "number"
+              },
+              "TemperateRainForest": {
+                "description": "Value for Temperate rain forest patches.",
+                "type": "number"
+              },
+              "HotDesert": {
+                "description": "Value for Hot desert patches.",
+                "type": "number"
+              },
+              "ThornScrub": {
+                "description": "Value for Thorn scrub patches.",
+                "type": "number"
+              },
+              "Savanna": {
+                "description": "Value for Savanna patches.",
+                "type": "number"
+              },
+              "TropicalDryForest": {
+                "description": "Value for Tropical dry forest patches.",
+                "type": "number"
+              },
+              "TropicalRainForest": {
+                "description": "Value for Tropical rain forest patches.",
+                "type": "number"
+              },
+              "Mangrove": {
+                "description": "Value for Mangrove patches.",
+                "type": "number"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "Id",
+          "Name",
+          "Enabled",
+          "BiomeFrequency"
         ],
         "additionalProperties": false
       }

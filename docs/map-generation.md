@@ -2,7 +2,8 @@
 
 This document describes every step that turns a foundation seed into the map: the cell
 hierarchy, oceans, elevation types, fields, rivers, lakes, the height map, biomes,
-resources, Prospects for cities and towns and the travel network. It is the specification
+resources, Prospects for cities and towns, the travel network and the potential
+population per race. It is the specification
 of the generation algorithms. The [readme](../readme.md) holds the domain model around
 them (foundation, Parameter Set, identity, region generation stages), and the names in
 this document follow the readme. Default parameter values are given in parentheses or in
@@ -33,11 +34,13 @@ The algorithms were first worked out in an earlier prototype called Sandbox 4.
 16. [Travel network](#16-travel-network)
 17. [Drawing the map](#17-drawing-the-map)
 18. [Order of work and pitfalls](#18-order-of-work-and-pitfalls)
+19. [Races and potential population](#19-races-and-potential-population)
 
 Appendices: [A. Exact generators](#appendix-a-exact-generators) ·
 [B. Crop tables](#appendix-b-crop-tables) ·
 [C. Factors by biome](#appendix-c-factors-by-biome) ·
-[D. Resource rules in full](#appendix-d-resource-rules-in-full)
+[D. Resource rules in full](#appendix-d-resource-rules-in-full) ·
+[E. The default races](#appendix-e-the-default-races)
 
 ---
 
@@ -71,6 +74,7 @@ seed ──► fields (initial temperature, precipitation, prosperity, supernatu
           ├─► biomes      per patch: fields + height
           ├─► resources   per patch: biome, water, elevation type, bedrock, prosperity
           ├─► Prospects   per region: scored patches → Prospects for cities and towns
+          ├─► population  per region: what the land can feed, shared between the races
           └─► travel      roads, river routes, sea lanes between Prospects
 ```
 
@@ -552,7 +556,8 @@ climate fields have their own warp noises, so their belts do not line up. A warp
 gives the plain fBm.
 
 Uses: initial temperature and precipitation feed the biomes; precipitation also thins the rivers
-of dry flat zones (next section); prosperity feeds resources and Prospect scores; the
+of dry flat zones (next section); prosperity feeds resources, Prospect scores and the
+potential population (section 19); the
 supernatural field feeds nothing yet.
 
 ### 9.1 Distribution
@@ -1698,6 +1703,7 @@ the pixel's world position with `cellAt` and colour it.
    ridges, then levelling and the bed caps.
 9. Biomes (section 13), lakes (section 11).
 10. Resources, Prospects, travel (sections 14–16), in that order.
+11. Potential population (section 19). It only needs the biomes and the resources.
 
 ### 18.2 What gives the map its look
 
@@ -1738,6 +1744,81 @@ the pixel's world position with `cellAt` and colour it.
 - **Bit-exact reproduction** across machines additionally needs deterministic `exp`,
   `log`, `sin` and `cos` (given in Appendix A) and no
   `pow` in generation code. If you only need maps of the same kind, ignore this.
+
+---
+
+## 19. Races and potential population
+
+Stage: Planned.
+
+The races are a list in the Parameter Set. Each race has an id, a name, a toggle (on or
+off) and a frequency for each of the 16 biomes. Per region, the land gets a potential
+population: how many persons it can feed. The races that are on share it.
+
+In a Parameter Set file a race lists only the biomes it lives in. A biome that is left out
+has the frequency 0, and a frequency of 0 is not written to the file.
+
+| Parameter | Default |
+|---|---|
+| Persons per km² at a food supply of 1 and a middling Prosperity | 60 |
+| Prosperity effect | 0.5 |
+| Races | 23, of which 6 are on (Appendix E) |
+
+All inputs use the estimated biomes and resources, like the Prospects (section 15), so
+the potential population never depends on the height map. There is no random choice in
+this section, so it needs no hash purpose.
+
+The ids of the races must be given and unique. A Parameter Set that breaks this is
+refused when the world is created.
+
+### 19.1 Capacity of a patch
+
+Every land patch of the region has a capacity in persons:
+
+```
+supply   = clamp(food + 0.2 · fish, 0, 1)        # food: the summary of 14.5; fish: the amount on the patch
+factor   = 1 + effect · (2 · prosperity − 1)     # prosperity at the patch's site, rescaled to 0–1
+capacity = area · personsPerKm2 · supply · factor
+```
+
+- `area` is the number of patch cells of the patch times the square of the patch grid
+  size, in km² (64 km² per patch cell at the defaults). Lakes are not taken out.
+- `effect` is the Prosperity effect, clamped to 0–1. With the default 0.5 the factor runs
+  from 0.5 in the poorest land to 1.5 in the richest. 0 turns the effect off.
+- Ocean patches have no capacity.
+
+### 19.2 Shares of the races
+
+Within one biome the races that are on share the land by their frequency:
+
+```
+share(r, biome) = frequency(r, biome) / Σ frequency(q, biome)   over the races q that are on
+```
+
+- A negative frequency counts as 0.
+- If the sum is 0, no race that is on lives in the biome. The patches of that biome hold
+  nobody, and their capacity is not handed to another biome.
+- A race that is off is left out of the sum. Its share goes to the races that are on, so
+  toggling a race changes how the land is shared, not how many persons it feeds.
+- Only the proportions between the races within one biome matter. Doubling every
+  frequency of one race doubles its weight against the others in every biome.
+
+### 19.3 Potential population of a region
+
+```
+population(r) = round(Σ capacity(patch) · share(r, biome of patch))   over the region's land patches, in key order
+```
+
+The result has one entry for every race that is on, in the order of the Parameter Set. A
+race that finds no land to live on has 0. Each race is rounded on its own, half up, so the
+sum over the races can differ from the rounded sum of the capacities by a few persons.
+
+The land patches of a region are the patches of its zones (section 6.2), so every land
+patch counts in exactly one region.
+
+With the defaults the median region has a potential population of about 357,000 and the
+range is 113,000 to 840,000 (measured on 50 regions of two seeds). Of all persons 63 % are
+human, 10 % orc, 10 % goblin, 7 % elf, 7 % halfling and 4 % dwarf.
 
 ---
 
@@ -2224,3 +2305,52 @@ neighbour. With `T₀` at its site:
 
 The fur gate of an ocean patch is `toUnit(hash4(seed, 0x5e05, patch i, patch j)) < 0.5 · boost`.
 Kinds 50 and 51 use `chance · boost` and richness `0.35 + 0.65 · hash` as in 14.4.
+
+---
+
+## Appendix E. The default races
+
+The default list of races of the Parameter Set (section 19). The frequency of a race in a
+biome is its habitat weight in that biome times how common the race is:
+
+```
+frequency(race, biome) = habitat(race, biome) · common(race)
+```
+
+The habitat weights are 0 avoided, 1 tolerated, 2 good and 3 native. The Parameter Set
+only holds the frequencies: the human frequency in Temperate grassland is 3 · 10 = 30. A
+biome with the weight 0 is left out of the race's entry in the file.
+
+Columns: Ice & snow, Tundra, Cold steppe, Boreal forest, Cold desert, Temperate grassland,
+Woodland & shrubland, Temperate mixed forest, Temperate broadleaf forest, Temperate rain
+forest, Hot desert, Thorn scrub, Savanna, Tropical dry forest, Tropical rain forest,
+Mangrove.
+
+| Id | Name | On | Common | Ice | Tun | CSt | Bor | CDs | TGr | WSh | TMx | TBl | TRn | HDs | Thn | Sav | TDf | TRf | Mgv |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| `human` | Human | yes | 10 | 0 | 1 | 2 | 2 | 1 | 3 | 3 | 3 | 3 | 2 | 1 | 1 | 2 | 2 | 1 | 1 |
+| `elf` | Elf | yes | 2 | 0 | 0 | 0 | 2 | 0 | 1 | 1 | 3 | 3 | 3 | 0 | 0 | 0 | 1 | 2 | 0 |
+| `darkElf` | Dark elf | no | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
+| `dwarf` | Dwarf | yes | 2 | 1 | 2 | 1 | 2 | 1 | 1 | 1 | 2 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `halfling` | Halfling | yes | 2 | 0 | 0 | 1 | 1 | 0 | 3 | 3 | 2 | 2 | 1 | 0 | 0 | 1 | 1 | 1 | 0 |
+| `gnome` | Gnome | no | 1 | 0 | 1 | 1 | 2 | 1 | 1 | 2 | 2 | 3 | 1 | 0 | 1 | 1 | 1 | 0 | 0 |
+| `orc` | Orc | yes | 2 | 0 | 1 | 3 | 1 | 2 | 2 | 2 | 1 | 1 | 1 | 2 | 2 | 2 | 1 | 0 | 0 |
+| `goblin` | Goblin | yes | 2 | 0 | 1 | 1 | 2 | 1 | 2 | 2 | 2 | 2 | 1 | 1 | 2 | 1 | 1 | 1 | 0 |
+| `hobgoblin` | Hobgoblin | no | 1 | 0 | 1 | 2 | 1 | 1 | 2 | 2 | 2 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 0 |
+| `kobold` | Kobold | no | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
+| `gnoll` | Gnoll | no | 1 | 0 | 0 | 2 | 1 | 1 | 2 | 2 | 1 | 1 | 0 | 2 | 3 | 3 | 1 | 0 | 0 |
+| `giantBlooded` | Giant-blooded | no | 0.5 | 1 | 2 | 2 | 2 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 | 1 | 1 | 0 | 0 |
+| `ogre` | Ogre | no | 0.5 | 1 | 2 | 2 | 2 | 1 | 1 | 2 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 0 |
+| `troll` | Troll | no | 0.5 | 2 | 2 | 1 | 2 | 1 | 1 | 1 | 2 | 2 | 2 | 2 | 2 | 1 | 2 | 2 | 2 |
+| `lizardfolk` | Lizardfolk | no | 1 | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 1 | 1 | 2 | 1 | 1 | 1 | 2 | 3 | 3 |
+| `catfolk` | Catfolk | no | 1 | 0 | 0 | 1 | 0 | 1 | 2 | 1 | 1 | 1 | 1 | 2 | 2 | 3 | 2 | 2 | 1 |
+| `ratfolk` | Ratfolk | no | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
+| `birdfolk` | Birdfolk | no | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
+| `bullFolk` | Bull-folk | no | 1 | 0 | 1 | 2 | 1 | 1 | 3 | 2 | 1 | 1 | 1 | 1 | 1 | 3 | 1 | 0 | 0 |
+| `centaur` | Centaur | no | 1 | 0 | 0 | 3 | 1 | 1 | 3 | 2 | 2 | 2 | 1 | 1 | 1 | 3 | 1 | 0 | 0 |
+| `dragonkin` | Dragonkin | no | 0.5 | 0 | 0 | 1 | 1 | 2 | 1 | 1 | 1 | 1 | 1 | 2 | 2 | 2 | 1 | 1 | 1 |
+| `undead` | Undead | no | 0.5 | 1 | 2 | 1 | 1 | 2 | 1 | 1 | 1 | 1 | 1 | 2 | 1 | 1 | 1 | 1 | 1 |
+| `frostFolk` | Frost folk | no | 1 | 3 | 3 | 1 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+
+The six races that are on live in every biome between them: in Ice & snow only the
+dwarves do, in Mangrove only the humans.

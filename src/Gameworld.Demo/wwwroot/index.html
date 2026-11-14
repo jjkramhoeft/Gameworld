@@ -362,6 +362,13 @@ async function inspect(p) {
     const row = (k, v) => rows.push(`<dt>${esc(k)}</dt><dd>${v}</dd>`);
     row('Region', `(${d.Region[0]}, ${d.Region[1]}) · ${d.Stage} · ${d.RegionHasSeaAccess ? 'sea access' : 'landlocked'}`);
     if (d.RegionProspects) row('', `Prospects: ${prospectCount(d.RegionProspects)} · score sum ${num(d.RegionScoreSum, 0)}`);
+    if (d.RegionPopulation) {
+      const people = n => Math.round(n).toLocaleString('en-US');
+      const total = d.RegionPopulation.reduce((sum, r) => sum + r.Persons, 0);
+      const races = d.RegionPopulation.filter(r => r.Persons > 0).sort((a, b) => b.Persons - a.Persons)
+        .map(r => `${esc(r.Name)} ${people(r.Persons)}`).join(' · ');
+      row('', `Potential population: ${people(total)}${races ? ' (' + races + ')' : ''}`);
+    }
     row('Zone', `(${d.Zone.Id[0]}, ${d.Zone.Id[1]}) · ${words(d.Zone.ElevationType)} · ${d.Zone.Cells} cell${d.Zone.Cells > 1 ? 's' : ''}`);
     if (d.Zone.Prospects) row('', 'Prospects: ' + prospectCount(d.Zone.Prospects));
     else if (!d.Ocean && !d.RegionProspects) row('', '<span class="muted">Prospects are counted once the region is Planned (Prospects layer).</span>');
