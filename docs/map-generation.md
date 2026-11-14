@@ -74,7 +74,7 @@ seed ──► fields (initial temperature, precipitation, prosperity, supernatu
           ├─► biomes      per patch: fields + height
           ├─► resources   per patch: biome, water, elevation type, bedrock, prosperity
           ├─► Prospects   per region: scored patches → Prospects for cities and towns
-          ├─► population  per region: what the land can feed, shared between the races
+          ├─► population  per region: what the land can feed, shared between the races by biome and height
           └─► travel      roads, river routes, sea lanes between Prospects
 ```
 
@@ -1703,7 +1703,8 @@ the pixel's world position with `cellAt` and colour it.
    ridges, then levelling and the bed caps.
 9. Biomes (section 13), lakes (section 11).
 10. Resources, Prospects, travel (sections 14–16), in that order.
-11. Potential population (section 19). It only needs the biomes and the resources.
+11. Potential population (section 19). It only needs the height map and the final biomes
+    and resources.
 
 ### 18.2 What gives the map its look
 
@@ -1752,21 +1753,27 @@ the pixel's world position with `cellAt` and colour it.
 Stage: Planned.
 
 The races are a list in the Parameter Set. Each race has an id, a name, a toggle (on or
-off) and a frequency for each of the 16 biomes. Per region, the land gets a potential
-population: how many persons it can feed. The races that are on share it.
+off), a frequency for each of the 16 biomes and, if the height matters to it, a height
+modifier. Per region, the land gets a potential population: how many persons it can feed.
+The races that are on share it.
 
 In a Parameter Set file a race lists only the biomes it lives in. A biome that is left out
-has the frequency 0, and a frequency of 0 is not written to the file.
+has the frequency 0, and a frequency of 0 is not written to the file. A race without a
+height modifier does not carry one in the file.
 
 | Parameter | Default |
 |---|---|
 | Persons per km² at a food supply of 1 and a middling Prosperity | 60 |
 | Prosperity effect | 0.5 |
 | Races | 23, of which 6 are on (Appendix E) |
+| Height modifiers | dwarves only from 200 m and up, elves only below 200 m |
 
-All inputs use the estimated biomes and resources, like the Prospects (section 15), so
-the potential population never depends on the height map. There is no random choice in
-this section, so it needs no hash purpose.
+The inputs are the final form of the region's land patches (the Elevated stage, sections
+12 to 14): the height of each patch and the biome and resources calculated with it. The
+height of a patch is its mean height in the height map, not below 0, or the typical
+height of its elevation type (section 13.1) when no raster cell centre lies in the patch.
+So the potential population depends on the height map, unlike the Prospects (section 15).
+There is no random choice in this section, so it needs no hash purpose.
 
 The ids of the races must be given and unique. A Parameter Set that breaks this is
 refused when the world is created.
@@ -1789,24 +1796,50 @@ capacity = area · personsPerKm2 · supply · factor
 
 ### 19.2 Shares of the races
 
-Within one biome the races that are on share the land by their frequency:
+On one patch the races that are on share the land by their frequency in its biome, each
+multiplied by the height factor of the race at the height of the patch:
 
 ```
-share(r, biome) = frequency(r, biome) / Σ frequency(q, biome)   over the races q that are on
+weight(r, patch) = frequency(r, biome of patch) · heightFactor(r, height of patch)
+share(r, patch)  = weight(r, patch) / Σ weight(q, patch)   over the races q that are on
 ```
 
 - A negative frequency counts as 0.
-- If the sum is 0, no race that is on lives in the biome. The patches of that biome hold
-  nobody, and their capacity is not handed to another biome.
+- If the sum is 0, no race that is on lives on the patch, by its biome or its height. The
+  patch holds nobody, and its capacity is not handed to another patch.
 - A race that is off is left out of the sum. Its share goes to the races that are on, so
   toggling a race changes how the land is shared, not how many persons it feeds.
-- Only the proportions between the races within one biome matter. Doubling every
-  frequency of one race doubles its weight against the others in every biome.
+- Only the proportions between the races on one patch matter. Doubling every frequency
+  of one race doubles its weight against the others everywhere.
+
+**Height factor.** The height modifier of a race is a list of control points
+`(height in m, factor)`. A race without one has the factor 1 at every height.
+
+```
+heightFactor(r, h):
+    points = the control points of r, sorted by height; points at the same height keep the order of the list
+    if there are no points:        return 1
+    if h < height of the first:    return factor of the first
+    a = the last point with height ≤ h
+    if a is the last point:        return factor of a
+    b = the point after a
+    return factor(a) + (h − height(a)) / (height(b) − height(a)) · (factor(b) − factor(a))
+```
+
+- The factor runs in a straight line between two points and is constant below the first
+  and above the last.
+- Two points at the same height make a step: the first holds below that height, the
+  second from that height and up. `(200, 0), (200, 1)` is a race that only lives from
+  200 m and up. `(200, 1), (200, 0)` is a race that only lives below 200 m.
+- `(100, 0), (300, 1)` fades a race in: none below 100 m, half weight at 200 m, full
+  weight from 300 m.
+- A negative factor counts as 0. A factor above 1 makes the race more frequent at that
+  height.
 
 ### 19.3 Potential population of a region
 
 ```
-population(r) = round(Σ capacity(patch) · share(r, biome of patch))   over the region's land patches, in key order
+population(r) = round(Σ capacity(patch) · share(r, patch))   over the region's land patches, in key order
 ```
 
 The result has one entry for every race that is on, in the order of the Parameter Set. A
@@ -1816,9 +1849,10 @@ sum over the races can differ from the rounded sum of the capacities by a few pe
 The land patches of a region are the patches of its zones (section 6.2), so every land
 patch counts in exactly one region.
 
-With the defaults the median region has a potential population of about 357,000 and the
-range is 113,000 to 840,000 (measured on 50 regions of two seeds). Of all persons 63 % are
-human, 10 % orc, 10 % goblin, 7 % elf, 7 % halfling and 4 % dwarf.
+With the defaults the median region has a potential population of about 351,000 and the
+range is 112,000 to 834,000 (measured on 50 regions of two seeds). Of all persons 66 % are
+human, 10.5 % orc, 10 % goblin, 7 % halfling, 4.5 % elf and 2 % dwarf. 39 % of the land
+patches lie at 200 m or higher, and every one of the 50 regions has both dwarves and elves.
 
 ---
 
@@ -2352,5 +2386,9 @@ Mangrove.
 | `undead` | Undead | no | 0.5 | 1 | 2 | 1 | 1 | 2 | 1 | 1 | 1 | 1 | 1 | 2 | 1 | 1 | 1 | 1 | 1 |
 | `frostFolk` | Frost folk | no | 1 | 3 | 3 | 1 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
+**Height modifiers.** Dwarf: `(200, 0), (200, 1)`, only from 200 m and up. Elf:
+`(200, 1), (200, 0)`, only below 200 m. The other 21 races have none.
+
 The six races that are on live in every biome between them: in Ice & snow only the
-dwarves do, in Mangrove only the humans.
+dwarves do, in Mangrove only the humans. Ice & snow below 200 m holds nobody, since the
+dwarves do not live that low.

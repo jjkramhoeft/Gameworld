@@ -10,6 +10,8 @@ public sealed class PatchFinal
     public required PatchDetail Patch { get; init; }
     /// <summary>The mean height of the patch's land; null when no raster cell centre lies in it.</summary>
     public required double? MeanHeightM { get; init; }
+    /// <summary>The height the final form is calculated with: the mean height, not below sea level, or the typical height of the elevation type when there is no mean.</summary>
+    public required double HeightM { get; init; }
     public required BiomeRecord Biome { get; init; }
     public required PatchResources Resources { get; init; }
 }
@@ -62,6 +64,7 @@ internal static class ElevationBuilder
             {
                 Patch = patch,
                 MeanHeightM = mean,
+                HeightM = h,
                 Biome = biome,
                 Resources = DetailBuilder.ResourcesOf(world, patch, biome),
             });

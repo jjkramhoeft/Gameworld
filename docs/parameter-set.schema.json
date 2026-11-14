@@ -1042,10 +1042,10 @@
       }
     },
     "Races": {
-      "description": "The races: the peoples that can live in the world. Add a race by adding an entry, and switch a race on or off with Enabled. The potential population of a region is shared between the races that are on, by their frequency in the biome of each patch (§19). A file that gives this list replaces the whole default list.",
+      "description": "The races: the peoples that can live in the world. Add a race by adding an entry, and switch a race on or off with Enabled. The potential population of a region is shared between the races that are on, by their frequency in the biome of each patch and their height modifier at its height (§19). A file that gives this list replaces the whole default list.",
       "type": "array",
       "items": {
-        "description": "A race: a people that can live in the world, and how frequent it is in each biome.",
+        "description": "A race: a people that can live in the world, and how frequent it is in each biome and at each height.",
         "type": "object",
         "properties": {
           "Id": {
@@ -1130,6 +1130,32 @@
               }
             },
             "additionalProperties": false
+          },
+          "HeightModifier": {
+            "description": "How the height of the land changes the frequency of the race: control points from the mean height of a patch to a factor on its biome frequencies. The factor runs in a straight line between two points and is constant beyond the first and the last. Two points at the same height make a step: the first holds below that height, the second from that height and up. So [200 → 0, 200 → 1] is a race that only lives from 200 m and up, and [200 → 1, 200 → 0] one that only lives below 200 m. Left out, the height does not matter to the race (§19.2).",
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "description": "One control point of the height modifier of a race: the factor at a height.",
+              "type": "object",
+              "properties": {
+                "HeightM": {
+                  "description": "Height in metres above sea level.",
+                  "type": "number"
+                },
+                "Factor": {
+                  "description": "What the biome frequencies of the race are multiplied by at that height. 0 means the race does not live at that height; a negative number counts as 0.",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "HeightM",
+                "Factor"
+              ],
+              "additionalProperties": false
+            }
           }
         },
         "required": [

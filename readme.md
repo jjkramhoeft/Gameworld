@@ -105,7 +105,7 @@ Sited is not a state a region is in. It needs only the seed, so it is a pure fun
 
 The sites of all three levels come from seed-hashed jittered grids, so the cell of any region, zone or patch and its neighbours can be computed locally without generating the rest of the world.
 
-Biomes and resources exist in two forms. The estimated form is calculated in the Detailed stage with a typical height per elevation type instead of the real height. The final form is calculated in the Elevated stage with the height from the height map. Lakes, Prospects, the potential population and the travel network only read the estimated form, so they never depend on the height map. The region is still Elevated before it is Planned: the Planned stage reads the Detailed data, but it does not come before the Elevated stage.
+Biomes and resources exist in two forms. The estimated form is calculated in the Detailed stage with a typical height per elevation type instead of the real height. The final form is calculated in the Elevated stage with the height from the height map. Lakes, Prospects and the travel network only read the estimated form, so they never depend on the height map. The potential population reads the final form and the height of each patch. The region is still Elevated before it is Planned: the Planned stage reads the Detailed data, but it does not come before the Elevated stage.
 
 The policy for when a region advances (e.g. Detailed within some distance of the player) is not part of the domain model. The model only knows the stage and its preconditions.
 
@@ -323,21 +323,24 @@ The races are a list in the Parameter Set, not a fixed set in the code. The list
 * An id and a name. Generated data points at a race by its id.
 * A toggle: the race is on or off. A race that is off does not live in the world.
 * A frequency for each biome: how frequent the race is in that biome, relative to the other races. 0 means the race does not live there. In a Parameter Set file a race lists only the biomes it lives in: a biome that is left out has the frequency 0.
+* A height modifier: a factor on the frequencies of the race that depends on the height of the land. It can cut a race off at a height or fade it in and out. A race without a height modifier lives at every height.
 
 The default list holds 23 races. Human, Elf, Dwarf, Halfling, Orc and Goblin are on. The other 17 are off until they are toggled on:
 
 Dark elf, Gnome, Hobgoblin, Kobold, Gnoll, Giant-blooded, Ogre, Troll, Lizardfolk, Catfolk, Ratfolk, Birdfolk, Bull-folk, Centaur, Dragonkin, Undead, Frost folk
+
+By default dwarves only live from 200 m and up and elves only below 200 m. The height does not matter to the other races.
 
 How a faction, a family or a person gets its race is not decided yet.
 
 #### Potential population
 An estimate of how many persons the land of a region can feed, for each race that is on. It is not a count of people that exist: cities, families and persons come in the Settled stage.
 
-Every land patch has a capacity in persons. It comes from the area of the patch, its food resources and the Prosperity field. The races that are on share the capacity of a patch in proportion to their frequency in the biome of the patch. The potential population of a race in a region is the sum of its shares over the land patches of the region.
+Every land patch has a capacity in persons. It comes from the area of the patch, its food resources and the Prosperity field. The races that are on share the capacity of a patch in proportion to their frequency in the biome of the patch, each multiplied by the height modifier of the race at the height of the patch. The potential population of a race in a region is the sum of its shares over the land patches of the region.
 
-So the races compete for the same land. Toggling a race off does not lower the potential population of a region, it leaves its share to the other races. Land in a biome where no race that is on lives holds nobody.
+So the races compete for the same land. Toggling a race off does not lower the potential population of a region, it leaves its share to the other races. Land where no race that is on lives, by its biome or its height, holds nobody.
 
-The potential population is calculated in the Planned stage and only reads the estimated biomes and resources (see Region Generation Stages). See [docs/map-generation.md](docs/map-generation.md) section 19 for the rule and Appendix E for the default list.
+The potential population is calculated in the Planned stage. It reads the height map: the height of a patch is its mean height, and the biomes and resources are the final ones (see Region Generation Stages). See [docs/map-generation.md](docs/map-generation.md) section 19 for the rule and Appendix E for the default list.
 
 #### Faction
 A group of people in one region. A political grouping. Could be a Kingdom, a thieves guild or a tribe of people.

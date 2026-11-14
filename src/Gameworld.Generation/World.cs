@@ -142,7 +142,7 @@ public sealed partial class World
                 region.Advance(detail.ToDomain());
                 break;
             case RegionStage.Planned:
-                var plan = PlanBuilder.Build(this, _detail[id]);
+                var plan = PlanBuilder.Build(this, _detail[id], _elevation[id]);
                 _plan[id] = plan;
                 region.Advance(plan.ToDomain());
                 break;

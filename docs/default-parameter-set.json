@@ -157,7 +157,7 @@
     "RichScore": 75,
     "PoorScore": 62,
     "Population": {
-      "PersonsPerKm2": 5,
+      "PersonsPerKm2": 60,
       "ProsperityEffect": 0.5
     }
   },
@@ -363,11 +363,13 @@
         "Tundra": 10,
         "ColdSteppe": 20,
         "BorealForest": 20,
+        "ColdDesert": 10,
         "TemperateGrassland": 30,
         "WoodlandAndShrubland": 30,
         "TemperateMixedForest": 30,
         "TemperateBroadleafForest": 30,
         "TemperateRainForest": 20,
+        "HotDesert": 10,
         "ThornScrub": 10,
         "Savanna": 20,
         "TropicalDryForest": 20,
@@ -380,30 +382,44 @@
       "Name": "Elf",
       "Enabled": true,
       "BiomeFrequency": {
-        "BorealForest": 8,
+        "BorealForest": 4,
         "TemperateGrassland": 2,
         "WoodlandAndShrubland": 2,
-        "TemperateMixedForest": 7,
-        "TemperateBroadleafForest": 7,
+        "TemperateMixedForest": 6,
+        "TemperateBroadleafForest": 6,
         "TemperateRainForest": 6,
-        "TropicalDryForest": 3,
+        "TropicalDryForest": 2,
         "TropicalRainForest": 4
-      }
+      },
+      "HeightModifier": [
+        {
+          "HeightM": 200,
+          "Factor": 1
+        },
+        {
+          "HeightM": 200,
+          "Factor": 0
+        }
+      ]
     },
     {
       "Id": "darkElf",
       "Name": "Dark elf",
       "Enabled": false,
       "BiomeFrequency": {
-        "Tundra": 2,
-        "ColdSteppe": 2,
+        "IceAndSnow": 1,
+        "Tundra": 1,
+        "ColdSteppe": 1,
         "BorealForest": 1,
+        "ColdDesert": 1,
         "TemperateGrassland": 1,
         "WoodlandAndShrubland": 1,
         "TemperateMixedForest": 1,
         "TemperateBroadleafForest": 1,
         "TemperateRainForest": 1,
+        "HotDesert": 1,
         "ThornScrub": 1,
+        "Savanna": 1,
         "TropicalDryForest": 1,
         "TropicalRainForest": 1,
         "Mangrove": 1
@@ -424,7 +440,17 @@
         "TemperateMixedForest": 4,
         "TemperateBroadleafForest": 2,
         "TemperateRainForest": 2
-      }
+      },
+      "HeightModifier": [
+        {
+          "HeightM": 200,
+          "Factor": 0
+        },
+        {
+          "HeightM": 200,
+          "Factor": 1
+        }
+      ]
     },
     {
       "Id": "halfling",
@@ -489,6 +515,8 @@
       "BiomeFrequency": {
         "Tundra": 2,
         "ColdSteppe": 2,
+        "BorealForest": 4,
+        "ColdDesert": 2,
         "TemperateGrassland": 4,
         "WoodlandAndShrubland": 4,
         "TemperateMixedForest": 4,

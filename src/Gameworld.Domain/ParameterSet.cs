@@ -38,7 +38,7 @@ public sealed record ParameterSet
     [Description("The bedrock types and their relative weight under each elevation type. The bedrock of a zone is drawn by these weights (§14.1). The resource rules know the nine ids of the defaults; a bedrock with another id gives no bedrock-bound resources.")]
     public IReadOnlyList<BedrockParameters> Bedrocks { get; init; } = BedrockParameters.Defaults;
 
-    [Description("The races: the peoples that can live in the world. Add a race by adding an entry, and switch a race on or off with Enabled. The potential population of a region is shared between the races that are on, by their frequency in the biome of each patch (§19). A file that gives this list replaces the whole default list.")]
+    [Description("The races: the peoples that can live in the world. Add a race by adding an entry, and switch a race on or off with Enabled. The potential population of a region is shared between the races that are on, by their frequency in the biome of each patch and their height modifier at its height (§19). A file that gives this list replaces the whole default list.")]
     public IReadOnlyList<RaceParameters> Races { get; init; } = RaceParameters.Defaults;
 
     public static ParameterSet Default => new();
@@ -546,25 +546,41 @@ public sealed record BedrockParameters(
 /// A race: a people that can live in the world. The races are a list in the Parameter Set, so
 /// a race is added, changed or switched off without touching the generation code.
 /// </summary>
-[Description("A race: a people that can live in the world, and how frequent it is in each biome.")]
+[Description("One control point of the height modifier of a race: the factor at a height.")]
+public sealed record HeightFactorPoint(
+    [property: Description("Height in metres above sea level.")] double HeightM,
+    [property: Description("What the biome frequencies of the race are multiplied by at that height. 0 means the race does not live at that height; a negative number counts as 0.")] double Factor);
+
+[Description("A race: a people that can live in the world, and how frequent it is in each biome and at each height.")]
 public sealed record RaceParameters(
     [property: Description("The id the generated data knows the race by. Unique in the list; keep it when the name changes.")] string Id,
     [property: Description("The name shown for the race.")] string Name,
     [property: Description("Whether the race lives in the world. A race that is off gets no population, and the races that are on share the land without it.")] bool Enabled,
     [property: Description("How frequent the race is in each biome, relative to the other races. The potential population of a patch is shared between the races that are on in proportion to these numbers, so only the proportions between the races within one biome matter. List only the biomes the race lives in: a biome that is left out has the frequency 0, and a frequency of 0 is not written to the file. A negative number counts as 0 (§19.2).")] PerBiome<double> BiomeFrequency)
 {
+    [Description("How the height of the land changes the frequency of the race: control points from the mean height of a patch to a factor on its biome frequencies. The factor runs in a straight line between two points and is constant beyond the first and the last. Two points at the same height make a step: the first holds below that height, the second from that height and up. So [200 → 0, 200 → 1] is a race that only lives from 200 m and up, and [200 → 1, 200 → 0] one that only lives below 200 m. Left out, the height does not matter to the race (§19.2).")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public IReadOnlyList<HeightFactorPoint>? HeightModifier { get; init; }
+
+    /// <summary>The height modifier of a race that only lives from a height and up.</summary>
+    public static IReadOnlyList<HeightFactorPoint> OnlyFrom(double heightM) => [new(heightM, 0), new(heightM, 1)];
+
+    /// <summary>The height modifier of a race that only lives below a height.</summary>
+    public static IReadOnlyList<HeightFactorPoint> OnlyBelow(double heightM) => [new(heightM, 1), new(heightM, 0)];
+
     /// <summary>
     /// The default list (map-generation.md Appendix E): the six classic races are on, the rest are off.
     /// Each frequency is the habitat weight of the race in the biome (0 avoided, 1 tolerated,
-    /// 2 good, 3 native) times how common the race is in the world.
+    /// 2 good, 3 native) times how common the race is in the world. Dwarves only live from 200 m
+    /// and up and elves only below 200 m; the height does not matter to the other races.
     /// </summary>
     public static IReadOnlyList<RaceParameters> Defaults { get; } =
     [
         //                                               common  Ice Tun CSt Bor CDs TGr WSh TMx TBl TRn HDs Thn Sav TDf TRf Mgv
         Make("human", "Human", true, 10, /*            */ 0, 1, 2, 2, 1, 3, 3, 3, 3, 2, 1, 1, 2, 2, 1, 1),
-        Make("elf", "Elf", true, 2, /*                 */ 0, 0, 0, 2, 0, 1, 1, 3, 3, 3, 0, 0, 0, 1, 2, 0),
+        Make("elf", "Elf", true, 2, /*                 */ 0, 0, 0, 2, 0, 1, 1, 3, 3, 3, 0, 0, 0, 1, 2, 0) with { HeightModifier = OnlyBelow(200) },
         Make("darkElf", "Dark elf", false, 1, /*       */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
-        Make("dwarf", "Dwarf", true, 2, /*             */ 1, 2, 1, 2, 1, 1, 1, 2, 1, 1, 0, 0, 0, 0, 0, 0),
+        Make("dwarf", "Dwarf", true, 2, /*             */ 1, 2, 1, 2, 1, 1, 1, 2, 1, 1, 0, 0, 0, 0, 0, 0) with { HeightModifier = OnlyFrom(200) },
         Make("halfling", "Halfling", true, 2, /*       */ 0, 0, 1, 1, 0, 3, 3, 2, 2, 1, 0, 0, 1, 1, 1, 0),
         Make("gnome", "Gnome", false, 1, /*            */ 0, 1, 1, 2, 1, 1, 2, 2, 3, 1, 0, 1, 1, 1, 0, 0),
         Make("orc", "Orc", true, 2, /*                 */ 0, 1, 3, 1, 2, 2, 2, 1, 1, 1, 2, 2, 2, 1, 0, 0),

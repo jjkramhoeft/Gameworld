@@ -34,8 +34,8 @@ public sealed record RacePopulation(string Race, long Persons);
 /// <summary>
 /// The potential population of a region: how many persons its land can feed, by its food
 /// resources and the Prosperity field, shared between the races that are on by their frequency
-/// in the biome of each patch. It is an estimate of what the land can carry, not a count of
-/// people that exist.
+/// in the biome of each patch and their height modifier at its height. It is an estimate of
+/// what the land can carry, not a count of people that exist.
 /// </summary>
 /// <param name="Races">One entry for every race that is on, in the order of the Parameter Set. A race that finds no land to live on has 0 persons.</param>
 public sealed record PotentialPopulation(IReadOnlyList<RacePopulation> Races)

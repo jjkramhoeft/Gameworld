@@ -5,19 +5,17 @@ namespace Gameworld.Generation.Races;
 /// <summary>
 /// The potential population of the land and how the races share it (map-generation.md
 /// section 19). There is no random choice in it: it is a plain function of the Parameter Set
-/// and of the biome, the resources and the Prosperity of a patch.
+/// and of the biome, the height, the resources and the Prosperity of a patch.
 /// </summary>
 public sealed class PopulationRules
 {
     /// <summary>How much the fish of a patch adds to its food supply.</summary>
     public const double FishShare = 0.2;
 
-    private static readonly Biome[] Biomes = Enum.GetValues<Biome>();
-
     private readonly PopulationParameters _parameters;
     private readonly RaceParameters[] _races;
-    /// <summary>Per biome: the share of each race that is on, in the order of <see cref="Races"/>; null where none of them lives.</summary>
-    private readonly double[]?[] _shares;
+    /// <summary>Per race that is on: the control points of its height modifier, by height; empty when the height does not matter to it.</summary>
+    private readonly HeightFactorPoint[][] _heightPoints;
 
     public PopulationRules(ParameterSet parameters)
     {
@@ -33,16 +31,13 @@ public sealed class PopulationRules
         }
         _races = parameters.Races.Where(r => r.Enabled).ToArray();
 
-        _shares = new double[]?[Biomes.Length];
-        foreach (var biome in Biomes)
-        {
-            var frequencies = _races.Select(r => Frequency(r, biome)).ToArray();
-            var sum = 0.0;
-            foreach (var f in frequencies) sum += f;
-            if (sum <= 0) continue;
-            for (var k = 0; k < frequencies.Length; k++) frequencies[k] /= sum;
-            _shares[(int)biome] = frequencies;
-        }
+        // Sorted by height; points at the same height keep the order of the list (the sort is stable).
+        _heightPoints = _races
+            .Select(r => (r.HeightModifier ?? [])
+                .Where(point => double.IsFinite(point.HeightM))
+                .OrderBy(point => point.HeightM)
+                .ToArray())
+            .ToArray();
     }
 
     /// <summary>The races that are on, in the order of the Parameter Set.</summary>
@@ -63,19 +58,55 @@ public sealed class PopulationRules
     }
 
     /// <summary>
-    /// 19.2 The share of each race that is on in a biome, in the order of <see cref="Races"/>:
-    /// its frequency over the sum of the frequencies. Empty when none of them lives in the biome.
+    /// 19.2 The height factor of a race that is on (by its index in <see cref="Races"/>) at a height:
+    /// a straight line between its control points and constant beyond them. Of two points at the
+    /// same height the first holds below that height and the second from it and up. 1 for a
+    /// race without a height modifier.
     /// </summary>
-    public ReadOnlySpan<double> Shares(Biome biome) => _shares[(int)biome];
+    public double HeightFactor(int race, double heightM)
+    {
+        var points = _heightPoints[race];
+        if (points.Length == 0) return 1;
+        if (heightM < points[0].HeightM) return Factor(points[0]);
+
+        // The last point at or below the height.
+        var at = 0;
+        while (at + 1 < points.Length && points[at + 1].HeightM <= heightM) at++;
+        if (at + 1 == points.Length) return Factor(points[at]);
+
+        var (a, b) = (points[at], points[at + 1]);
+        var t = (heightM - a.HeightM) / (b.HeightM - a.HeightM);
+        return Factor(a) + t * (Factor(b) - Factor(a));
+    }
+
+    /// <summary>
+    /// 19.2 The share of each race that is on in a biome at a height, in the order of
+    /// <see cref="Races"/>: its frequency in the biome times its height factor, over the sum of
+    /// these. Empty when none of them lives there.
+    /// </summary>
+    public double[] Shares(Biome biome, double heightM)
+    {
+        var shares = new double[_races.Length];
+        var sum = 0.0;
+        for (var k = 0; k < shares.Length; k++)
+        {
+            shares[k] = Frequency(_races[k], biome) * HeightFactor(k, heightM);
+            sum += shares[k];
+        }
+        if (sum <= 0) return [];
+        for (var k = 0; k < shares.Length; k++) shares[k] /= sum;
+        return shares;
+    }
 
     /// <summary>19.3 The potential population of a region from its land patches, taken in the given order.</summary>
-    public PotentialPopulation Region(IEnumerable<(Biome Biome, double AreaKm2, PatchResources Resources, double Prosperity)> landPatches)
+    public PotentialPopulation Region(
+        IEnumerable<(Biome Biome, double HeightM, double AreaKm2, PatchResources Resources, double Prosperity)> landPatches)
     {
         var persons = new double[_races.Length];
         foreach (var patch in landPatches)
         {
-            var shares = Shares(patch.Biome);
-            if (shares.IsEmpty) continue;
+            var shares = Shares(patch.Biome, patch.HeightM);
+            if (shares.Length == 0) continue;
             var capacity = Capacity(patch.AreaKm2, patch.Resources, patch.Prosperity);
             for (var k = 0; k < shares.Length; k++) persons[k] += capacity * shares[k];
         }
@@ -88,4 +119,7 @@ public sealed class PopulationRules
         var f = race.BiomeFrequency[biome];
         return f > 0 && double.IsFinite(f) ? f : 0;
     }
+
+    private static double Factor(HeightFactorPoint point) =>
+        point.Factor > 0 && double.IsFinite(point.Factor) ? point.Factor : 0;
 }
