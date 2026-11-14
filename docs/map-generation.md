@@ -6,7 +6,8 @@ resources, Prospects for cities and towns and the travel network. It is the spec
 of the generation algorithms. The [readme](../readme.md) holds the domain model around
 them (foundation, Parameter Set, identity, region generation stages), and the names in
 this document follow the readme. Default parameter values are given in parentheses or in
-tables; they are the defaults of the Parameter Set.
+tables. The parameters and their defaults are collected in
+[default-parameter-set.json](default-parameter-set.json), grouped by region generation stage.
 
 Each section states the region generation stage that its result belongs to. The reasons
 behind the algorithms are in [map-generation-research.md](map-generation-research.md).
