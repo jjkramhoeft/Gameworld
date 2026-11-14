@@ -585,14 +585,16 @@ public class WorldTests
     {
         var parameters = ParameterSet.Default.Fields;
         var fields = World.Create("cellgen").Fields;
-        foreach (var kind in new[] { FieldKind.InitialTemperature, FieldKind.Precipitation })
+        foreach (var kind in new[] { FieldKind.InitialTemperature, FieldKind.Precipitation, FieldKind.Supernatural })
         {
             var points = parameters[kind].Distribution;
             Assert.NotEmpty(points);
             var below = new int[points.Count];
             var samples = 0;
-            for (double y = -2e6; y < 2e6; y += 10000)
-                for (double x = -2e6; x < 2e6; x += 10000)
+            // The step is not a multiple of a feature size: steps of 10 km would only hit the
+            // lattice points of the Supernatural noise, where it is not spread like the rest.
+            for (double y = -2e6; y < 2e6; y += 9700)
+                for (double x = -2e6; x < 2e6; x += 9700)
                 {
                     var value = fields.Sample(kind, x, y);
                     Assert.InRange(value, parameters[kind].Min, parameters[kind].Max);

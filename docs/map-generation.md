@@ -517,7 +517,8 @@ Four scalar fields are defined over the plane. Each is an
 independent Perlin fBm stretched to a `[min, max]` range. They do not depend on the map.
 The two climate fields are warped: the fBm is read at a position that a second noise has
 moved, which draws its round features out into winding belts. They also have a
-distribution (9.1), which says what share of the map lies below a value.
+distribution (9.1), which says what share of the map lies below a value. The supernatural
+field has a distribution too.
 
 | Field | Seed | Feature size | Octaves | Lacunarity | Gain | Min | Max | Scale | Warp | Warp feature size |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -558,7 +559,7 @@ supernatural field feeds nothing yet.
 
 Without a distribution the values of a field follow the bell shape of the noise: half
 the map lies in the middle quarter of the range, and only the strongest highs and lows
-reach `min` and `max`. Prosperity and Supernatural are like that.
+reach `min` and `max`. Prosperity is like that.
 
 A **distribution** is a list of points `(share, value)`. Each point says what share of the
 map lies below a value. `min` is the point at share 0 and `max` the point at share 1.
@@ -602,6 +603,18 @@ close to the bounds of the moisture classes in the temperate and tropical belts.
 
 The shares hold over a large area, some thousand kilometres across. One view of a few
 regions can differ by several points, because a climate belt is as large as a region.
+
+The supernatural field has a distribution to keep the supernatural rare. The bell shape
+put 6 % of the map above 80 and gave a mean of 50. The points lie on the bounds of the
+bands the field is drawn in (17), so the shares are the shares of the bands: 40 %, 30 %,
+20 %, 9 % and 1 % from the lowest band to the highest, with a mean of 30. Measured, the
+highest band holds 0.75 %: the tail of the noise is a little thinner than a normal one.
+
+| Supernatural | below 20 | below 40 | below 60 | below 80 |
+|---|---|---|---|---|
+| Share of the map | 40 % | 70 % | 90 % | 99 % |
+
+Its features are 10 km across, so the shares hold within a single region.
 
 ---
 

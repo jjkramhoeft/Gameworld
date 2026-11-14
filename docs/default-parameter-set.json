@@ -237,7 +237,24 @@
       "Max": 100,
       "WarpKm": 0,
       "WarpFeatureSizeKm": 200,
-      "Distribution": []
+      "Distribution": [
+        {
+          "Share": 0.4,
+          "Value": 20
+        },
+        {
+          "Share": 0.7,
+          "Value": 40
+        },
+        {
+          "Share": 0.9,
+          "Value": 60
+        },
+        {
+          "Share": 0.99,
+          "Value": 80
+        }
+      ]
     }
   },
   "Bedrocks": [

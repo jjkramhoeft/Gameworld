@@ -874,7 +874,7 @@
           "additionalProperties": false
         },
         "Supernatural": {
-          "description": "Supernatural index, on a linear scale. It feeds nothing yet (§9).",
+          "description": "Supernatural index, on a linear scale. Its Distribution keeps the supernatural rare: most of the map is low and 1 % lies above 80. It feeds nothing yet (§9).",
           "type": "object",
           "properties": {
             "FeatureSizeKm": {
@@ -940,8 +940,7 @@
                   "Value"
                 ],
                 "additionalProperties": false
-              },
-              "default": []
+              }
             }
           },
           "required": [

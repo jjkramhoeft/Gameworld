@@ -421,8 +421,11 @@ public sealed record FieldsParameters
     [Description("Prosperity index, on a linear scale. Feeds the resources (it boosts the valuable ones) and the Prospect scores (§9).")]
     public FieldParameters Prosperity { get; init; } = new(200, 3, 2, 0.5, 1, 100);
 
-    [Description("Supernatural index, on a linear scale. It feeds nothing yet (§9).")]
-    public FieldParameters Supernatural { get; init; } = new(10, 3, 2, 0.5, 0, 100);
+    [Description("Supernatural index, on a linear scale. Its Distribution keeps the supernatural rare: most of the map is low and 1 % lies above 80. It feeds nothing yet (§9).")]
+    public FieldParameters Supernatural { get; init; } = new(10, 3, 2, 0.5, 0, 100)
+    {
+        Distribution = [new(0.4, 20), new(0.7, 40), new(0.9, 60), new(0.99, 80)],
+    };
 
     public FieldParameters this[FieldKind kind] => kind switch
     {
