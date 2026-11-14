@@ -443,7 +443,7 @@ public sealed record PopulationParameters
 {
     [Description("Persons per km² on land with a food supply of 1 at a middling Prosperity. The potential population of a patch is its area × this × its food supply × its Prosperity factor (§19.1).")]
     [Range(0, double.PositiveInfinity)]
-    public double PersonsPerKm2 { get; init; } = 60;
+    public double PersonsPerKm2 { get; init; } = 6;
 
     [Description("How much the Prosperity field moves the potential population of a patch: the factor runs from 1 − this at the lowest Prosperity to 1 + this at the highest. 0 turns the effect of Prosperity off (§19.1).")]
     [Range(0, 1)]

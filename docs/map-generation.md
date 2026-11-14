@@ -1763,7 +1763,7 @@ height modifier does not carry one in the file.
 
 | Parameter | Default |
 |---|---|
-| Persons per km² at a food supply of 1 and a middling Prosperity | 60 |
+| Persons per km² at a food supply of 1 and a middling Prosperity | 6 |
 | Prosperity effect | 0.5 |
 | Races | 23, of which 6 are on (Appendix E) |
 | Height modifiers | dwarves only from 200 m and up, elves only below 200 m |
@@ -1849,8 +1849,8 @@ sum over the races can differ from the rounded sum of the capacities by a few pe
 The land patches of a region are the patches of its zones (section 6.2), so every land
 patch counts in exactly one region.
 
-With the defaults the median region has a potential population of about 351,000 and the
-range is 112,000 to 834,000 (measured on 50 regions of two seeds). Of all persons 66 % are
+With the defaults the median region has a potential population of about 35,100 and the
+range is 11,200 to 83,400 (measured on 50 regions of two seeds). Of all persons 66 % are
 human, 10.5 % orc, 10 % goblin, 7 % halfling, 4.5 % elf and 2 % dwarf. 39 % of the land
 patches lie at 200 m or higher, and every one of the 50 regions has both dwarves and elves.
 

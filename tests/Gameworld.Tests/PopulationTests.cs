@@ -205,8 +205,8 @@ public class PopulationTests
             (Biome.Savanna, 199.9, 64, Resources(0.5), 0.5),
             (Biome.Savanna, 650, 64, Resources(0.25), 0.5),
         ]);
-        Assert.Equal(960, population.Of("high")); // 64 km² × 60 × 0.25
-        Assert.Equal(3840, population.Of("low")); // 2 × 64 km² × 60 × 0.5
+        Assert.Equal(96, population.Of("high")); // 64 km² × 6 × 0.25
+        Assert.Equal(384, population.Of("low")); // 2 × 64 km² × 6 × 0.5
 
         // With only the high race on, the lowland holds nobody.
         var highOnly = new PopulationRules(With(Race("high", RaceParameters.OnlyFrom(200)))).Region(
@@ -214,7 +214,7 @@ public class PopulationTests
             (Biome.Savanna, 80, 64, Resources(0.5), 0.5),
             (Biome.Savanna, 650, 64, Resources(0.25), 0.5),
         ]);
-        Assert.Equal(960, highOnly.Total);
+        Assert.Equal(96, highOnly.Total);
     }
 
     [Fact]
@@ -225,13 +225,13 @@ public class PopulationTests
         (Biome, double, double, PatchResources, double)[] land = [(Biome.Savanna, 120, 64, Resources(0.5), 0.5)];
 
         var both = new PopulationRules(With(human, elf)).Region(land);
-        Assert.Equal(1920, both.Total); // 64 km² × 60 × 0.5
-        Assert.Equal(1440, both.Of("human"));
-        Assert.Equal(480, both.Of("elf"));
+        Assert.Equal(192, both.Total); // 64 km² × 6 × 0.5
+        Assert.Equal(144, both.Of("human"));
+        Assert.Equal(48, both.Of("elf"));
 
         var humansOnly = new PopulationRules(With(human, elf with { Enabled = false })).Region(land);
         Assert.Equal(["human"], humansOnly.Races.Select(r => r.Race));
-        Assert.Equal(1920, humansOnly.Of("human"));
+        Assert.Equal(192, humansOnly.Of("human"));
         Assert.Equal(0, humansOnly.Of("elf"));
         Assert.Equal(both.Total, humansOnly.Total);
     }
@@ -251,8 +251,8 @@ public class PopulationTests
             (Biome.Tundra, 120, 64, Resources(1), 0.5),
             (Biome.IceAndSnow, 120, 64, Resources(0.25), 0.5),
         ]);
-        Assert.Equal(960, population.Of("frostFolk"));
-        Assert.Equal(960, population.Total);
+        Assert.Equal(96, population.Of("frostFolk"));
+        Assert.Equal(96, population.Total);
 
         // With no race on, the region has no potential population at all.
         var nobody = new PopulationRules(With(frost with { Enabled = false })).Region([(Biome.IceAndSnow, 120, 64, Resources(1), 0.5)]);
@@ -264,13 +264,13 @@ public class PopulationTests
     public void The_capacity_of_a_patch_follows_its_area_food_and_prosperity()
     {
         var rules = new PopulationRules(ParameterSet.Default);
-        Assert.Equal(64 * 60 * 0.5, rules.Capacity(64, Resources(0.5), 0.5), 9);
+        Assert.Equal(64 * 6 * 0.5, rules.Capacity(64, Resources(0.5), 0.5), 9);
         Assert.Equal(2 * rules.Capacity(64, Resources(0.5), 0.5), rules.Capacity(128, Resources(0.5), 0.5), 9);
         Assert.Equal(0, rules.Capacity(64, Resources(0), 0.5));
 
         // Prosperity: from half at the lowest to one and a half at the highest.
-        Assert.Equal(64 * 60 * 0.5 * 0.5, rules.Capacity(64, Resources(0.5), 0), 9);
-        Assert.Equal(64 * 60 * 0.5 * 1.5, rules.Capacity(64, Resources(0.5), 1), 9);
+        Assert.Equal(64 * 6 * 0.5 * 0.5, rules.Capacity(64, Resources(0.5), 0), 9);
+        Assert.Equal(64 * 6 * 0.5 * 1.5, rules.Capacity(64, Resources(0.5), 1), 9);
 
         // Fish adds a fifth of its amount to the food supply, which never passes 1.
         Assert.Equal(0.5, PopulationRules.FoodSupply(Resources(0.5)), 12);
@@ -331,8 +331,8 @@ public class PopulationTests
             dwarves += population.Of("dwarf");
             elves += population.Of("elf");
         }
-        // Nine regions of the default world: a few hundred thousand persons each, with both highland and lowland.
-        Assert.InRange(people / 9, 100_000, 1_000_000);
+        // Nine regions of the default world: a few tens of thousands of persons each, with both highland and lowland.
+        Assert.InRange(people / 9, 10_000, 100_000);
         Assert.True(dwarves > 0);
         Assert.True(elves > 0);
     }

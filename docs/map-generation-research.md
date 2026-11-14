@@ -883,14 +883,14 @@ This section rests on a later note, RACES (see §1). It was added on 2026-11-14 
 | Tweaks after phase 1 | A changed list is a new Parameter Set and a new foundation | Reopening the Parameter Set of an existing foundation: it would break "derived data is a pure function of the foundation" |
 | Which races | All 23 of RACES §4.1 are listed. The six most common are on: human, elf, dwarf, halfling, orc, goblin | Only the six in the list; all 23 on; humans only on |
 | From frequency to persons | The land has one capacity per patch, and the races that are on share it by their frequency in the biome | Each race on its own (frequency × food × Prosperity): the total of a region would grow with every race that is toggled on, so the toggles would also tune the size of the world |
-| Capacity | Area × 60 persons per km² × food supply × a Prosperity factor of 0.5 to 1.5 | The calibrated density per biome and elevation type of SITES §6 (the K term): the resource layer already holds the food, as for the Prospect scores (§10.6) |
+| Capacity | Area × 6 persons per km² × food supply × a Prosperity factor of 0.5 to 1.5 | The calibrated density per biome and elevation type of SITES §6 (the K term): the resource layer already holds the food, as for the Prospect scores (§10.6) |
 | Height | A height modifier per race: control points from the height of a patch to a factor on the biome frequencies, with a step where two points share a height. Asked for by the user: dwarves only from 200 m and up, elves only below 200 m | A lowest and a highest height per race: it cannot fade a race in. The elevation type weights of RACES §4.2: the user asked for a limit in metres |
 | Which height | The mean height of the patch in the height map | The typical height of the elevation type (70, 140, 270 and 470 m): a limit at 200 m would then only tell hills and mountains from flat land and lowland |
 | Biomes and resources read | The final ones, calculated with the same height. The region is Elevated when it is Planned, so they are there | The estimated ones, as the Prospects read: the biome of a patch would come from the typical height and its dwarves from the real one. The first version read the estimated ones, before the height modifier |
 
 **The default frequencies.** A frequency is the habitat weight of RACES §4.1 times how common the race is: 10 for humans, 2 for the other five that are on, and 1 or 0.5 for the rest. The habitat weight alone would give humans a quarter of a temperate grassland, level with halflings. The six weights for "common" are my own judgement and are not sourced. With the two height modifiers they give 66 % humans, 4.5 % elves and 2 % dwarves over 50 measured regions; 39 % of the land patches lie at 200 m or higher.
 
-**The density.** 60 persons per km² at a food supply of 1 gives a median region of about 351,000 persons. SITES §6 expects about 330,000 for a temperate region.
+**The density.** 6 persons per km² at a food supply of 1 gives a median region of about 35,100 persons. The first default was 60, which gave about 351,000 and matched the 330,000 that SITES §6 expects for a temperate region. The user found that world too populated and asked for a tenth of it (2026-11-14), so the default no longer follows SITES §6.
 
 | Topic | Status |
 |---|---|

@@ -157,7 +157,7 @@
     "RichScore": 75,
     "PoorScore": 62,
     "Population": {
-      "PersonsPerKm2": 60,
+      "PersonsPerKm2": 6,
       "ProsperityEffect": 0.5
     }
   },
