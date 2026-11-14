@@ -13,6 +13,8 @@ internal static class TestParameters
             RegionJitter = 0.3,
             ZoneCellsPerRegion = new(8, 12),
             PatchCellsPerZoneCell = new(8, 18),
+            ZoneCellCandidates = 16,
+            PatchCellCandidates = 12,
             OceanSeedsPerRegion = new(0, 3),
             ElevationWeights = new(3, 3, 2, 1),
         },
@@ -35,7 +37,11 @@ internal static class TestParameters
             Prosperity = Noise(),
             Supernatural = Noise(),
         },
-        Bedrocks = [new() { Id = new("shield"), Name = "Crystalline shield", Weights = new(1, 1, 1, 0) }],
+        Bedrocks =
+        [
+            new() { Id = new("shield"), Name = "Crystalline shield", Weights = new(1, 1, 1, 0) },
+            new() { Id = new("volcanic"), Name = "Volcanic arc", Weights = new(0, 0, 0, 1) },
+        ],
         Biomes = [new() { Id = new("tundra"), Name = "Tundra", Color = new(200, 210, 190) }],
     };
 

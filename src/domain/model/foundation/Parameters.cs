@@ -34,6 +34,15 @@ public sealed record SitingParameters
     /// <summary>Number of patch cells per zone cell (approximately 8-18).</summary>
     public required IntRange PatchCellsPerZoneCell { get; init; }
 
+    /// <summary>
+    /// How many candidate positions are tried for each zone cell site. 1 scatters the sites
+    /// at random; higher values spread them more evenly.
+    /// </summary>
+    public required int ZoneCellCandidates { get; init; }
+
+    /// <summary>How many candidate positions are tried for each patch cell site.</summary>
+    public required int PatchCellCandidates { get; init; }
+
     /// <summary>Number of zone cells per region that start as ocean seeds.</summary>
     public required IntRange OceanSeedsPerRegion { get; init; }
 

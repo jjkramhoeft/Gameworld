@@ -25,7 +25,7 @@ public class FoundationTests
     [Fact]
     public void Parameter_set_id_is_pinned()
     {
-        Assert.Equal("3cf6e4addcffb67c07b98710e4f9edeb", TestParameters.Create().ComputeId().Value);
+        Assert.Equal("43df6924ac7d67cf9a9a6f8196410c5d", TestParameters.Create().ComputeId().Value);
     }
 
     [Fact]
@@ -33,7 +33,7 @@ public class FoundationTests
     {
         var foundation = new Foundation(Seed, new GeneratorVersion(1), TestParameters.Create());
 
-        Assert.Equal("49e47377060febfbf920c167c9aa7aa5", foundation.Id.Value);
+        Assert.Equal("396d30b27b45124b4fda9c24d6815535", foundation.Id.Value);
     }
 
     [Fact]
