@@ -1,3 +1,9 @@
 {
-  "dotnet.defaultSolution": "Gameworld.slnx"
+  "dotnet.defaultSolution": "Gameworld.slnx",
+  "json.schemas": [
+    {
+      "fileMatch": ["*parameter-set*.json", "*parameters*.json", "!*.schema.json"],
+      "url": "./docs/parameter-set.schema.json"
+    }
+  ]
 }

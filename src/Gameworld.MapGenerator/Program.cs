@@ -20,6 +20,13 @@ if (options.ExportParameters is { } exportPath)
     return 0;
 }
 
+if (options.ExportSchema is { } schemaPath)
+{
+    ParameterSetSchema.Save(schemaPath);
+    Console.WriteLine($"Wrote the JSON Schema of the Parameter Set to {schemaPath}");
+    return 0;
+}
+
 var parameters = options.ParametersPath is { } path ? ParameterSet.Load(path) : ParameterSet.Default;
 var foundation = new Foundation(Seed.FromText(options.Seed), World.GeneratorVersion, parameters);
 var world = new World(foundation);
@@ -104,6 +111,7 @@ internal sealed record Options
     public MapMode[] Modes { get; init; } = [MapMode.Map, MapMode.Biomes, MapMode.Height];
     public bool WriteRegions { get; init; } = true;
     public string? ExportParameters { get; init; }
+    public string? ExportSchema { get; init; }
 
     public static Options? Parse(string[] args)
     {
@@ -133,6 +141,7 @@ internal sealed record Options
                         break;
                     case "--no-regions": o = o with { WriteRegions = false }; break;
                     case "--export-parameters": o = o with { ExportParameters = Value() }; break;
+                    case "--export-schema": o = o with { ExportSchema = Value() }; break;
                     case "-h" or "--help":
                         Help();
                         return null;
@@ -164,5 +173,7 @@ internal sealed record Options
           --modes <list>              map,biomes,height (default all three)
           --no-regions                do not write the regions as json
           --export-parameters <file>  write the default Parameter Set to a json file and stop
+          --export-schema <file>      write the JSON Schema of the Parameter Set (the help text of
+                                      every parameter) to a file and stop
         """);
 }

@@ -1,0 +1,873 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Gameworld Parameter Set",
+  "description": "The set of all map and world parameters of a foundation, grouped by region generation stage. A parameter that is left out keeps its default. Section numbers refer to docs/map-generation.md.",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "description": "The address of this schema, so an editor can show help for the file. Ignored when the file is loaded.",
+      "type": "string"
+    },
+    "Siting": {
+      "description": "Sited stage: the three levels of cells, the ocean seeds and the elevation types (§3, §4, §5.1, §8).",
+      "type": "object",
+      "properties": {
+        "RegionGridSizeKm": {
+          "description": "Grid spacing of the region level in km: the size of a region (§4).",
+          "type": "number",
+          "default": 128
+        },
+        "RegionJitter": {
+          "description": "How far a region site may lie from the centre of its grid square: 0 gives a square grid, 1 lets the site be anywhere in its square (§3.1).",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 1
+        },
+        "ZoneGridSizeKm": {
+          "description": "Grid spacing of the zone level in km. The sizes are kept nested: it is clamped to between 1/16 and 1/1.5 of the region size (§4).",
+          "type": "number",
+          "default": 32
+        },
+        "ZoneJitter": {
+          "description": "How far a zone site may lie from the centre of its grid square: 0 gives a square grid, 1 lets the site be anywhere in its square (§3.1).",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 1
+        },
+        "ZoneWarp": {
+          "description": "Border warp of the zone level, in cell sizes. 0 leaves the borders of zone cells unwarped. It affects which zone cell owns a patch cell (§3.2, §4).",
+          "type": "number",
+          "minimum": 0,
+          "default": 0
+        },
+        "ZoneWarpFrequency": {
+          "description": "Warp noise cycles per zone cell. Only used when ZoneWarp is above 0 (§3.2).",
+          "type": "number",
+          "default": 0.6
+        },
+        "PatchGridSizeKm": {
+          "description": "Grid spacing of the patch level in km. It is clamped to between 1/16 and 1/1.5 of the zone size (§4).",
+          "type": "number",
+          "default": 8
+        },
+        "PatchJitter": {
+          "description": "How far a patch site may lie from the centre of its grid square: 0 gives a square grid, 1 lets the site be anywhere in its square (§3.1).",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 1
+        },
+        "PatchWarp": {
+          "description": "Border warp of the patch level, in cell sizes. Coastlines and zone and region borders run along patch borders, so this gives all of them their wavy shape. 0 gives straight borders (§3.2, §4).",
+          "type": "number",
+          "minimum": 0,
+          "default": 0.26
+        },
+        "PatchWarpFrequency": {
+          "description": "Warp noise cycles per patch cell: lower gives broader waves in the borders (§3.2).",
+          "type": "number",
+          "default": 0.33
+        },
+        "NestLevels": {
+          "description": "Classify a point through its patch only (point → patch → zone → region), so zone borders, region borders and coastlines all run along patch borders. Only true is supported: every later layer assumes nesting (§4).",
+          "type": "boolean",
+          "default": true
+        },
+        "OceanSeedsPerRegion": {
+          "description": "How many of the zone cells it owns each region chooses as ocean seeds: a count drawn evenly from Min to Max. More seeds give more sea (§5.1).",
+          "type": "object",
+          "properties": {
+            "Min": {
+              "description": "Smallest count, inclusive.",
+              "type": "integer",
+              "default": 0
+            },
+            "Max": {
+              "description": "Largest count, inclusive.",
+              "type": "integer",
+              "default": 2
+            }
+          },
+          "required": [
+            "Min",
+            "Max"
+          ],
+          "additionalProperties": false
+        },
+        "ElevationWeights": {
+          "description": "Relative weights of the four land elevation types, drawn per zone cell. Whole numbers; with the defaults 5 of 13 zone cells are Flat Land (§8).",
+          "type": "object",
+          "properties": {
+            "FlatLand": {
+              "description": "Value for Flat Land zones.",
+              "type": "integer",
+              "default": 5
+            },
+            "Lowland": {
+              "description": "Value for Lowland zones.",
+              "type": "integer",
+              "default": 6
+            },
+            "Hills": {
+              "description": "Value for Hills zones.",
+              "type": "integer",
+              "default": 1
+            },
+            "Mountains": {
+              "description": "Value for Mountains zones.",
+              "type": "integer",
+              "default": 1
+            }
+          },
+          "required": [
+            "FlatLand",
+            "Lowland",
+            "Hills",
+            "Mountains"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "Outline": {
+      "description": "Outlined stage: ocean links, ocean expansion and zone mergers (§5.2, §5.3, §6.1).",
+      "type": "object",
+      "properties": {
+        "OceanLinkChance": {
+          "description": "Chance that an ocean seed makes one link, to its nearest other ocean seed. Tested when the seed does not make two links. Every zone cell under a link becomes ocean (§5.2).",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.4
+        },
+        "OceanDoubleLinkChance": {
+          "description": "Chance that an ocean seed makes two links, to its two nearest other ocean seeds. Tested first (§5.2).",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.05
+        },
+        "OceanLinkRangeRegions": {
+          "description": "How many regions away an ocean seed looks for seeds to link to: 2 is a 5 × 5 block of regions. A region can be Outlined when all regions within this range + 5 rings are Sited, so a larger range makes every lookup reach further (§5.2).",
+          "type": "integer",
+          "minimum": 0,
+          "default": 2
+        },
+        "OceanExpansionFrom": {
+          "description": "Which ocean zone cells expand in the first pass. Linked: every zone cell on a link, so a lone ocean seed stays a sea of one zone cell. All: every ocean zone cell, lone seeds too (§5.3).",
+          "enum": [
+            "Linked",
+            "All"
+          ],
+          "default": "Linked"
+        },
+        "OceanExpansionPasses": {
+          "description": "Number of ocean expansion passes. Each pass after the first expands from the zone cells the previous pass converted. More passes give more sea; 0 turns expansion off (§5.3).",
+          "type": "integer",
+          "minimum": 0,
+          "default": 1
+        },
+        "OceanExpansionWeights": {
+          "description": "Relative weights for an expanding zone cell converting 0, 1, 2 or 3 of its nearest land neighbours to ocean: four numbers in that order. A negative weight counts as 0 (§5.3).",
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "default": [
+            23,
+            33,
+            33,
+            10
+          ]
+        },
+        "ZoneMergersPerRegion": {
+          "description": "How many of the zone cells it owns each region chooses to merge into their nearest neighbour: a count drawn evenly from Min to Max. A merger that finds no neighbour on its side of the coast still counts (§6.1).",
+          "type": "object",
+          "properties": {
+            "Min": {
+              "description": "Smallest count, inclusive.",
+              "type": "integer",
+              "default": 2
+            },
+            "Max": {
+              "description": "Largest count, inclusive.",
+              "type": "integer",
+              "default": 4
+            }
+          },
+          "required": [
+            "Min",
+            "Max"
+          ],
+          "additionalProperties": false
+        },
+        "MergeAcrossCoast": {
+          "description": "Let a zone cell merge into its nearest neighbour even when one is land and the other ocean. Off by default: only land-land and ocean-ocean mergers are allowed (§6.1).",
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "Detail": {
+      "description": "Detailed stage: patch mergers, rivers and lakes (§6.3, §10, §11).",
+      "type": "object",
+      "properties": {
+        "PatchMergersPerZoneCell": {
+          "description": "How many of the patch cells it owns each zone cell chooses to merge into their nearest neighbour patch cell in the same zone: a count drawn evenly from Min to Max (§6.3).",
+          "type": "object",
+          "properties": {
+            "Min": {
+              "description": "Smallest count, inclusive.",
+              "type": "integer",
+              "default": 2
+            },
+            "Max": {
+              "description": "Largest count, inclusive.",
+              "type": "integer",
+              "default": 4
+            }
+          },
+          "required": [
+            "Min",
+            "Max"
+          ],
+          "additionalProperties": false
+        },
+        "Rivers": {
+          "description": "Rivers: grown per region with space colonization, from the sea into the land (§10).",
+          "type": "object",
+          "properties": {
+            "AttractorsPerPatchCell": {
+              "description": "Attraction points scattered in every eligible patch cell. More give denser rivers. River sizes are flows divided by this number, so they read as patches drained (§10.1).",
+              "type": "integer",
+              "minimum": 1,
+              "default": 10
+            },
+            "StepKm": {
+              "description": "Length of one growth step, which is one river segment, in km (§10).",
+              "type": "number",
+              "default": 1
+            },
+            "InfluenceKm": {
+              "description": "An attractor pulls its nearest river node only within this radius, in km. Raised to at least 1.5 × the step. A large radius gives fewer, straighter rivers; a small one many independent branches (§10, §18.2).",
+              "type": "number",
+              "default": 47.8
+            },
+            "KillKm": {
+              "description": "An attractor is reached once a river node is this close, in km. Raised to at least 1.05 × the step (§10).",
+              "type": "number",
+              "default": 5
+            },
+            "RandomMotion": {
+              "description": "Weight of a random unit vector added to the direction of every growth step. 0 gives straight runs towards the attractors (§10.3).",
+              "type": "number",
+              "minimum": 0,
+              "default": 0.4
+            },
+            "Wander": {
+              "description": "How much of a step's random vector is inherited from the parent node, 0 to 1. Higher makes bends persist over several steps instead of wiggling (§10.3).",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.23
+            },
+            "PerceptionConeDegrees": {
+              "description": "A river node is only pulled by attractors within ± half this angle of its heading, in degrees. It stops branches hooking back; 360 lets nodes see all round (§10.3).",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 360,
+              "default": 120
+            },
+            "MainStemDominance": {
+              "description": "A node that already has a child only sprouts a side branch if its own pulls are at least this share of the pulls on the stem beyond it. Higher removes more short side twigs; 0 turns it off (§10.5).",
+              "type": "number",
+              "minimum": 0,
+              "default": 0.24
+            },
+            "PullPower": {
+              "description": "Weight of one pull by its distance d relative to the influence radius. Normal: every pull has equal weight. Squared: (d / influence)², far attractors pull harder. Root: √(d / influence) (§10.3).",
+              "enum": [
+                "Normal",
+                "Squared",
+                "Root"
+              ],
+              "default": "Normal"
+            },
+            "Inertia": {
+              "description": "Weight of the node's current heading in the direction of its next step. 0 is no inertia; higher gives straighter rivers (§10.3).",
+              "type": "number",
+              "default": 0
+            },
+            "SkipCoastalPatchCells": {
+              "description": "Put no attractors in coastal patch cells. It keeps river mouths apart and gives the rivers a clear run from the coast into the interior (§10.1).",
+              "type": "boolean",
+              "default": true
+            },
+            "RiverPoorPrecipitationCutoffMm": {
+              "description": "A flat zone whose site gets less precipitation than this, in mm/yr, is river-poor: its patch cells get 0 or 1 attractor instead of the full number, it is drier for the biomes and it holds no lakes. Higher makes more of the flat zones dry plains (§10.1).",
+              "type": "number",
+              "default": 1660
+            }
+          },
+          "additionalProperties": false
+        },
+        "Lakes": {
+          "description": "Lakes: placed per region on the rivers (§11).",
+          "type": "object",
+          "properties": {
+            "Frequency": {
+              "description": "Chance that a patch cell with a suitable river node gets a lake (§11).",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.06
+            },
+            "MinSizeKm": {
+              "description": "Smallest lake in km, measured as the diameter of a circle of equal area (§11).",
+              "type": "number",
+              "default": 1.5
+            },
+            "MaxSizeKm": {
+              "description": "Largest lake in km, measured as the diameter of a circle of equal area. Sizes are skewed towards small lakes (§11).",
+              "type": "number",
+              "default": 5
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "Elevation": {
+      "description": "Elevated stage: the height map and the biomes (§12, §13).",
+      "type": "object",
+      "properties": {
+        "HeightMap": {
+          "description": "The height map: a raster per region, fitted to the rivers and the coast (§12).",
+          "type": "object",
+          "properties": {
+            "ResolutionM": {
+              "description": "Raster cell size in metres (§12.1).",
+              "type": "number",
+              "default": 1000
+            },
+            "ChannelSlope": {
+              "description": "River gradient at a flow of 1, in m/m. Higher gives steeper rivers, and with them higher land, since the land rises from the river beds (§12.2).",
+              "type": "number",
+              "default": 0.01
+            },
+            "Concavity": {
+              "description": "Rivers flatten downstream as flow to the power −concavity: higher gives flatter large rivers. The default is 7/16; multiples of 1/16 are computed exactly (§12.2).",
+              "type": "number",
+              "default": 0.4375
+            },
+            "HillslopeMultiplier": {
+              "description": "Scales the hillslope of every elevation type (§12).",
+              "type": "number",
+              "default": 1
+            },
+            "LevelFlatZones": {
+              "description": "How strongly zones with a river gradient factor below 1 (flat zones by default) are levelled towards the height of their lowest river entry, so they read as a plain at roughly one level. 0 turns levelling off (§12.2).",
+              "type": "number",
+              "default": 1
+            },
+            "MountainBelts": {
+              "description": "Strength of the region-scale relief field, which makes groups of neighbouring zones rugged or gentle together. 0 turns it off (§12.1).",
+              "type": "number",
+              "default": 0.5
+            },
+            "RegionRidgeM": {
+              "description": "Ridge height along region borders, in metres. Region borders are watersheds (§12.5).",
+              "type": "number",
+              "default": 80
+            },
+            "BasinDivideM": {
+              "description": "Ridge height between two river systems, in metres (§12.5).",
+              "type": "number",
+              "default": 30
+            },
+            "DetailNoise": {
+              "description": "Multiplier on the surface detail noise. 0 gives a smooth surface (§12.5).",
+              "type": "number",
+              "default": 1
+            },
+            "ChannelDepthM": {
+              "description": "How deep rivers are cut below their bed profile, in metres (§12.6).",
+              "type": "number",
+              "default": 3
+            },
+            "SeaDepthM": {
+              "description": "Sea depth 40 km or more from the coast, in metres (§12.5).",
+              "type": "number",
+              "default": 300
+            },
+            "Hillslope": {
+              "description": "How steeply the land rises away from rivers and the coast, in m/m, per elevation type. This is what makes the land between the rivers a plain or a range (§12).",
+              "type": "object",
+              "properties": {
+                "FlatLand": {
+                  "description": "Value for Flat Land zones.",
+                  "type": "number",
+                  "default": 0.006
+                },
+                "Lowland": {
+                  "description": "Value for Lowland zones.",
+                  "type": "number",
+                  "default": 0.06
+                },
+                "Hills": {
+                  "description": "Value for Hills zones.",
+                  "type": "number",
+                  "default": 0.15
+                },
+                "Mountains": {
+                  "description": "Value for Mountains zones.",
+                  "type": "number",
+                  "default": 0.277
+                }
+              },
+              "required": [
+                "FlatLand",
+                "Lowland",
+                "Hills",
+                "Mountains"
+              ],
+              "additionalProperties": false
+            },
+            "RiverGradientFactor": {
+              "description": "Multiplier on the river gradient, per elevation type. A type with a factor below 1 is levelled, see LevelFlatZones (§12.2).",
+              "type": "object",
+              "properties": {
+                "FlatLand": {
+                  "description": "Value for Flat Land zones.",
+                  "type": "number",
+                  "default": 0.7
+                },
+                "Lowland": {
+                  "description": "Value for Lowland zones.",
+                  "type": "number",
+                  "default": 1
+                },
+                "Hills": {
+                  "description": "Value for Hills zones.",
+                  "type": "number",
+                  "default": 1.8
+                },
+                "Mountains": {
+                  "description": "Value for Mountains zones.",
+                  "type": "number",
+                  "default": 3
+                }
+              },
+              "required": [
+                "FlatLand",
+                "Lowland",
+                "Hills",
+                "Mountains"
+              ],
+              "additionalProperties": false
+            },
+            "Floodplain": {
+              "description": "Floodplain half-width as a function of the river bed height (§12).",
+              "type": "object",
+              "properties": {
+                "Points": {
+                  "description": "Control points of a monotone spline from river bed height to floodplain half-width. The half-width is constant beyond the end points and never less than 0.75 × the raster cell size (§12).",
+                  "type": "array",
+                  "items": {
+                    "description": "One control point: the floodplain half-width at a river bed height.",
+                    "type": "object",
+                    "properties": {
+                      "BedHeightM": {
+                        "description": "River bed height in metres.",
+                        "type": "number"
+                      },
+                      "HalfWidthM": {
+                        "description": "Floodplain half-width in metres at that bed height.",
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "BedHeightM",
+                      "HalfWidthM"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "ScaleWithRiverSize": {
+                  "description": "When on, the points give the half-width at a flow of 100 and other flows get × √(flow / 100), so big rivers get wide floodplains (§12).",
+                  "type": "boolean",
+                  "default": true
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "Biomes": {
+          "description": "Biomes: one per land patch, from temperature and aridity (§13).",
+          "type": "object",
+          "properties": {
+            "Cooling": {
+              "description": "Control points of a monotone spline from height to the cooling of the Initial Temperature. Constant below the first point; above the last it continues along the last segment's slope. The defaults are much steeper than the real atmosphere, so land below 1000 m still gets cold highlands (§13.1).",
+              "type": "array",
+              "items": {
+                "description": "One control point: the cooling at a height.",
+                "type": "object",
+                "properties": {
+                  "HeightM": {
+                    "description": "Height in metres.",
+                    "type": "number"
+                  },
+                  "CoolingC": {
+                    "description": "Cooling in °C at that height.",
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "HeightM",
+                  "CoolingC"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "RiverPoorPrecipitationFactor": {
+              "description": "The precipitation of a patch in a river-poor flat zone is multiplied by this for the biomes. Lower makes the dry plains drier (§13.1).",
+              "type": "number",
+              "minimum": 0,
+              "default": 0.2
+            },
+            "MangroveMinTemperatureC": {
+              "description": "A coastal patch in a flat or lowland zone becomes Mangrove when it is at least this warm, in °C, and at least as wet as MangroveMinAridity (§13.2).",
+              "type": "number",
+              "default": 20
+            },
+            "MangroveMinAridity": {
+              "description": "The smallest aridity (precipitation ÷ the dryness threshold of the temperature) at which a warm low coast becomes Mangrove. Below 0.5 is desert, 0.5 to 1 steppe, above 1 humid (§13.2).",
+              "type": "number",
+              "default": 0.5
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "Planning": {
+      "description": "Planned stage: Prospects for cities and towns (§15).",
+      "type": "object",
+      "properties": {
+        "ProspectsPerRegion": {
+          "description": "Prospects per region. Regions with little habitable land end up with fewer (§15.5).",
+          "type": "integer",
+          "minimum": 0,
+          "default": 20
+        },
+        "CityProspectsPerRegion": {
+          "description": "How many of a region's Prospects are for cities, at most. The rest are for towns (§15.5).",
+          "type": "integer",
+          "minimum": 0,
+          "default": 4
+        },
+        "SpacingKm": {
+          "description": "Smallest distance between two Prospects, in km. Prospects for cities keep 2.5 × this from each other. When a region cannot fit its Prospects the spacing is relaxed by 15 % at a time, down to one patch size (§15.5).",
+          "type": "number",
+          "default": 20
+        },
+        "Weights": {
+          "description": "Weights of the five factors in the score of a patch. Only their proportions matter. A negative weight counts as 0; if all are 0 the plain mean is used (§15.4).",
+          "type": "object",
+          "properties": {
+            "Resources": {
+              "description": "Weight of the resources factor: food, fresh water, building materials and fuel, fish and trade goods on and around the patch (§15.3).",
+              "type": "number",
+              "default": 0.3
+            },
+            "Geography": {
+              "description": "Weight of the geography factor: buildable ground, waterside and defence (§15.3).",
+              "type": "number",
+              "default": 0.15
+            },
+            "Trade": {
+              "description": "Weight of the trade factor: gateways (river mouths, harbours, heads of navigation, confluences) and how much of the region's food is within reach (§15.3).",
+              "type": "number",
+              "default": 0.25
+            },
+            "Climate": {
+              "description": "Weight of the climate factor: a comfortable temperature and enough moisture (§15.3).",
+              "type": "number",
+              "default": 0.15
+            },
+            "Prosperity": {
+              "description": "Weight of the prosperity factor: the Prosperity field at the spot (§15.3).",
+              "type": "number",
+              "default": 0.15
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "Travel": {
+      "description": "Settled stage: the travel network (§16).",
+      "type": "object",
+      "properties": {
+        "MinProspectScore": {
+          "description": "Only Prospects with at least this score (0 to 100) are on show and are connected by roads, river routes and sea lanes. With the defaults a median of 13 of a region's 20 Prospects pass (§15.5, §16).",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 59
+        }
+      },
+      "additionalProperties": false
+    },
+    "Fields": {
+      "description": "The four Fields: noise maps that drive climate, biomes and resources. They have no stage (§9).",
+      "type": "object",
+      "properties": {
+        "Precipitation": {
+          "description": "Precipitation in mm/yr, on a logarithmic scale: the middle of the range is √(Min · Max), so most of the map is dry to moderate and only a few places are very wet. Feeds the biomes and thins the rivers of dry flat zones (§9).",
+          "type": "object",
+          "properties": {
+            "FeatureSizeKm": {
+              "description": "Size of the features of the noise in km: larger gives slower changes across the map.",
+              "type": "number",
+              "default": 80
+            },
+            "Octaves": {
+              "description": "Number of noise octaves: a whole number, at least 1. More octaves add finer detail.",
+              "type": "number",
+              "default": 2
+            },
+            "Lacunarity": {
+              "description": "Frequency multiplier from one octave to the next.",
+              "type": "number",
+              "default": 2.2
+            },
+            "Gain": {
+              "description": "Amplitude multiplier from one octave to the next: lower makes the finer octaves weaker.",
+              "type": "number",
+              "default": 0.55
+            },
+            "Min": {
+              "description": "The value at the strongest lows of the noise. At least 1 for the logarithmic Precipitation field.",
+              "type": "number",
+              "default": 100
+            },
+            "Max": {
+              "description": "The value at the strongest highs of the noise. Only the strongest highs and lows reach Min and Max.",
+              "type": "number",
+              "default": 12000
+            }
+          },
+          "required": [
+            "FeatureSizeKm",
+            "Octaves",
+            "Lacunarity",
+            "Gain",
+            "Min",
+            "Max"
+          ],
+          "additionalProperties": false
+        },
+        "InitialTemperature": {
+          "description": "Initial Temperature in °C at sea level, on a linear scale. It is cooled by the height of the patch for the biomes (§9, §13.1).",
+          "type": "object",
+          "properties": {
+            "FeatureSizeKm": {
+              "description": "Size of the features of the noise in km: larger gives slower changes across the map.",
+              "type": "number",
+              "default": 110
+            },
+            "Octaves": {
+              "description": "Number of noise octaves: a whole number, at least 1. More octaves add finer detail.",
+              "type": "number",
+              "default": 2
+            },
+            "Lacunarity": {
+              "description": "Frequency multiplier from one octave to the next.",
+              "type": "number",
+              "default": 2
+            },
+            "Gain": {
+              "description": "Amplitude multiplier from one octave to the next: lower makes the finer octaves weaker.",
+              "type": "number",
+              "default": 0.5
+            },
+            "Min": {
+              "description": "The value at the strongest lows of the noise. At least 1 for the logarithmic Precipitation field.",
+              "type": "number",
+              "default": -10
+            },
+            "Max": {
+              "description": "The value at the strongest highs of the noise. Only the strongest highs and lows reach Min and Max.",
+              "type": "number",
+              "default": 30
+            }
+          },
+          "required": [
+            "FeatureSizeKm",
+            "Octaves",
+            "Lacunarity",
+            "Gain",
+            "Min",
+            "Max"
+          ],
+          "additionalProperties": false
+        },
+        "Prosperity": {
+          "description": "Prosperity index, on a linear scale. Feeds the resources (it boosts the valuable ones) and the Prospect scores (§9).",
+          "type": "object",
+          "properties": {
+            "FeatureSizeKm": {
+              "description": "Size of the features of the noise in km: larger gives slower changes across the map.",
+              "type": "number",
+              "default": 200
+            },
+            "Octaves": {
+              "description": "Number of noise octaves: a whole number, at least 1. More octaves add finer detail.",
+              "type": "number",
+              "default": 3
+            },
+            "Lacunarity": {
+              "description": "Frequency multiplier from one octave to the next.",
+              "type": "number",
+              "default": 2
+            },
+            "Gain": {
+              "description": "Amplitude multiplier from one octave to the next: lower makes the finer octaves weaker.",
+              "type": "number",
+              "default": 0.5
+            },
+            "Min": {
+              "description": "The value at the strongest lows of the noise. At least 1 for the logarithmic Precipitation field.",
+              "type": "number",
+              "default": 1
+            },
+            "Max": {
+              "description": "The value at the strongest highs of the noise. Only the strongest highs and lows reach Min and Max.",
+              "type": "number",
+              "default": 100
+            }
+          },
+          "required": [
+            "FeatureSizeKm",
+            "Octaves",
+            "Lacunarity",
+            "Gain",
+            "Min",
+            "Max"
+          ],
+          "additionalProperties": false
+        },
+        "Supernatural": {
+          "description": "Supernatural index, on a linear scale. It feeds nothing yet (§9).",
+          "type": "object",
+          "properties": {
+            "FeatureSizeKm": {
+              "description": "Size of the features of the noise in km: larger gives slower changes across the map.",
+              "type": "number",
+              "default": 10
+            },
+            "Octaves": {
+              "description": "Number of noise octaves: a whole number, at least 1. More octaves add finer detail.",
+              "type": "number",
+              "default": 3
+            },
+            "Lacunarity": {
+              "description": "Frequency multiplier from one octave to the next.",
+              "type": "number",
+              "default": 2
+            },
+            "Gain": {
+              "description": "Amplitude multiplier from one octave to the next: lower makes the finer octaves weaker.",
+              "type": "number",
+              "default": 0.5
+            },
+            "Min": {
+              "description": "The value at the strongest lows of the noise. At least 1 for the logarithmic Precipitation field.",
+              "type": "number",
+              "default": 0
+            },
+            "Max": {
+              "description": "The value at the strongest highs of the noise. Only the strongest highs and lows reach Min and Max.",
+              "type": "number",
+              "default": 100
+            }
+          },
+          "required": [
+            "FeatureSizeKm",
+            "Octaves",
+            "Lacunarity",
+            "Gain",
+            "Min",
+            "Max"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "Bedrocks": {
+      "description": "The bedrock types and their relative weight under each elevation type. The bedrock of a zone is drawn by these weights (§14.1). The resource rules know the nine ids of the defaults; a bedrock with another id gives no bedrock-bound resources.",
+      "type": "array",
+      "items": {
+        "description": "A bedrock type and its weight under each elevation type.",
+        "type": "object",
+        "properties": {
+          "Id": {
+            "description": "The id the resource rules know the bedrock by: shield, foldBelt, granite, volcanic, basalt, ophiolite, carbonate, clastic or alluvium.",
+            "type": "string"
+          },
+          "Name": {
+            "description": "The name shown for the bedrock.",
+            "type": "string"
+          },
+          "Weights": {
+            "description": "Relative weight of the bedrock under each elevation type. Whole numbers; 0 means never under that type.",
+            "type": "object",
+            "properties": {
+              "FlatLand": {
+                "description": "Value for Flat Land zones.",
+                "type": "integer"
+              },
+              "Lowland": {
+                "description": "Value for Lowland zones.",
+                "type": "integer"
+              },
+              "Hills": {
+                "description": "Value for Hills zones.",
+                "type": "integer"
+              },
+              "Mountains": {
+                "description": "Value for Mountains zones.",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "FlatLand",
+              "Lowland",
+              "Hills",
+              "Mountains"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "Id",
+          "Name",
+          "Weights"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,4 +1,5 @@
 {
+  "$schema": "./parameter-set.schema.json",
   "Siting": {
     "RegionGridSizeKm": 128,
     "RegionJitter": 1,

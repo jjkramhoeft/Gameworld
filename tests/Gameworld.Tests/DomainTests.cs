@@ -37,9 +37,61 @@ public class DomainTests
     [Fact]
     public void Default_parameter_set_is_the_documented_one()
     {
-        var documented = JsonNode.Parse(File.ReadAllText(Path.Combine(RepoRoot(), "docs", "default-parameter-set.json")));
+        var documented = JsonNode.Parse(File.ReadAllText(Path.Combine(RepoRoot(), "docs", "default-parameter-set.json")))!.AsObject();
+        Assert.Equal("./" + ParameterSetSchema.FileName, documented["$schema"]?.GetValue<string>());
+        documented.Remove("$schema"); // the pointer to the schema is not a parameter
         var builtIn = JsonNode.Parse(ParameterSet.Default.ToJson());
         Assert.True(JsonNode.DeepEquals(documented, builtIn), "docs/default-parameter-set.json and ParameterSet.Default differ.");
+    }
+
+    [Fact]
+    public void The_documented_schema_is_the_generated_one_and_describes_every_parameter()
+    {
+        var path = Path.Combine(RepoRoot(), "docs", ParameterSetSchema.FileName);
+        var documented = JsonNode.Parse(File.ReadAllText(path));
+        var generated = ParameterSetSchema.Build();
+        Assert.True(JsonNode.DeepEquals(documented, generated),
+            $"docs/{ParameterSetSchema.FileName} is out of date. Regenerate it: dotnet run --project src/Gameworld.MapGenerator -- --export-schema docs/{ParameterSetSchema.FileName}");
+
+        // Every parameter of the default Parameter Set has a description, and every plain value its default.
+        var missing = new List<string>();
+        void Check(JsonObject schema, JsonNode value, string at)
+        {
+            if (at.Length > 0 && string.IsNullOrWhiteSpace(schema["description"]?.GetValue<string>())) missing.Add(at + " (description)");
+            Assert.Null(schema["$ref"]);
+            switch (value)
+            {
+                case JsonObject obj:
+                    Assert.False(schema["additionalProperties"]!.GetValue<bool>());
+                    foreach (var (name, child) in obj)
+                    {
+                        if (schema["properties"]?[name] is JsonObject childSchema) Check(childSchema, child!, $"{at}/{name}");
+                        else missing.Add($"{at}/{name}");
+                    }
+                    break;
+                case JsonArray array when array.Count > 0 && array[0] is JsonObject first:
+                    Check((JsonObject)schema["items"]!, first, at + "/items");
+                    break;
+                default:
+                    if (!at.Contains("/items")) Assert.True(JsonNode.DeepEquals(value, schema["default"]), $"{at} has no default in the schema.");
+                    break;
+            }
+        }
+        Check(generated.AsObject(), JsonNode.Parse(ParameterSet.Default.ToJson())!, "");
+        Assert.Empty(missing);
+
+        Assert.Equal(1, generated["properties"]!["Siting"]!["properties"]!["RegionJitter"]!["maximum"]!.GetValue<double>());
+        Assert.Equal(["Linked", "All"], generated["properties"]!["Outline"]!["properties"]!["OceanExpansionFrom"]!["enum"]!.AsArray().Select(v => v!.GetValue<string>()));
+    }
+
+    [Fact]
+    public void A_parameter_file_may_point_at_its_schema_and_leave_parameters_out()
+    {
+        var p = ParameterSet.FromJson("""{ "$schema": "./parameter-set.schema.json", "Siting": { "PatchWarp": 0.4 } }""");
+        Assert.Equal(0.4, p.Siting.PatchWarp);
+        Assert.Equal(ParameterSet.Default.Siting.PatchGridSizeKm, p.Siting.PatchGridSizeKm);
+        var expected = ParameterSet.Default with { Siting = ParameterSet.Default.Siting with { PatchWarp = 0.4 } };
+        Assert.Equal(expected.ToJson(), p.ToJson());
     }
 
     [Fact]

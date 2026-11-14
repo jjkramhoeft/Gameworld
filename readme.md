@@ -366,8 +366,9 @@ dotnet run --project src/Gameworld.MapGenerator -c Release -- --seed atlas --reg
 | `--modes <list>` | Which maps to draw: `map`, `biomes`, `height` | all three |
 | `--no-regions` | Do not write the regions as json | |
 | `--export-parameters <file>` | Write the default Parameter Set to a json file and stop | |
+| `--export-schema <file>` | Write the JSON Schema of the Parameter Set to a file and stop | |
 
-To try other parameters, export the defaults, edit the file and pass it back:
+To try other parameters, export the defaults, edit the file and pass it back. A parameter that is left out of the file keeps its default.
 
 ```bash
 dotnet run --project src/Gameworld.MapGenerator -c Release -- --export-parameters my-parameters.json
@@ -375,6 +376,21 @@ dotnet run --project src/Gameworld.MapGenerator -c Release -- --export-parameter
 
 ```bash
 dotnet run --project src/Gameworld.MapGenerator -c Release -- --parameters my-parameters.json --out out/mine
+```
+
+### Help text for the parameters
+
+Every parameter has a description: what it does, its unit and the section of [docs/map-generation.md](docs/map-generation.md) it belongs to. The descriptions are written once, on the `ParameterSet` types in `src/Gameworld.Domain/ParameterSet.cs`, and [docs/parameter-set.schema.json](docs/parameter-set.schema.json) is generated from them as a JSON Schema, together with the default, the range and the allowed values of each parameter.
+
+An editor that knows the schema shows the description when you hover a name, completes names and values, and underlines unknown names and values out of range.
+
+* In VS Code this works without setup for every file in this folder named like `*parameters*.json` or `*parameter-set*.json` (see `.vscode/settings.json`).
+* In any other editor that follows `"$schema"`, put it first in the file, with the path to the schema from the file, as [docs/default-parameter-set.json](docs/default-parameter-set.json) does: `"$schema": "./parameter-set.schema.json"`. The line is ignored when the file is loaded.
+
+After changing a description or adding a parameter, regenerate the schema (a test fails while it is out of date):
+
+```bash
+dotnet run --project src/Gameworld.MapGenerator -c Release -- --export-schema docs/parameter-set.schema.json
 ```
 
 ### Demo app
