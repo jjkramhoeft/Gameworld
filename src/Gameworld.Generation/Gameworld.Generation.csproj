@@ -14,4 +14,11 @@
     <InternalsVisibleTo Include="Gameworld.Tests" />
   </ItemGroup>
 
+  <!-- The name models of Names/NameGenerator.cs. The resource name is the file name with the namespace in front. -->
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\pregenerated-data\*_names_sets.json"
+                      LogicalName="Gameworld.Generation.Names.%(Filename)%(Extension)"
+                      Link="Names\Data\%(Filename)%(Extension)" />
+  </ItemGroup>
+
 </Project>

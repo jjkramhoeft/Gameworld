@@ -36,8 +36,8 @@ public readonly record struct AuthoringTrack(GenerationState State)
 }
 
 /// <summary>
-/// Text and portrait are tracked separately, so an entity can be shown with a name and
-/// biography before the picture arrives.
+/// Text and portrait are tracked separately, so an entity can be shown with a description
+/// and history before the picture arrives.
 /// </summary>
 public readonly record struct EntityGeneration(AuthoringTrack Text, AuthoringTrack Portrait)
 {

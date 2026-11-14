@@ -112,11 +112,13 @@ Cities, factions, families and people each have their own generation state, inde
 
 Stub → Pending → Realised
 
-* A Stub holds every gameplay-relevant fact, and is derived data. For a person: age, sex, role, family links, faction membership and home.
+* A Stub holds every gameplay-relevant fact, and is derived data. For a person: name, age, sex, role, family links, faction membership and home.
 * Pending means the authoring by LLM or diffusion model is in flight. On failure the entity returns to Stub.
-* Realised adds the authored presentation only: name, biography and portrait. Authored data must not contradict the Stub.
+* Realised adds the authored presentation only. For a person: the textual description, the history and the portrait. Authored data must not contradict the Stub.
 
-Text and portrait are tracked separately, so a person can be shown with a name and biography before the picture arrives. A city can exist with a population count long before any individual in it is authored.
+The name of a person is not authored. It comes from the name generator (see [docs/NameGenerator-Reuse.md](docs/NameGenerator-Reuse.md)), so a person has a name already as a Stub.
+
+Text and portrait are tracked separately, so a person can be shown with a description and history before the picture arrives. A city can exist with a population count long before any individual in it is authored.
 
 #### Region
 The map is structured in large regions the size of Middle Ages European kingdoms (approximately 100-200km x 100-200km, 128 km by default). The regions are divided into zones (32 km by default). The zones are divided into patches (8 km by default).
@@ -318,7 +320,7 @@ A group of people in one region. A political grouping. Could be a Kingdom, a thi
 A family of NPCs. Typically living together in a household. Can include servants or slaves.
 
 #### Person
-An NPC in the game. A person.
+An NPC in the game. A person. The name is generated and belongs to the Stub. The textual description, the history and the portrait are authored.
 
 ## Setup and run
 
