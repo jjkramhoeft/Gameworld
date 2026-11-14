@@ -70,8 +70,9 @@ public static partial class MapRenderer
         var canvas = new Canvas(view.Width, view.Height);
         var mpp = view.MetresPerPixel;
 
-        // Classify every pixel, with a margin of 2 so borders match across neighbouring tiles.
-        const int margin = 2;
+        // Classify every pixel, with a margin of 5 so borders match across neighbouring tiles:
+        // a border dot looks up to 5 pixels beyond its own pixel.
+        const int margin = 5;
         var bw = view.Width + 2 * margin;
         var bh = view.Height + 2 * margin;
         var info = new CellInfo[bw * bh];
@@ -152,7 +153,7 @@ public static partial class MapRenderer
         var mpp = view.MetresPerPixel;
         var showZones = cells.ZoneSize / mpp >= 24;
         var showPatches = cells.PatchSize / mpp >= 14;
-        // Dashes are anchored to world pixels so tiles join.
+        // Dots are anchored to world pixels so tiles join.
         var gx0 = (long)Math.Round(view.Left / mpp);
         var gy0 = (long)Math.Round(view.Top / mpp);
 
@@ -172,9 +173,12 @@ public static partial class MapRenderer
                 }
                 if (here.Ocean) continue;
 
-                if (RegionEdgeNear(info, bw, bx, by))
+                // Region border: a 3 px dot on every point of a 6 px lattice that the border passes.
+                var dx = DotOffset(gx0 + x);
+                var dy = DotOffset(gy0 + y);
+                if (Math.Abs(dx) <= 1 && Math.Abs(dy) <= 1 && RegionEdgeAround(info, bw, bx - dx, by - dy))
                 {
-                    if ((((gx0 + x) + (gy0 + y)) / 5 & 1) == 0) canvas.Set(x, y, RegionBorderColour);
+                    canvas.Set(x, y, RegionBorderColour);
                     continue;
                 }
                 if (showZones && (here.Zone != left.Zone || here.Zone != up.Zone))
@@ -184,8 +188,21 @@ public static partial class MapRenderer
             }
     }
 
-    /// <summary>A 3 px wide region border: the pixel or one of its 4 neighbours differs in region from its left or upper neighbour.</summary>
-    private static bool RegionEdgeNear(CellInfo[] info, int bw, int bx, int by)
+    private const int DotSpacing = 6;
+
+    /// <summary>The offset of a world pixel from the nearest dot lattice line, -3 to 2.</summary>
+    private static int DotOffset(long worldPixel)
+    {
+        var m = (int)(((worldPixel + DotSpacing / 2) % DotSpacing + DotSpacing) % DotSpacing);
+        return m - DotSpacing / 2;
+    }
+
+    /// <summary>
+    /// A region border passes within half a dot spacing of the lattice point. An edge lies on the
+    /// left or upper side of its pixel, hence the half pixel shift: a straight border then hits
+    /// exactly one lattice line, so the dots neither double nor leave gaps.
+    /// </summary>
+    private static bool RegionEdgeAround(CellInfo[] info, int bw, int bx, int by)
     {
         bool Edge(int x, int y)
         {
@@ -195,7 +212,11 @@ public static partial class MapRenderer
             return (!left.Ocean && !here.Ocean && here.Region != left.Region)
                 || (!up.Ocean && !here.Ocean && here.Region != up.Region);
         }
-        return Edge(bx, by) || Edge(bx + 1, by) || Edge(bx, by + 1) || Edge(bx - 1, by) || Edge(bx, by - 1);
+        for (var dy = -2; dy <= 3; dy++)
+            for (var dx = -2; dx <= 3; dx++)
+                if ((dx - 0.5) * (dx - 0.5) + (dy - 0.5) * (dy - 0.5) <= 9 && Edge(bx + dx, by + dy))
+                    return true;
+        return false;
     }
 
     private static void DrawWater(World world, Canvas canvas, MapView view, GridCoord region, MapLayers layers)

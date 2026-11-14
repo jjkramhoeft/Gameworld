@@ -1524,7 +1524,8 @@ the pixel's world position with `cellAt` and colour it.
   per zone and ±3 % per patch. "Biomes" mode: the biome colour (13.3) varied ±5 % per
   patch.
 - **Borders**, found by comparing each pixel with its left and upper neighbour: coastline
-  in near-black (14, 20, 30); region borders as a 3 px dashed red line (235, 28, 36);
+  in near-black (14, 20, 30); region borders as a dotted red line (235, 28, 36): a 3 px dot on every point of a 6 px
+  lattice, anchored to world pixels, that the border passes within 3 px of;
   zone borders darken the pixel to 50 %, patch borders to 80 %. Zone and patch borders
   are dropped when their cells get small on screen.
 - **Height mode**: a hypsometric tint, linear between stops at 0 m (72, 128, 76), 60 m
