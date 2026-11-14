@@ -1,24 +1,12 @@
-# Map Generation Research: The Research Behind Sandbox 4
+# Map generation research
 
-*Compiled 2026-11-14 from the ten research notes in `docs/research/` (research dates 2026-11-07 to 2026-11-12). Sandbox 4 is described as of commit `e721296`.*
+*Compiled 2026-11-14 from the ten research notes in [research/](research/) (research dates 2026-11-07 to 2026-11-12).*
 
-> **About this document in the Gameworld repository.** It was written in the Sandbox 4
-> repository, and "this repository" below means that one. It is kept here as the
-> background for [map-generation.md](map-generation.md), unchanged apart from this note
-> and the links mentioned next.
->
-> - **Files that are not here.** The ten research notes in `docs/research/`, `sandbox3.md`,
->   the other documents named in §1, the source files and the commits belong to the
->   Sandbox 4 repository. Their links are removed and only the file names are left.
-> - **Sandbox 4 only.** §12 (delivery in the browser) and the ECMAScript rules of §3.3
->   describe the TypeScript prototype. The status tables say what Sandbox 4 implements,
->   not what Gameworld implements.
-> - **Terms and authority.** See the note at the top of
->   [map-generation.md](map-generation.md).
+This document combines the ten research notes into one text, ordered the way the map is built: cells, oceans, rivers, height, fields, biomes, resources, Prospects for cities and towns, travel network. For each layer it gives what the research found, which alternatives were weighed, what the generation adopted, and what is still open.
 
-This document combines the research notes of this repository into one text, ordered the way Sandbox 4 builds its map: cells, oceans, rivers, height, climate, biomes, resources, city and town locations, travel network. For each layer it gives what the research found, which alternatives were weighed, what Sandbox 4 adopted, and what is still open.
+It is the companion of [map-generation.md](map-generation.md). That document says **how** the map is generated, step by step. This one says **why** it is generated that way and what else the research has in store. Topics in the notes that the generation does not use (cellular-automaton caves, Wave Function Collapse, hex grids, noise-line networks) are only summarised in [§4.6](#46-surveyed-but-not-used).
 
-It is the companion of [map-generation.md](map-generation.md). That document says **how** the map is generated, step by step, so that you can rebuild it. This one says **why** it is generated that way and what else the research has in store. Topics in the notes that Sandbox 4 does not use (cellular-automaton caves, Wave Function Collapse, hex grids, noise-line networks) are only summarised in [§4.6](#46-surveyed-but-not-used).
+The names in this document follow the [readme](../readme.md). The notes themselves were written for an earlier prototype called Sandbox 4 and keep its names: "elevation zone" there is Zone here, "zone type" is elevation type, "lattice" is grid, and "location" is Prospect. Where the notes point at source files, they mean the files of that prototype.
 
 ## Contents
 
@@ -28,24 +16,23 @@ It is the companion of [map-generation.md](map-generation.md). That document say
 4. [Cells: the base map](#4-cells-the-base-map)
 5. [Rivers: space colonization](#5-rivers-space-colonization)
 6. [Height map: terrain fitted to the rivers](#6-height-map-terrain-fitted-to-the-rivers)
-7. [Tiles and performance](#7-tiles-and-performance)
+7. [Tiles and cost](#7-tiles-and-cost)
 8. [Climate and biomes](#8-climate-and-biomes)
 9. [Resources](#9-resources)
-10. [City and town locations](#10-city-and-town-locations)
+10. [Prospects for cities and towns](#10-prospects-for-cities-and-towns)
 11. [Travel and trade](#11-travel-and-trade)
-12. [Delivery in the browser](#12-delivery-in-the-browser)
-13. [Research not yet used: a backlog](#13-research-not-yet-used-a-backlog)
-14. [Open questions](#14-open-questions)
-15. [Numeric quick reference](#15-numeric-quick-reference)
-16. [Sources](#16-sources)
+12. [Research not yet used: a backlog](#12-research-not-yet-used-a-backlog)
+13. [Open questions](#13-open-questions)
+14. [Numeric quick reference](#14-numeric-quick-reference)
+15. [Sources](#15-sources)
 
 **How to read this document**
 
-- **Citations.** A reference such as (HEIGHT §3.2) points to a section of a source note; the keys are in §1. The notes hold the full citations (paper, section, figure, or repository, file, lines and commit). §16 lists the main external sources by topic.
+- **Citations.** A reference such as (HEIGHT §3.2) points to a section of a source note; the keys are in §1. The notes hold the full citations (paper, section, figure, or repository, file, lines and commit). §15 lists the main external sources by topic.
 - **Sourced or design.** The notes separate sourced claims from engineering judgement, which they mark "Design note" or "Recommendation". This document keeps that separation: a paragraph that begins **Design** is the notes' own judgement, not a sourced fact.
 - **Verification.** The notes mark claims they could not check against a primary text as *[unverified]* or *[partially verified]*. Where such a claim carries weight here, the mark is repeated.
-- **Status.** Each layer ends with a status table. **Implemented** means Sandbox 4 does it. **Partly** means a simpler form exists. **Open** means the research is there and the code is not.
-- **Numbers drift.** The notes were written against earlier commits. Several defaults have changed since (river step and radii, the terrain halo, the precipitation field). This document gives the current value and says so where it differs from the note.
+- **Status.** Each layer ends with a status table. **Adopted** means the generation does it, as [map-generation.md](map-generation.md) describes. **Partly** means a simpler form is adopted. **Open** means the research is there and the generation does not use it. The status says nothing about what is adopted in code.
+- **Numbers drift.** The notes were written against earlier versions of the generator. Several defaults have changed since (river step and radii, the terrain halo, the precipitation field). This document gives the current value and says so where it differs from the note.
 
 ---
 
@@ -53,47 +40,45 @@ It is the companion of [map-generation.md](map-generation.md). That document say
 
 | Key | Note | Date | Covers | Used in |
 |---|---|---|---|---|
-| CELLS | `docs/research/procedural-cell-generation.md` | 2026-11-07 | First survey: Voronoi and Delaunay partitions, grids and chunks, hashing, cellular automata, Wave Function Collapse, noise, erosion, and a recommended architecture | §3, §4 |
-| GAPS | `docs/research/readme-topics-gaps.md` | 2026-11-07 | Second pass: space colonization, distance functions, line networks from noise, deterministic noise in the browser, GitHub Pages delivery | §3, §4, §5, §12 |
-| RIVERS | `docs/research/space-colonization-branch-variants.md` | 2026-11-07 | 22 techniques that change the branching and look of space-colonization rivers, each with a hook in `rivers.ts` | §5 |
-| HEIGHT | `docs/research/heightmap-from-biomes-and-rivers.md` | 2026-11-07 | Methods that fit a height map to an existing map and river network; three pipelines (A, B, C) | §6 |
-| TILES | `docs/research/sandbox4-tiling.md` | 2026-11-07 | Generating Sandbox 4 tile by tile; measurements; required changes | §7 |
-| BIOMES | `docs/research/biomes-and-climate.md` | 2026-11-08 | Biome schemes (Whittaker, Holdridge, Köppen, WWF, IUCN), aridity, lapse rates, treeline, azonal biomes; a classifier design | §8 |
-| CHARTS | `docs/research/biome-climate-charts.md` | 2026-11-12 | A catalogue of temperature × precipitation charts and rule tables, with data availability and licences | §8 |
-| RES | `docs/research/patch-resources.md` | 2026-11-10 | A catalogue of about 370 natural resources and 28 fantasy resources keyed to the map's fields; missing map features; a bedrock attribute; generation rules | §9 |
-| TRADE | `docs/research/game-resources-and-trade.md` | 2026-11-10 | How games choose, place and trade resources; trade theory; a 39-resource set; price and flow models | §9, §11 |
-| SITES | `docs/research/settlement-siting.md` | 2026-11-10 | Where settlements form; suitability methods; how generators and games place cities; a siting design for Sandbox 4 | §10, §11 |
-
-Related documents that are not research notes: `sandbox3.md` (the original spec of the three-level base map), `docs/resource-overview.md` (the 39 game resources with every catalogue variant under them), `docs/map-structure.md` and `docs/network-structure.md` (the exported JSON), and `README.md`.
+| CELLS | [procedural-cell-generation.md](research/procedural-cell-generation.md) | 2026-11-07 | First survey: Voronoi and Delaunay partitions, grids and chunks, hashing, cellular automata, Wave Function Collapse, noise, erosion, and a recommended architecture | §3, §4 |
+| GAPS | [readme-topics-gaps.md](research/readme-topics-gaps.md) | 2026-11-07 | Second pass: space colonization, distance functions, line networks from noise, deterministic noise in the browser, GitHub Pages delivery | §3, §4, §5 |
+| RIVERS | [space-colonization-branch-variants.md](research/space-colonization-branch-variants.md) | 2026-11-07 | 22 techniques that change the branching and look of space-colonization rivers, each with a hook in the river code | §5 |
+| HEIGHT | [heightmap-from-biomes-and-rivers.md](research/heightmap-from-biomes-and-rivers.md) | 2026-11-07 | Methods that fit a height map to an existing map and river network; three pipelines (A, B, C) | §6 |
+| TILES | [sandbox4-tiling.md](research/sandbox4-tiling.md) | 2026-11-07 | Generating the map tile by tile; measurements; required changes | §7 |
+| BIOMES | [biomes-and-climate.md](research/biomes-and-climate.md) | 2026-11-08 | Biome schemes (Whittaker, Holdridge, Köppen, WWF, IUCN), aridity, lapse rates, treeline, azonal biomes; a classifier design | §8 |
+| CHARTS | [biome-climate-charts.md](research/biome-climate-charts.md) | 2026-11-12 | A catalogue of temperature × precipitation charts and rule tables, with data availability and licences | §8 |
+| RES | [patch-resources.md](research/patch-resources.md) | 2026-11-10 | A catalogue of about 370 natural resources and 28 fantasy resources keyed to the map's fields; missing map features; a bedrock attribute; generation rules | §9 |
+| TRADE | [game-resources-and-trade.md](research/game-resources-and-trade.md) | 2026-11-10 | How games choose, place and trade resources; trade theory; a 39-resource set; price and flow models | §9, §11 |
+| SITES | [settlement-siting.md](research/settlement-siting.md) | 2026-11-10 | Where settlements form; suitability methods; how generators and games place cities; a siting design | §10, §11 |
 
 ---
 
 ## 2. Summary: decisions and their research
 
-| Layer | What Sandbox 4 does | Research basis | Main alternatives weighed |
+| Layer | What is adopted | Research basis | Main alternatives weighed |
 |---|---|---|---|
-| Cells | Three nested levels of jittered-lattice Voronoi cells (128, 32 and 8 km), looked up without a mesh | Worley's hashed feature points and Azgaar's jittered grid give "infinite Voronoi" (CELLS §3.3) | Poisson-disc points with Delaunator; Lloyd relaxation; hex or square grids |
-| Randomness | `hash(seed, stage, i, j)` from pcg3d and a MurmurHash3 finaliser; sfc32 for sequences | Jarzynski & Olano 2020; ECMAScript arithmetic guarantees (CELLS §3.3, GAPS §4) | Stateful RNG; shader-style `sin` hashes; `Math.random` |
+| Cells | Three nested levels of jittered-grid Voronoi cells (128, 32 and 8 km), looked up without a mesh | Worley's hashed feature points and Azgaar's jittered grid give "infinite Voronoi" (CELLS §3.3) | Poisson-disc points with Delaunator; Lloyd relaxation; hex or square grids |
+| Randomness | `hash(seed, purpose, i, j)` from pcg3d and a MurmurHash3 finaliser; sfc32 for sequences | Jarzynski & Olano 2020; exactly specified IEEE arithmetic (CELLS §3.3, GAPS §4) | Stateful RNG; shader-style `sin` hashes; an unseeded platform generator |
 | Noise | In-house simplex and Perlin with hashed gradients, fBm, ridged; warp on the query point | Gustavson, Perlin, Quilez (CELLS §6, GAPS §3.3, §4.3) | `simplex-noise` v4; OpenSimplex2 (no JS port, 64-bit hash) |
 | Rivers | Space colonization per region, grown upstream from the sea, before any terrain | Runions et al. 2005, 2007; Palubicki et al. 2009 (GAPS §1, RIVERS) | Flow accumulation on a heightfield with depression filling; noise isolines |
 | Height | River beds by the χ integral of the stream-power law; land as a geodesic envelope over beds and coast; ridges; burn; Priority-Flood ("Option B") | Mudd et al. 2014; Génevaux et al. 2013; Hellweger & Maidment 1997; Barnes et al. 2014 (HEIGHT) | Height first and rivers from it; diffusion; pinned stream-power simulation |
-| Tiles | Terrain in tiles of about 256 km with a 24 km halo, in a Web Worker | Measurements on the generator itself (TILES) | Per-region rasters; one fixed 4 × 4 tile size |
+| Tiles | Height map in tiles of about 256 km with a 24 km halo | Measurements on the prototype (TILES) | Per-region rasters; one fixed 4 × 4 tile size |
 | Climate | Two independent Perlin fBm fields: temperature (°C) and precipitation (mm/yr, log scale) | The schemes all use temperature and precipitation, never relative humidity (BIOMES §3.4) | Latitude bands; wind and rain sweep; a humidity field |
 | Biomes | Thermal belt × aridity class, with aridity m = P / (20·T + 140) and height cooling; mangrove override | Köppen's dryness threshold; Holdridge's belts; Whittaker as cross-check (BIOMES §7.3, CHARTS §8) | Whittaker lookup grid; Holdridge hexagons; full Köppen rules |
-| Resources | 24 raw resources per patch: potentials from crop trapezoids and biome tables, hashed deposits on a bedrock class per zone, river placers | FAO ECOCROP; USGS deposit models; game survey (RES §7, TRADE §5) | One good per zone; climate-only deposits |
-| Locations | About 20 scored city and town locations per region from five factors, selected inside the region | Break of bulk, navigable rivers, central places, Hansen accessibility (SITES §2–§6) | Global greedy placement as in Azgaar and O'Leary; one centre per lattice cell |
+| Resources | 24 raw resources per patch: potentials from crop trapezoids and biome tables, hashed deposits on a bedrock type per zone, river placers | FAO ECOCROP; USGS deposit models; game survey (RES §7, TRADE §5) | One good per zone; climate-only deposits |
+| Prospects | About 20 scored Prospects for cities and towns per region from five factors, selected inside the region | Break of bulk, navigable rivers, central places, Hansen accessibility (SITES §2–§6) | Global greedy placement as in Azgaar and O'Leary; one centre per grid square |
 | Travel | Roads, river routes and sea lanes on a 2 km cost grid; links between travel-cost neighbours, pruned by detour | Water is far cheaper than land; a fixed charge per mode change (TRADE §4.2, SITES §3.3, §6.8) | Straight-line graphs; a patch-graph model |
 
 Two decisions run through all of it:
 
-1. **Rivers come before height.** Almost every published generator builds height first and derives rivers from it. Sandbox 4 grows the rivers first and fits the terrain to them (HEIGHT §1). That removes depression handling from the river step and guarantees that the drawn rivers are the valleys.
+1. **Rivers come before height.** Almost every published generator builds height first and derives rivers from it. The generator grows the rivers first and fits the terrain to them (HEIGHT §1). That removes depression handling from the river step and guarantees that the drawn rivers are the valleys.
 2. **The region is the unit of work.** Rivers never enter another region's land. Every non-landlocked region is therefore a closed drainage unit, its land border is a divide, and any step that looks global (filling, routing, selection) can run per region with a bounded halo (HEIGHT §1, SITES §1).
 
 ---
 
 ## 3. Constraints that shaped every choice
 
-Sandbox 4's map is unbounded, generated on demand, the same in any order of exploration, and bit-identical in every browser. The notes test every method against these demands. HEIGHT states them as five criteria, which the later notes reuse:
+The map is unbounded, generated on demand, the same in any order of exploration, and bit-identical on every machine. The notes test every method against these demands. HEIGHT states them as five criteria, which the later notes reuse:
 
 | Key | Question |
 |---|---|
@@ -111,7 +96,7 @@ Sandbox 4's map is unbounded, generated on demand, the same in any order of expl
   - (b) run in **phases**, where phase k of a chunk may read phase k − 1 of its neighbours;
   - (c) push long-range processes into a **coarser layer** that chunks only sample.
 - **Avoid order-dependent seam repair.** Johnson et al.'s infinite caves smooth across a new chunk and its neighbours, which makes the result depend on generation order. A generator that wants exact reproducibility should not do that (CELLS §3.2).
-- **What Sandbox 4 uses.** All three fixes appear: the terrain raster has a 24 km halo (a); the oceans are built in phases, seeds, then links, then growth, each reading only the phase before (b); regions are the coarse layer that owns rivers (c).
+- **What the generator uses.** All three fixes appear: the height map raster has a 24 km halo (a); the oceans are built in phases, ocean seeds, then links, then expansion, each reading only the phase before (b); regions are the coarse layer that owns rivers (c).
 
 ### 3.2 Randomness from hashes
 
@@ -119,36 +104,34 @@ Sandbox 4's map is unbounded, generated on demand, the same in any order of expl
 - **Which hash.** Jarzynski & Olano tested over 100 hash variants for quality and speed and name pcg3d and pcg4d for N-D input and output. They warn that generators which are good sequentially "fall short" when used in parallel with neighbouring seeds, which is exactly the per-cell case (CELLS §3.3).
 - **Worley already did this.** Each unit cube's feature points come from a generator seeded by the hashed cube id, with no tables (CELLS §3.3, §6.3).
 - **Sequential stages.** Dart throwing, attractor placement and shuffles are inherently sequential. For those, seed a small PRNG per cell. GAPS §4.2 compares five and recommends **sfc32 seeded with four words from SplitMix32** applied to the stage hash. sfc32 passes PractRand and BigCrush per bryc's notes; Mulberry32 is not equidistributed (about a third of the 32-bit outputs never occur).
-- **Sandbox 4.** `hash4(seed, stage, x, y) = fmix32(pcg3(x, y, seed XOR stage·0x9e3779b9))`, with one `stage` constant per purpose, and sfc32 seeded per region for sequences, with 12 outputs discarded as in the original seeding.
+- **The generator.** `hash4(seed, purpose, x, y) = fmix32(pcg3(x, y, seed XOR purpose·0x9e3779b9))`, with one constant per purpose, and sfc32 seeded per region for sequences, with 12 outputs discarded as in the original seeding.
 
 ### 3.3 Bit-exact arithmetic
 
-What ECMAScript guarantees (GAPS §4.1):
+The same foundation must give the same map on every machine. The notes worked the rules out for one platform (GAPS §4.1), and the conclusion holds in general:
 
-- Numbers are IEEE 754 binary64. Add, subtract, multiply and divide are each defined by the IEEE rules with round-to-nearest-even. `Math.sqrt` is correctly rounded. `Math.floor`, `Math.round`, `Math.fround` and `Math.imul` are exactly specified.
-- Because each operation is specified on its own, a conforming engine cannot fuse `a*b + c` or keep extended precision. **The same arithmetic gives the same bits in every conforming engine.**
-- The transcendental functions are not: `sin`, `cos`, `exp`, `log`, `pow`, `atan2`, `hypot`, `cbrt` and the `**` operator are "implementation-approximated". V8 has shipped at least two different trig implementations [partially verified].
-- `Math.random` cannot be seeded.
+- IEEE 754 add, subtract, multiply, divide and square root are exactly defined. They give the same bits everywhere, as long as nothing fuses `a*b + c` into one operation or keeps extended precision.
+- The transcendental functions are not: `sin`, `cos`, `exp`, `log`, `pow`, `atan2`, `hypot` and `cbrt` may differ in the last bit between implementations.
 
 Rules that follow, used throughout the notes:
 
 | Rule | Reason | Source |
 |---|---|---|
-| No `sin`, `cos`, `exp`, `log`, `pow`, `**`, `hypot` in generation code | Results may differ between engines | GAPS §4.1 |
-| Use `Math.imul` for 32-bit multiplies and `>>> 0` to read unsigned | A plain `a * b` can exceed 2⁵³ and lose the low bits a hash depends on | GAPS §4.1 |
+| No platform `sin`, `cos`, `exp`, `log`, `pow` or `hypot` in generation code | Results may differ between machines | GAPS §4.1 |
+| Hash arithmetic in 32-bit unsigned integers with wrap-around | The low bits a hash depends on must not be lost | GAPS §4.1 |
 | No shader-style `fract(sin(x)·43758.5453)` hash | Uses `sin` | GAPS §4.1 |
 | Angles as cosine literals or `√` constructions: cos 30° = √3/2, cos 45° = √½, cos 60° = ½, cos 72° = (√5 − 1)/4 | Avoids trig | RIVERS, header |
 | Rotation by the rational form `c = (1 − t²)/(1 + t²)`, `s = 2t/(1 + t²)`, with `t = tan(θ/2)` as a literal | Avoids trig | RIVERS, header |
 | Dyadic exponents by nested roots: `A^−7⁄16 = 1/(⁴√A · ⁸√A · ¹⁶√A)` | Avoids `pow` | HEIGHT §3.2 |
 | Logarithmic axes as comparisons against powers of 2, or as products compared with a constant | Avoids `log` | BIOMES §7.4 |
 | Seasonal cycles from a literal table of 12 cosine constants | Avoids `cos` | BIOMES §7.2 |
-| Tobler's walking speed with a deterministic `dexp`, or as `6 / (1 + a + a²/2 + a³/6 + a⁴/24)` | Avoids `exp` | SITES §3.3 |
+| Tobler's walking speed with a deterministic `exp`, or as `6 / (1 + a + a²/2 + a³/6 + a⁴/24)` | Avoids `exp` | SITES §3.3 |
 | Heap ties break on the cell index; sums run in a fixed order | Float sums and equal keys depend on order | HEIGHT §4.1, SITES §5.3 |
-| Keep generation off the GPU | GPU float rules are looser than ECMAScript's [unverified] | GAPS §5.2 |
+| Keep generation off the GPU | GPU float rules are looser [unverified] | GAPS §5.2 |
 
-**Design.** Thresholds are safe: constants such as 0.0065 are not exact in binary, but they are the same double on every engine, so comparisons stay deterministic (BIOMES §7.4).
+**Design.** Thresholds are safe: constants such as 0.0065 are not exact in binary, but they are the same double on every machine, so comparisons stay deterministic (BIOMES §7.4).
 
-**Sandbox 4.** The rule is in force: generation uses hashing, seeded PRNGs and exactly specified arithmetic only. `shared/core/dmath.ts` holds deterministic replacements (`dexp`, `dlog`) for the few places that need them, such as the logarithmic precipitation scale. SITES §6.13 found two leftovers while reading the code at commit `b94e28d`: `Math.log` and `Math.exp` in the log-scale climate field, and `Math.hypot` and `** 2` in `world.ts` and `rivers.ts`. Both are gone at `e721296`: `climate.ts` now uses `dlog` and `dexp`, and a search of `src/world/` finds no `Math.log`, `Math.exp`, `Math.hypot`, `Math.pow` or `** 2`.
+**The generator.** The rule is in force: generation uses hashing, seeded PRNGs and exactly specified arithmetic only. The few places that need `exp`, `ln`, `sin` or `cos`, such as the logarithmic precipitation scale, use deterministic versions built from `+ − × ÷` (map-generation.md, Appendix A).
 
 ---
 
@@ -165,36 +148,36 @@ The first survey separates four things that are all called cells (CELLS §1):
 | Automaton cell | A grid cell updated by a local rule | Caves, smoothing, erosion |
 | Constraint cell | A slot holding the tiles still possible | Tile layouts that obey adjacency rules |
 
-Sandbox 4 uses the first, addressed through the second: a Voronoi partition whose sites live on a lattice.
+The generator uses the first, addressed through the second: a Voronoi partition whose sites live on a grid.
 
 ### 4.2 Choosing the points
 
 | Method | How | Fit for an unbounded map |
 |---|---|---|
 | Uniform random | Independent points | Clumps and gaps; Red Blob Games rejects it |
-| **Jittered grid** | One point per lattice square at a random offset | Local by construction. Azgaar uses a jitter of ±0.9 × half the spacing. With jitter 0 the cells are the lattice itself, so jitter is a single knob from regular to organic |
+| **Jittered grid** | One point per grid square at a random offset | Local by construction. Azgaar uses a jitter of ±0.9 × half the spacing. With jitter 0 the cells are the grid itself, so jitter is a single knob from regular to organic |
 | Lloyd relaxation | Move each site to the centroid of its cell, repeatedly | Global and iterative. O'Leary uses one pass |
 | Poisson disc (Bridson 2007) | Samples at least `r` apart, grown from one seed with `k` = 30 tries, O(N) | Global growth order; needs a per-chunk variant |
 
 (CELLS §2.2.)
 
-**The key observation.** If each lattice cell owns one hashed point, as in Worley noise and Azgaar's grid, the Voronoi cell containing any location can be found by checking the lattice cells around it. No triangulation is needed. Poisson-disc spacing is lost, but cells stay reasonably regular (CELLS §3.3).
+**The key observation.** If each grid square owns one hashed point, as in Worley noise and Azgaar's grid, the Voronoi cell containing any location can be found by checking the grid squares around it. No triangulation is needed. Poisson-disc spacing is lost, but cells stay reasonably regular (CELLS §3.3).
 
 ### 4.3 Exactness of the neighbourhood search
 
 The survey suggested a 3 × 3 search. The second pass corrected that (GAPS §2.2):
 
-- With one point per unit lattice cell, every point outside the 3 × 3 block is at least 1 away in the L∞ metric, and every Lp distance is at least the L∞ distance.
+- With one point per unit grid square, every point outside the 3 × 3 block is at least 1 away in the L∞ metric, and every Lp distance is at least the L∞ distance.
 - The point in the query's own cell is within 1 (L∞), √2 (L2) or 2 (L1). So **3 × 3 is provably exact for the nearest point only under L∞**. For Euclidean distance a closer point outside the block is possible, though rare.
 - The exact method is Worley's pruning: visit neighbouring cells in order of their minimum box distance and stop when that distance exceeds the best found.
 
-**Sandbox 4** searches square rings of radius 0 to 3 and stops when the ring's lower bound, `r − 1 + (1 − jitter)/2` lattice units, exceeds the best distance. That is the pruned, exact form.
+**The generator** searches square rings of radius 0 to 3 and stops when the ring's lower bound, `r − 1 + (1 − jitter)/2` grid units, exceeds the best distance. That is the pruned, exact form.
 
-### 4.4 Triangulation, and why Sandbox 4 skips it
+### 4.4 Triangulation, and why the generator skips it
 
 Mesh-based generators triangulate their points. The survey compares Fortune's sweepline (O(n log n), hard to make robust), Bowyer–Watson (simple, incremental) and Delaunator (about 1 s per million points, flat integer arrays) (CELLS §2.3). All are global constructions over a finite point set.
 
-Sandbox 4 needs adjacency, not a mesh. It uses the **Gabriel graph**: two cells are neighbours when no third site lies inside the circle whose diameter joins their sites. It is a subgraph of the Delaunay triangulation, it is symmetric, it always contains the nearest neighbour, and it can be tested locally on a lattice.
+The generator needs adjacency, not a mesh. It uses the **Gabriel graph**: two cells are neighbours when no third site lies inside the circle whose diameter joins their sites. It is a subgraph of the Delaunay triangulation, it is symmetric, it always contains the nearest neighbour, and it can be tested locally on a grid.
 
 ### 4.5 Borders, distance functions and warping
 
@@ -204,13 +187,13 @@ Sandbox 4 needs adjacency, not a mesh. It uses the **Gabriel graph**: two cells 
 - **Signed distance functions** turn a polygon or a set of capsules into a smooth field. The notes propose them for island masks (`e = fbm − α·sdf`), coastal bands and river corridors (GAPS §2.3).
 - **Domain warping** evaluates a pattern at a displaced position, `f(p + h(p))`, with `h` built from fBm. Quilez's canonical constants are a warp scale of 4 and the offsets (5.2, 1.3), (1.7, 9.2) and (8.3, 2.8) (GAPS §3.3).
 
-**Sandbox 4** warps the **query point**, not the sites: patch borders become wavy (amplitude 0.26 cell sizes) while sites stay put. Borders are drawn pixel-exact in the raster by comparing neighbouring pixels, so the uneven-width problem does not arise. Signed distance functions and non-Euclidean metrics are not used.
+**The generator** warps the **query point**, not the sites: patch borders become wavy (amplitude 0.26 cell sizes) while sites stay put. Borders are drawn pixel-exact in the raster by comparing neighbouring pixels, so the uneven-width problem does not arise. Signed distance functions and non-Euclidean metrics are not used.
 
 ### 4.6 Surveyed but not used
 
-The first survey covers more than Sandbox 4 needs. In brief:
+The first survey covers more than the generator needs. In brief:
 
-| Topic | Finding | Why it is not in Sandbox 4 |
+| Topic | Finding | Why it is not adopted |
 |---|---|---|
 | Square and hex grids | Hex neighbours are uniform; axial coordinates are the recommended storage (CELLS §3.1) | The Voronoi levels give the organic look; a hex overlay for gameplay stays possible |
 | Cellular-automaton caves | The "4-5 rule" with 40–45 % initial fill; a flood fill for connectivity (CELLS §4.1) | No underground layer |
@@ -219,7 +202,7 @@ The first survey covers more than Sandbox 4 needs. In brief:
 | Tectonic plates | Cortial et al. 2019; a cheap Voronoi approximation is sketched (CELLS §7) | Zone types and a relief noise stand in for tectonics |
 | Line networks from noise | A single field's zero isoline has no junctions; the 2D AND of two fields gives dots, the OR gives a network; gradient normalisation keeps width constant (GAPS §3) | Rivers come from space colonization and roads from routing |
 
-The survey's architecture recommendation (CELLS §9) was a finite Voronoi **world layer** of 10,000–50,000 cells plus chunked local layers, with a `CellGraph` interface and `Field` arrays. Sandbox 4 went another way: there is no finite world layer. The "infinite alternative" the survey listed as an option, the jittered lattice, became the whole base map, and regions took the place of the world layer. The survey's open question 2 ("a coarse infinite layer with bounded-range hydrology is an unsolved design area") is what the per-region rivers answer.
+The survey's architecture recommendation (CELLS §9) was a finite Voronoi **world layer** of 10,000–50,000 cells plus chunked local layers, with a `CellGraph` interface and `Field` arrays. The generator went another way: there is no finite world layer. The "infinite alternative" the survey listed as an option, the jittered grid, became the whole base map, and regions took the place of the world layer. The survey's open question 2 ("a coarse infinite layer with bounded-range hydrology is an unsolved design area") is what the per-region rivers answer.
 
 ### 4.7 What other generators do
 
@@ -228,24 +211,24 @@ The survey's architecture recommendation (CELLS §9) was a finite Voronoi **worl
 | Red Blob mapgen2 | Poisson disc, Delaunay, centroid dual | Distance from the coast | Follow the downslope graph | Moisture from distance to fresh water; Whittaker-style table |
 | Red Blob mapgen4 | Same | Noise plus mountain distance fields | Binary trees on triangles, flow accumulated in reverse | Wind sweep with orographic rain |
 | O'Leary | 16,384 points, one Lloyd pass | Primitives, then flux erosion | From erosion flux | — |
-| Azgaar | Jittered square lattice | Templates of hills, ranges and troughs | Depressions raised, flux downhill | Winds along the lattice; 5 × 26 biome matrix |
-| **Sandbox 4** | Three nested jittered lattices, no mesh | Fitted to the rivers | Space colonization per region | Noise fields; belt × aridity |
+| Azgaar | Jittered square grid | Templates of hills, ranges and troughs | Depressions raised, flux downhill | Winds along the grid; 5 × 26 biome matrix |
+| **This generator** | Three nested jittered grids, no mesh | Fitted to the rivers | Space colonization per region | Noise fields; belt × aridity |
 
 (CELLS §2.4, HEIGHT §8.) All four reference generators are finite and global. None is order-independent on an unbounded map.
 
-### 4.8 Sandbox 4: the hierarchy, oceans and merges
+### 4.8 The hierarchy, oceans and mergers
 
-The three-level structure follows the owner's spec in `sandbox3.md`, not a research note: regions of 128 km own ocean seeds and zone merges, elevation zones of 32 km are the land or ocean unit, patches of 8 km carry detail. The research contributes the construction (stateless lattice Voronoi) and, later, a reading of the sizes:
+The three-level structure follows the owner's own spec, not a research note: regions of 128 km own ocean seeds and zone mergers, zones of 32 km are the land or ocean unit, patches of 8 km carry detail. The research contributes the construction (stateless grid Voronoi) and, later, a reading of the sizes:
 
 - **The sizes are Christaller's K = 4 system.** In the traffic principle, market-area spacings double per order: 4, 8, 16, 32, 64, 128, 256 km. Patches, zones and regions are orders 2, 4 and 6, and K = 4 predicts 16 lower areas per area two orders up, which is 16 patches per zone and 16 zones per region (SITES §5.2) [partially verified].
 - **The patch is a farming catchment.** A mean area of 64 km² is a circle of radius 4.5 km, the one-hour catchment of site-catchment analysis (SITES §2.2).
 
 | Topic | Status |
 |---|---|
-| Stateless lattice Voronoi with exact pruned search | Implemented |
-| Per-cell hashing, per-region sfc32 streams | Implemented |
-| Order independence, tested by exploring in two orders | Implemented |
-| Query-point warping; nesting through the patch | Implemented |
+| Stateless grid Voronoi with exact pruned search | Adopted |
+| Per-cell hashing, per-region sfc32 streams | Adopted |
+| Order independence | Adopted |
+| Query-point warping; nesting through the patch | Adopted |
 | Distance metric as a parameter; SDF masks | Open (not needed so far) |
 
 ---
@@ -276,15 +259,15 @@ Branches appear when the set of points pulling one node later **splits** between
 
 (GAPS §1.3, RIVERS §3.1.) Documented ratios in other implementations: Coding Train `dᵢ` = 20D, `dₖ` = 2D; Webb 6D and 1D; Palubicki 4–6 and 2 internodes.
 
-**Sandbox 4** now runs with `D` = 1 km, `dᵢ` = 47.8 km and `dₖ` = 5 km. At the time of the notes it was 2, 16 and 3 km. The large influence radius gives fewer, straighter rivers.
+**The defaults** are now `D` = 1 km, `dᵢ` = 47.8 km and `dₖ` = 5 km. At the time of the notes they were 2, 16 and 3 km. The large influence radius gives fewer, straighter rivers.
 
 ### 5.3 Cost, pitfalls and determinism
 
 - **Cost.** Naively, finding each point's closest node is O(points × nodes) per iteration. The 2005 paper keeps Voronoi diagrams; Webb rebuilds a k-d tree each frame (GAPS §1.4).
-- **Design: an incremental nearest-node cache.** Nodes are only added, never moved. So each attraction point can cache its nearest node, and after a growth step only the points near each new node need updating, found through a grid with cell size about `dᵢ`. The kill test comes for free (GAPS §1.4). Sandbox 4 does exactly this.
-- **Stalled tips.** When a tip's points lie on opposite sides, the pulls cancel. Guards: skip growth when the sum is near zero, reject a node that lands on an earlier one, and keep `dₖ > D` so a tip cannot step over a point (GAPS §1.5). Sandbox 4 raises `dₖ` to at least 1.05·D and has a stall guard that steps straight at the closest attractor.
+- **Design: an incremental nearest-node cache.** Nodes are only added, never moved. So each attraction point can cache its nearest node, and after a growth step only the points near each new node need updating, found through a grid with cell size about `dᵢ`. The kill test comes for free (GAPS §1.4). The generator does exactly this.
+- **Stalled tips.** When a tip's points lie on opposite sides, the pulls cancel. Guards: skip growth when the sum is near zero, reject a node that lands on an earlier one, and keep `dₖ > D` so a tip cannot step over a point (GAPS §1.5). The generator raises `dₖ` to at least 1.05·D and has a stall guard that steps straight at the closest attractor.
 - **Determinism.** The 2005 paper breaks ties at random, and float sums depend on order. Break ties by node index, iterate in a fixed order, and seed the placement from the stage hash (GAPS §1.5).
-- **It is global and sequential.** The result depends on growth order across the whole domain, so it cannot be computed chunk by chunk like noise. It needs an owner with a closed domain (GAPS §1.5). In Sandbox 4 that owner is the region.
+- **It is global and sequential.** The result depends on growth order across the whole domain, so it cannot be computed chunk by chunk like noise. It needs an owner with a closed domain (GAPS §1.5). In the generator that owner is the region.
 
 ### 5.4 Rivers first
 
@@ -294,9 +277,9 @@ Branches appear when the set of points pulling one node later **splits** between
 - It gives direct control over density (`dₖ`) and wiggliness (`dᵢ`).
 - Nothing guarantees that the rivers run downhill on a terrain that already exists. That consistency has to be built in afterwards, which is §6.
 
-How Sandbox 4 applies it:
+How the generator applies it:
 
-| Element | Research suggestion | Sandbox 4 |
+| Element | Research suggestion | Adopted |
 |---|---|---|
 | Domain | Land cells of a world layer | The land of one region |
 | Attraction points | Land-cell centres, density weighted by rainfall | 10 random points inside every inland patch; 0 or 1 in a river-poor flat zone (a flat zone whose site precipitation is below 1,660 mm/yr) |
@@ -305,11 +288,11 @@ How Sandbox 4 applies it:
 | Width | Murray's rule `rⁿ = r₁ⁿ + r₂ⁿ`, n ≈ 2–3 | Width ∝ flow^b with b = 0.4; flow = attractors reached upstream |
 | Termination | Points exhausted or out of range | Runs until every attractor is reached: a gap wider than `dᵢ` is bridged with a straight run |
 
-The region rule is Sandbox 4's own: a river node may lie over any ocean or on its own region's land, never on another region's land. Landlocked regions are exempt and search up to 4 zone steps for an ocean.
+The region rule is the generator's own: a river node may lie over any ocean or on its own region's land, never on another region's land. Landlocked regions are exempt and search up to 4 zone steps for an ocean.
 
 ### 5.5 Knobs that change the look
 
-RIVERS lists 22 techniques, each with the place in `rivers.ts` where it hooks in, its cost and whether it can be bit-exact. Its ranking by look change per effort put inertia, the perception cone, correlated wander and tropism first. Status in Sandbox 4:
+RIVERS lists 22 techniques, each with the place in the river code where it hooks in, its cost and whether it can be bit-exact. Its ranking by look change per effort put inertia, the perception cone, correlated wander and tropism first. Status:
 
 | # | Technique | Visual effect | Source | Status |
 |---|---|---|---|---|
@@ -318,32 +301,32 @@ RIVERS lists 22 techniques, each with the place in `rivers.ts` where it hooks in
 | 2.3 | Incremental release (headward waves, coarse-to-fine) | Long trunks, a size hierarchy | Runions 2005, 2007 | Open |
 | 2.4 | Warped or clustered attractors | Tributary fans and gaps | Webb (effect undocumented) | Open |
 | 3.1 | `dᵢ` and `dₖ` as multiples of `D` | The character survives a change of `D` | Runions 2007 | Open (minimum ratios only) |
-| 3.2 | **Perception cone** | Forward forks, no hooking back, a cap on junction angles | Palubicki 2009 | **Implemented** (120° by default) |
-| 4.1 | **Inertia** | Straighter reaches, wider bends | Palubicki 2009; Coding Train | **Implemented** (default 0) |
+| 3.2 | **Perception cone** | Forward forks, no hooking back, a cap on junction angles | Palubicki 2009 | **Adopted** (120° by default) |
+| 4.1 | **Inertia** | Straighter reaches, wider bends | Palubicki 2009; Coding Train | **Adopted** (default 0) |
 | 4.2 | Tropism (an inland bias vector) | Parallel drainage | Runions 2007 | Open |
 | 4.3 | Turn limit per step | No hairpins | Design | Open |
-| 4.4 | **Correlated wander** | Bends instead of wiggle | Langbein & Leopold 1966 (motivation) | **Implemented** (0.23) |
+| 4.4 | **Correlated wander** | Bends instead of wiggle | Langbein & Leopold 1966 (motivation) | **Adopted** (0.23) |
 | 5.1 | Coherence-scaled step | Nodes bunch at junctions | Coding Train (side effect) | Open |
-| 5.2 | **Vigour and apical control** | Dominant main stems, fewer stubs | Palubicki 2009 | **Implemented** as main-stem dominance (0.24) |
+| 5.2 | **Vigour and apical control** | Dominant main stems, fewer stubs | Palubicki 2009 | **Adopted** as main-stem dominance (0.24) |
 | 5.3 | Child cap, lateral gap, alternating sides | Bifurcations, spacing, herringbone | Design | Open (a safety cap of 8 children) |
 | 6 | Closed venation (loops) | Braids and deltas | Runions 2005 | Open; flow assumes a tree |
 | 7.1 | Junction angle by climate | 45° arid, 72° humid | Seybold et al. 2017 | Open |
 | 7.3 | Drainage-pattern presets | Dendritic, parallel, trellis, rectangular, radial | Howard 1967 | Open |
 | 7.4 | Meanders as a post-process | Bends on big rivers | Langbein & Leopold 1966 | Open |
-| 8.1 | **Width exponent** | Trunk dominance | Leopold & Maddock 1953 | **Implemented** (b = 0.4; ½ is the hydraulic-geometry value) |
+| 8.1 | **Width exponent** | Trunk dominance | Leopold & Maddock 1953 | **Adopted** (b = 0.4; ½ is the hydraulic-geometry value) |
 | 8.2 | Strahler order | Stepped widths, pruning | Strahler 1957 [unverified] | Open |
 | 8.3 | Spur pruning | Fewer "hairs" | Design | Open |
 | 8.4 | Decimate, relax, smooth | Smaller junction angles, smooth curves | Runions 2007 | Open |
 | 8.5 | Optimal-channel-network rewiring | Geomorphic statistics | OCNet | Open |
 
-Sandbox 4 adds a sixth branching knob that is not in the note: **pull power** (equal pulls, or weighted by distance² or √distance).
+The generator adds a sixth branching knob that is not in the note: **pull power** (equal pulls, or weighted by distance² or √distance).
 
-Details worth keeping from the implemented four:
+Details worth keeping from the adopted four:
 
 - **Cone.** It comes from Palubicki et al. 2009, not from the 2007 tree paper, which uses a sphere. Every node is a "bud" here, so the cone half-angle caps the junction angle. The nearest-node bookkeeping must skip nodes that cannot see the attractor (RIVERS §3.2).
 - **Inertia.** `dir = unit(unit(Σ pulls) + w·heading)`. High values overshoot attractors, which the stall guard catches (RIVERS §4.1).
 - **Wander.** The white-noise jitter draws an independent vector each step and gives wiggle, not bends. A child inheriting part of its parent's random vector gives long, coherent bends (RIVERS §4.4).
-- **Main-stem dominance.** A node that already has a child may sprout a lateral only if its pull count is large enough against the continuing stem's (RIVERS §5.2). Sandbox 4 compares it with the pulls on the child's subtree up to 47 generations.
+- **Main-stem dominance.** A node that already has a child may sprout a lateral only if its pull count is large enough against the continuing stem's (RIVERS §5.2). The generator compares it with the pulls on the child's subtree up to 47 generations.
 
 ### 5.6 Realism targets
 
@@ -352,7 +335,7 @@ Details worth keeping from the implemented four:
 | Junction angle | About 45° in the driest climates, about 72° in humid ones | Seybold et al. 2017 [partially verified] | A cone or turn limit by patch moisture |
 | Groundwater-fed branching | 71.9° ± 0.8°, the predicted 2π/5 | Devauchelle et al. 2012 [partially verified] | Same |
 | Hack's law | Stream length ∝ area^0.6: `L = 1.4·A^0.6` in miles | Hack 1957 | A diagnostic: fit log length against log flow per region |
-| Bifurcation ratio | About 3–5 | [unverified] | A diagnostic in the statistics panel |
+| Bifurcation ratio | About 3–5 | [unverified] | A diagnostic |
 | Width | `w = a·Q^b` with b close to 0.5 downstream | Leopold & Maddock 1953 | With additive flow this equals the pipe rule with n = 1/b, so b = ½ is Leonardo's rule |
 | Meanders | Direction is a sine of path distance; meander length ÷ bend radius ≈ 4.7 | Langbein & Leopold 1966 | A trig-free post-process with the parabolic arc `4x(1 − x)` |
 
@@ -362,10 +345,10 @@ Details worth keeping from the implemented four:
 
 | Topic | Status |
 |---|---|
-| Open-venation space colonization per region, upstream from the sea | Implemented |
-| Grid-accelerated nearest-node cache, fixed orders, index tie-breaks | Implemented |
-| Region border rule, bridges, landlocked search | Implemented (Sandbox 4's own additions) |
-| Cone, inertia, wander, main-stem dominance, pull power, width exponent | Implemented |
+| Open-venation space colonization per region, upstream from the sea | Adopted |
+| Grid-accelerated nearest-node cache, fixed orders, index tie-breaks | Adopted |
+| Region border rule, bridges, landlocked search | Adopted (the generator's own additions) |
+| Cone, inertia, wander, main-stem dominance, pull power, width exponent | Adopted |
 | Tropism, blue-noise spacing, incremental release | Open |
 | Hack exponent and bifurcation ratio as tuning gauges | Open |
 | Meanders, smoothing, Strahler order, pruning, OCN rewiring | Open |
@@ -397,7 +380,7 @@ Two observations shape the method (HEIGHT §1):
 - **Alternative.** Génevaux sets river slope from a position map, not from area. That loses the concave profile, so the note keeps it only as a per-type multiplier on S₀ (HEIGHT §3.3).
 - **Repair.** If anything later lowers or raises nodes, one reverse sweep `z[parent] = min(z[parent], z[k] − ε)` restores monotonicity. mapgen4 and Azgaar both carve this way (HEIGHT §3.4).
 
-**Sandbox 4:** S₀ = 0.01, θ selectable among ⅜, 7⁄16 (default) and ½, and a gradient factor per zone type (flat 0.7, lowland 1, hills 1.8, mountains 3). One addition is not in the note: **Level flat zones**, which puts a zone whose gradient factor is below 1 at one level by lowering the rivers that enter it, cutting gorges through the steeper land downstream.
+**The generator:** S₀ = 0.01, θ selectable among ⅜, 7⁄16 (default) and ½, and a gradient factor per elevation type (flat 0.7, lowland 1, hills 1.8, mountains 3). One addition is not in the note: **Level flat zones**, which puts a zone whose gradient factor is below 1 at one level by lowering the rivers that enter it, cutting gorges through the steeper land downstream.
 
 ### 6.3 Filling the land between the rivers
 
@@ -440,14 +423,14 @@ Two observations shape the method (HEIGHT §1):
 |---|---|---|---|
 | **A, envelope** | χ profile; min over segments within R; blended slopes; masked noise | Rivers monotone; every pixel drains, before noise | Low; no global structures |
 | **B, raster with repair** | A on a per-region raster with fast marching; border ridge and divide boost; noise; AGREE burn; ε-Priority-Flood from the region's ocean cells | Every cell has a downhill path to the sea through the given rivers | Medium |
-| **C, pinned relaxation** | B, then implicit stream power on the free cells with uplift and diffusion | Sub-resolution gullies that feed the drawn rivers | High; a worker and a cache per region |
+| **C, pinned relaxation** | B, then implicit stream power on the free cells with uplift and diffusion | Sub-resolution gullies that feed the drawn rivers | High; a background job and a cache per region |
 
-(HEIGHT §9.) The note recommended building A first. **Sandbox 4 implements Option B:**
+(HEIGHT §9.) The note recommended building A first. **The generator uses Option B:**
 
-| Step | Research | Sandbox 4 |
+| Step | Research | Adopted |
 |---|---|---|
-| River beds | χ integration with dyadic θ | As researched, plus the gradient factor per zone type and flat-zone levelling |
-| Hillslopes | Fast marching with a varying slope | A geodesic distance by 8-connected Dijkstra from every bed and the coast, with the zone type's hillslope as the cost (flat 0.006, lowland 0.06, hills 0.15, mountains 0.277) |
+| River beds | χ integration with dyadic θ | As researched, plus the gradient factor per elevation type and flat-zone levelling |
+| Hillslopes | Fast marching with a varying slope | A geodesic distance by 8-connected Dijkstra from every bed and the coast, with the elevation type's hillslope as the cost (flat 0.006, lowland 0.06, hills 0.15, mountains 0.277) |
 | Floodplain | Half-width ∝ √flow | A monotone spline over bed height (400 m at sea level to 30 m at 1,000 m), × √(flow/100) |
 | Relief belts | A region-scale relief field | An fBm with 220 km features, strength 0.5 |
 | Blending | Compact polynomial weights on parameters | A 4 km box blur of hillslope, noise amplitude and ridged share over land cells |
@@ -456,12 +439,12 @@ Two observations shape the method (HEIGHT §1):
 | Repair | AGREE burn, then ε-Priority-Flood | As researched; channel depth 3 m; the fill is seeded from the sea and the region border |
 | Sea floor | A depth by distance from the coast | Deepens to 300 m at 40 km |
 
-Relief is steered by the **elevation zone type** (flat, lowland, hills, mountains, hashed with weights 5 / 6 / 1 / 1), which replaced the cosmetic land types the note worked with.
+Relief is steered by the **elevation type** (flat, lowland, hills, mountains, hashed with weights 5 / 6 / 1 / 1), which replaced the cosmetic land types the note worked with.
 
 | Topic | Status |
 |---|---|
-| Option B, all five steps | Implemented |
-| Tests: monotone beds, every cell drains, seamless tiles, determinism | Implemented |
+| Option B, all five steps | Adopted |
+| Properties to test: monotone beds, every cell drains, seamless tiles, determinism | Adopted |
 | Lipschitz clamp against perched rivers | Not needed so far (hillslopes are much steeper than channels) |
 | Lakes levelled in the terrain | Open: lakes are a separate layer and the height map does not level them |
 | Pockets walled off from the sea | They fill up to the border ridge; not drawn as lakes |
@@ -470,29 +453,16 @@ Relief is steered by the **elevation zone type** (flat, lowland, hills, mountain
 
 ---
 
-## 7. Tiles and performance
+## 7. Tiles and cost
 
-TILES asked what must change so that Sandbox 4 generates the map in tiles and panning only computes what is new. It measured the generator itself (seed 12345, default parameters, Node).
+TILES asked what it takes to generate the map tile by tile, so that moving over the map only computes what is new. The figures were measured on the prototype (seed 12345, default parameters). They show the relative cost of the layers, not the speed of any later implementation.
 
-### 7.1 Verdict per layer
-
-| Layer | Already local? | Change needed |
-|---|---|---|
-| World: regions, zones, patches, oceans, merges | Yes: a memoised pure function of the point, independent of exploration order | None |
-| Rivers | Yes: a pure function of the region | None; a tile is a handful of region computes |
-| Terrain | Per region, with a large halo | One raster per tile; the result is bit-identical |
-| 2D map raster | No: every camera change re-renders the viewport | A tile pyramid; this is where panning costs time |
-| Overlays, statistics, 3D | Drawn per frame from caches | Only through the terrain lookup |
-
-Generation was already tileable. The work is in how terrain and the 2D picture are **cut up and cached**.
-
-### 7.2 Measurements
-
-- **Per-pixel classification.** A 1600 × 1000 viewport costs about 0.9 s of `cellAt`, warm or cold. The cost is the per-pixel Voronoi query plus the warp fBm, so memo caches barely help.
-- **Ocean halo.** The first query in new territory sources 428 regions and 8,477 zones in 20 ms. The radius is `connectRange + 5` = 7 regions. Cheap enough to leave alone.
+- **The map is local already.** Regions, zones, patches, oceans and mergers are a memoised pure function of the point, independent of the order of exploration. Rivers are a pure function of the region. Only the height map carries a large halo.
+- **Ocean halo.** The first query in new territory reads 428 regions and 8,477 zone cells in 20 ms. The radius is the link range + 5 = 7 regions. Cheap enough to leave alone.
 - **Rivers.** About 14 ms per region.
-- **Per-region terrain overhead.** One region's raster is about 190 × 185 cells at 2 km: 9.3 raster cells per own land cell.
-- **Tile against per-region rasters** (16 regions):
+- **Per-pixel classification.** A picture of 1600 × 1000 pixels costs about 0.9 s of `cellAt`. The cost is the Voronoi query plus the warp noise per pixel, so memo caches barely help. A map display should cache its picture in tiles.
+- **Per-region height map overhead.** One region's raster is about 190 × 185 cells at 2 km: 9.3 raster cells per own land cell.
+- **One raster per tile against one per region** (16 regions):
 
   | Resolution | 16 region rasters | One tile raster | Time, 16 regions | Time, tile |
   |---|---|---|---|---|
@@ -501,21 +471,15 @@ Generation was already tileable. The work is in how terrain and the 2D picture a
 
   That is 3.2 times fewer cells and about 2.4 times less time.
 - **Equality.** Heights on every own-land cell are bit-identical between the tile raster and the per-region rasters (202,671 cells at 1 km).
-- **Edge effects.** The heights before the fill differ between overlapping rasters only near a raster edge: up to 3,706 m within 10 km, 0.2 m at 10–20 km, zero beyond 20 km. So the halo could shrink from 48 km to about 24 km.
-
-### 7.3 What was recommended and what was done
+- **Edge effects.** The heights before the fill differ between overlapping rasters only near a raster edge: up to 3,706 m within 10 km, 0.2 m at 10–20 km, zero beyond 20 km. So a halo of 24 km is enough.
 
 | Recommendation | Status |
 |---|---|
-| Own cells by region lattice index, never by point | Implemented |
-| One raster per tile; steps 1–4 once, the fill once per owned region | Implemented |
-| Tile size by a roughly constant world size, not always 4 × 4 regions | Implemented: about 256 km, which is 2 × 2 regions at the default size, 1 from 256 km up, up to 4 × 4 for small regions |
-| Halo 24 km | Implemented |
-| Compute tiles in a Web Worker and return transferable typed arrays | Implemented, nearest first, plus a look-ahead ring one tile beyond the view |
-| Bit-equality of tile and per-region heights as a regression test | Implemented |
-| 2D raster as a tile pyramid with an apron of 3 px top and left and 1 px right, cached per tile, coarse levels as placeholders | **Open** (part 2) |
-
-Sandbox 4 computes at most 64 regions at 1 km. A tile takes half a second to a second at 1 km cells.
+| Own cells by region grid coordinate, never by point | Adopted |
+| One raster per tile; steps 1–4 once, the fill once per owned region | Adopted as an optimisation (map-generation.md 12.1) |
+| Tile size by a roughly constant world size: about 256 km, which is 2 × 2 regions at the default size | Adopted |
+| Halo 24 km | Adopted |
+| The drawn map as a pyramid of cached picture tiles | Open |
 
 ---
 
@@ -550,8 +514,8 @@ Numbers worth keeping:
 
 - **Example.** At a biotemperature of 3 °C, Holdridge's PET is about 177 mm, and 500 mm of rain is perhumid. At 24 °C the PET is about 1,414 mm, and the same 500 mm is semiarid (BIOMES §3.1).
 - **Aridity index.** AI = precipitation ÷ potential evapotranspiration. Classes after UNEP: hyper-arid below 0.03, arid to 0.2, semi-arid to 0.5, dry sub-humid to 0.65, humid above (BIOMES §3.2). Holdridge's PET ratio is its reciprocal.
-- **Relative humidity is the wrong variable.** It is a state of the air, it swings daily, and no biome scheme uses it (BIOMES §3.4). The climate module's second field was documented as "relative humidity, %" when the note was written. **Design:** read it as a moisture index, or replace it with precipitation in mm/yr. **Sandbox 4 replaced it:** the second field is precipitation, 100 to 12,000 mm/yr on a log scale.
-- **Seasonality.** Köppen's subtypes test the driest month against the wettest; Holdridge treats monsoon and Mediterranean regimes as associations inside a life zone (BIOMES §3.3). Sandbox 4 has no seasonality field, so it cannot tell a Mediterranean climate from a summer-wet one with the same totals.
+- **Relative humidity is the wrong variable.** It is a state of the air, it swings daily, and no biome scheme uses it (BIOMES §3.4). The second climate field was documented as "relative humidity, %" when the note was written. **Design:** read it as a moisture index, or replace it with precipitation in mm/yr. **The generator replaced it:** the second field is precipitation, 100 to 12,000 mm/yr on a log scale.
+- **Seasonality.** Köppen's subtypes test the driest month against the wettest; Holdridge treats monsoon and Mediterranean regimes as associations inside a life zone (BIOMES §3.3). The generator has no seasonality field, so it cannot tell a Mediterranean climate from a summer-wet one with the same totals.
 
 ### 8.4 Elevation
 
@@ -575,14 +539,14 @@ Numbers worth keeping:
 
 ### 8.6 The scale gap
 
-With a feature size of 110 km, the temperature field goes from coldest to warmest over about 55 km: roughly 0.7 °C per km. Earth's equator-to-pole gradient is about 0.004 °C per km. At the defaults the whole tundra-to-rainforest sequence fits inside one or two elevation zones. That may be intended for a game-scale map; the feature-size range of 20–4,000 km allows Earth-like scales (BIOMES §7.1). One consequence the trade note relies on: belts change over a few regions, so climate-locked luxuries are typically 2–5 regions from their consumers (TRADE §5.5).
+With a feature size of 110 km, the temperature field goes from coldest to warmest over about 55 km: roughly 0.7 °C per km. Earth's equator-to-pole gradient is about 0.004 °C per km. At the defaults the whole tundra-to-rain forest sequence fits inside one or two zones. That may be intended for a game-scale map; the feature-size range of 20–4,000 km allows Earth-like scales (BIOMES §7.1). One consequence the trade note relies on: belts change over a few regions, so climate-locked luxuries are typically 2–5 regions from their consumers (TRADE §5.5).
 
 ### 8.7 The recommended pipeline and classifier
 
 **Design** (BIOMES §7.2):
 
-1. Sea-level temperature T₀ from the field.
-2. Local temperature `T = T₀ − Γ·z` with the height from the terrain. There is no cycle: biomes depend on height, and height depends on zone types and rivers, not on biomes.
+1. Initial Temperature T₀ (at sea level) from the field.
+2. Local temperature `T = T₀ − Γ·z` with the height from the terrain. There is no cycle: biomes depend on height, and height depends on elevation types and rivers, not on biomes.
 3. Moisture from a precipitation field, optionally times an orographic factor.
 4. Optionally a seasonality amplitude, which would make biotemperature and the full Köppen rules computable.
 5. Classify.
@@ -609,28 +573,26 @@ CHARTS catalogues 24 charts and rule tables in six lineages: Whittaker–Ricklef
 
 **Design** (CHARTS §8): keep `plotbiomes` as the reference but match its **topology**, not its cells; treat boundaries as soft; use Holdridge for explicit reusable thresholds without copying GPL code; use empirical sources only as a sanity check; accept that a Mediterranean biome needs seasonality or a small hashed region at about 13–20 °C and 700–1,300 mm. For an image, the Navarras chart on Commons is CC0.
 
-### 8.9 What Sandbox 4 does
+### 8.9 What is adopted
 
-| Step | Sandbox 4 | Research link |
+| Step | Adopted | Research link |
 |---|---|---|
-| Fields | Temperature −10 to 30 °C (110 km features); precipitation 100–12,000 mm/yr on a log scale (80 km), so the middle is about 1,100 mm | Fields in the schemes' own units (BIOMES §7.1) |
-| Height | The mean height of the patch's land from its terrain tile; a typical height per zone type until the tile exists (70, 140, 270, 470 m) | Step 2 of the pipeline |
+| Fields | Initial Temperature −10 to 30 °C (110 km features); precipitation 100–12,000 mm/yr on a log scale (80 km), so the middle is about 1,100 mm | Fields in the schemes' own units (BIOMES §7.1) |
+| Height | The mean height of the patch's land from its terrain tile; a typical height per elevation type until the tile exists (70, 140, 270, 470 m) | Step 2 of the pipeline |
 | Cooling | `T = T₀ − cooling(h)`, a monotone spline through 5 points. The defaults are (0 m, 0°), (200, 1°), (400, 5°), (900, 11°), (1250, 20°): far steeper than 6.5 °C/km, so terrain that is mostly below 1,000 m still gets cold highlands | The lapse-rate step, made a tunable curve |
-| Moisture | P, × 0.2 in a river-poor flat zone, so those zones favour desert | Sandbox 4's own rule |
+| Moisture | P, × 0.2 in a river-poor flat zone, so those zones favour desert | The generator's own rule |
 | Aridity | `m = P / max(40, 20·T + 140)` | Köppen's evenly-spread dryness threshold (BIOMES §2.3) |
 | Belts | Polar below −10 °C, subpolar to −3, boreal to 3, temperate to 18, tropical above | Holdridge-like belts; thresholds calibrated against the `plotbiomes` grid |
-| Classes | m < 0.5 desert, 0.5–1 steppe or scrub, 1–2 woodland or savanna, then forest; rainforest from m ≥ 6 (temperate) or ≥ 4 (tropical) | The belt × aridity table |
+| Classes | m < 0.5 desert, 0.5–1 steppe or scrub, 1–2 woodland or savanna, then forest; rain forest from m ≥ 6 (temperate) or ≥ 4 (tropical) | The belt × aridity table |
 | Result | 15 land biomes, plus **mangrove** on coastal patches of flat or lowland zones with T ≥ 20 °C and m ≥ 0.5 | Azonal override, with an annual-mean test because there is no coldest-month value |
 
 The note's own caveat applies (RES §7.5): crop altitude limits from ECOCROP assume real lapse rates, so with the steep default curve crops drop out lower than their limits suggest.
 
 | Topic | Status |
 |---|---|
-| Aridity × thermal belt classifier; height cooling | Implemented |
-| Mangrove override | Implemented |
-| Sea-level biome per patch (finds tropical highlands) | Implemented |
-| Statistics panel: land share per biome, belt × moisture grid | Implemented |
-| A chart of `classify(T, P)` against the Whittaker outlines | Partly: `docs/classify-vs-whittaker.svg` and `scripts/biome-chart.ts` exist |
+| Aridity × thermal belt classifier; height cooling | Adopted |
+| Mangrove override | Adopted |
+| Sea-level biome per patch (finds tropical highlands) | Adopted |
 | Orographic precipitation, rain shadows | Open |
 | Seasonality field; Köppen rules; Mediterranean biome | Open |
 | Alpine, flooded-grassland and fire overrides | Open |
@@ -651,7 +613,7 @@ A world economy needs three things from the land: **food** (how many people a pl
 
 ### 9.2 The catalogue
 
-RES §4 lists about 370 resources in 18 groups, from cereals to water features, plus 28 fantasy resources (§5). Each row has its role (food, construction, wealth), position (above ground, underground, water), zone types, biomes, sourced conditions, rarity, value class and processing chain.
+RES §4 lists about 370 resources in 18 groups, from cereals to water features, plus 28 fantasy resources (§5). Each row has its role (food, construction, wealth), position (above ground, underground, water), elevation types, biomes, sourced conditions, rarity, value class and processing chain.
 
 - **Crops** carry ECOCROP numbers: optimal and absolute temperature, optimal and absolute annual rainfall, maximum altitude, killing temperature. Bread wheat, for example: T 15–23 (5–27) °C, P 750–900 (300–1,600) mm, altitude 4,500 m.
 - **Caveats.** ECOCROP temperatures are crop-cycle means, while the map's temperature is an annual mean. The values are "expert opinion and not necessarily optimal". A few rows are visibly damaged (RES, header).
@@ -664,16 +626,16 @@ A resource that depends on a feature the map lacks should not be forced onto a b
 
 | Feature | Resources that need it | Status |
 |---|---|---|
-| Lake | Lake fish, reeds, wild rice, ice harvest | **Implemented** as polygons on rivers, with a host patch |
-| Mangrove | Mangrove poles and charcoal, tannin bark, crabs, oysters | **Implemented** as a biome |
-| Bedrock class per zone | Every ore, gem, stone, coal and salt bed | **Implemented** (9 classes) |
+| Lake | Lake fish, reeds, wild rice, ice harvest | **Adopted** as polygons on rivers, with a host patch |
+| Mangrove | Mangrove poles and charcoal, tannin bark, crabs, oysters | **Adopted** as a biome |
+| Bedrock type per zone | Every ore, gem, stone, coal and salt bed | **Adopted** (9 classes) |
 | Oasis; estuary and delta | Dates, irrigated grain; oysters, salt meadows | Partly: river irrigation and river-mouth features exist as patch facts |
 | Endorheic lake, salt flat | Lake salt, natron, borax | Partly: salt flats in a few arid river-poor flat zones |
 | Marsh, fen, peat bog | Reeds, wildfowl, bog iron, peat | Open |
 | Coral reef, kelp coast, upwelling coast | Reef fish, pearls, kelp ash, large fisheries | Partly: shelf fish, pearls and coral by water temperature on ocean patches |
 | Alpine meadow; cloud forest | Summer pasture; coffee, tea | Partly: tropical highlands are found from the sea-level biome |
 | Mediterranean and monsoon climates | Olive, vine; unirrigated rice | Open: needs seasonality |
-| Karst, volcanic ground, hot springs, aquifers | Caves, obsidian, sulfur, wells | Partly: volcanic arc and carbonate platform are bedrock classes; caves, springs and aquifers are open |
+| Karst, volcanic ground, hot springs, aquifers | Caves, obsidian, sulfur, wells | Partly: volcanic arc and carbonate platform are bedrock types; caves, springs and aquifers are open |
 | Fire regime | Savanna against dry forest | Open |
 
 ### 9.4 Two kinds of resources
@@ -684,15 +646,15 @@ A resource that depends on a feature the map lacks should not be forced onto a b
    - Use the **ECOCROP trapezoid**: 0 outside the absolute limits, 1 inside the optimum, linear between. It is bit-exact.
    - Compare ECOCROP's annual rainfall directly with the patch's precipitation, and add an irrigation bonus next to rivers, so desert rivers grow wheat and dates.
    - For temperature, use an offset by belt until there is a seasonality field.
-2. **Deposits** (ores, gems, stone, salt, coal): rare point resources. Each is a hashed draw against a probability from geology × climate × zone type. A patch gets 0 to 3.
+2. **Deposits** (ores, gems, stone, salt, coal): rare point resources. Each is a hashed draw against a probability from geology × climate × elevation type. A patch gets 0 to 3.
    - One hash salt per resource family, so adding a resource does not reshuffle the others.
    - Starting probabilities per eligible patch: common 0.3–0.6, uncommon 0.05–0.2, rare 0.005–0.03, very rare below 0.002. With 16 patches per zone, a rare deposit appears in every 2nd to 12th eligible zone.
 
 ### 9.5 Geology: the minimal attribute
 
-The map has relief classes, not rocks. **Design:** one **bedrock class per elevation zone**, drawn like the zone type and correlated with it (RES §7.3):
+The map has relief classes, not rocks. **Design:** one **bedrock type per zone**, drawn like the elevation type and correlated with it (RES §7.3):
 
-| Bedrock class | Typical zone types | Unlocks |
+| Bedrock type | Typical elevation types | Unlocks |
 |---|---|---|
 | Crystalline shield | Flat, lowland, hills | Granite, kaolin, banded iron, diamonds, lode gold |
 | Fold belt | Hills, mountains | Slate, marble, lode gold, lead-zinc and silver veins |
@@ -742,45 +704,44 @@ Which level owns what (TRADE §5.4): the **patch** owns potentials, 0–3 deposi
 
 1. **Salt is sparse.** At least half of all regions have no salt deposit.
 2. **Iron needs two inputs:** ore, and fuel in the same or the next zone.
-3. **Bronze needs two distant metals.** Copper and tin come from different bedrock classes, so no zone has both.
+3. **Bronze needs two distant metals.** Copper and tin come from different bedrock types, so no zone has both.
 4. **Luxuries are climate-locked:** spices in the tropical belt, furs in boreal and subpolar.
 5. **Every region has a signature export:** a tradeable resource with a location quotient of at least 1.5, raised by a hashed draw if none qualifies.
 6. **Every region has a deficit.**
 
 A `thrive` score from food, fuel, material, salt, an export and access to water could replace the prosperity noise (TRADE §5.5).
 
-### 9.9 What Sandbox 4 does
+### 9.9 What is adopted
 
 Every patch gets an amount from 0 to 1 for each of the **24 raw resources**, with the variant that fits best ("grain: barley", "iron ore: bog iron"). A resource is listed from an amount of 0.25; a typical land patch lists about eight.
 
-| Element | Sandbox 4 | Research link |
+| Element | Adopted | Research link |
 |---|---|---|
-| Crops | The best of a table of crops, each an ECOCROP trapezoid over growing-season temperature and yearly water, × farmland by zone type × soil by biome × season length | RES §7.1 |
+| Crops | The best of a table of crops, each an ECOCROP trapezoid over growing-season temperature and yearly water, × farmland by elevation type × soil by biome × season length | RES §7.1 |
 | Irrigation | A river adds 100 mm a year per patch it drains beyond the first, up to 1,200 mm | "Desert rivers grow wheat and dates" |
-| Other potentials | Tables by biome and zone type, plus coast, harbour, river size, lake | The catalogue's Biomes and Zones columns |
-| Bedrock | One of the nine classes per land zone, hashed by weight from its zone type | RES §7.3 |
+| Other potentials | Tables by biome and elevation type, plus coast, harbour, river size, lake | The catalogue's Biomes and Zones columns |
+| Bedrock | One of the nine classes per land zone, hashed by weight from its elevation type | RES §7.3 |
 | Deposits | A hashed draw per patch against a chance; the amount is the richness | RES §7.2 |
 | Placers | Each river node knows the share of its upstream network in gold-bearing or tin-bearing hills and mountains; placers form where the river reaches flatter ground | The placer rule |
-| Tin and copper | From different bedrock classes, so no zone has both | Rule 3 |
+| Tin and copper | From different bedrock types, so no zone has both | Rule 3 |
 | Salt | Solar pans on dry warm low coasts, salt flats, rock salt in some clastic basins; about half the regions have none | Rule 1 |
 | Luxuries | Regional: a hashed gate per crop and zone; spices only in the tropical belt | Rule 4 |
-| Prosperity | The deposit chances of gold, silver and gems and the share of zones with a luxury are × (2 × prosperity)² | **Not from the notes.** The notes proposed deriving prosperity from resources; Sandbox 4 does the reverse and lets the prosperity field decide where the valuable things are |
+| Prosperity | The deposit chances of gold, silver and gems and the share of zones with a luxury are × (2 × prosperity)² | **Not from the notes.** The notes proposed deriving prosperity from resources; the generator does the reverse and lets the prosperity field decide where the valuable things are |
 
 | Topic | Status |
 |---|---|
-| 24 raw resources with variants; potentials and deposits | Implemented |
-| Bedrock classes; placers; scarce salt; tin and copper apart | Implemented |
-| Ocean patches: fish, shelf, seaweed, seals, pearls, coral | Implemented |
+| 24 raw resources with variants; potentials and deposits | Adopted |
+| Bedrock classes; placers; scarce salt; tin and copper apart | Adopted |
+| Ocean patches: fish, shelf, seaweed, seals, pearls, coral | Adopted |
 | Tier 2 and tier 3 goods; processing sites by Weber's rule | Open |
 | Fantasy resources on the supernatural map | Open (the field feeds nothing yet) |
 | Quantities, yields, populations | Open |
 | Location quotient, signature export, deficit check, `thrive` | Open |
 | Metallogenic province noise | Open |
-| A resource colour mode on the map | Open (the inspector lists them) |
 
 ---
 
-## 10. City and town locations
+## 10. Prospects for cities and towns
 
 ### 10.1 Seven findings
 
@@ -806,7 +767,7 @@ Every patch gets an amount from 0 to 1 for each of the **24 raw resources**, wit
 
 **Design.** Two kinds of city follow: a **central place** at the centre of its catchment and a **gateway** at a mode change (river mouth, harbour, head of navigation, pass). The city score takes the maximum of a centrality term and a gateway term, so both kinds arise. Defence gets a small weight and is never a necessity, because rugged ground hurts cities (SITES §2.3, §2.4).
 
-Classic site factors and their map signals (SITES §2.1): water supply (a river node or lake in the patch; aridity as a proxy for wells), floodplain against terrace (height above the nearest drainage), defensibility (zone type, confluence, peninsula), river crossing and lowest bridging point (narrow floodplain), confluence, head of navigation and fall line (a knickpoint, or a river leaving hills for a lowland), natural harbour (a coastal patch next to mostly enclosed sea), estuary (where a river crosses the coast).
+Classic site factors and their map signals (SITES §2.1): water supply (a river node or lake in the patch; aridity as a proxy for wells), floodplain against terrace (height above the nearest drainage), defensibility (elevation type, confluence, peninsula), river crossing and lowest bridging point (narrow floodplain), confluence, head of navigation and fall line (a knickpoint, or a river leaving hills for a lowland), natural harbour (a coastal patch next to mostly enclosed sea), estuary (where a river crosses the coast).
 
 Scales (SITES §2.2):
 
@@ -843,27 +804,27 @@ Scales (SITES §2.2):
 
 | Tier | Decides | Inputs | Rule |
 |---|---|---|---|
-| **M (map)** | Which patches hold a village, market village, town, county town or city; rank and population | The map, zone types, coast, the region's rivers and bed heights, climate, biome on **estimated** height | A pure function of the region |
+| **M (map)** | Which patches hold a village, market village, town, county town or city; rank and population | The map, elevation types, coast, the region's rivers and bed heights, climate, biome on **estimated** height | A pure function of the region |
 | **T (terrain)** | The exact point inside the chosen patch | The height tile: height, HAND, slope, relative height | Never changes a Tier M choice |
 
 Why Tier M must not read exact heights: the biome of a patch is an estimate until its tile arrives. A choice that read it would change when the user zooms in.
 
-- **Features per patch:** zone type, climate and biome, coast, lake, harbour, the largest drainage in the patch, the drainage at a river mouth, a confluence measure, head of navigation, fall line, bridging point, and border depth.
-- **Score terms:** food density K (people per km² by biome and zone type, plus irrigation and fish), water W and climate comfort C as necessities, material M, defence D, trade X with diminishing returns (`max + 0.25 × rest`), and Hansen centrality.
+- **Features per patch:** elevation type, climate and biome, coast, lake, harbour, the largest drainage in the patch, the drainage at a river mouth, a confluence measure, head of navigation, fall line, bridging point, and border depth.
+- **Score terms:** food density K (people per km² by biome and elevation type, plus irrigation and fish), water W and climate comfort C as necessities, material M, defence D, trade X with diminishing returns (`max + 0.25 × rest`), and Hansen centrality.
 - **Composites:** `village = P_v · W · C · (0.8 + 0.2·M) · (1 + 0.2·X)`; the city score ranks towns by `max(centrality, gateway)`.
 - **Selection inside one region:** villages above a threshold; one market town per zone by greedy suppression at 0.6 × the K = 4 spacing; up to 3 market villages per zone; one city among towns at depth ≥ 2; up to 3 county towns.
 - **Population:** `pop_k = a · P(market area) · (1 + γ·X)` with an urban share a = 0.035 per order, about 11 % urban in total; a temperate region of about 330,000 people gets a city of 12,000–25,000.
 - **Tests:** order independence, the tier contract, locality, nesting caps, spacing, geography sanity (at least 60 % of cities on water), a rank-size slope between −1.4 and −0.8.
 
-### 10.6 What Sandbox 4 does
+### 10.6 What is adopted
 
-Sandbox 4 implements Tier M "in a first, simpler form": a ranked list of scored sites, not a settlement hierarchy with populations.
+The generator uses Tier M "in a first, simpler form": a ranked list of scored sites, not a settlement hierarchy with populations.
 
-| Element | Research design | Sandbox 4 |
+| Element | Research design | Adopted |
 |---|---|---|
-| Output | Five orders with populations | About 20 locations per region: up to 4 cities, then towns |
+| Output | Five orders with populations | About 20 Prospects per region: up to 4 for cities, the rest for towns |
 | Candidates | Land patches of the region | Same; a candidate must not touch another region's land |
-| Inputs | Map only, estimated biomes | Same: rivers, lakes, zone types, climate, estimated biomes and the resource layer; no terrain tiles |
+| Inputs | Map only, estimated biomes | Same: rivers, lakes, elevation types, climate, estimated biomes and the resource layer; no terrain tiles |
 | Score | A product of necessities times bounded bonuses | `100 × need × weighted mean of five factors`, with `need = min(fresh water, temperature comfort) × 2`, capped at 1. Necessities still veto; the factors compensate each other |
 | Factors | K, W, C, M, D, X, centrality | Resources 30 %, geography 15 %, trade & travel 25 %, climate 15 %, prosperity 15 % |
 | Food | Calibrated density per biome | Read from the resource layer: grain, roots, herds, orchards and game of the catchment |
@@ -876,9 +837,9 @@ Sandbox 4 implements Tier M "in a first, simpler form": a ranked list of scored 
 
 | Topic | Status |
 |---|---|
-| Per-region, order-independent scoring and selection | Implemented |
-| Gateway and central-place terms; Hansen accessibility | Implemented |
-| Resources factor from the resource layer | Implemented |
+| Per-region, order-independent scoring and selection | Adopted |
+| Gateway and central-place terms; Hansen accessibility | Adopted |
+| Resources factor from the resource layer | Adopted |
 | Settlement hierarchy (villages, market villages, county towns) and populations | Open |
 | Rank-size check | Open |
 | Fall lines and lowest bridging points (need bed heights) | Open |
@@ -908,22 +869,22 @@ Sandbox 4 implements Tier M "in a first, simpler form": a ranked list of scored 
 
 (TRADE §4.) Three goods are short almost everywhere: **salt**, **iron** (ore and fuel must meet) and **timber and fuel** [unverified as stated].
 
-### 11.3 The travel model in the research and in Sandbox 4
+### 11.3 The travel model in the research and in the generator
 
-SITES §6.8 proposed a graph with one node per land patch, Gabriel edges and water edges. Sandbox 4 built the travel network on a finer structure:
+SITES §6.8 proposed a graph with one node per land patch, Gabriel edges and water edges. The generator built the travel network on a finer structure:
 
-| Element | Research proposal | Sandbox 4 |
+| Element | Research proposal | Adopted |
 |---|---|---|
-| Structure | The patch graph (8 km) | A 2 km cost grid per region, with heights estimated the way the height map builds them (beds by the stream-power law, land rising at its zone type's hillslope). It needs no terrain tile |
-| Land cost | Naismith time × roughness by zone type × vegetation | Per km: zone type (flat 1, lowland 1.15, hills 1.8, mountains 4) × biome (grassland 1, forest 1.3, rainforest 2.2, mangrove 3, deserts 3.5–4, ice 5) × slope (1 + (slope / 5 %)², at most 13) × height (twice at 1,500 m) |
+| Structure | The patch graph (8 km) | A 2 km cost grid per region, with heights estimated the way the height map builds them (beds by the stream-power law, land rising at its elevation type's hillslope). It needs no terrain tile |
+| Land cost | Naismith time × roughness by elevation type × vegetation | Per km: elevation type (flat 1, lowland 1.15, hills 1.8, mountains 4) × biome (grassland 1, forest 1.3, rain forest 2.2, mangrove 3, deserts 3.5–4, ice 5) × slope (1 + (slope / 5 %)², at most 13) × height (twice at 1,500 m) |
 | River | Downstream faster than upstream, on navigable chains | 0.4 per km on navigable rivers, plus 6 km at each end |
 | Sea | The cheapest mode | 0.3 per km (0.6 at the shore), plus 12 km at each end |
 | Mode change | A fixed charge | The per-link loading costs, so short hops go by road and long hauls by water |
 | Crossings | A bridging point as a feature | +3 km to cross a navigable river; × 8 across a lake |
 
-In units of open flat road the implemented ratio is about sea 1 : river 1.3 : road 3.3, rising to 13 and more through mountains or rainforest. That is flatter than the researched 1 : 2–6 : 10–40; the terminal charges do part of the work.
+In units of open flat road the adopted ratio is about sea 1 : river 1.3 : road 3.3, rising to 13 and more through mountains or rain forest. That is flatter than the researched 1 : 2–6 : 10–40; the terminal charges do part of the work.
 
-**Which places are linked** is Sandbox 4's own design. Two shortest-path forests are grown over a region and its eight neighbours, one over land and one over water. Each cell ends up with its cheapest location, a Voronoi diagram under travel cost. Two locations whose cells touch get a candidate link, the cheapest route through their common border. A link is dropped when cheaper links make a detour of at most 1.6 × its cost; a road gives way to water only when the water route costs at most 0.35 × the road. Every pair of regions has one owner, so the network does not depend on the order regions are computed in.
+**Which places are linked** is the generator's own design. Two shortest-path forests are grown over a region and its eight neighbours, one over land and one over water. Each cell ends up with its cheapest Prospect, a Voronoi diagram under travel cost. Two Prospects whose cells touch get a candidate link, the cheapest route through their common border. A link is dropped when cheaper links make a detour of at most 1.6 × its cost; a road gives way to water only when the water route costs at most 0.35 × the road. Every pair of regions has one owner, so the network does not depend on the order regions are computed in.
 
 ### 11.4 Prices and flows
 
@@ -938,9 +899,8 @@ Generation order (TRADE §5.8): potentials and deposits per patch → zone sums,
 
 | Topic | Status |
 |---|---|
-| Travel network: roads, river routes, sea lanes; terrain-following routes | Implemented |
-| One owner per pair of regions; one connected network | Implemented |
-| Exported as a weighted graph (`docs/network-default-structure.json`) | Implemented |
+| Travel network: roads, river routes, sea lanes; terrain-following routes | Adopted |
+| One owner per pair of regions; one connected network | Adopted |
 | Upstream and downstream river costs | Open |
 | Routing on the real height raster; bridges, fords and passes as places; road classes | Open |
 | Goods, prices (Model A), flows (Model B) | Open |
@@ -948,21 +908,7 @@ Generation order (TRADE §5.8): potentials and deposits per patch → zone sums,
 
 ---
 
-## 12. Delivery in the browser
-
-(GAPS §5.)
-
-- **Rendering.** Canvas 2D is universal and suits rasters through `ImageData`. WebGL2 is available in all current browsers. WebGPU is not Baseline (about 87 % support in October 2026) and should stay optional.
-- **Workers.** Module workers are supported everywhere; Vite bundles `new Worker(new URL(...), { type: 'module' })`. Post typed arrays with their buffers in the transfer list for zero-copy moves.
-- **No `SharedArrayBuffer`.** It needs cross-origin isolation headers that GitHub Pages cannot set.
-- **Static hosting.** GitHub Pages serves static files only, with a 1 GB site limit. Keep the seed and parameters in the URL query or hash.
-- **Keep generation on the CPU.** GPU arithmetic is not reproducible enough for golden-hash tests.
-
-**Sandbox 4:** TypeScript and Vite with no runtime dependencies; Canvas 2D for the map and WebGL2 for the 3D view; terrain tiles in a Web Worker with transferred arrays; the seed, every non-default parameter and the camera in the URL hash; a relative base path, so the build works under any repository name; tests, build and deploy by a GitHub Actions workflow. The noise is in-house, as GAPS §6 suggested as the alternative to a library: a lattice hash instead of a permutation table, so it never repeats and uses the same hash as everything else.
-
----
-
-## 13. Research not yet used: a backlog
+## 12. Research not yet used: a backlog
 
 Ordered by layer. "Value" is the notes' own assessment where they give one.
 
@@ -972,7 +918,7 @@ Ordered by layer. "Value" is the notes' own assessment where they give one.
 | Rivers | Half-way relaxation and Chaikin smoothing | Smaller junction angles, smooth curves; a pure post-pass | RIVERS §8.4 |
 | Rivers | Blue-noise attractor spacing | Smoother trunks; low cost | RIVERS §2.1 |
 | Rivers | Junction angle by patch moisture (45° to 72°) | Climate shows in the river pattern | RIVERS §7.1 |
-| Rivers | Hack exponent and bifurcation ratio in the statistics panel | A cheap realism gauge | RIVERS §7.2 |
+| Rivers | Hack exponent and bifurcation ratio as diagnostics | A cheap realism gauge | RIVERS §7.2 |
 | Rivers | Meanders on large rivers | Polynomial shape keeps it bit-exact | RIVERS §7.4 |
 | Height | Level the lakes; show filled pockets | Consistency between layers | HEIGHT §9 |
 | Height | Pinned stream-power relaxation (Option C) | Sub-resolution gullies; high cost | HEIGHT §4.6 |
@@ -984,15 +930,15 @@ Ordered by layer. "Value" is the notes' own assessment where they give one.
 | Resources | Tier 2 and 3 goods placed by the material index | Completes the 39-resource set | TRADE §5.2 |
 | Resources | Signature export and deficit checks | Guarantees trade | TRADE §5.5 |
 | Resources | Fantasy layer triggered by the supernatural field | The field is ready and unused | RES §5 |
-| Locations | Hierarchy and populations with a rank-size test | Turns scored sites into settlements | SITES §6.5–§6.7 |
-| Locations | Tier T site refinement; fall lines; bridging points | The exact spot; needs bed heights and the tile | SITES §6.6 |
+| Prospects | Hierarchy and populations with a rank-size test | Turns scored sites into settlements | SITES §6.5–§6.7 |
+| Prospects | Tier T site refinement; fall lines; bridging points | The exact spot; needs bed heights and the tile | SITES §6.6 |
 | Trade | Model A prices, then Model B flows | Order-independent trade on the existing network | TRADE §5.7 |
 
 ---
 
-## 14. Open questions
+## 13. Open questions
 
-Collected from the notes; questions that Sandbox 4 has since settled are left out.
+Collected from the notes; questions that have since been settled are left out.
 
 **Cells and structure**
 - Should the distance metric be a parameter of the levels (CELLS, GAPS §6)?
@@ -1025,14 +971,14 @@ Collected from the notes; questions that Sandbox 4 has since settled are left ou
 
 ---
 
-## 15. Numeric quick reference
+## 14. Numeric quick reference
 
 **Map scales**
 
 | Unit | Size | Mean area | Count per parent |
 |---|---|---|---|
 | Patch | 8 km | 64 km² | 16 per zone |
-| Elevation zone | 32 km | 1,024 km² | 16 per region |
+| Zone | 32 km | 1,024 km² | 16 per region |
 | Region | 128 km | 16,384 km² | — |
 | Terrain tile | about 256 km, 24 km halo | — | 2 × 2 regions |
 | Terrain cell | 1 km (2 km or 500 m) | — | — |
@@ -1055,13 +1001,13 @@ Collected from the notes; questions that Sandbox 4 has since settled are left ou
 |---|---|
 | Lapse rate | 6.5 K/km standard; 6 Holdridge; about 4–6 observed |
 | Köppen dryness threshold, even rain | 20·T + 140 mm; desert below half |
-| Thermal belts in Sandbox 4 | −10, −3, 3, 18 °C |
-| Aridity classes in Sandbox 4 | 0.5, 1, 2, then 6 (temperate) or 4 (tropical) |
+| Thermal belts, as adopted | −10, −3, 3, 18 °C |
+| Aridity classes, as adopted | 0.5, 1, 2, then 6 (temperate) or 4 (tropical) |
 | Holdridge guide lines | 1.5, 3, 6, 12, 24 °C; 62.5 mm doubling to 8,000 |
 | Holdridge PET | 58.93 mm × biotemperature |
 | Treeline | 6.4–6.7 °C growing-season mean; biotemperature 3 °C |
 | Savanna–forest bistable band | 1,000–2,000 mm (Africa) |
-| Mangrove in Sandbox 4 | T ≥ 20 °C, m ≥ 0.5, coastal, flat or lowland |
+| Mangrove, as adopted | T ≥ 20 °C, m ≥ 0.5, coastal, flat or lowland |
 
 **Settlement and travel**
 
@@ -1076,8 +1022,8 @@ Collected from the notes; questions that Sandbox 4 has since settled are left ou
 | Urban share, Europe | about 3 % (800) to about 15 % (1800) |
 | Travel per day | Horse 32–48 km, legion 24–32 km, hiker 16–24 km |
 | Researched freight ratios | Sea 1 : river 2–6 : road 10–20 : trackless 20–40 |
-| Sandbox 4 costs per km | Sea 0.3, river 0.4, flat road 1, mountain road 4 |
-| Navigable in Sandbox 4 | From 8 patches drained; large from 80 |
+| Adopted costs per km | Sea 0.3, river 0.4, flat road 1, mountain road 4 |
+| Navigable, as adopted | From 8 patches drained; large from 80 |
 
 **Resources**
 
@@ -1091,7 +1037,7 @@ Collected from the notes; questions that Sandbox 4 has since settled are left ou
 
 ---
 
-## 16. Sources
+## 15. Sources
 
 The notes hold the full citations with sections, lines and commit hashes, and say for each source how much of it was read. The main external sources by topic:
 

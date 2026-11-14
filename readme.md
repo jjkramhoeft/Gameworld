@@ -161,7 +161,7 @@ When linking, each ocean seed makes zero, one or two links by configured chances
 
 The second step is ocean expansion. Every zone cell on a link - the two ocean seeds and the cells between them - converts a number of its nearest land neighbours to ocean. The number is 0 to 3 and it is drawn by configured weights. The neighbours can be in another region. An ocean seed that is not on any link does not expand. The expansion can run in a configured number of passes (1 by default), where each pass expands from the cells the previous pass converted.
 
-The third step is merges. In each region a configured number of merges are determined. That number of the zone cells the region owns is randomly chosen, and each merges into its nearest neighbour on the same side of the coast. Only land-land or ocean-ocean mergers are allowed - so some mergers can not be completed (but still count). The neighbour can be owned by another region.
+The third step is zone mergers. In each region a configured number of mergers are determined. That number of the zone cells the region owns is randomly chosen, and each merges into its nearest neighbour on the same side of the coast. Only land-land or ocean-ocean mergers are allowed - so some mergers can not be completed (but still count). The neighbour can be owned by another region.
 
 The neighbour is the survivor of a merger. It can itself have merged into a third zone cell. The cell at the end of that chain is the root, and all zone cells with the same root are one zone. The zone takes everything from its root: ocean or land, the region, the elevation type and the bedrock. Apart from this and the conversion to ocean, the elevation type a zone cell got when Sited is final.
 
@@ -203,7 +203,7 @@ The biome of a patch comes from its temperature and its aridity. The temperature
 
 The current set (not binding yet) is 15 land biomes and Mangrove:
 
-Ice and snow, Tundra, Cold steppe, Boreal forest (taiga), Cold desert, Temperate grassland, Woodland and shrubland, Temperate mixed forest, Temperate broadleaf forest, Temperate rain forest, Hot desert, Thorn scrub, Savanna, Tropical dry forest, Tropical rain forest, Mangrove
+Ice & snow, Tundra, Cold steppe, Boreal forest, Cold desert, Temperate grassland, Woodland & shrubland, Temperate mixed forest, Temperate broadleaf forest, Temperate rain forest, Hot desert, Thorn scrub, Savanna, Tropical dry forest, Tropical rain forest, Mangrove
 
 #### Rivers
 Rivers are calculated per region with a space-colonization algorithm, growing from the sea into the land. It is the rivers that drive the height of the landscape.
@@ -211,7 +211,7 @@ Rivers are calculated per region with a space-colonization algorithm, growing fr
 A river never runs on the land of another region. Region borders are therefore watersheds, and the height map puts a ridge on them. The exception is a landlocked region: its rivers search up to 4 zones away for an ocean, and they cross the land of a neighbouring region to reach it.
 
 #### Lakes
-Lakes are placed per region after the rivers. A lake always sits on a river, so every lake has a river running in and out. There are no lakes in mountain zones, in deserts or in dry flat zones with few rivers.
+Lakes are placed per region after the rivers. A lake always sits on a river, so every lake has a river running in and out. There are no lakes in mountain zones, in deserts or in river-poor flat zones (dry flat zones that get few rivers).
 
 Lakes do not change the height map. They count as fresh water for resources and prospects.
 

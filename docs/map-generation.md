@@ -1,70 +1,37 @@
-# How the Sandbox 4 map is generated
+# How the map is generated
 
-> **About this document in the Gameworld repository.** It was written for the Sandbox 4
-> generator, a TypeScript prototype in another repository. It is kept here as the
-> reference for the generation algorithms of Gameworld, unchanged apart from this note.
->
-> - **Paths.** `sandboxes/…`, `shared/core/…` and the other source files named here belong
->   to the Sandbox 4 repository. They are not in this repository.
-> - **Authority.** This document decides the generation rules. The
->   [readme](../readme.md) decides the domain model around them: foundation, parameter set,
->   identity, generation stages and storage.
-> - **Stages.** This document computes every layer on demand and has no stages. The readme
->   places the layers in region generation stages:
->
->   | Sections | Stage in the readme |
->   |---|---|
->   | 3, 4, 5.1, 8, and the bedrock of 14.1 | Sited |
->   | 5.2, 5.3, 6.1, 6.2 | Outlined |
->   | 6.3, 10, 11, and 13–14 at the typical height per zone type | Detailed |
->   | 12, and 13–14 at the height from the height map | Elevated |
->   | 15 | Planned |
->   | 16 | Settled |
->
->   The fields of section 9 have no stage. They can be sampled at any time.
-> - **Terms.** The readme uses other names for some of the things in this document:
->
->   | This document | The readme |
->   |---|---|
->   | Elevation zone | Zone |
->   | Elevation zone type; Flat | Elevation type; Flat Land |
->   | Raw zone, raw patch | Zone cell, patch cell |
->   | Merged zone, merged patch | Zone, Patch |
->   | Ocean growth | Ocean expansion |
->   | `connectRange` | Link range |
->   | Location (city or town) | Prospect |
->   | World seed, parameters | Foundation seed, Parameter Set |
+This document describes every step that turns a foundation seed into the map: the cell
+hierarchy, oceans, elevation types, fields, rivers, lakes, the height map, biomes,
+resources, Prospects for cities and towns and the travel network. It is the specification
+of the generation algorithms. The [readme](../readme.md) holds the domain model around
+them (foundation, Parameter Set, identity, region generation stages), and the names in
+this document follow the readme. Default parameter values are given in parentheses or in
+tables; they are the defaults of the Parameter Set.
 
-This document describes every step that turns a seed into the Sandbox 4 map: the cell
-hierarchy, oceans, elevation zone types, climate, rivers, lakes, the height map, biomes,
-resources, city and town locations and the travel network. It is written so that you can
-build your own generator from it and get maps of the same kind. Default parameter values
-are given in parentheses or in tables; they are the values in
-`sandboxes/sandbox4/defaults.json`.
-
-The reference implementation is TypeScript in `sandboxes/sandbox4/src/world/` (one file per
-layer) on top of `shared/core/` (hashing, noise, heap). Each section names its source file.
+Each section states the region generation stage that its result belongs to. The reasons
+behind the algorithms are in [map-generation-research.md](map-generation-research.md).
+The algorithms were first worked out in an earlier prototype called Sandbox 4.
 
 ## Contents
 
 1. [Overview](#1-overview)
-2. [Foundations: units, hashing, random numbers, noise](#2-foundations)
-3. [One level of cells: a jittered-lattice Voronoi diagram](#3-one-level-of-cells)
+2. [Basics: units, hashing, random numbers, noise](#2-basics)
+3. [One level of cells: a jittered-grid Voronoi diagram](#3-one-level-of-cells)
 4. [The three-level hierarchy](#4-the-three-level-hierarchy)
 5. [Oceans](#5-oceans)
-6. [Merging cells](#6-merging-cells)
+6. [Zone and patch mergers](#6-zone-and-patch-mergers)
 7. [Classifying a point](#7-classifying-a-point)
-8. [Elevation zone types](#8-elevation-zone-types)
-9. [Climate, prosperity and supernatural fields](#9-climate-prosperity-and-supernatural-fields)
+8. [Elevation types](#8-elevation-types)
+9. [Fields](#9-fields)
 10. [Rivers](#10-rivers)
 11. [Lakes](#11-lakes)
 12. [Height map](#12-height-map)
 13. [Biomes](#13-biomes)
 14. [Resources](#14-resources)
-15. [City and town locations](#15-city-and-town-locations)
+15. [Prospects for cities and towns](#15-prospects-for-cities-and-towns)
 16. [Travel network](#16-travel-network)
 17. [Drawing the map](#17-drawing-the-map)
-18. [Building your own: order of work and pitfalls](#18-building-your-own)
+18. [Order of work and pitfalls](#18-order-of-work-and-pitfalls)
 
 Appendices: [A. Exact generators](#appendix-a-exact-generators) ·
 [B. Crop tables](#appendix-b-crop-tables) ·
@@ -76,12 +43,12 @@ Appendices: [A. Exact generators](#appendix-a-exact-generators) ·
 ## 1. Overview
 
 The map is an unbounded plane measured in metres. Nothing is generated up front. Every
-layer is a pure function of `(seed, parameters, position)` and is computed on demand for
-the part of the world in view, then cached. Two rules make that possible:
+layer is a pure function of `(foundation seed, Parameter Set, position)` and is computed on
+demand, then cached. Two rules make that possible:
 
 - **Per-cell randomness comes from a hash**, never from a shared random stream:
-  `hash(seed, stage, i, j)` gives the random numbers of lattice cell `(i, j)` for one
-  purpose (`stage`). The result does not depend on the order in which cells are visited.
+  `hash(seed, purpose, i, j)` gives the random numbers of grid square `(i, j)` for one
+  purpose. The result does not depend on the order in which cells are visited.
 - **Every value depends on a bounded neighbourhood.** A cell can be evaluated by looking
   at a fixed number of cells around it, so the map is the same whether you approach a
   place from the east or the west.
@@ -89,60 +56,60 @@ the part of the world in view, then cached. Two rules make that possible:
 The layers, in dependency order:
 
 ```
-seed ──► cell hierarchy (regions 128 km ▸ elevation zones 32 km ▸ patches 8 km)
+seed ──► cell hierarchy (regions 128 km ▸ zones 32 km ▸ patches 8 km)
           │
-          ├─► oceans (seeds → links → growth, on elevation zones)
-          ├─► merges (zones join a neighbour zone, patches a neighbour in the same zone)
-          ├─► elevation zone type (flat / lowland / hills / mountains)
+          ├─► oceans (ocean seeds → links → expansion, on zone cells)
+          ├─► mergers (zone cells merge into a neighbour, patch cells into a neighbour in the same zone)
+          ├─► elevation type (Flat Land / Lowland / Hills / Mountains)
           │
-seed ──► climate fields (temperature, precipitation, prosperity, supernatural)
+seed ──► fields (initial temperature, precipitation, prosperity, supernatural)
           │
           ├─► rivers      per region: space colonization from the sea into the land
           ├─► lakes       per region: on rivers
           ├─► height map  per region (raster): fitted to the rivers and the coast
-          ├─► biomes      per patch: climate + height
-          ├─► resources   per patch: biome, water, zone type, prosperity
-          ├─► locations   per region: scored patches → cities and towns
-          └─► travel      roads, river routes, sea lanes between locations
+          ├─► biomes      per patch: fields + height
+          ├─► resources   per patch: biome, water, elevation type, bedrock, prosperity
+          ├─► Prospects   per region: scored patches → Prospects for cities and towns
+          └─► travel      roads, river routes, sea lanes between Prospects
 ```
 
-The first block (hierarchy, oceans, merges) is "the map" in the narrow sense: it decides
+The first block (hierarchy, oceans, mergers) is "the map" in the narrow sense: it decides
 where land and sea are and how the land is divided. Everything after it is a layer on top
 that reads the map but never changes it. In particular the **height map is derived from
 the rivers**, not the other way round: rivers are drawn first as branching trees, and the
-terrain is then built so that those rivers run downhill.
+height map is then built so that those rivers run downhill.
 
-A **region** is the unit of work for most layers: rivers, lakes, locations and terrain are
-computed one region at a time, and rivers never cross from one region's land into
-another's. Region borders therefore become watersheds, and the terrain puts a ridge on
+A **region** is the unit of work for most layers: rivers, lakes, Prospects and the height
+map are computed one region at a time, and rivers never cross from one region's land into
+another's. Region borders therefore become watersheds, and the height map puts a ridge on
 them.
 
 If you only need a finite map, you can drop the laziness: generate every cell inside your
 rectangle plus a margin, in the order above. To match the unbounded version right up to
-the edge, the ocean seeds and links need a margin of `connectRange + 5` = 7 regions
+the edge, the ocean seeds and links need a margin of link range + 5 = 7 regions
 (section 5.2); the other layers need one or two regions.
 
-Throughout this document `seed` in a formula such as `hash4(seed, stage, i, j)` is the
-**world seed** (the number made from the seed text). The only exceptions are the three
-Voronoi levels and the climate fields, which use the derived seeds given in their tables
+Throughout this document `seed` in a formula such as `hash4(seed, purpose, i, j)` is the
+**foundation seed** (the number made from the seed text). The only exceptions are the three
+Voronoi levels and the fields, which use the derived seeds given in their tables
 (sections 4 and 9).
 
 ---
 
-## 2. Foundations
+## 2. Basics
 
 ### 2.1 Units and coordinates
 
 - World coordinates are metres, `x` to the east and `y` to the south (screen order). The
   world is unbounded in both directions, including negative coordinates.
-- Lattice cells are addressed by integer indices `(i, j)`; cell `(i, j)` of a lattice with
+- Grid squares are addressed by integer indices `(i, j)`; cell `(i, j)` of a grid with
   spacing `size` covers `[i·size, (i+1)·size) × [j·size, (j+1)·size)`.
 - A cell key packs `(i, j)` into one number: `key = (i + 2²¹)·2²² + (j + 2²¹)`. Keys order
   cells by `i` first, then `j`; several steps break ties "by key".
 
 ### 2.2 Hashing and random numbers
 
-Source: `shared/core/hash.ts`. All arithmetic is 32-bit integer arithmetic with wrap-around.
+All arithmetic is 32-bit integer arithmetic with wrap-around.
 
 ```
 pcg3(a, b, c):                       # pcg3d (Jarzynski & Olano 2020), first lane
@@ -160,16 +127,16 @@ fmix32(h):                           # MurmurHash3 finalizer
     h ^= h >>> 16
     return h as uint32
 
-hash4(seed, stage, x, y) = fmix32(pcg3(x, y, seed XOR (stage·0x9e3779b9)))
+hash4(seed, purpose, x, y) = fmix32(pcg3(x, y, seed XOR (purpose·0x9e3779b9)))
 toUnit(h) = h / 2³²                  # uniform in [0, 1)
 ```
 
 - **Seed text → number**: a string of 1–9 digits is used as a number, anything else is
   hashed to a uint32 (xmur3). The default seed text is `cellgen`.
-- **Per-cell values** use `toUnit(hash4(seed, stage, i, j))`. Each purpose has its own
-  `stage` constant so the streams are independent.
-- **Sequences** (for example "pick 3 of this region's zones", or the river growth of one
-  region) use a small sequential generator, sfc32, seeded with `hash4(seed, stage, i, j)`
+- **Per-cell values** use `toUnit(hash4(seed, purpose, i, j))`. Each purpose has its own
+  constant so the streams are independent.
+- **Sequences** (for example "pick 3 of this region's zone cells", or the river growth of one
+  region) use a small sequential generator, sfc32, seeded with `hash4(seed, purpose, i, j)`
   of the cell: the state `a, b, c, d` is filled from SplitMix32 and 12 outputs are
   discarded (exact code in Appendix A). Any good 32-bit PRNG seeded per cell will do.
 
@@ -193,13 +160,11 @@ quality. You do need it to reproduce a given seed bit for bit.
 
 ### 2.3 Noise
 
-Source: `shared/core/noise.ts`.
-
 - **Simplex noise** `simplex2(seed, x, y)` in about [−1, 1]: standard 2D simplex noise
-  whose gradient at lattice point `(i, j)` is one of 12 unit vectors at 30° steps, chosen
+  whose gradient at grid point `(i, j)` is one of 12 unit vectors at 30° steps, chosen
   by `pcg3(i, j, seed) mod 12` (no permutation table, so it never repeats).
 - **Perlin noise** `perlin2(seed, x, y)` in [−1, 1]: classic gradient noise on the integer
-  lattice with the same 12 gradients and hash, Perlin's quintic fade
+  grid with the same 12 gradients and hash, Perlin's quintic fade
   `t³(t(6t − 15) + 10)`, and the result multiplied by √2.
 - **fBm** (fractal sum) over either basis, with `octaves`, `lacunarity` and `gain`:
 
@@ -215,7 +180,7 @@ Source: `shared/core/noise.ts`.
   ```
 
   `fbm` uses simplex noise, `perlinFbm` uses Perlin noise. The rotation between octaves
-  hides the lattice.
+  hides the grid.
 - **Ridged noise** `ridged(seed, x, y)` in [−1, 1] (Musgrave's ridged multifractal over
   simplex noise): per octave `r = (1 − |noise|)²·weight`, `weight = min(1, 2r)` for the
   next octave, same octave stepping as fBm, result `2·sum/norm − 1`.
@@ -241,16 +206,16 @@ order.
 
 ## 3. One level of cells
 
-Source: `world/level.ts`.
+Stage: Sited.
 
 Each of the three levels of the hierarchy is an infinite Voronoi diagram defined without a
-mesh. A level has five parameters: `seed`, `size` (lattice spacing in metres), `jitter`
+mesh. A level has five parameters: `seed`, `size` (grid spacing in metres), `jitter`
 (0–1), `warp` (border warp amplitude in cell sizes) and `warpFreq` (warp noise cycles per
 cell).
 
 ### 3.1 Sites
 
-Every lattice cell `(i, j)` holds exactly one site:
+Every grid square `(i, j)` holds exactly one site:
 
 ```
 siteX(i, j) = (i + 0.5 + (toUnit(hash4(seed, 0x3a01, i, j)) − 0.5)·jitter)·size
@@ -258,8 +223,8 @@ siteY(i, j) = (j + 0.5 + (toUnit(hash4(seed, 0x3a02, i, j)) − 0.5)·jitter)·s
 ```
 
 With `jitter = 0` the sites form a square grid; with `jitter = 1` (the default on all
-levels) a site may be anywhere inside its lattice cell. The cell of the diagram is named
-after the lattice cell of its site.
+levels) a site may be anywhere inside its grid square. The cell of the diagram is named
+after the grid square of its site.
 
 ### 3.2 Which cell contains a point
 
@@ -270,16 +235,16 @@ query(wx, wy):
         f = warpFreq / size;  a = warp·size
         x += a·fbm(seed XOR 0x2f6b1e3d, wx·f,        wy·f;        2 octaves, lacunarity 2, gain 0.5)
         y += a·fbm(seed XOR 0x5bd1e995, wx·f + 31.7, wy·f − 47.3; same)
-    return the lattice cell whose site is nearest to (x, y)
+    return the grid square whose site is nearest to (x, y)
 ```
 
 The warp moves the **query point**, not the sites, so cell borders become wavy while the
 sites stay put. (A site can therefore lie just outside its own warped cell. Everything
 that asks "which parent does this cell belong to" uses the site position.)
 
-The nearest site is found by searching the lattice cells around the cell containing
+The nearest site is found by searching the grid squares around the cell containing
 `(x, y)` in square rings of radius 0, 1, 2, 3. A site in ring `r` is at least
-`r − 1 + (1 − jitter)/2` lattice units away, so the search stops as soon as that bound
+`r − 1 + (1 − jitter)/2` grid units away, so the search stops as soon as that bound
 exceeds the best distance found. Equal distances are resolved in favour of the smaller
 `j`, then the smaller `i`.
 
@@ -287,8 +252,8 @@ exceeds the best distance found. Equal distances are resolved in favour of the s
 
 Two cells are neighbours when their sites are **Gabriel neighbours**: no third site lies
 strictly inside the circle whose diameter is the segment between the two sites. Candidates
-are the 24 lattice cells within ±2 of the cell; for each candidate, test the sites of all
-lattice cells overlapping the circle's bounding box.
+are the 24 grid squares within ±2 of the cell; for each candidate, test the sites of all
+grid squares overlapping the circle's bounding box.
 
 The neighbour list of a cell is **sorted by site distance, nearest first** (ties by key).
 The Gabriel graph is a subgraph of the Delaunay triangulation, it is symmetric, and it
@@ -300,167 +265,182 @@ are computed on the unwarped sites.
 
 ## 4. The three-level hierarchy
 
-Source: `world/world.ts`.
+Stage: Sited.
 
 | Level | Default size | Jitter | Warp | Warp freq. | Level seed | Role |
 |---|---|---|---|---|---|---|
-| Regions | 128 km | 1 | 0 (never warped) | – | `seed XOR 0x1b873593` | unit of work; rivers stay inside; decides ocean seeds and zone merges |
-| Elevation zones | 32 km | 1 | 0 | 0.6 | `seed XOR 0x7f4a7c15` | the land/ocean unit; carries the terrain type |
-| Patches | 8 km | 1 | 0.26 | 0.33 | `seed XOR 0x6c8e9cf5` | detail: coastline shape, biomes, resources, settlements |
+| Regions | 128 km | 1 | 0 (never warped) | – | `seed XOR 0x1b873593` | unit of work; rivers stay inside; decides ocean seeds and zone mergers |
+| Zones | 32 km | 1 | 0 | 0.6 | `seed XOR 0x7f4a7c15` | the land/ocean unit; carries the elevation type and the bedrock |
+| Patches | 8 km | 1 | 0.26 | 0.33 | `seed XOR 0x6c8e9cf5` | detail: coastline shape, biomes, resources, Prospects |
 
 The sizes are kept nested: the zone size is clamped to `[regionSize/16, regionSize/1.5]`
 and the patch size to `[zoneSize/16, zoneSize/1.5]`.
 
+Every Voronoi cell of the zone level is a **zone cell** and every cell of the patch level
+is a **patch cell**. Zones and patches are built from them by the mergers of section 6.
+
 **Ownership goes by site.**
 
-- An elevation zone belongs to the region that contains the zone's site
-  (`regionLevel.query(zone site)`).
-- A patch belongs to the elevation zone that contains the patch's site
-  (`zoneLevel.query(patch site)`, including the zone level's warp if it has one).
+- A zone cell is owned by the region that contains its site
+  (`regionLevel.query(zone cell site)`).
+- A patch cell is owned by the zone cell that contains its site
+  (`zoneLevel.query(patch cell site)`, including the zone level's warp if it has one).
 
-To list the zones a region `(i, j)` owns, scan the zone lattice cells that cover the
-region's lattice cell plus one region cell on every side, and keep those whose owning
-region is this one, **in lattice order** (row by row: `j` outer, `i` inner). With region
-size `R` and zone size `B` the scanned zone indices are, inclusive on both ends,
+To list the zone cells a region `(i, j)` owns, scan the zone grid squares that cover the
+region's grid square plus one region grid square on every side, and keep those whose
+owning region is this one, **in grid order** (row by row: `j` outer, `i` inner). With
+region size `R` and zone size `B` the scanned zone grid coordinates are, inclusive on both
+ends,
 
 ```
 zi from floor((i − 1)·R / B) to floor((i + 2)·R / B)        # same for zj with j
 ```
 
-The patches of a zone `(zi, zj)` are listed the same way, with patch size `S` and a margin
-of `m = ⌈warp of the zone level⌉ + 1` zone cells (1 at the defaults):
+The patch cells of a zone cell `(zi, zj)` are listed the same way, with patch size `S` and
+a margin of `m = ⌈warp of the zone level⌉ + 1` zone grid squares (1 at the defaults):
 
 ```
 pi from floor((zi − m)·B / S) to floor((zi + 1 + m)·B / S)  # same for pj with zj
 ```
 
-The lattice order and the exact window matter because random picks are made from these
+The grid order and the exact window matter because random picks are made from these
 lists.
 
 **Nesting.** With "nest levels" on (the default) a point is classified through its patch
-only: point → patch → the zone owning that patch → the region owning that zone. Zone
-borders, region borders and coastlines therefore all run along patch borders, and the
-8 km warped patch cells give the coast its shape. (With nesting off, each level is looked
-up at the point itself and borders of different levels cross each other; the rest of this
-document assumes nesting.)
+only: point → patch → the zone of that patch → the region of that zone. Zone borders,
+region borders and coastlines therefore all run along patch borders, and the 8 km warped
+patch cells give the coast its shape. (With nesting off, each level is looked up at the
+point itself and borders of different levels cross each other; the rest of this document
+assumes nesting.)
 
 ---
 
 ## 5. Oceans
 
-Source: `world/world.ts`. Oceans are decided on **raw elevation zones** (before merging),
-in three steps.
+Stage: ocean seeds are Sited; linking and expansion make the region Outlined.
 
-### 5.1 Seeds
+Oceans are decided on **zone cells** (before the mergers), in three steps.
 
-Each region `(i, j)` chooses some of the zones it owns as ocean seeds:
+### 5.1 Ocean seeds
+
+Each region `(i, j)` chooses some of the zone cells it owns as ocean seeds:
 
 ```
 rng    = sfc32(hash4(seed, 0x5e01, i, j))
-nSeeds = between(oceanMin, oceanMax, rng())        # defaults 0 and 2
-seeds  = pick(ownedZones, nSeeds, rng)
+nSeeds = between(oceanSeedsMin, oceanSeedsMax, rng())   # defaults 0 and 2
+seeds  = pick(ownedZoneCells, nSeeds, rng)
 ```
 
 ### 5.2 Links
 
-Each seed zone `s` (lattice index `(si, sj)`) decides how many links it makes:
+Each ocean seed `s` (grid coordinate `(si, sj)`) decides how many links it makes:
 
 ```
 if   toUnit(hash4(seed, 0x5e05, si, sj)) < doubleLinkChance:  n = 2     # default 5 %
-elif toUnit(hash4(seed, 0x5e03, si, sj)) < connectChance:     n = 1     # default 40 %
+elif toUnit(hash4(seed, 0x5e03, si, sj)) < linkChance:        n = 1     # default 40 %
 else:                                                          n = 0
 ```
 
-It links to its `n` nearest **other seeds**, searching the seeds of all regions within
-`connectRange` (2) lattice cells of its own region (a 5 × 5 block), ordered by squared site
-distance, ties by key.
+It links to its `n` nearest **other ocean seeds**, searching the seeds of all regions
+within the link range (2 grid squares) of its own region (a 5 × 5 block), ordered by
+squared site distance, ties by key.
 
-A link turns every zone on the straight segment between the two seed sites into ocean:
-divide the segment into `n = max(1, ⌈length / (0.12 × zone size)⌉)` equal parts and query
-the zone level at the interior points `t = k/n`, `k = 1 … n − 1`. Each zone hit, and the
-two end seeds themselves, are flagged **LINKED**. Zones in between are called
-*chain* zones. Because chains from several seeds can overlap, several seeds can end up in
-one sea.
+A link turns every zone cell on the straight segment between the two seed sites into
+ocean: divide the segment into `n = max(1, ⌈length / (0.12 × zone size)⌉)` equal parts and
+query the zone level at the interior points `t = k/n`, `k = 1 … n − 1`. Each zone cell hit,
+and the two end seeds themselves, are flagged **LINKED**. The zone cells in between are
+called *chain* cells. Because chains from several seeds can overlap, several seeds can end
+up in one sea.
 
-Each zone thus carries two flags, `SEED` and `LINKED`, OR-ed together from every region
-that touches it. A lone seed that links to nothing and is not on anyone's chain stays a
-single-zone sea.
+Each zone cell thus carries two flags, `SEED` and `LINKED`, OR-ed together from every
+region that touches it. A lone seed that links to nothing and is not on anyone's chain
+stays a sea of a single zone cell.
 
-A zone can be flagged by links that start several regions away. When evaluating lazily,
-process the seeds and links of every region within `connectRange + 5` lattice cells of a
-zone's region before reading its flags.
+A zone cell can be flagged by links that start several regions away. When evaluating
+lazily, process the seeds and links of every region within link range + 5 grid squares of
+a zone cell's region before reading its flags.
 
-### 5.3 Growth
+### 5.3 Expansion
 
-Growth runs for `growPasses` passes (1). In each pass some ocean zones ("growers") convert
-a few of their land neighbours.
+Expansion runs for a number of expansion passes (1). In each pass some ocean zone cells
+convert a few of their land neighbours.
 
-- **Growers of pass 1**: every zone flagged LINKED (with `growFrom = all`: every zone with
-  any flag, lone seeds too).
-- **Growers of pass p > 1**: the zones that became ocean in pass p − 1.
+- **Pass 1** expands from every zone cell flagged LINKED (with the option "expand from
+  all": from every zone cell with any flag, lone seeds too).
+- **Pass p > 1** expands from the zone cells that became ocean in pass p − 1.
 
-Each grower `g` at lattice index `(gi, gj)` draws how many neighbours it converts:
+Each expanding cell `g` at grid coordinate `(gi, gj)` draws how many neighbours it
+converts:
 
 ```
 u = toUnit(hash4(seed, 0x5e10 + p, gi, gj))
-n = 0, 1, 2 or 3 with relative weights growWeights[0..3]   # defaults 23, 33, 33, 10
+n = 0, 1, 2 or 3 with relative weights expansionWeights[0..3]   # defaults 23, 33, 33, 10
     # normalise the weights (negative → 0), cdf[k] = w[0] + … + w[k];
     # n = the first k with u < cdf[k], at most 3
 ```
 
 and converts its `n` **nearest neighbours that were still land after pass p − 1**. All
-growers of a pass act on the state after the previous pass, so the order does not matter;
-a zone is ocean after pass `p` if it was ocean before or any neighbouring grower picked it.
+expanding cells of a pass act on the state after the previous pass, so the order does not
+matter; a zone cell is ocean after pass `p` if it was ocean before or any neighbouring
+expanding cell picked it.
 
 With the defaults about 18 % of the map ends up as sea (measured over three seeds):
-scattered single-zone seas, and larger seas where chains and their growth run together. More seeds, a higher link chance
-and more passes give more water (see the presets in `params.ts`: "Archipelago",
-"Continents", "Ocean world").
+scattered seas of a single zone cell, and larger seas where chains and their expansion run
+together. More ocean seeds, a higher link chance and more passes give more water.
 
 ---
 
-## 6. Merging cells
+## 6. Zone and patch mergers
 
-Source: `world/world.ts`. Merging makes cell sizes irregular: some zones and patches
-join a neighbour and form a double (or larger) cell.
+Stage: zone mergers make the region Outlined; patch mergers are the first step of Detailed.
 
-### 6.1 Elevation zone merges
+The mergers make cell sizes irregular: some zone cells and patch cells merge into a
+neighbour and form a double (or larger) zone or patch.
 
-Each region `(i, j)` chooses zones to merge away:
+### 6.1 Zone mergers
 
-```
-rng    = sfc32(hash4(seed, 0x5e02, i, j))
-nMerge = between(mergeMin, mergeMax, rng())        # defaults 2 and 4
-merges = pick(ownedZones, nMerge, rng)
-```
-
-A chosen zone joins its **nearest neighbour on the same side of the coast** (ocean with
-ocean, land with land; with "merge across coast" on, simply its nearest neighbour). The
-neighbour may belong to another region. If none qualifies, the zone is not merged.
-
-### 6.2 Roots
-
-A merged zone points at its target, which may itself be merged into a third zone. Follow
-the targets until a zone that is not merged: that is the **root**, and all zones with the
-same root form one merged zone. If the chain loops (A → B → A), the root is the smallest
-key in the loop. (The implementation gives up after 64 steps.)
-
-A merged zone takes everything from its root: ocean or land, its region (the region owning
-the root's site), and its elevation zone type. So a zone merged into a zone of the
-neighbouring region moves to that region: region borders follow merged zones.
-
-### 6.3 Patch merges
-
-Each raw zone `(i, j)` chooses patches to merge away:
+Each region `(i, j)` chooses zone cells to merge away:
 
 ```
-rng    = sfc32(hash4(seed, 0x5e04, i, j))
-nMerge = between(patchMergeMin, patchMergeMax, rng())   # defaults 2 and 4
-merges = pick(ownedPatches, nMerge, rng)
+rng      = sfc32(hash4(seed, 0x5e02, i, j))
+nMergers = between(mergersMin, mergersMax, rng())        # defaults 2 and 4
+chosen   = pick(ownedZoneCells, nMergers, rng)
 ```
 
-A chosen patch joins its **nearest neighbour patch in the same merged zone** (the root of
-the neighbour's owning zone equals the root of its own). Roots are resolved as for zones.
+A chosen zone cell merges into its **nearest neighbour on the same side of the coast**
+(ocean with ocean, land with land; with the option "merge across coast", simply its
+nearest neighbour). The neighbour may be owned by another region. If none qualifies, the
+zone cell does not merge.
+
+### 6.2 Root cells
+
+A zone cell that merges points at its target, which may itself have merged into a third
+zone cell. Follow the targets until a zone cell that has not merged: that is the **root
+cell**, and all zone cells with the same root cell form one **zone**. If the chain loops
+(A → B → A), the root cell is the one with the smallest key in the loop. (Give up after
+64 steps.)
+
+A zone takes everything from its root cell: ocean or land, its region (the region that
+owns the root cell), its elevation type and its bedrock. So a zone cell that merges into a
+zone of the neighbouring region moves to that region: region borders follow the zones.
+
+From here on a **zone** is such a set of zone cells, addressed by the grid coordinate of
+its root cell, and a **zone cell** is one Voronoi cell. A zone cell that has not merged is
+a zone of one cell. **Patch** and **patch cell** are used the same way.
+
+### 6.3 Patch mergers
+
+Each zone cell `(i, j)` chooses patch cells to merge away:
+
+```
+rng      = sfc32(hash4(seed, 0x5e04, i, j))
+nMergers = between(patchMergersMin, patchMergersMax, rng())   # defaults 2 and 4
+chosen   = pick(ownedPatchCells, nMergers, rng)
+```
+
+A chosen patch cell merges into its **nearest neighbour patch cell in the same zone** (the
+root cell of the neighbour's owning zone cell equals the root cell of its own). Root cells
+are resolved as for zones.
 
 ---
 
@@ -470,68 +450,74 @@ With the pieces above, any world point is classified like this:
 
 ```
 cellAt(x, y):
-    p    = patchLevel.query(x, y)             # raw patch (warped borders)
-    pr   = root(p)                            # merged patch
-    z    = zone owning patch pr (by pr's site)
-    zr   = root(z)                            # merged elevation zone
+    p    = patchLevel.query(x, y)             # patch cell (warped borders)
+    pr   = root(p)                            # patch
+    z    = zone cell owning pr (by pr's site)
+    zr   = root(z)                            # zone
     return {
-        patchRaw: p,  patch: pr,
-        elevationZoneRaw: z,  elevationZone: zr,
+        patchCell: p,  patch: pr,
+        zoneCell: z,  zone: zr,
         region: region owning zr (by zr's site),
-        ocean:  zr is ocean after the last growth pass
+        ocean:  zr is ocean after the last expansion pass
     }
 ```
 
-Memoise the result per raw patch: every point of a patch gives the same answer. This
+Memoise the result per patch cell: every point of a patch cell gives the same answer. This
 function is the whole "map" as far as the later layers are concerned.
 
 Two derived notions are used later:
 
-- **The zones drawn in region R**: the raw zones whose merged root belongs to R. They are
-  found among the zones owned by R and by its 8 lattice neighbours, and sorted by key.
-  This differs from "the zones R owns" because of merges across region borders.
-- **Coastal patch** (as the rivers use it): a raw patch with at least one neighbour patch
-  (Gabriel neighbours) on the other side of the coast. The biomes and resources use the
-  same idea on merged patches: a merged land patch is coastal when any of its raw member
-  patches has an ocean patch as neighbour.
+- **The zone cells drawn in region R**: the zone cells whose root cell belongs to R. They
+  are found among the zone cells owned by R and by its 8 grid neighbours, and sorted by
+  key. This differs from "the zone cells R owns" because of mergers across region borders.
+- **Coastal patch cell** (as the rivers use it): a patch cell with at least one neighbour
+  patch cell (Gabriel neighbours) on the other side of the coast. The biomes and resources
+  use the same idea on patches: a land patch is coastal when any of its member patch cells
+  has an ocean patch cell as neighbour.
 
 ---
 
-## 8. Elevation zone types
+## 8. Elevation types
 
-Source: `world/zones.ts`. Every land zone is one of four types, chosen by weight from a
-hash of the merged zone's lattice index `(i, j)`:
+Stage: Sited for the type of each zone cell; a zone has the type of its root cell.
+
+Every land zone is one of four types, chosen by weight from a hash of the grid coordinate
+`(i, j)` of its root cell:
 
 ```
-h = hash4(0x0c0101, 1, i, j) mod 13
+h = hash4(seed, 0x0c01, i, j) mod 13
 ```
 
 | Type | Weight | Share of land | Map colour (RGB) |
 |---|---|---|---|
 | Ocean | – | – | 38, 84, 132 |
-| Flat | 5 | 38 % | 143, 174, 93 |
+| Flat Land | 5 | 38 % | 143, 174, 93 |
 | Lowland | 6 | 46 % | 92, 134, 74 |
 | Hills | 1 | 8 % | 154, 138, 98 |
 | Mountains | 1 | 8 % | 124, 116, 112 |
 
 Walk the table from the top, subtracting each weight from `h`, and take the first type
-where `h` goes negative. (In the reference the hash is not mixed with the world seed, so a
-zone's type depends on its lattice index only; you may prefer to mix the seed in.)
+where `h` goes negative. The hash includes the foundation seed, like every other step, so
+every world has its own pattern of elevation types.
 
-The type is a label at this point. It becomes terrain in section 12, where each type has
+The text below writes "flat zone" for a zone of the type Flat Land.
+
+The type is a label at this point. It becomes height in section 12, where each type has
 its own hillslope steepness, river gradient and surface roughness, and it feeds the
 biomes, resources and travel costs.
 
 ---
 
-## 9. Climate, prosperity and supernatural fields
+## 9. Fields
 
-Source: `world/climate.ts`. Four scalar fields are defined over the plane. Each is an
+Stage: none, the fields can be sampled at any time.
+
+Four scalar fields are defined over the plane. Each is an
 independent Perlin fBm stretched to a `[min, max]` range. They do not depend on the map.
 
 | Field | Seed | Feature size | Octaves | Lacunarity | Gain | Min | Max | Scale |
 |---|---|---|---|---|---|---|---|---|
-| Temperature (°C, at sea level) | `seed XOR 0x7e3a11c5` | 110 km | 2 | 2 | 0.5 | −10 | 30 | linear |
+| Initial Temperature (°C, at sea level) | `seed XOR 0x7e3a11c5` | 110 km | 2 | 2 | 0.5 | −10 | 30 | linear |
 | Precipitation (mm/yr) | `seed XOR 0x2b9d40f3` | 80 km | 2 | 2.2 | 0.55 | 100 | 12000 | logarithmic |
 | Prosperity (index) | `seed XOR 0x5c1f86a9` | 200 km | 3 | 2 | 0.5 | 1 | 100 | linear |
 | Supernatural (index) | `seed XOR 0x3ad5e217` | 10 km | 3 | 2 | 0.5 | 0 | 100 | linear |
@@ -550,15 +536,17 @@ Only the strongest highs and lows reach `min` and `max`. The log scale for preci
 means the middle of the range is √(100 · 12000) ≈ 1100 mm: most of the map is dry to
 moderate and only a few places are very wet.
 
-Uses: temperature and precipitation feed the biomes; precipitation also thins the rivers
-of dry flat zones (next section); prosperity feeds resources and settlement scores; the
+Uses: initial temperature and precipitation feed the biomes; precipitation also thins the rivers
+of dry flat zones (next section); prosperity feeds resources and Prospect scores; the
 supernatural field feeds nothing yet.
 
 ---
 
 ## 10. Rivers
 
-Source: `world/rivers.ts`. Rivers are grown per region with the **space colonization
+Stage: Detailed.
+
+Rivers are grown per region with the **space colonization
 algorithm** (Runions et al. 2005, the open venation variant): attraction points are
 scattered over the land, tree nodes start at the sea, and the trees grow step by step
 towards the attraction points until all are reached. The result is a set of trees rooted
@@ -586,46 +574,49 @@ in the sea whose branches are the rivers. Flow direction is from the leaves to t
 For region `(ri, rj)`, with `rng = sfc32(hash4(seed, 0x7e01, ri, rj))`:
 
 ```
-for each raw zone drawn in the region (sorted by key), if it is land:
-    sparse = the merged zone is a river-poor flat zone (see below)
-    for each patch the raw zone owns (lattice order):
-        skip if the patch is ocean or not in this region
-        skip if it is a coastal patch                    # "skip coast patches"
-        count = sparse ? (hash4(seed, 0x7e04, patch i, patch j) AND 1) : attractorsPerPatch
+for each zone cell drawn in the region (sorted by key), if it is land:
+    sparse = its zone is a river-poor flat zone (see below)
+    for each patch cell the zone cell owns (grid order):
+        skip if the patch cell is ocean or not in this region
+        skip if it is a coastal patch cell                # "skip coast patches"
+        count = sparse ? (hash4(seed, 0x7e04, patch cell i, patch cell j) AND 1) : attractorsPerPatch
         repeat count times:
             try up to 24 times:
-                q = patch site + (rng() − 0.5, rng() − 0.5) · 1.6 · patchSize
-                accept q if patchLevel.query(q) is this patch
-            if none accepted: use the patch site itself, provided the site is land of
+                q = patch cell site + (rng() − 0.5, rng() − 0.5) · 1.6 · patchSize
+                accept q if patchLevel.query(q) is this patch cell
+            if none accepted: use the patch cell site itself, provided the site is land of
                               this region; otherwise drop this attractor
 ```
 
-**River-poor flat zones.** A merged zone of type *flat* whose site gets less initial
+**River-poor flat zones.** A flat zone whose site (the site of its root cell) gets less
 precipitation than the cutoff (1660 mm/yr; about two thirds of the flat zones with the
-default climate) is river-poor: each of its patches gets 0 or 1 attractor (a coin flip
-from the patch's hash) instead of 10. These become the dry plains with few rivers; the
-same flag later makes them drier for the biomes and bars lakes.
+default fields) is river-poor: each of its patch cells gets 0 or 1 attractor (a coin flip
+from the patch cell's hash) instead of 10. These become the dry plains with few rivers;
+the same flag later makes them drier for the biomes and bars lakes.
 
-Leaving the coastal patches empty keeps river mouths apart and gives the rivers a clear
-run from the coast into the interior.
+Leaving the coastal patch cells empty keeps river mouths apart and gives the rivers a
+clear run from the coast into the interior.
 
-### 10.2 Roots
+### 10.2 River roots
 
-Every **raw** ocean zone that touches the region's land gets one root node (a merged sea
-gets one root per raw member that qualifies):
+A river root is the node a river tree starts from. It has nothing to do with the root
+cell of a merger. Every ocean **zone cell** that touches the region's land gets one river
+root (a sea of several zone cells gets one per zone cell that qualifies):
 
-- every ocean zone that is a neighbour of a land zone drawn in the region, and
-- every ocean zone drawn in the region that has a land neighbour.
+- every ocean zone cell that is a neighbour of a land zone cell drawn in the region, and
+- every ocean zone cell drawn in the region that has a land neighbour.
 
-The root sits at the ocean zone's **site**, out in the water, so each river first grows
-across the sea to the coast (that stretch is hidden when drawing). If the site happens to
-fall on land (coasts follow patch cells), use the site of the nearest patch of the zone
-whose site is ocean; if there is none, the zone gets no root. Roots are created in order
-of ocean zone key. A region without attractors gets no roots and no rivers.
+The root sits at the ocean zone cell's **site**, out in the water, so each river first
+grows across the sea to the coast (that stretch is hidden when drawing). If the site
+happens to fall on land (coasts follow patch cells), use the site of the nearest patch
+cell of the zone cell whose site is ocean; if there is none, the zone cell gets no root.
+Roots are created in order of ocean zone cell key. A region without attractors gets no
+roots and no rivers.
 
-A **landlocked** region (no ocean zone touches its land) searches outwards breadth-first
-over zone neighbours, up to 4 steps, and takes the first ocean zones it finds. Such a
-region is exempt from the border rule below, since its rivers must cross a neighbour.
+A **landlocked** region (no ocean zone cell touches its land) searches outwards
+breadth-first over zone cell neighbours, up to 4 steps, and takes the first ocean zone
+cells it finds. Such a region is exempt from the border rule below, since its rivers must
+cross a neighbour.
 
 ### 10.3 Growth
 
@@ -737,7 +728,9 @@ was reached in the 75 regions measured.
 
 ## 11. Lakes
 
-Source: `world/lakes.ts`. Lakes are placed per region after the rivers and always sit on
+Stage: Detailed.
+
+Lakes are placed per region after the rivers and always sit on
 a river, so every lake has a river running in and out.
 
 | Parameter | Default |
@@ -752,18 +745,19 @@ desert, section 13), or lies in a river-poor flat zone. A point is *lake-eligibl
 region R when it is land of R in a patch that may hold a lake.
 
 **Candidates.** Collect the river nodes of the region that are on land, are not roots,
-carry a flow of at least 4, and lie at a lake-eligible point; group them by raw patch, in
+carry a flow of at least 4, and lie at a lake-eligible point; group them by patch cell, in
 node index order.
 
 **Placement.** With `rng = sfc32(hash4(seed, 0x1a01, ri, rj))`, visit the region's land
-patches zone by zone (raw zones drawn in the region by key, skipping ocean and mountains
-zones; the patches each owns in lattice order, skipping ocean patches and patches of
-another region) and draw three numbers for *every* such patch, coastal and river-poor ones
-included, so the stream does not depend on which patches have rivers:
+patch cells zone cell by zone cell (zone cells drawn in the region by key, skipping ocean
+and mountains zones; the patch cells each owns in grid order, skipping ocean patch cells
+and patch cells of another region) and draw three numbers for *every* such patch cell,
+coastal and river-poor ones included, so the stream does not depend on which patch cells
+have rivers:
 
 ```
 roll = rng();  u = rng();  pickU = rng()
-if the patch has no candidate nodes: continue
+if the patch cell has no candidate nodes: continue
 if roll ≥ frequency: continue
 centre  = the candidate node at index floor(pickU · count)
 nominal = minSize + (maxSize − minSize)·u²          # skewed towards small lakes
@@ -775,7 +769,7 @@ shape the lake (below); drop it if the shaping fails
 **Shape.** The outline is a star-shaped polygon of 64 rays from the centre, at equal
 angles (ray `k` points at angle `2πk/64`). It uses a second generator
 `srng = sfc32(s)` with `s = hash4(seed, 0x1a02, pi·4099 + id, pj)`, where `(pi, pj)` is the
-lattice index of the **merged** patch and `id` is the number of lakes already accepted in
+grid coordinate of the patch and `id` is the number of lakes already accepted in
 the region. The draws are, in order: the axis (rejection sampling, Appendix A), `u₁`, `u₂`,
 `nx`, `ny`, and the ring `u`. The noise seed is `s XOR 0x5bd1e995`.
 
@@ -810,7 +804,9 @@ for the later layers.
 
 ## 12. Height map
 
-Source: `world/terrain.ts`. The height map is **fitted to the map and its rivers**. It is
+Stage: Elevated.
+
+The height map is **fitted to the map and its rivers**. It is
 built so that every river runs downhill to the sea, land rises away from rivers and
 coasts, and region borders and the boundaries between river systems become ridges. It is
 a raster (1 km cells by default) computed per region.
@@ -829,11 +825,11 @@ a raster (1 km cells by default) computed per region.
 | Channel depth | 3 m | how deep rivers are cut below their bed profile |
 | Sea depth | 300 m | depth 40 km or more from the coast |
 
-Per elevation zone type:
+Per elevation type:
 
 | Type | Hillslope (m/m) | River gradient factor | Noise amplitude (m) | Ridged share |
 |---|---|---|---|---|
-| Flat | 0.006 | 0.7 | 8 | 0 |
+| Flat Land | 0.006 | 0.7 | 8 | 0 |
 | Lowland | 0.06 | 1 | 25 | 0.15 |
 | Hills | 0.15 | 1.8 | 80 | 1 |
 | Mountains | 0.277 | 3 | 180 | 1 |
@@ -846,16 +842,16 @@ get `× √(flow/100)`. The half-width is never less than `0.75 ×` the raster c
 ### 12.1 The raster
 
 The raster of a region is aligned to the world: cell `(i, j)` has its centre at
-`((i + 0.5)·res, (j + 0.5)·res)`. It covers the bounding box of the sites of all zones
+`((i + 0.5)·res, (j + 0.5)·res)`. It covers the bounding box of the sites of all zone cells
 drawn in or owned by the region, plus `1.6 × zone size × (1 + zone warp)` and a **halo of
 24 km**. The halo
 exists because neighbouring regions' rivers and coasts shape the land near the border;
 with it, the rasters of two neighbouring regions agree where they overlap.
 
-Classify every cell with `cellAt` at its centre: ocean or land, region, merged zone and
-its type, merged patch.
+Classify every cell with `cellAt` at its centre: ocean or land, region, zone and
+its type, patch.
 
-(The reference computes one raster per *tile* of 2 × 2 regions and shares the halo; that is
+(One raster can be computed for a *tile* of 2 × 2 regions with a shared halo; that is
 an optimisation and gives identical heights.)
 
 **Per-type parameters are blended across zone borders** so there are no cliffs between a
@@ -880,7 +876,7 @@ each node rises above its parent by
 
 ```
 rise(k) = Δx · min(channelSlope, hillslope)
-channelSlope = S₀ · gradientFactor(zone type at k) · relief(k) · flow(k)^−θ
+channelSlope = S₀ · gradientFactor(elevation type at k) · relief(k) · flow(k)^−θ
 hillslope    = the blended hillslope at k, read from the coarse grid described below
 Δx           = distance from k to its parent
 ```
@@ -1008,8 +1004,8 @@ seedN = hash4(seed, 0x7e12, 0, 0)
 
 The mask `m` keeps valley floors smooth: ridges and noise fade in with height above the
 river. The noise term lies in [0, amplitude], so it only ever adds height. A land cell the
-envelope never reached uses the largest `E` on the raster. From here on the reference
-stores heights as 32-bit floats, and the fill in step 5 compares and raises in that
+envelope never reached uses the largest `E` on the raster. From here on heights are
+stored as 32-bit floats, and the fill in step 5 compares and raises in that
 precision (this matters only for bit-exact output).
 
 ### 12.6 Step 4: burn the rivers in
@@ -1043,9 +1039,9 @@ fill raised about 1 500 cells, by 9 m at most.
 ### 12.8 Results
 
 Heights are stored per raster cell and read with bilinear interpolation. Also store the
-**mean height of every merged patch** (over its land cells): the biomes use it. A patch
+**mean height of every patch** (over its land cells): the biomes use it. A patch
 with no land cell centre in it has no mean height; the biomes then use the typical height
-of its zone type (section 13.1).
+of its elevation type (section 13.1).
 
 Measured at the defaults on one tile: median patch height about 85 m in flat zones, 160 m
 in lowland, 260 m in hills and 410 m in mountains; the highest patches are near 1 000 m
@@ -1055,13 +1051,16 @@ and single peaks reach above 3 000 m.
 
 ## 13. Biomes
 
-Source: `world/biomes.ts`. Every land patch (merged) gets one biome, from the climate at
-the patch's site and the patch's height.
+Stage: Detailed (estimated biome) and Elevated (final biome).
+
+Every land patch gets one biome, from the fields at
+the patch's site and the patch's height. The estimated biome uses the typical height of
+the elevation type, and the final biome uses the height from the height map (13.1).
 
 ### 13.1 Inputs
 
 ```
-T₀ = temperature field at the site (°C, sea level)
+T₀ = Initial Temperature field at the site (°C, sea level)
 P₀ = precipitation field at the site (mm/yr)
 h  = mean height of the patch's land (section 12.8), at least 0
 T  = T₀ − cooling(h)
@@ -1071,12 +1070,13 @@ P  = P₀ · 0.2   if the patch lies in a river-poor flat zone (section 10.1), e
 `cooling(h)` is a monotone spline through five points, default
 `(0 m, 0°), (200, 1°), (400, 5°), (900, 11°), (1250, 20°)`. Below the first point it is
 constant; above the last it continues along the last segment's slope. The defaults are
-much steeper than the real atmosphere (6.5 °C per km): with them the generated terrain,
+much steeper than the real atmosphere (6.5 °C per km): with them the generated land,
 which is mostly below 1 000 m, still gets cold highlands.
 
-Layers that must not depend on the height raster (lakes, resources as used by the
-locations, locations, travel) use a **typical height per zone type** instead of `h`:
-70 m flat, 140 m lowland, 270 m hills, 470 m mountains.
+Layers that must not depend on the height map (lakes, resources as used by the
+Prospects, Prospects, travel) use a **typical height per elevation type** instead of `h`:
+70 m flat, 140 m lowland, 270 m hills, 470 m mountains. The biome with the typical height
+is the **estimated biome**, and the biome with `h` is the **final biome**.
 
 ### 13.2 Classification
 
@@ -1092,14 +1092,14 @@ m    = P / P_th                   # < 0.5 desert, 0.5–1 steppe, > 1 humid
 |---|---|---|---|---|---|---|
 | Polar | below −10 | Ice & snow | Ice & snow | Ice & snow | Ice & snow | Ice & snow |
 | Subpolar | −10 to −3 | Tundra | Tundra | Tundra | Tundra | Tundra |
-| Boreal | −3 to 3 | Cold desert | Cold steppe | Taiga | Taiga | Taiga |
-| Temperate | 3 to 18 | Cold desert | Grassland | Shrubland | Mixed forest (T < 10) or broadleaf forest (T ≥ 10) | Temperate rainforest |
-| Tropical | 18 and up | Hot desert | Thorn scrub | Savanna | Tropical dry forest | Tropical rainforest |
+| Boreal | −3 to 3 | Cold desert | Cold steppe | Boreal forest | Boreal forest | Boreal forest |
+| Temperate | 3 to 18 | Cold desert | Grassland | Shrubland | Mixed forest (T < 10) or broadleaf forest (T ≥ 10) | Temperate rain forest |
+| Tropical | 18 and up | Hot desert | Thorn scrub | Savanna | Tropical dry forest | Tropical rain forest |
 
 The wet bound is `m = 6` in the temperate belt and `m = 4` in the tropical belt.
 
 **Mangrove** overrides the table: a patch becomes mangrove when it is coastal (one of its
-raw patches has an ocean patch as neighbour), lies in a flat or lowland zone, has
+patch cells has an ocean patch as neighbour), lies in a flat or lowland zone, has
 `T ≥ 20 °C` and `m ≥ 0.5`.
 
 The same classification with `T₀` in place of `T` gives the patch's **sea-level biome**,
@@ -1110,12 +1110,12 @@ which the lakes use to rule out deserts without needing the height map.
 | Biome | RGB | Biome | RGB |
 |---|---|---|---|
 | Ocean | 38, 84, 132 | Temperate broadleaf forest | 90, 140, 64 |
-| Ice & snow | 234, 239, 243 | Temperate rainforest | 40, 102, 80 |
+| Ice & snow | 234, 239, 243 | Temperate rain forest | 40, 102, 80 |
 | Tundra | 146, 154, 138 | Hot desert | 229, 200, 138 |
 | Cold steppe | 178, 171, 132 | Thorn scrub | 198, 166, 100 |
-| Taiga | 56, 94, 78 | Savanna | 190, 176, 80 |
+| Boreal forest | 56, 94, 78 | Savanna | 190, 176, 80 |
 | Cold desert | 204, 189, 152 | Tropical dry forest | 122, 144, 58 |
-| Temperate grassland | 186, 186, 112 | Tropical rainforest | 28, 94, 44 |
+| Temperate grassland | 186, 186, 112 | Tropical rain forest | 28, 94, 44 |
 | Woodland & shrubland | 144, 152, 90 | Mangrove | 66, 132, 118 |
 | Temperate mixed forest | 68, 114, 72 | | |
 
@@ -1123,7 +1123,9 @@ which the lakes use to rule out deserts without needing the height map.
 
 ## 14. Resources
 
-Source: `world/resources.ts`. Every patch gets an amount in [0, 1] for each of 24 raw
+Stage: Detailed (estimated) and Elevated (final).
+
+Every patch gets an amount in [0, 1] for each of 24 raw
 resources, plus a named variant ("grain: rye", "timber: teak"). A resource is listed for
 a patch when its amount is at least 0.25. The layer is a pure function of the patch.
 
@@ -1134,13 +1136,14 @@ dyes (luxuries); horses & pack animals.
 
 ### 14.1 Inputs per patch
 
-- The patch's **biome record** (section 13) with zone-typical or exact height: `T`, `T₀`,
-  `P`, aridity, thermal belt, moisture class, biome, zone type, coastal flag, sparse flag.
-- **Bedrock** of the merged zone, hashed by weight from the zone type: take
+- The patch's **biome record** (section 13), estimated or final: `T`, `T₀`,
+  `P`, aridity, thermal belt, moisture class, biome, elevation type, coastal flag, sparse flag.
+- **Bedrock** of the zone (Sited per zone cell; a zone has the bedrock of its root cell),
+  hashed by weight from the elevation type: take
   `h = hash4(seed, 0x5e01, zone i, zone j) mod (sum of the type's column)` and walk the
   table from the top, subtracting each weight, to the first row where `h` goes negative:
 
-  | Bedrock | Flat | Lowland | Hills | Mountains |
+  | Bedrock | Flat Land | Lowland | Hills | Mountains |
   |---|---|---|---|---|
   | Crystalline shield | 20 | 20 | 20 | 10 |
   | Fold belt | 0 | 5 | 30 | 40 |
@@ -1199,7 +1202,7 @@ score(crop):
     s = trap(tg, crop.t)
     water = P;  if water < crop.p.optMin: water = min(crop.p.optMin, water + irr)   # rivers irrigate
     s *= trap(water, crop.p)
-    s *= farmland(crop, zone type)                 # default 1 / 1 / 0.6 / 0.3 for flat … mountains
+    s *= farmland(crop, elevation type)                 # default 1 / 1 / 0.6 / 0.3 for flat … mountains
     s *= limits on the yearly mean T, where the crop has them:
          0 at minT − 2 rising to 1 at minT;  1 at maxT falling to 0 at maxT + 2
     s *= tree crop ? treeGround(biome) : season · soil(biome)
@@ -1217,7 +1220,7 @@ specialities worth trading.
 
 ### 14.3 Other potentials
 
-These come from small tables over biome and zone type plus the water site. The table
+These come from small tables over biome and elevation type plus the water site. The table
 below is an overview; where its wording is looser than Appendix D, the appendix is exact:
 
 | Resource | Rule |
@@ -1238,7 +1241,7 @@ Appendix C.
 
 ### 14.4 Deposits
 
-Deposits are rare point resources. Each kind has a fixed stage number; for a patch:
+Deposits are rare point resources. Each kind has a fixed purpose number; for a patch:
 
 ```
 present  = toUnit(hash4(seed, 0x5e400 + kind, patch i, patch j)) < chance (× boost for valuables)
@@ -1246,12 +1249,12 @@ richness = rich · (0.35 + 0.65 · toUnit(hash4(seed, 0x5e800 + kind, patch i, p
 ```
 
 A resource keeps the largest amount any of its kinds gives. The chances depend on bedrock,
-zone type, climate and water. In summary (all 51 kinds with their exact conditions,
+elevation type, climate and water. In summary (all 51 kinds with their exact conditions,
 chances and kind numbers are in Appendix D.2):
 
 | Resource | Where (chance per patch) |
 |---|---|
-| Stone | by zone type: 0.04 flat, 0.12 lowland, 0.75 hills, 0.95 mountains; × 2.5 on carbonate, × 2 on basalt, × 1.6 on clastic, × 0.5 on cover |
+| Stone | by elevation type: 0.04 flat, 0.12 lowland, 0.75 hills, 0.95 mountains; × 2.5 on carbonate, × 2 on basalt, × 1.6 on clastic, × 0.5 on cover |
 | Crystal | hills and mountains 0.03–0.05 (× 2 granite or fold belt, × 3 volcanic); glass sand on coasts and navigable rivers |
 | Coal, lignite, oil seeps | clastic basins: 0.04, 0.04, 0.01 |
 | Salt | solar salt on dry warm low coasts 0.25; playa salt in 8 % of arid river-poor flat zones 0.3; rock salt and brine in 5 % of clastic basins 0.12 / 0.08 |
@@ -1262,7 +1265,7 @@ chances and kind numbers are in Appendix D.2):
 | Gold | lodes in fold-belt highlands, shield hills, volcanic mountains 0.03; placer gold `0.2 · goldLoad` on rivers below; beach gold at river mouths |
 | Gems | by bedrock in highlands (0.004 for diamond and emerald up to 0.04 for jade, agate, topaz); amber on cool clastic coasts; pearls on warm coasts 0.04 |
 
-Copper and tin come from different bedrock classes, so no zone has both: bronze needs
+Copper and tin come from different bedrock typees, so no zone has both: bronze needs
 trade.
 
 **Ocean patches** have fish (0.9 next to land, 0.5 in open water) and, next to land,
@@ -1270,7 +1273,7 @@ seaweed in cool water, seals in cold water, pearls or coral in warm water (Appen
 
 ### 14.5 Summaries
 
-Two summary numbers per patch feed the settlement scores:
+Two summary numbers per patch feed the Prospect scores:
 
 ```
 food   = clamp(0.75 · max(grain, 0.8 · produce) + 0.2 · livestock + 0.1 · orchard + 0.05 · wildFood, 0, 1)
@@ -1281,24 +1284,26 @@ tradeValue: gold 1, tin 0.9, silver 0.9, gems 0.8, salt 0.7, spices 0.7, copper 
 
 ---
 
-## 15. City and town locations
+## 15. Prospects for cities and towns
 
-Source: `world/locations.ts`. Per region, every land patch (merged) is scored as a place
-to settle, and the best patches become the region's locations.
+Stage: Planned.
+
+Per region, every land patch is scored as a place
+to settle, and the best patches become the region's Prospects.
 
 | Parameter | Default |
 |---|---|
-| Locations per region | 20 |
-| Cities per region | 4 |
+| Prospects per region | 20 |
+| Of these, Prospects for cities | 4 |
 | Spacing | 20 km |
 | Weights: resources / geography / trade / climate / prosperity | 0.3 / 0.15 / 0.25 / 0.15 / 0.15 |
 
-All inputs use biomes at zone-typical heights, so locations never depend on the height
-raster.
+All inputs use the estimated biomes and resources, so Prospects never depend on the
+height map.
 
 ### 15.1 Facts per patch
 
-- **Neighbours** (via the raw member patches' Gabriel neighbours): own-region land
+- **Neighbours** (via the member patch cells' Gabriel neighbours): own-region land
   patches, ocean patches, other regions' land patches. From these: `coast` (any ocean
   neighbour), `oceanFrac` (share of ocean neighbours), `harbour` (borders a bay, section
   14.1), `border` (touches another region's land).
@@ -1311,12 +1316,12 @@ raster.
   branch of its biggest junction), in patches drained; `head` = the patch holds the
   upstream end of navigation (a navigable node none of whose children is navigable). Only
   children on the region's own land count for both.
-- **Spot**: where the settlement is drawn. Choose one river node of the patch among those
+- **Spot**: where the Prospect is placed. Choose one river node of the patch among those
   not inside a lake: a mouth node beats any other node; within the same kind the larger
   flow wins, then the lower index. If that node carries a flow of at least 3 (attractors,
-  not patches drained), the spot is on it. Otherwise the spot is the merged patch's site.
+  not patches drained), the spot is on it. Otherwise the spot is the patch's site.
   If the site lies outside its own patch (warp) or in a lake, try instead the sites of the
-  patch's raw members, then, ring by ring (`ring = 1 … 4`), points around each member site
+  patch's member patch cells, then, ring by ring (`ring = 1 … 4`), points around each member site
   at `ring · patchSize / 4` in the 8 directions E, S, W, N, SE, SW, NW, NE (diagonals as
   `(±0.7, ±0.7)`); the first point inside the patch and outside any lake wins.
 
@@ -1327,10 +1332,10 @@ region's land patches:
 
 - land edge between neighbouring patches: `km · ½(rough_i + rough_j) · ½(veg_i + veg_j)`
   with `rough` = 1, 1, 1.3, 2 for flat … mountains and `veg` = 1 for open land, 1.3 for
-  forest, 2 for rainforest and mangrove (and similar);
+  forest, 2 for rain forest and mangrove (and similar);
 - river edge between consecutive patches along a navigable river: `km · 0.4`.
 
-`km` is the straight distance between the two merged patches' sites. All edges work in
+`km` is the straight distance between the two patches' sites. All edges work in
 both directions; river edges are added on top of the land edges. Neighbouring patches
 here are land patches of this region only.
 
@@ -1341,7 +1346,7 @@ acc(s) = Σ_u  food(u) · area(u) / (1 + d(s, u) / 35 km)²
 centrality(s) = clamp(acc(s) / (0.55 · ideal), 0, 1)
 ```
 
-where `area(u)` is the number of raw patches in the merged patch × the patch size squared
+where `area(u)` is the number of patch cells in the patch × the patch size squared
 (km²), and `ideal` is the same sum for the centre of a disc of full farmland with the area of
 one region: with `R = regionSize / √π / 35 km`,
 `ideal = 2π · 35² · (ln(1 + R) + 1/(1 + R) − 1)` km².
@@ -1360,7 +1365,7 @@ resources = 0.45·food + 0.2·water + 0.15·materials + 0.1·fish + 0.1·goods
 geography = buildable · (0.5 + 0.3·waterside + 0.2·defence) · (0.75 + 0.25·clamp(depth/3))
     buildable = 1, 0.9, 0.55, 0.25 for flat … mountains; × 0.5 in mangrove
     waterside = max(river: 1 navigable, 0.7 from 2, 0.4 any; harbour 1, coast 0.7; lake 0.8)
-    defence   = max(0, 0.1, 0.6, 0.7 by zone type; 0.5 if oceanFrac ≥ 0.5; 0.4 if confluence ≥ 4)
+    defence   = max(0, 0.1, 0.6, 0.7 by elevation type; 0.5 if oceanFrac ≥ 0.5; 0.4 if confluence ≥ 4)
 
 trade = clamp(max(gateway, centrality) + 0.25·min(gateway, centrality))
     items   = [ clamp(mouth/80), harbour ? 0.6 : coast ? 0.24 : 0, 0.5·ramp(river, 8, 80),
@@ -1374,7 +1379,7 @@ prosperity = the prosperity field at the spot, rescaled to 0–1
 ```
 
 In these formulas "land neighbours" are neighbouring land patches of the same region
-(land of other regions is counted nowhere), "ocean neighbours" are neighbouring merged
+(land of other regions is counted nowhere), "ocean neighbours" are neighbouring
 ocean patches, `fish` is the patch's own fish amount (section 14), and `river`, `mouth`
 and `confluence` are in patches drained.
 
@@ -1389,28 +1394,30 @@ score = 100 · need · weighted mean of the five factors
 ### 15.5 Selection
 
 Eligible candidates have `score > 0` and `depth ≥ 1` (they do not touch another region's
-land, which keeps locations apart across borders without looking at the neighbour). Sort
+land, which keeps Prospects apart across borders without looking at the neighbour). Sort
 by score, best first; ties by `hash4(seed, 0x10c1, patch i, patch j)`, then by patch key.
 Distances are measured between spots.
 
-1. **Cities**: walk the list and take up to `min(cities, count)` = 4 candidates with
-   `depth ≥ 2` that are at least `2.5 × spacing` from every city already taken. Cities
-   are chosen once and kept.
-2. **Towns**: walk the list again and take candidates at least `spacing` from every
-   location taken so far, until the region has 20.
+1. **Prospects for cities**: walk the list and take up to 4 candidates (never more than
+   the Prospects per region) with `depth ≥ 2` that are at least `2.5 × spacing` from every
+   city Prospect already taken. They are chosen once and kept.
+2. **Prospects for towns**: walk the list again and take candidates at least `spacing`
+   from every Prospect taken so far, until the region has 20.
 3. If the region ends up with fewer than 20, multiply the spacing by 0.85 (not below one
-   patch size), discard the towns and redo step 2. Repeat until there are 20 or the
+   patch size), discard the town Prospects and redo step 2. Repeat until there are 20 or the
    spacing has reached one patch size.
 
-Regions with little habitable land end up with fewer locations. The display shows only
-locations with a score of at least 59 by default (a median of 13 of the 20 per region).
+Regions with little habitable land end up with fewer Prospects. A map display shows only
+Prospects with a score of at least 59 by default (a median of 13 of the 20 per region).
 
 ---
 
 ## 16. Travel network
 
-Source: `world/travel.ts`. Roads, river routes and sea lanes connect the locations on
-show. The network of a region is computed from the locations and cost grids of the 3 × 3
+Stage: Settled.
+
+Roads, river routes and sea lanes connect the Prospects on
+show (15.5). The network of a region is computed from the Prospects and cost grids of the 3 × 3
 regions around it.
 
 ### 16.1 Cost grid (per region, 2 km cells)
@@ -1420,10 +1427,10 @@ For every cell of the region (classified at its centre):
 - **Sea cells**: cost 0.3 per km (0.6 right at the shore, so lanes keep off capes).
 - **Land cells**: road cost per km relative to open flat land =
   zone factor (1, 1.15, 1.8, 4 for flat … mountains) × biome factor (1 for grassland; 1.3
-  forests; 2–2.2 rainforests; 3 mangrove; 3.5–4 deserts; 5 ice) × 8 if the cell centre is
+  forests; 2–2.2 rain forests; 3 mangrove; 3.5–4 deserts; 5 ice) × 8 if the cell centre is
   in a lake.
 - **Estimated height** (no height raster needed). The hillslope here is the **unblurred**
-  one: the zone type's hillslope × the hillslope multiplier × the relief at the point.
+  one: the elevation type's hillslope × the hillslope multiplier × the relief at the point.
   River beds get the simple rise of 12.2 with that hillslope (no levelling, no caps) and
   seed the cells containing river nodes (the lowest bed per cell); land cells with an
   ocean cell among their 8 neighbours are seeded with `hillslope · 1 km`; then spread with
@@ -1439,14 +1446,14 @@ For every cell of the region (classified at its centre):
 Put the nine regions' cells on one raster. Land cost is multiplied by
 `1 + height / 1500 m`.
 
-**Seeds.** Searches are square windows of cells around the location's own cell, and the
+**Seeds.** Searches are square windows of cells around the Prospect's own cell, and the
 nearest matching cell centre wins.
 
 - Road forest: the nearest land cell within ±2 cells that is not already another
-  location's seed, at cost 0. A location with no such cell has no roads.
+  Prospect's seed, at cost 0. A Prospect with no such cell has no roads.
 - Water forest, river landing: the nearest cell holding a river link within ±2 cells, at
   cost `6 + distance to the cell centre in km`.
-- Water forest, port (coastal locations only): the nearest sea cell within
+- Water forest, port (coastal Prospects only): the nearest sea cell within
   `±⌈1.5 · patch size / 2 km⌉` cells (6 at the defaults), at cost `12 + distance in km`.
 - A water seed is set only where it is cheaper than a seed already on that cell.
 
@@ -1467,24 +1474,24 @@ knight move:     c = mean cost of four cells (both ends and the two passed betwe
 direction) `length · 0.4`; between two sea cells `length · mean sea cost`. A diagonal sea
 move is not allowed when both cells it squeezes between are not sea.
 
-Each cell ends up with its cheapest location and the path to it: a Voronoi diagram of the
-locations under travel cost, one for roads and one for water.
+Each cell ends up with its cheapest Prospect and the path to it: a Voronoi diagram of the
+Prospects under travel cost, one for roads and one for water.
 
 ### 16.3 Links
 
-- **Candidates.** Wherever two cells of different locations are one move apart (for
-  roads any of the 16 moves, for water the 8 neighbours), the two locations can be linked
+- **Candidates.** Wherever two cells of different Prospects are one move apart (for
+  roads any of the 16 moves, for water the 8 neighbours), the two Prospects can be linked
   through that crossing at cost `dist(cell a) + step + dist(cell b)`. Keep the cheapest
-  crossing per pair of locations, separately for road and water.
+  crossing per pair of Prospects, separately for road and water.
 - **Pruning.** Drop a link if the same two places are connected by a path of *cheaper*
   links costing at most 1.6 × the link. For a road, count other roads only at 1.6 ×; a
   route that uses water replaces a road only if it costs at most 0.35 × the road.
-  "Cheaper" is a strict order: lower cost, then road before water, then the lower location
+  "Cheaper" is a strict order: lower cost, then road before water, then the lower Prospect
   indices. The test is made once per link against **all candidate links**, not against
   the links that survive, so it is a single pass with no iteration. Because only cheaper
   links can replace a link, the dearest link of a cycle goes and the network stays
   connected.
-- **Ownership.** A link between locations of two regions `(ia, ja)` and `(ib, jb)` is
+- **Ownership.** A link between Prospects of two regions `(ia, ja)` and `(ib, jb)` is
   decided by one region: that region itself if they are the same; the smaller key if they
   are neighbours (8 neighbours); the region `(⌊(ia + ib)/2⌋, ⌊(ja + jb)/2⌋)` if they are
   two apart; no link if they are further apart. This keeps the result independent of the
@@ -1492,8 +1499,8 @@ locations under travel cost, one for roads and one for water.
 
 ### 16.4 Routes
 
-- **Road**: the cells along the path from one location through the crossing to the other,
-  with the end points moved to the location spots, smoothed with two passes of a ¼ ½ ¼
+- **Road**: the cells along the path from one Prospect through the crossing to the other,
+  with the end points moved to the Prospect spots, smoothed with two passes of a ¼ ½ ¼
   filter. Links out of one place share their first stretch, like real roads.
 - **Water**: one water link can mix river and sea stretches. Split its cell path wherever
   the steps change between sea-to-sea and anything else.
@@ -1508,10 +1515,10 @@ locations under travel cost, one for roads and one for water.
 
 ## 17. Drawing the map
 
-Sources: `render/source.ts`, `render/overlays.ts`. The map is drawn per pixel: classify
+The map is drawn per pixel: classify
 the pixel's world position with `cellAt` and colour it.
 
-- **Base colour** ("Map" mode): the zone type colour (section 8), with the lightness
+- **Base colour** ("Map" mode): the elevation type colour (section 8), with the lightness
   varied by ±8 % per patch from a hash so the patches read. Ocean: its colour varied ±7 %
   per zone and ±3 % per patch. "Biomes" mode: the biome colour (13.3) varied ±5 % per
   patch.
@@ -1531,13 +1538,14 @@ the pixel's world position with `cellAt` and colour it.
   `scale = 0.8`, and `zoom` = (2 km on screen in px) / 7 clamped to [0.45, 2.2]. Real
   rivers widen with about the square root of discharge (`b = 0.5`).
 - **Lakes**: their polygons, filled, drawn together with the rivers.
-- **Locations**: a diamond for a city and a dot for a town, coloured by score.
+- **Prospects**: a diamond for a city Prospect and a dot for a town Prospect, coloured by
+  score.
 - **Travel**: roads, river routes and sea lanes as lines; stretches shared by several
   links are drawn once.
 
 ---
 
-## 18. Building your own
+## 18. Order of work and pitfalls
 
 ### 18.1 Order of work
 
@@ -1545,31 +1553,31 @@ the pixel's world position with `cellAt` and colour it.
    same outputs on every run.
 2. One level: sites, `query`, Gabriel neighbours (section 3). Draw it; try jitter 0
    (squares) and warp on and off.
-3. Three levels with ownership and nesting (section 4). Draw patches coloured by their
+3. Three levels with ownership and nesting (section 4). Dpatch cells coloured by their
    zone and check that zone borders follow patch borders.
-4. Oceans (section 5). Draw seeds, links and growth separately; expect roughly a fifth of
+4. Oceans (section 5). Draw ocean seeds, links and expansion separately; expect roughly a fifth of
    the map as sea at the defaults.
-5. Merges (section 6) and `cellAt` (section 7). Everything later only needs `cellAt`, the
-   neighbour lists and the per-region lists of zones and patches.
-6. Zone types and the climate fields (sections 8, 9).
+5. Mergers (section 6) and `cellAt` (section 7). Everything later only needs `cellAt`, the
+   neighbour lists and the per-region lists of zone cells and patch cells.
+6. Elevation types and the fields (sections 8, 9).
 7. Rivers (section 10). Start with plain space colonization (pulls, step, kill, flow);
    add bridges and the region border rule next, then cone, wander and main-stem dominance.
 8. Height map (section 12). Start with the simple bed rise and steps 1, 3, 4, 5. Add the
    ridges, then levelling and the bed caps.
 9. Biomes (section 13), lakes (section 11).
-10. Resources, locations, travel (sections 14–16), in that order.
+10. Resources, Prospects, travel (sections 14–16), in that order.
 
 ### 18.2 What gives the map its look
 
-- **Jittered-lattice Voronoi on three scales**, with the coast following the smallest,
+- **Jittered-grid Voronoi on three scales**, with the coast following the smallest,
   warped cells. This gives angular but irregular coastlines without any noise threshold.
-- **Oceans from linked seeds**: straight chains of zones make elongated seas and straits
+- **Oceans from linked ocean seeds**: straight chains of zone cells make elongated seas and straits
   rather than round blobs.
-- **Rivers before terrain.** Space colonization gives evenly spread, tree-like drainage
+- **Rivers before height.** Space colonization gives evenly spread, tree-like drainage
   that fills every region. A large influence radius (48 km by default) gives fewer,
   straighter rivers and a small one many independent branches; the cone stops branches
   hooking back and main-stem dominance removes short stubs.
-- **Terrain as an envelope over the rivers.** Valleys are exactly where the rivers are,
+- **The height map as an envelope over the rivers.** Valleys are exactly where the rivers are,
   and the per-type hillslope decides whether the land between them is a plain or a range.
 - **Regions as watersheds.** Rivers never cross region land borders, and the border gets
   a ridge.
@@ -1577,48 +1585,27 @@ the pixel's world position with `cellAt` and colour it.
 ### 18.3 Pitfalls
 
 - **Order independence.** Never draw per-cell random numbers from a shared stream. Where
-  a sequence is needed, seed it from the cell and consume it in a fixed order (lattice
-  order for cells, key order for zones, index order for nodes). Draw the random numbers
+  a sequence is needed, seed it from the cell and consume it in a fixed order (grid
+  order for cells, key order for zone cells, index order for nodes). Draw the random numbers
   even for items you then skip (see the lakes), or the stream shifts.
-- **Lists must have a defined order.** "Pick 3 of the region's zones" depends on the order
-  of the list. Sort or enumerate in lattice order.
+- **Lists must have a defined order.** "Pick 3 of the region's zone cells" depends on the order
+  of the list. Sort or enumerate in grid order.
 - **Ties.** Nearest-site ties, heap ties and equal scores need a fixed rule (smaller index
   or key, or a hash).
 - **Ownership by site, classification by point.** A warped cell does not contain exactly
   the points nearest its site. Use the site for "which parent owns this cell" and
   `query` for "which cell is this point in". With nesting on, never ask for the zone or
   region of a point directly; go through the patch.
-- **Merged cells cross borders.** A zone merged into a neighbouring region's zone belongs
-  to that region. Always work with "zones drawn in the region", not "zones owned by it".
-- **Rivers over the sea.** Roots sit in the water; treat nodes over ocean as height 0,
-  leave them out of the terrain and hide them when drawing.
-- **Halo.** Anything rasterised per region (terrain, travel costs) needs sources from
-  beyond the region or the seams show. 24 km is enough for the terrain at the defaults.
+- **Mergers cross borders.** A zone cell that merges into a neighbouring region's zone
+  belongs to that region. Always work with "zone cells drawn in the region", not "zone
+  cells owned by it".
+- **Rivers over the sea.** River roots sit in the water; treat nodes over ocean as height 0,
+  leave them out of the height map and hide them when drawing.
+- **Halo.** Anything rasterised per region (height map, travel costs) needs sources from
+  beyond the region or the seams show. 24 km is enough for the height map at the defaults.
 - **Bit-exact reproduction** across machines additionally needs deterministic `exp`,
-  `log`, `sin` and `cos` (the reference has its own in `shared/core/dmath.ts`) and no
+  `log`, `sin` and `cos` (given in Appendix A) and no
   `pow` in generation code. If you only need maps of the same kind, ignore this.
-
-### 18.4 Where to look in the reference
-
-| Layer | File |
-|---|---|
-| Hash, PRNG | `shared/core/hash.ts` |
-| Noise | `shared/core/noise.ts` |
-| Voronoi level | `sandboxes/sandbox4/src/world/level.ts` |
-| Hierarchy, oceans, merges | `sandboxes/sandbox4/src/world/world.ts` |
-| Zone types | `sandboxes/sandbox4/src/world/zones.ts` |
-| Climate fields | `sandboxes/sandbox4/src/world/climate.ts` |
-| Rivers | `sandboxes/sandbox4/src/world/rivers.ts` |
-| Lakes | `sandboxes/sandbox4/src/world/lakes.ts` |
-| Height map | `sandboxes/sandbox4/src/world/terrain.ts` |
-| Biomes | `sandboxes/sandbox4/src/world/biomes.ts` |
-| Resources | `sandboxes/sandbox4/src/world/resources.ts` |
-| Locations | `sandboxes/sandbox4/src/world/locations.ts` |
-| Travel | `sandboxes/sandbox4/src/world/travel.ts` |
-| Parameters and defaults | `sandboxes/sandbox4/src/params.ts`, `sandboxes/sandbox4/defaults.json` |
-
-A C# port of the same pipeline lives in `sandboxes/sandbox5/src/Sandbox5.Domain/Generation/`
-and is tested for parity against the TypeScript version.
 
 ---
 
@@ -1697,7 +1684,7 @@ for bit-exact output:
 - `w⁴` is computed as `(w·w)·(w·w)`.
 - Divisions by a size are done as multiplication by a stored reciprocal: `inv = 1/size`,
   then `x·inv` and `warpFreq·inv` in the level query; `f = 1/featureSize`, then `x·f` in
-  the climate fields.
+  the fields.
 - The octave count of fBm and ridged noise is `max(1, floor(octaves))`. A level clamps
   jitter to [0, 1] and warp to at least 0.
 - The seed text is trimmed of surrounding white space before it is parsed or hashed.
@@ -1706,7 +1693,7 @@ for bit-exact output:
   `d > 10⁻¹²` (rivers) or `d > 10⁻⁶` (lake axis), then divide by `√d`.
 
 **Deterministic `exp`, `ln`, `sin`, `cos`.** Platform maths functions may differ in the
-last bit between machines, so the reference uses its own (`shared/core/dmath.ts`), built
+last bit between machines, so the generation uses its own, built
 from `+ − × ÷`, rounding and the float's bit pattern only. Everything else in generation
 uses `+ − × ÷ √` and comparisons. They are used in four places: `exp` and `ln` for the
 log-scaled precipitation field, `ln` for the `ideal` term of the central places (15.2),
@@ -1735,13 +1722,13 @@ sin(x), cos(x):
 
 Columns: the temperature trapezoid over the growing-season temperature and the water
 trapezoid over the yearly water (absolute min / optimum min / optimum max / absolute max);
-the farmland factor by zone type (flat / lowland / hills / mountains); limits on the yearly
+the farmland factor by elevation type (flat / lowland / hills / mountains); limits on the yearly
 mean temperature; whether it is a tree crop; a requirement (river, coast or tropical
 highland); the gate (share of zones where the crop grows at all); and the yield factor `k`
 (1 when blank). Section 14.2 gives the scoring.
 
 Crops are numbered 0 … 107 in the order listed here (grain first, dyes last). A gated
-crop number `n` grows in merged zone `(i, j)` when
+crop number `n` grows in zone `(i, j)` when
 `toUnit(hash4(seed, 0x5e100 + n, i, j)) < gate · boost` (`boost` = 1 for silk, which is
 a fibre; the prosperity boost for spices, stimulants and dyes).
 
@@ -1902,25 +1889,25 @@ central-place graph (15.2); "road cost" is the biome factor of the travel grid (
 | Ice & snow | 0 | 0 | 0 | 0.05 | 0 | 0 | 0 | 0 | 1.5 | 5 |
 | Tundra | 0.3 | 0.2 | 0.25 | 0.3 | 0 | 0.5 | 0 | 0 | 1.1 | 1.6 |
 | Cold steppe | 1 | 1 | 0.7 | 0.3 | 0.08 | 0.15 | 0.9 | 0.1 | 1 | 1.1 |
-| Boreal forest (taiga) | 0.55 | 1 | 0.25 | 0.7 | 1 | 0.85 | 0 | 0.2 | 1.3 | 1.4 |
+| Boreal forest | 0.55 | 1 | 0.25 | 0.7 | 1 | 0.85 | 0 | 0.2 | 1.3 | 1.4 |
 | Cold desert | 1 | 1 | 0.2 | 0.1 | 0 | 0 | 0.5 | 0 | 1 | 3.5 |
 | Temperate grassland | 1 | 1 | 1 | 0.4 | 0.1 | 0 | 0.9 | 0.2 | 1 | 1 |
 | Woodland & shrubland | 1 | 1 | 0.7 | 0.45 | 0.4 | 0 | 0.3 | 0.3 | 1.1 | 1.1 |
 | Temperate mixed forest | 1 | 1 | 0.6 | 0.8 | 1 | 0.3 | 0.15 | 0.2 | 1.3 | 1.3 |
 | Temperate broadleaf forest | 1 | 1 | 0.6 | 0.8 | 1 | 0.1 | 0.15 | 0.3 | 1.3 | 1.3 |
-| Temperate rainforest | 0.55 | 1 | 0.5 | 0.8 | 1 | 0.2 | 0 | 0.15 | 2 | 2 |
+| Temperate rain forest | 0.55 | 1 | 0.5 | 0.8 | 1 | 0.2 | 0 | 0.15 | 2 | 2 |
 | Hot desert | 1 | 1 | 0.15 | 0.05 | 0 | 0 | 0.5 | 0 | 1.1 | 4 |
 | Thorn scrub | 0.7 | 1 | 0.5 | 0.3 | 0.25 | 0.25 | 0.4 | 0.15 | 1.1 | 1.5 |
 | Savanna | 0.6 | 1 | 0.8 | 0.6 | 0.35 | 0.4 | 0.3 | 0.2 | 1 | 1.05 |
 | Tropical dry forest | 0.7 | 1 | 0.45 | 0.6 | 0.8 | 0.35 | 0.1 | 0.2 | 1.3 | 1.3 |
-| Tropical rainforest | 0.4 | 1 | 0.15 | 0.6 | 1 | 0.35 | 0 | 0.15 | 2 | 2.2 |
+| Tropical rain forest | 0.4 | 1 | 0.15 | 0.6 | 1 | 0.35 | 0 | 0.15 | 2 | 2.2 |
 | Mangrove | 0.3 | 0.4 | 0.1 | 0.4 | 0.5 | 0 | 0 | 0.1 | 2 | 3 |
 
 ---
 
 ## Appendix D. Resource rules in full
 
-Notation: `zt` = zone type; *low* = flat or lowland, *high* = hills or mountains;
+Notation: `zt` = elevation type; *low* = flat or lowland, *high* = hills or mountains;
 `river`, `mouth`, `lake`, `harbour`, `goldLoad`, `tinLoad` as in 14.1; `T` = temperature
 after cooling, `T₀` = at sea level; `m` = aridity; *humid* = `m ≥ 2`; belts in the order
 polar, subpolar, boreal, temperate, tropical. `put(resource, amount, variant)` keeps the
@@ -1937,13 +1924,13 @@ dyes → horses.
 
 ### D.1 Potentials
 
-**Livestock.** Amount = `pasture · (1, 1, 0.9, 0.7 by zone type)`, + 0.1 if `river ≥ 1`
+**Livestock.** Amount = `pasture · (1, 1, 0.9, 0.7 by elevation type)`, + 0.1 if `river ≥ 1`
 and the belt is boreal or warmer. Variant, first match: mountains with `T < 5` and not
 tundra → yak; mountains → goats (shrubland, thorn scrub) or alpine summer pasture; tundra
-or taiga → herded reindeer; cold steppe or cold desert → sheep; grassland → pick[cattle,
+or boreal forest → herded reindeer; cold steppe or cold desert → sheep; grassland → pick[cattle,
 sheep]; shrubland → goats in hills, else sheep; broadleaf → pick[pigs, cattle]; mixed
-forest or temperate rainforest → pick[cattle, sheep]; hot desert or thorn scrub → goats;
-dry forest → water buffalo on a floodplain, else cattle; rainforest or mangrove →
+forest or temperate rain forest → pick[cattle, sheep]; hot desert or thorn scrub → goats;
+dry forest → water buffalo on a floodplain, else cattle; rain forest or mangrove →
 pick[pigs, poultry]; otherwise cattle.
 
 **Fish.** All that apply are `put`:
@@ -1960,12 +1947,12 @@ pick[pigs, poultry]; otherwise cattle.
 
 **Wild food.** Amount = `game`, + 0.15 with a lake or on a floodplain outside the polar
 belt; on ice it is 0 unless coastal. Variant by biome: ice seals; tundra pick[caribou,
-cloudberry and crowberry]; taiga pick[deer and elk, bilberry and blueberry, forest
+cloudberry and crowberry]; boreal forest pick[deer and elk, bilberry and blueberry, forest
 mushrooms]; mixed forest pick[deer, wild boar, forest mushrooms]; broadleaf pick[deer,
-wild boar, acorns]; temperate rainforest pick[deer, raspberry and bramble]; grassland
+wild boar, acorns]; temperate rain forest pick[deer, raspberry and bramble]; grassland
 pick[bison and wild cattle, hares and rabbits]; cold steppe pick[antelope and gazelle,
 upland game birds]; shrubland pick[upland game birds, wild herbs, hares and rabbits];
-mangrove waterfowl; cold desert pick[hares and rabbits, upland game birds]; rainforest
+mangrove waterfowl; cold desert pick[hares and rabbits, upland game birds]; rain forest
 and dry forest pick[wild boar, deer, wild herbs]; others antelope and gazelle. Overrides:
 in mountains (not ice or tundra) wild sheep and ibex; otherwise with a lake in the
 temperate belt waterfowl, in the tropical belt lotus.
@@ -1975,20 +1962,20 @@ in hills and mountains. Hot and cold desert: 0.3 if `river ≥ 2`, else 0. Tundr
 coastal, else 0. In mountains an amount above 0.6 is multiplied by 0.8. Listed only when
 above 0. Variant:
 
-- taiga: high → pick[larch, spruce]; else pick[Scots pine, spruce]
+- boreal forest: high → pick[larch, spruce]; else pick[Scots pine, spruce]
 - mixed forest: mountains fir; hills pick[beech, spruce]; else pick[oak, Scots pine, lime]
 - broadleaf: mountains cedar (`T ≥ 12`) or beech; hills pick[beech, oak]; else on a
   floodplain pick[oak, ash, elm], otherwise oak
-- temperate rainforest: giant conifers
+- temperate rain forest: giant conifers
 - shrubland: `T < 10` → juniper (high) or pick[oak, Scots pine, juniper]; else
   pick[cypress, Mediterranean pines] (high) or pick[cork oak, Mediterranean pines]
 - dry forest: `P ≥ 1500` → pick[teak, sal]; else pick[teak, Spanish cedar, rosewood]
-- rainforest: pick[mahogany, iroko, rosewood, ebony, mahogany, iroko]
+- rain forest: pick[mahogany, iroko, rosewood, ebony, mahogany, iroko]
 - savanna: African mahogany if `river ≥ 1`, else thorn-scrub wood; thorn scrub:
   thorn-scrub wood; mangrove: mangrove timber; deserts: poplar; tundra and ice: driftwood
 - grassland and cold steppe: willow and poplar if `river ≥ 1`, else juniper
 
-**Clay** (not on ice). Amount = `(0.7, 0.6, 0.25, 0.1 by zone type)`, + 0.3 if
+**Clay** (not on ice). Amount = `(0.7, 0.6, 0.25, 0.1 by elevation type)`, + 0.3 if
 `river ≥ 1` on low ground, + 0.1 on unconsolidated cover, × 0.3 on tundra. Variant, first
 match: `m < 1` in the temperate or tropical belt → adobe and mud-brick earth; `river ≥ 1`
 → brick and pottery clay; mixed or broadleaf forest → wattle and daub; `m < 1` or
@@ -2003,20 +1990,20 @@ dung fuel `0.35 · livestock` when livestock ≥ 0.15.
 
 **Furs & ivory.** Amount = `fur`. It counts only where the zone passes its gate: in the
 tropical belt `toUnit(hash4(seed, 0x5e04, zone i, zone j)) < 0.3 · boost`, elsewhere
-`toUnit(hash4(seed, 0x5e05, zone i, zone j)) < 0.5 · boost`. Variant by biome: taiga →
+`toUnit(hash4(seed, 0x5e05, zone i, zone j)) < 0.5 · boost`. Variant by biome: boreal forest →
 pick[beaver, sable and marten] if `river ≥ 1`, else pick[sable and marten, squirrel,
 ermine]; tundra → fox and Arctic fox, or on the coast pick[walrus, seals, fox and Arctic
 fox] with + 0.15; ice → pick[walrus, seals, narwhal tusk] with amount 0.5 on the coast and
-0 inland; mixed forest and temperate rainforest → bear (high), beaver (`river ≥ 1`), else
+0 inland; mixed forest and temperate rain forest → bear (high), beaver (`river ≥ 1`), else
 pick[squirrel, sable and marten]; broadleaf and cold steppe → fox and Arctic fox; savanna →
 pick[elephant ivory, ostrich, big cats]; thorn scrub → ostrich; dry forest →
-pick[elephant ivory, big cats]; rainforest → pick[exotic feathers, big cats, elephant
+pick[elephant ivory, big cats]; rain forest → pick[exotic feathers, big cats, elephant
 ivory]. A biome with none of these on a coast with `T₀ < 3` gives seals at 0.3.
 
-**Dyes.** The dye crops, plus lichen dyes at 0.15 on tundra and in temperate rainforest,
+**Dyes.** The dye crops, plus lichen dyes at 0.15 on tundra and in temperate rain forest,
 plus the deposits murex and kermes below.
 
-**Horses & pack animals.** Amount = `mounts · (1, 1, 0.7, 0.4 by zone type)`. Variant,
+**Horses & pack animals.** Amount = `mounts · (1, 1, 0.7, 0.4 by elevation type)`. Variant,
 first match: hot desert or thorn scrub → donkeys and mules (high) or dromedary camel; cold
 desert → Bactrian camel; tropical highland in mountains → llama and alpaca-like camelids,
 amount at least `0.5 · pasture`; high → donkeys and mules, amount at least `0.3 · pasture`;
@@ -2024,13 +2011,13 @@ else horses.
 
 ### D.2 Deposits
 
-`#` is the kind number of the hash stage (14.4). The chance is multiplied by the
+`#` is the kind number of the hash purpose (14.4). The chance is multiplied by the
 prosperity boost for silver & lead, gold, gems, furs and dyes. "Rich" is the richness
 factor (1 when blank).
 
 | # | Resource | Variant | Condition | Chance | Rich |
 |---|---|---|---|---|---|
-| 1 | Stone | by bedrock, see below | any land patch | zone type 0.04 / 0.12 / 0.75 / 0.95 × bedrock factor | zone type 0.35 / 0.5 / 0.85 / 1 |
+| 1 | Stone | by bedrock, see below | any land patch | elevation type 0.04 / 0.12 / 0.75 / 0.95 × bedrock factor | elevation type 0.35 / 0.5 / 0.85 / 1 |
 | 2 | Clay | kaolin | granite or shield, `T ≥ 10`, humid, not mountains | 0.05 | 1.2 |
 | 3 | Crystal | rock crystal | high | 0.05 mountains, 0.03 hills; × 3 volcanic, × 2 granite or fold belt | |
 | 4 | Crystal | glass sand | low | 0.03 if coastal + 0.015 if `river ≥ 8` | 0.8 |
@@ -2038,12 +2025,12 @@ factor (1 when blank).
 | 6 | Fuel | lignite | clastic; low | 0.04 | 0.7 |
 | 7 | Fuel | oil and naphtha seeps | clastic; low | 0.01 | 0.8 |
 | 8 | Salt | solar sea salt | coastal, low, `m < 1`, `T ≥ 12` | 0.25 | |
-| 9 | Salt | lake and playa salt | river-poor flat zone, `m < 0.5`, zone gate 8 % (stage 0x5e02) | 0.3 | |
+| 9 | Salt | lake and playa salt | river-poor flat zone, `m < 0.5`, zone gate 8 % (purpose 0x5e02) | 0.3 | |
 | 10 | Salt | natron and soda | as 9 | 0.05 | 0.8 |
-| 11 | Salt | rock salt | clastic, not mountains, zone gate 5 % (stage 0x5e03) | 0.12 | |
+| 11 | Salt | rock salt | clastic, not mountains, zone gate 5 % (purpose 0x5e03) | 0.12 | |
 | 12 | Salt | brine springs | as 11 | 0.08 | 0.8 |
-| 13 | Iron | bog iron | low, humid, taiga / mixed / broadleaf / temperate rainforest | 0.1 with a river (`≥ 1`) or lake, else 0.05 | 0.7 |
-| 14 | Iron | lateritic iron and ironstone | not mountains; rainforest, dry forest or savanna | 0.1 | 0.8 |
+| 13 | Iron | bog iron | low, humid, boreal forest / mixed / broadleaf / temperate rain forest | 0.1 with a river (`≥ 1`) or lake, else 0.05 | 0.7 |
+| 14 | Iron | lateritic iron and ironstone | not mountains; rain forest, dry forest or savanna | 0.1 | 0.8 |
 | 15 | Iron | banded iron formation | shield; hills or lowland | 0.08 | |
 | 16 | Iron | magnetite skarn iron | granite or carbonate; high | 0.06 | |
 | 17 | Iron | black sands | coastal; basalt | 0.05 | 0.6 |
@@ -2092,7 +2079,7 @@ and quern stone]; unconsolidated cover × 0.5, field stone and boulders.
 
 ### D.3 Ocean patches
 
-A merged ocean patch is *on the shelf* when any of its raw patches has a land patch as
+An ocean patch is *on the shelf* when any of its patch cells has a land patch as
 neighbour. With `T₀` at its site:
 
 - Shelf: fish 0.9 (cod banks below 4 °C, herring below 11, sardine and anchovy below 18,
