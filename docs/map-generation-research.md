@@ -2,6 +2,20 @@
 
 *Compiled 2026-11-14 from the ten research notes in `docs/research/` (research dates 2026-11-07 to 2026-11-12). Sandbox 4 is described as of commit `e721296`.*
 
+> **About this document in the Gameworld repository.** It was written in the Sandbox 4
+> repository, and "this repository" below means that one. It is kept here as the
+> background for [map-generation.md](map-generation.md), unchanged apart from this note
+> and the links mentioned next.
+>
+> - **Files that are not here.** The ten research notes in `docs/research/`, `sandbox3.md`,
+>   the other documents named in §1, the source files and the commits belong to the
+>   Sandbox 4 repository. Their links are removed and only the file names are left.
+> - **Sandbox 4 only.** §12 (delivery in the browser) and the ECMAScript rules of §3.3
+>   describe the TypeScript prototype. The status tables say what Sandbox 4 implements,
+>   not what Gameworld implements.
+> - **Terms and authority.** See the note at the top of
+>   [map-generation.md](map-generation.md).
+
 This document combines the research notes of this repository into one text, ordered the way Sandbox 4 builds its map: cells, oceans, rivers, height, climate, biomes, resources, city and town locations, travel network. For each layer it gives what the research found, which alternatives were weighed, what Sandbox 4 adopted, and what is still open.
 
 It is the companion of [map-generation.md](map-generation.md). That document says **how** the map is generated, step by step, so that you can rebuild it. This one says **why** it is generated that way and what else the research has in store. Topics in the notes that Sandbox 4 does not use (cellular-automaton caves, Wave Function Collapse, hex grids, noise-line networks) are only summarised in [§4.6](#46-surveyed-but-not-used).
@@ -39,18 +53,18 @@ It is the companion of [map-generation.md](map-generation.md). That document say
 
 | Key | Note | Date | Covers | Used in |
 |---|---|---|---|---|
-| CELLS | [procedural-cell-generation.md](docs/research/procedural-cell-generation.md) | 2026-11-07 | First survey: Voronoi and Delaunay partitions, grids and chunks, hashing, cellular automata, Wave Function Collapse, noise, erosion, and a recommended architecture | §3, §4 |
-| GAPS | [readme-topics-gaps.md](docs/research/readme-topics-gaps.md) | 2026-11-07 | Second pass: space colonization, distance functions, line networks from noise, deterministic noise in the browser, GitHub Pages delivery | §3, §4, §5, §12 |
-| RIVERS | [space-colonization-branch-variants.md](docs/research/space-colonization-branch-variants.md) | 2026-11-07 | 22 techniques that change the branching and look of space-colonization rivers, each with a hook in `rivers.ts` | §5 |
-| HEIGHT | [heightmap-from-biomes-and-rivers.md](docs/research/heightmap-from-biomes-and-rivers.md) | 2026-11-07 | Methods that fit a height map to an existing map and river network; three pipelines (A, B, C) | §6 |
-| TILES | [sandbox4-tiling.md](docs/research/sandbox4-tiling.md) | 2026-11-07 | Generating Sandbox 4 tile by tile; measurements; required changes | §7 |
-| BIOMES | [biomes-and-climate.md](docs/research/biomes-and-climate.md) | 2026-11-08 | Biome schemes (Whittaker, Holdridge, Köppen, WWF, IUCN), aridity, lapse rates, treeline, azonal biomes; a classifier design | §8 |
-| CHARTS | [biome-climate-charts.md](docs/research/biome-climate-charts.md) | 2026-11-12 | A catalogue of temperature × precipitation charts and rule tables, with data availability and licences | §8 |
-| RES | [patch-resources.md](docs/research/patch-resources.md) | 2026-11-10 | A catalogue of about 370 natural resources and 28 fantasy resources keyed to the map's fields; missing map features; a bedrock attribute; generation rules | §9 |
-| TRADE | [game-resources-and-trade.md](docs/research/game-resources-and-trade.md) | 2026-11-10 | How games choose, place and trade resources; trade theory; a 39-resource set; price and flow models | §9, §11 |
-| SITES | [settlement-siting.md](docs/research/settlement-siting.md) | 2026-11-10 | Where settlements form; suitability methods; how generators and games place cities; a siting design for Sandbox 4 | §10, §11 |
+| CELLS | `docs/research/procedural-cell-generation.md` | 2026-11-07 | First survey: Voronoi and Delaunay partitions, grids and chunks, hashing, cellular automata, Wave Function Collapse, noise, erosion, and a recommended architecture | §3, §4 |
+| GAPS | `docs/research/readme-topics-gaps.md` | 2026-11-07 | Second pass: space colonization, distance functions, line networks from noise, deterministic noise in the browser, GitHub Pages delivery | §3, §4, §5, §12 |
+| RIVERS | `docs/research/space-colonization-branch-variants.md` | 2026-11-07 | 22 techniques that change the branching and look of space-colonization rivers, each with a hook in `rivers.ts` | §5 |
+| HEIGHT | `docs/research/heightmap-from-biomes-and-rivers.md` | 2026-11-07 | Methods that fit a height map to an existing map and river network; three pipelines (A, B, C) | §6 |
+| TILES | `docs/research/sandbox4-tiling.md` | 2026-11-07 | Generating Sandbox 4 tile by tile; measurements; required changes | §7 |
+| BIOMES | `docs/research/biomes-and-climate.md` | 2026-11-08 | Biome schemes (Whittaker, Holdridge, Köppen, WWF, IUCN), aridity, lapse rates, treeline, azonal biomes; a classifier design | §8 |
+| CHARTS | `docs/research/biome-climate-charts.md` | 2026-11-12 | A catalogue of temperature × precipitation charts and rule tables, with data availability and licences | §8 |
+| RES | `docs/research/patch-resources.md` | 2026-11-10 | A catalogue of about 370 natural resources and 28 fantasy resources keyed to the map's fields; missing map features; a bedrock attribute; generation rules | §9 |
+| TRADE | `docs/research/game-resources-and-trade.md` | 2026-11-10 | How games choose, place and trade resources; trade theory; a 39-resource set; price and flow models | §9, §11 |
+| SITES | `docs/research/settlement-siting.md` | 2026-11-10 | Where settlements form; suitability methods; how generators and games place cities; a siting design for Sandbox 4 | §10, §11 |
 
-Related documents that are not research notes: [sandbox3.md](sandbox3.md) (the original spec of the three-level base map), [docs/resource-overview.md](docs/resource-overview.md) (the 39 game resources with every catalogue variant under them), [docs/map-structure.md](docs/map-structure.md) and [docs/network-structure.md](docs/network-structure.md) (the exported JSON), and [README.md](README.md).
+Related documents that are not research notes: `sandbox3.md` (the original spec of the three-level base map), `docs/resource-overview.md` (the 39 game resources with every catalogue variant under them), `docs/map-structure.md` and `docs/network-structure.md` (the exported JSON), and `README.md`.
 
 ---
 

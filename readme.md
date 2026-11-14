@@ -45,37 +45,45 @@ The foundation is the root of the game world. It has:
 * A reference to exactly one Parameter Set.
 * It can load and save all parameters to and from a json file
 
-After face 1 a foundation is immutable. Parameter will never changed after innitial load (there might be different set of parameters for different game modes or difficulty levels - but they do NOT change durring gameplay)
+During phase 1 the parameters of a foundation can be changed and reloaded. All derived data of the foundation is then discarded and recomputed.
+
+After phase 1 a foundation is immutable. Parameters will never change after the initial load (there might be different sets of parameters for different game modes or difficulty levels - but they do NOT change during gameplay)
 
 Many foundations can coexist in storage (e.g. to compare maps side by side in phase 1). A playthrough references exactly one foundation, and the game is modelled as single-player per foundation.
 
 The world of a foundation is unbounded. Regions are not fixed up front, they come into existence lazily as play moves outward.
 
 #### Parameter Set
-An immutable set of all map and world parameters. Referenced by a foundation. Can be json files or exported/loaded from json files.
+The set of all map and world parameters. Referenced by a foundation, and immutable after phase 1 like the foundation. Can be json files or exported/loaded from json files.
 
 #### Derived and Authored data
 All generated data belongs to one of two classes:
 
-* Derived data is a pure function of the foundation (seed + parameter set + generator version). Regions, zones, patches, rivers, biomes, resources, prospects and all Stubs are derived. The database is only a cache of derived data - it can be evicted and recomputed with an identical result.
-* Authored data comes from an LLM or a diffusion model. It cost to produced, so it is stored as the source of truth and is never regenerated or evicted.
+* Derived data is a pure function of the foundation (seed + parameter set + generator version). Regions, zones, patches, rivers, lakes, heights, biomes, resources, prospects, the travel network and all Stubs are derived. The database is only a cache of derived data - it can be evicted and recomputed with an identical result.
+* Authored data comes from an LLM or a diffusion model. It costs to produce, so it is stored as the source of truth and is never regenerated or evicted.
 
 #### Randomness
 There is no shared random stream. Every generation step seeds itself from a hash of (foundation seed, entity identity, purpose). A region gets the same result whether it is generated first or thousandth, so generation is independent of the order the player explores in.
 
-#### Identity
-All structural identities are deterministic paths. No database generated ids appear in the domain.
+Where a step needs a sequence of random numbers (e.g. pick 3 of the zone cells of a region), a small generator is seeded from the hash of that one cell and consumed in a fixed order.
 
-* Region = grid coordinate
-* Zone cell = region + index
-* Patch cell = zone cell + index
+#### Identity
+All structural identities are deterministic. No database generated ids appear in the domain.
+
+* Region = coordinate in the region grid
+* Zone cell = coordinate in the zone grid
+* Patch cell = coordinate in the patch grid
 * City, Faction, Family and Person = parent + slot index
 
-A Cell is the Voronoi site fixed when the region is Sited, and its path never changes. Zones and patches are built from cells and take their identity from them:
+Each of the three levels has its own grid, and every grid square holds exactly one Voronoi site. A Cell is that site. It is a pure function of the foundation and its coordinate never changes.
 
-* A Zone is one or more zone cells. It has the identity of its surviving cell (see Zone and Patch transformation). The indices of absorbed zone cells are retired, so there can be gaps.
-* A Patch keeps the identity from its original zone cell, also when that zone cell has been absorbed by another zone. The patch refers to the zone it currently belongs to.
-* Initial merging (for gameplay the merged cells are considered to to be one large cell) of zone and patch cells are posible. This is to give greater variation in size and form.
+The parent of a cell is not part of its identity, it is derived: a zone cell is owned by the region that contains its site, and a patch cell is owned by the zone cell that contains its site.
+
+Zones and patches are built from cells and take their identity from them:
+
+* A Zone is one or more zone cells that have merged. It has the identity of its root cell - the cell the others have merged into (see Zone and Patch transformation).
+* A Patch is one or more patch cells that have merged. It has the identity of its root cell, and it belongs to the zone of that cell.
+* For gameplay a merged zone or patch is considered to be one large cell. The merging is there to give greater variation in size and form.
 
 This lets player state and authored data point at derived data that may be evicted and recomputed, and it makes a Stub addressable before it is Realised.
 
@@ -86,14 +94,16 @@ Sited is not a state a region is in. It needs only the seed, so it is a pure fun
 
 | Stage | Contains | Needs |
 |---|---|---|
-| Sited | Region, Zone and Patch cell location, Zones initial type and bedrock. Ocean seeds, Determined number of links, expansions and mergers | foundation only |
-| Outlined | Zones linked, expanded and merged. Sea access | All regions within two rings Sited |
-| Detailed | Patch mergers, rivers | All bordering regions Outlined |
-| Elevated | heights, biomes, resources | All bordering regions Detailed |
+| Sited | Region, Zone and Patch cell location, Zone cells initial type and bedrock. Ocean seeds, Determined number of links, expansions and mergers | foundation only |
+| Outlined | Zones linked, expanded and merged. Sea access | All regions within the link range + 5 rings Sited (7 rings at the defaults) |
+| Detailed | Patch mergers, rivers, lakes. Estimated biomes and resources | All bordering regions Outlined |
+| Elevated | Height map. Final biomes and resources | All bordering regions Detailed |
 | Planned | Factions and Prospects for cities and towns | The region Detailed |
-| Settled | Actual Cities and towns, families and important persons | The region Planned |
+| Settled | Travel network. Actual Cities and towns, families and important persons | The region and all bordering regions Planned |
 
-Region sites come from a seed-hashed jittered grid, so the cell of any region and its neighbours can be computed locally without generating the rest of the world.
+The sites of all three levels come from seed-hashed jittered grids, so the cell of any region, zone or patch and its neighbours can be computed locally without generating the rest of the world.
+
+Biomes and resources exist in two forms. The estimated form is calculated in the Detailed stage with a typical height per elevation type instead of the real height. The final form is calculated in the Elevated stage with the height from the height map. Lakes, Prospects and the travel network only read the estimated form, so they never depend on the height map and never change when a region becomes Elevated.
 
 The policy for when a region advances (e.g. Detailed within some distance of the player) is not part of the domain model. The model only knows the stage and its preconditions.
 
@@ -109,59 +119,68 @@ Stub → Pending → Realised
 Text and portrait are tracked separately, so a person can be shown with a name and biography before the picture arrives. A city can exist with a population count long before any individual in it is authored.
 
 #### Region
-The map is structured in large regions the size of Middle Ages European kingdoms (approximately 100-200km x 100-200km). The regions are divided into zones (approximately 8-12 zones per region). The zones are divided into patches (approximately 8-18 patches per zone).
+The map is structured in large regions the size of Middle Ages European kingdoms (approximately 100-200km x 100-200km, 128 km by default). The regions are divided into zones (32 km by default). The zones are divided into patches (8 km by default).
 
-These counts are Parameter Set values for the number of cells when the region is Sited. After the mergers the resulting number of zones and patches is lower - that is an outcome to evaluate in phase 1, not a parameter.
+The cell sizes are the Parameter Set values - not the counts. With the default sizes a region owns about 16 zone cells and a zone cell owns about 16 patch cells, and the exact count varies with where the sites fall. After the mergers the resulting number of zones and patches is lower - that is an outcome to evaluate in phase 1, not a parameter.
 
-A region is a generation unit and it should be self contained. A region can be Outlined when all regions within two rings are Sited, and it can be Detailed when all bordering regions are Outlined (see Region Generation Stages).
+A region is the generation unit: rivers, lakes, the height map and prospects are calculated one region at a time. A region is not fully self contained:
 
-A Region is the top level of three levels of nested Voronoi cells. 
+* Ocean links and ocean expansion convert zone cells in any region.
+* A zone cell can merge into a zone of a neighbouring region. It then moves to that region, so region borders follow the merged zones.
+
+So the zones of a region are the zones whose root cell the region owns - not the zone cells the region owns.
+
+A region can be Outlined when all regions within the link range + 5 rings are Sited, and it can be Detailed when all bordering regions are Outlined (see Region Generation Stages).
+
+A Region is the top level of three levels of nested Voronoi cells. The levels are nested through the patch: a point belongs to a patch, the patch to a zone and the zone to a region. Zone borders, region borders and coastlines therefore all run along patch borders.
 
 #### Zone
 Zones have an elevation type: Ocean, Flat Land, Lowland, Hills or Mountains. And zones also have a bedrock type that drives mined resources in its patches
 
-The elevation type is the authoritative elevation class of the zone, and it is an input to river generation. The actual height is calculated in the Elevated stage from the rivers, and it stays within the band the elevation type allows. Ocean zones are never touched by river-driven height.
+The elevation type is the authoritative elevation class of the zone, and it is an input to river generation. The actual height is calculated in the Elevated stage from the rivers. The elevation type does not give a height band - it gives how steeply the land rises from rivers and coast, the gradient of the rivers and the roughness of the surface. Ocean zones are never touched by river-driven height, their depth follows the distance from the coast.
+
+The elevation type and the bedrock are drawn by configured weights per zone cell when the region is Sited. The bedrock weights depend on the elevation type.
 
 A zone is the middle level of three levels of nested Voronoi cells. 
 
 #### Patch
 Patches have one biome associated with them. The biome drives the patch flora and fauna.
 
-A patch is the bottom level of three levels of nested Voronoi cells. The patch level of Voronoi cells has its borders warped - to give the map a more natural aesthetic.
+A patch is the bottom level of three levels of nested Voronoi cells. The patch level of Voronoi cells has its borders warped - to give the map a more natural aesthetic. Because the levels are nested through the patch, the coastlines and the zone and region borders get the same warped shape.
 
 #### Zone and Patch transformation
 To give greater variation in zone and patch size and to give larger oceans - zones and patches undergo mergers.
-When a region is initialised a number of its zones are determined to be of the ocean type - these initial ocean zones are marked as ocean seeds.
+When a region is initialised a number of the zone cells it owns are determined to be of the ocean type - these initial ocean zone cells are marked as ocean seeds.
 
-The first step in the transformation is ocean linking. For this step all neighboring regions and their zones and ocean seeds must be known.
-When linking, each ocean seed in a region has a configured chance of linking to its nearest ocean seed. When linking, all zones in a straight line between the two ocean seeds are changed to ocean type zones.
+The first step in the transformation is ocean linking.
+When linking, each ocean seed makes zero, one or two links by configured chances. It links to its nearest other ocean seeds. When linking, all zone cells in a straight line between the two ocean seeds are changed to ocean type.
 
-* The nearest ocean seed of a seed in a bordering region can be two regions away. So all regions within two rings must be Sited before a region can be Outlined.
-* A link only converts zones in the two regions that own the two ocean seeds. A zone of a third region under the line is left alone.
-* There is a configured maximum link distance. An ocean seed with no other seed within that distance does not link.
+* A link converts every zone cell under the line, whichever region owns it.
+* There is a configured link range, counted in regions (2 by default). An ocean seed only links to the seeds of regions within that range, and an ocean seed with no other seed within the range does not link.
+* A zone cell can be converted by a link that starts several regions away. So all regions within the link range + 5 rings must be Sited before a region can be Outlined.
 
-The second step is ocean expansion. In each region a configured number of expansions are determined per ocean seed, for each the ocean seeds nearest land zones (in the same region) are converted to ocean zones.
+The second step is ocean expansion. Every zone cell on a link - the two ocean seeds and the cells between them - converts a number of its nearest land neighbours to ocean. The number is 0 to 3 and it is drawn by configured weights. The neighbours can be in another region. An ocean seed that is not on any link does not expand. The expansion can run in a configured number of passes (1 by default), where each pass expands from the cells the previous pass converted.
 
-The third step is merges. In each region a configured number of merges are determined. That number of zones is randomly chosen and merged with its nearest neighbor in the same region. Only land-land or ocean-ocean mergers are allowed - so some mergers can not be completed (but still counts).
+The third step is merges. In each region a configured number of merges are determined. That number of the zone cells the region owns is randomly chosen, and each merges into its nearest neighbour on the same side of the coast. Only land-land or ocean-ocean mergers are allowed - so some mergers can not be completed (but still count). The neighbour can be owned by another region.
 
-The randomly chosen zone is the survivor of a merger. It keeps its own elevation type and bedrock, and the absorbed zone takes them over. Apart from this and the conversion to ocean, the elevation type a zone got when Sited is final.
+The neighbour is the survivor of a merger. It can itself have merged into a third zone cell. The cell at the end of that chain is the root, and all zone cells with the same root are one zone. The zone takes everything from its root: ocean or land, the region, the elevation type and the bedrock. Apart from this and the conversion to ocean, the elevation type a zone cell got when Sited is final.
 
 These three steps make the region Outlined.
 
 The fourth step is patch merger.
-A number of patches in each zone merge with a neighboring patch in the same zone - This is to give greater variation in patch size and form.
+A number of the patch cells of each zone cell merge into their nearest neighbour patch in the same zone - This is to give greater variation in patch size and form. Roots are found as for zones.
 
-The patch merger is the first step of the Detailed stage. It runs when the zones are final, and only within a zone as it is after the zone mergers. Ocean zones keep their patch cells, but they skip patch merger, biomes and land resources - their patches only carry sea resources (e.g. fish).
+The patch merger is the first step of the Detailed stage. It runs when the zones are final, and only within a zone as it is after the zone mergers. Ocean zones have patch mergers like land zones, but they skip biomes and land resources - their patches only carry sea resources (e.g. fish).
 
-Se the docs/map-generation.md for details of the zone and Patch transformation
+See [docs/map-generation.md](docs/map-generation.md) for the details of the zone and patch transformation (sections 5 and 6), and for all the later generation steps. The reasons behind the algorithms are in [docs/map-generation-research.md](docs/map-generation-research.md).
 
 #### Sea
-A sea is a connected set of ocean zones. It can span several regions. An ocean seed that never links gives an enclosed sea inside one region.
+A sea is a connected set of ocean zones. It can span several regions. An ocean seed that is not on any link gives a small enclosed sea of one zone.
 
-A region has sea access if it has at least one ocean zone when it is Outlined. Whether two coasts are on the same sea is not stored as a region fact, because the world is unbounded. It is answered by a search over Outlined regions when gameplay needs it.
+A region has sea access if an ocean zone touches its land when it is Outlined. The ocean zone can belong to a neighbouring region. A region without sea access is landlocked. Whether two coasts are on the same sea is not stored as a region fact, because the world is unbounded. It is answered by a search over Outlined regions when gameplay needs it.
 
 #### Bedrock
-Bedrock will eventually be a fixed set of predetermined bedrock types (approximately 10).
+Bedrock will eventually be a fixed set of predetermined bedrock types (approximately 10). The generation currently uses the nine below, with weights per elevation type (see docs/map-generation.md section 14.1).
 
 Example table (not binding yet)
 | Id          | Name                 | Mostly under            | Gives                                                    |
@@ -180,14 +199,21 @@ Example table (not binding yet)
 #### Biome
 Biomes will eventually be a fixed set of predetermined biomes (10-20). Geography and climate will drive biomes.
 
-Examples (not binding yet)
+The biome of a patch comes from its temperature and its aridity. The temperature is the Initial Temperature field cooled by the height of the patch. The aridity is the precipitation relative to what the temperature demands. Mangrove is an override on warm, wet and low coasts.
 
-Tropical rain forest, Tropical seasonal forest, Savanna, Subtropical desert, Temperate rain forest, Temperate seasonal forest, Woodland, Shrubland, Temperate grassland, Desert, Boreal forest, Tundra, Ice, Mangrove
+The current set (not binding yet) is 15 land biomes and Mangrove:
+
+Ice and snow, Tundra, Cold steppe, Boreal forest (taiga), Cold desert, Temperate grassland, Woodland and shrubland, Temperate mixed forest, Temperate broadleaf forest, Temperate rain forest, Hot desert, Thorn scrub, Savanna, Tropical dry forest, Tropical rain forest, Mangrove
 
 #### Rivers
-Rivers are calculated with a space-colonization algorithm, and it is the rivers that drive the height of the landscape.
+Rivers are calculated per region with a space-colonization algorithm, growing from the sea into the land. It is the rivers that drive the height of the landscape.
 
-Rivers never cross region borders. A landlocked region only gets some lakes and small rivers, and it has no access to ocean sailing.
+A river never runs on the land of another region. Region borders are therefore watersheds, and the height map puts a ridge on them. The exception is a landlocked region: its rivers search up to 4 zones away for an ocean, and they cross the land of a neighbouring region to reach it.
+
+#### Lakes
+Lakes are placed per region after the rivers. A lake always sits on a river, so every lake has a river running in and out. There are no lakes in mountain zones, in deserts or in dry flat zones with few rivers.
+
+Lakes do not change the height map. They count as fresh water for resources and prospects.
 
 #### Fields
 Perlin Noise Maps that are used to drive climate, biomes and resources. They are Fields: stateless functions of foundation and coordinate that can be sampled anywhere at any time. Fields are never stored and have no generation stage - a stage only records the values it sampled.
@@ -195,6 +221,8 @@ Perlin Noise Maps that are used to drive climate, biomes and resources. They are
 * Initial Temperature
 * Prosperity
 * Supernatural
+
+The height map uses two more noise functions of the same kind: a relief field that makes neighbouring zones rugged or gentle together, and a detail noise on the surface.
 
 #### Resource
 
@@ -224,6 +252,13 @@ Variants of the same resource group
 
 ##### Product
 Products are produced from resources
+
+##### Generated resources
+The generation gives every patch an amount for each of 24 raw resources, and a variant (see docs/map-generation.md section 14). The example table below is finer than these 24 in some rows:
+
+* Wild food and game are one generated resource. The same goes for solid and liquid fuel, silver ore and lead ore, gems and pearls, spices and incense, furs and ivory, and mounts and pack animals.
+* Salt is a generated resource of its own. In the table it is a variant of Preserver.
+* Star metal and the sap from Elanor are fantasy resources. The generation has no rule for them yet.
 
 Example table (not sufficient)
 
@@ -264,6 +299,13 @@ Example table (not sufficient)
      
 #### Prospect 
 A potential location for a City or Town. Has information about resources, travel options etc.
+
+Every land patch of a region gets a score from five factors: resources, geography, trade, climate and prosperity. The best patches become the Prospects of the region (20 by default, of which up to 4 are for cities), with a minimum spacing between them. A Prospect never touches the land of another region, which keeps Prospects apart across region borders without reading the neighbour.
+
+Prospects only read the estimated biomes and resources (see Region Generation Stages).
+
+#### Travel network
+Roads, river routes and sea lanes that connect the Prospects. The network of a region is calculated from the Prospects of the region and its bordering regions. A link between Prospects in two regions is decided by exactly one region, so the network does not depend on the order the regions are generated in.
     
 #### Faction
 A group of people in one region. A political grouping. Could be a Kingdom, a thieves guild or a tribe of people.

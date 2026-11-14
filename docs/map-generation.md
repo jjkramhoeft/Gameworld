@@ -1,5 +1,40 @@
 # How the Sandbox 4 map is generated
 
+> **About this document in the Gameworld repository.** It was written for the Sandbox 4
+> generator, a TypeScript prototype in another repository. It is kept here as the
+> reference for the generation algorithms of Gameworld, unchanged apart from this note.
+>
+> - **Paths.** `sandboxes/…`, `shared/core/…` and the other source files named here belong
+>   to the Sandbox 4 repository. They are not in this repository.
+> - **Authority.** This document decides the generation rules. The
+>   [readme](../readme.md) decides the domain model around them: foundation, parameter set,
+>   identity, generation stages and storage.
+> - **Stages.** This document computes every layer on demand and has no stages. The readme
+>   places the layers in region generation stages:
+>
+>   | Sections | Stage in the readme |
+>   |---|---|
+>   | 3, 4, 5.1, 8, and the bedrock of 14.1 | Sited |
+>   | 5.2, 5.3, 6.1, 6.2 | Outlined |
+>   | 6.3, 10, 11, and 13–14 at the typical height per zone type | Detailed |
+>   | 12, and 13–14 at the height from the height map | Elevated |
+>   | 15 | Planned |
+>   | 16 | Settled |
+>
+>   The fields of section 9 have no stage. They can be sampled at any time.
+> - **Terms.** The readme uses other names for some of the things in this document:
+>
+>   | This document | The readme |
+>   |---|---|
+>   | Elevation zone | Zone |
+>   | Elevation zone type; Flat | Elevation type; Flat Land |
+>   | Raw zone, raw patch | Zone cell, patch cell |
+>   | Merged zone, merged patch | Zone, Patch |
+>   | Ocean growth | Ocean expansion |
+>   | `connectRange` | Link range |
+>   | Location (city or town) | Prospect |
+>   | World seed, parameters | Foundation seed, Parameter Set |
+
 This document describes every step that turns a seed into the Sandbox 4 map: the cell
 hierarchy, oceans, elevation zone types, climate, rivers, lakes, the height map, biomes,
 resources, city and town locations and the travel network. It is written so that you can
