@@ -1386,6 +1386,8 @@ to settle, and the best patches become the region's Prospects.
 | Of these, Prospects for cities | 4 |
 | Spacing | 20 km |
 | Weights: resources / geography / trade / climate / prosperity | 0.3 / 0.15 / 0.25 / 0.15 / 0.15 |
+| Score sum of a region at which 1 Prospect is on show / all are | 700 / 1,500 |
+| Score from which a Prospect is Rich / below which it is Poor | 75 / 62 |
 
 All inputs use the estimated biomes and resources, so Prospects never depend on the
 height map.
@@ -1496,8 +1498,32 @@ Distances are measured between spots.
    patch size), discard the town Prospects and redo step 2. Repeat until there are 20 or the
    spacing has reached one patch size.
 
-Regions with little habitable land end up with fewer Prospects. A map display shows only
-Prospects with a score of at least 59 by default (a median of 13 of the 20 per region).
+Regions with little habitable land end up with fewer Prospects.
+
+### 15.6 On show and class
+
+Not every Prospect is shown. The sum of the scores of a region's Prospects decides how
+many of them are **on show**: a map draws only these, and the travel network (section 16)
+connects only these.
+
+```
+sum    = Σ score   over the region's Prospects
+t      = clamp((sum − 700) / (1500 − 700), 0, 1)
+onShow = min(number of Prospects, floor(1 + (20 − 1) · t + ½))
+```
+
+A region with a sum of 700 or less has 1 Prospect on show, a region with 1,500 or more has
+all 20 (the Prospects per region), and the number grows evenly between. If the two sums
+are set equal, the number steps from 1 to all at that sum. A region without Prospects
+shows none. The Prospects on show are the best by score, in the order of 15.5 (ties
+included), whether they are for a city or a town.
+
+With the defaults about 1 region in 20 has a single Prospect on show, about 1 in 10 has
+all 20, and the median is 13 (measured on 600 regions of six seeds).
+
+Every Prospect has a **class** by its score: **Rich** from 75, **Poor** below 62 and
+**Average** between. About a quarter of the Prospects on show are Rich and a fifth are
+Poor.
 
 ---
 
@@ -1506,7 +1532,7 @@ Prospects with a score of at least 59 by default (a median of 13 of the 20 per r
 Stage: Settled.
 
 Roads, river routes and sea lanes connect the Prospects on
-show (15.5). The network of a region is computed from the Prospects and cost grids of the 3 × 3
+show (15.6). The network of a region is computed from the Prospects and cost grids of the 3 × 3
 regions around it.
 
 ### 16.1 Cost grid (per region, 2 km cells)
@@ -1643,8 +1669,9 @@ the pixel's world position with `cellAt` and colour it.
   `scale = 0.8`, and `zoom` = (2 km on screen in px) / 7 clamped to [0.45, 2.2]. Real
   rivers widen with about the square root of discharge (`b = 0.5`).
 - **Lakes**: their polygons, filled, drawn together with the rivers.
-- **Prospects**: a diamond for a city Prospect and a dot for a town Prospect, coloured by
-  score.
+- **Prospects**: only the ones on show (15.6). A diamond for a city Prospect and a dot for
+  a town Prospect, with a dark edge, coloured by class: Rich in gold (244, 196, 48),
+  Average in silver (228, 231, 236), Poor in bronze (170, 104, 50).
 - **Travel**: roads, river routes and sea lanes as lines; stretches shared by several
   links are drawn once.
 

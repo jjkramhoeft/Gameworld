@@ -4,7 +4,9 @@ using System.Text.Json;
 using Gameworld.Demo;
 using Gameworld.Domain;
 using Gameworld.Generation;
+using Gameworld.Generation.Cells;
 using Gameworld.Generation.Rendering;
+using Gameworld.Generation.Stages;
 
 // The demo app: a small map viewer on top of the generator. The browser pans and zooms a
 // tiled map; the backend holds one foundation, generates regions on demand and serves tiles
@@ -69,15 +71,20 @@ app.MapGet("/api/legend", () => Results.Json(new
         f.Unit,
         Bands = MapRenderer.FieldBands(f.Kind).Select(b => new { b.From, b.To, Colour = $"#{b.Colour.R:x2}{b.Colour.G:x2}{b.Colour.B:x2}" }),
     }),
+    Prospects = Enum.GetValues<ProspectClass>().Reverse().Select(c =>
+    {
+        var colour = MapRenderer.ProspectColour(c);
+        return new { Class = c.ToString(), Colour = $"#{colour.R:x2}{colour.G:x2}{colour.B:x2}" };
+    }),
 }, new JsonSerializerOptions()));
 
 app.MapGet("/api/inspect", (double x, double y, WorldHost host) => Json(host.Inspect(new WorldPoint(x, y))));
 
 // The statistics of a rectangle of the world, which the browser sets to the current view.
-app.MapGet("/api/statistics", (double left, double top, double width, double height, bool? final, WorldHost host) =>
+app.MapGet("/api/statistics", (double left, double top, double width, double height, bool? final, bool? plan, WorldHost host) =>
 {
     if (!(width > 0 && height > 0) || !double.IsFinite(left + top + width + height)) return Results.BadRequest();
-    return Results.Json(host.Statistics(left, top, width, height, final ?? false), new JsonSerializerOptions());
+    return Results.Json(host.Statistics(left, top, width, height, final ?? false, plan ?? false), new JsonSerializerOptions());
 });
 
 app.MapGet("/api/regions/{i:int}/{j:int}", (int i, int j, string? stage, WorldHost host) =>
@@ -133,7 +140,6 @@ namespace Gameworld.Demo
                     + $"\"GeneratorVersion\":{f.GeneratorVersion.Number},"
                     + $"\"TileSize\":{TileSize},\"MaxZoom\":{MaxZoom},\"BaseMetresPerPixel\":{BaseMetresPerPixel},"
                     + $"\"RegionSizeM\":{_world.Cells.RegionSize.ToString(CultureInfo.InvariantCulture)},"
-                    + $"\"MinProspectScore\":{f.Parameters.Travel.MinProspectScore.ToString(CultureInfo.InvariantCulture)},"
                     + $"\"Parameters\":{f.Parameters.ToJson()},"
                     + $"\"DefaultParameters\":{ParameterSet.Default.ToJson()}"
                     + "}";
@@ -194,8 +200,13 @@ namespace Gameworld.Demo
         /// The share of every biome in a rectangle of the world, by area. The rectangle is sampled on an even lattice of
         /// points, so the shares are those of the picture the map shows. It takes the regions in the rectangle to Detailed,
         /// or to Elevated when the final biomes are asked for.
+        /// <para>
+        /// It also counts the Prospects of the land zones in the rectangle, zone by zone. Only a Planned region has
+        /// Prospects: with <paramref name="plan"/> the regions in the rectangle are taken to Planned, which costs a
+        /// height map each; without it only the regions that are Planned already are counted.
+        /// </para>
         /// </summary>
-        public ViewStatistics Statistics(double left, double top, double width, double height, bool finalBiomes)
+        public ViewStatistics Statistics(double left, double top, double width, double height, bool finalBiomes, bool plan)
         {
             const int MaxSamples = 160;
             var step = Math.Max(width, height) / MaxSamples;
@@ -207,15 +218,17 @@ namespace Gameworld.Demo
                 var cells = world.Cells;
                 var counts = new Dictionary<Biome, int>();
                 var patchBiome = new Dictionary<long, Biome?>();
-                var regions = new HashSet<long>();
+                var regions = new Dictionary<long, GridCoord>();
+                var landZones = new Dictionary<long, CellInfo>();
                 int land = 0, ocean = 0;
                 for (var j = 0; j < ny; j++)
                     for (var i = 0; i < nx; i++)
                     {
                         var c = cells.CellAt(left + (i + 0.5) * width / nx, top + (j + 0.5) * height / ny);
-                        regions.Add(c.Region.Key);
+                        regions[c.Region.Key] = c.Region;
                         if (c.Ocean) { ocean++; continue; }
                         land++;
+                        landZones[c.Zone.Key] = c;
                         if (!patchBiome.TryGetValue(c.Patch.Key, out var biome))
                         {
                             var region = new RegionId(c.Region);
@@ -239,8 +252,38 @@ namespace Gameworld.Demo
                             var (r, g, bl) = Gameworld.Generation.Biomes.BiomeRules.Colour(p.Key);
                             return new BiomeShare(p.Key.ToString(), $"#{r:x2}{g:x2}{bl:x2}", p.Value * sampleKm2, (double)p.Value / land);
                         })
-                        .ToArray());
+                        .ToArray(),
+                    CountProspects(world, regions.Values, landZones.Values, plan));
             }
+        }
+
+        /// <summary>The Prospects of the land zones in view, for the regions that are Planned. Null when none is.</summary>
+        private static ProspectStatistics? CountProspects(World world, IEnumerable<GridCoord> regions, IEnumerable<CellInfo> landZones, bool plan)
+        {
+            var zonesOfRegion = landZones.ToLookup(z => z.Region, z => z.Zone);
+            var perZone = new Dictionary<GridCoord, List<Prospect>>();
+            var planned = 0;
+            foreach (var region in regions.OrderBy(r => r.Key))
+            {
+                var id = new RegionId(region);
+                var work = plan ? world.PlanOf(id) : world.FindPlan(id);
+                if (work is null) continue;
+                planned++;
+                foreach (var zone in zonesOfRegion[region]) perZone[zone] = [];
+                foreach (var prospect in work.Prospects)
+                    if (perZone.TryGetValue(world.Cells.CellAt(prospect.Spot).Zone, out var list)) list.Add(prospect);
+            }
+            if (planned == 0) return null;
+
+            var counts = perZone.Values.Select(ProspectCount.Of).ToArray();
+            var most = counts.Length == 0 ? 0 : counts.Max(c => c.OnShow);
+            return new ProspectStatistics(
+                planned,
+                counts.Length,
+                new ProspectCount(counts.Sum(c => c.City), counts.Sum(c => c.Town), counts.Sum(c => c.CityOnShow), counts.Sum(c => c.TownOnShow)),
+                Enumerable.Range(0, most + 1)
+                    .Select(n => new ZoneBin(n, counts.Count(c => c.OnShow == n), counts.Count(c => c.OnShow == n && c.CityOnShow > 0)))
+                    .ToArray());
         }
 
         /// <summary>The domain data behind a point: its region, zone and patch, and what the stages the region has reached say about the patch. Looking takes the region to Detailed, no further.</summary>
@@ -261,12 +304,17 @@ namespace Gameworld.Demo
                 var elevation = world.FindElevation(regionId);
                 var zoneCells = world.Advance(regionId, RegionStage.Outlined).Outline.Zones
                     .FirstOrDefault(z => z.Id.Coord == info.Zone)?.Cells.Count ?? 1;
+                var zoneProspects = plan is null || info.Ocean
+                    ? null
+                    : ProspectCount.Of(plan.Prospects.Where(p => cells.CellAt(p.Spot).Zone == info.Zone));
 
                 return new PointInfo(
                     point,
                     regionId,
                     world.StageOf(regionId),
                     world.Advance(regionId, RegionStage.Outlined).Outline.HasSeaAccess,
+                    plan is null ? null : ProspectCount.Of(plan.Prospects),
+                    plan?.ScoreSum,
                     info.Ocean,
                     new ZoneInfo(
                         new ZoneId(new ZoneCellId(info.Zone)),
@@ -274,7 +322,8 @@ namespace Gameworld.Demo
                         cells.ZoneBedrock(info.Zone),
                         world.Parameters.Bedrocks.FirstOrDefault(b => b.Id == cells.ZoneBedrock(info.Zone))?.Name,
                         zoneCells,
-                        !info.Ocean && world.IsRiverPoorZone(info.Zone)),
+                        !info.Ocean && world.IsRiverPoorZone(info.Zone),
+                        zoneProspects),
                     patch is null ? null : new PatchInfo(
                         new PatchId(new PatchCellId(info.Patch)),
                         patch.Shape.Cells.Length,
@@ -306,16 +355,52 @@ namespace Gameworld.Demo
     }
 
     /// <summary>The statistics of a rectangle of the world. The biomes are sorted by area, largest first.</summary>
-    public sealed record ViewStatistics(bool FinalBiomes, int Regions, double LandKm2, double OceanKm2, BiomeShare[] Biomes);
+    /// <param name="Prospects">Null when no region of the rectangle is Planned.</param>
+    public sealed record ViewStatistics(bool FinalBiomes, int Regions, double LandKm2, double OceanKm2, BiomeShare[] Biomes, ProspectStatistics? Prospects);
 
     /// <param name="Share">The share of the land of the rectangle, 0–1.</param>
     public sealed record BiomeShare(string Biome, string Colour, double AreaKm2, double Share);
 
+    /// <summary>
+    /// How many Prospects a region or a zone holds, for cities and for towns. The ones on show are the ones the map
+    /// draws and the travel network connects: the sum of the scores of a region's Prospects decides how many they are.
+    /// </summary>
+    public sealed record ProspectCount(int City, int Town, int CityOnShow, int TownOnShow)
+    {
+        public int OnShow => CityOnShow + TownOnShow;
+
+        public static ProspectCount Of(IEnumerable<Prospect> prospects)
+        {
+            int city = 0, town = 0, cityOnShow = 0, townOnShow = 0;
+            foreach (var p in prospects)
+            {
+                if (p.ForCity) city++; else town++;
+                if (!p.OnShow) continue;
+                if (p.ForCity) cityOnShow++; else townOnShow++;
+            }
+            return new ProspectCount(city, town, cityOnShow, townOnShow);
+        }
+    }
+
+    /// <summary>The Prospects of the land zones of a rectangle, counted in the regions that are Planned.</summary>
+    /// <param name="PlannedRegions">How many of the regions of the rectangle are Planned.</param>
+    /// <param name="LandZones">The land zones of those regions that the rectangle shows. A zone counts whole, also when part of it lies outside.</param>
+    /// <param name="Total">The Prospects of those zones.</param>
+    /// <param name="Zones">The histogram: the zones by their number of Prospects on show, from 0 up to the largest number.</param>
+    public sealed record ProspectStatistics(int PlannedRegions, int LandZones, ProspectCount Total, ZoneBin[] Zones);
+
+    /// <param name="ZonesWithCity">How many of the zones hold a city Prospect on show.</param>
+    public sealed record ZoneBin(int Prospects, int Zones, int ZonesWithCity);
+
+    /// <param name="RegionProspects">Null until the region is Planned.</param>
+    /// <param name="RegionScoreSum">The sum of the scores of the region's Prospects, which decides how many are on show. Null until the region is Planned.</param>
     public sealed record PointInfo(
         WorldPoint Point,
         RegionId Region,
         RegionStage Stage,
         bool RegionHasSeaAccess,
+        ProspectCount? RegionProspects,
+        double? RegionScoreSum,
         bool Ocean,
         ZoneInfo Zone,
         PatchInfo? Patch,
@@ -326,7 +411,8 @@ namespace Gameworld.Demo
     /// <summary>The four Fields sampled at the point itself, not at the site of its patch.</summary>
     public sealed record FieldValues(double InitialTemperatureC, double PrecipitationMm, double Prosperity, double Supernatural);
 
-    public sealed record ZoneInfo(ZoneId Id, ElevationType ElevationType, string? Bedrock, string? BedrockName, int Cells, bool RiverPoor);
+    /// <param name="Prospects">The Prospects in the zone. Null for an ocean zone and until the region is Planned.</param>
+    public sealed record ZoneInfo(ZoneId Id, ElevationType ElevationType, string? Bedrock, string? BedrockName, int Cells, bool RiverPoor, ProspectCount? Prospects);
 
     public sealed record PatchInfo(
         PatchId Id,

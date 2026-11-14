@@ -3,6 +3,7 @@ using Gameworld.Generation;
 using Gameworld.Generation.Basics;
 using Gameworld.Generation.Cells;
 using Gameworld.Generation.Rendering;
+using Gameworld.Generation.Stages;
 using Gameworld.Generation.Travel;
 
 namespace Gameworld.Tests;
@@ -317,10 +318,17 @@ public class WorldTests
                 Assert.True(plan.Prospects.Length <= p.ProspectsPerRegion);
                 Assert.True(plan.Prospects.Count(x => x.ForCity) <= p.CityProspectsPerRegion);
                 Assert.Equal(plan.Prospects.Length, plan.Prospects.Select(x => x.Patch).Distinct().Count());
-                shown.Add(plan.Prospects.Count(x => x.Score >= world.Parameters.Travel.MinProspectScore));
+                // On show: as many as the sum of the scores gives, and they are the best by score.
+                var onShow = plan.Prospects.Where(x => x.OnShow).ToArray();
+                Assert.Equal(PlanBuilder.OnShowCount(plan.ScoreSum, plan.Prospects.Length, p), onShow.Length);
+                if (plan.Prospects.Length > 0) Assert.InRange(onShow.Length, 1, p.ProspectsPerRegion);
+                if (onShow.Length > 0 && onShow.Length < plan.Prospects.Length)
+                    Assert.True(onShow.Min(x => x.Score) >= plan.Prospects.Where(x => !x.OnShow).Max(x => x.Score));
+                shown.Add(onShow.Length);
                 foreach (var prospect in plan.Prospects)
                 {
                     Assert.InRange(prospect.Score, 0.0001, 100);
+                    Assert.Equal(PlanBuilder.ClassOf(prospect.Score, p), prospect.Class);
                     Assert.True(prospect.Facts.Depth >= 1);
                     if (prospect.ForCity) Assert.True(prospect.Facts.Depth >= 2);
                     Assert.Equal(new GridCoord(i, j), world.Cells.CellAt(prospect.Spot).Region);
@@ -336,6 +344,39 @@ public class WorldTests
         shown.Sort();
         // The document measures a median of 13 of the 20 per region on show.
         Assert.InRange(shown[shown.Count / 2], 9, 17);
+    }
+
+    [Fact]
+    public void The_score_sum_of_a_region_decides_how_many_Prospects_are_on_show()
+    {
+        var p = ParameterSet.Default.Planning;
+        Assert.Equal(0, PlanBuilder.OnShowCount(0, 0, p));
+        // The lowest sums show 1, the top ones all 20, and the number grows evenly between.
+        Assert.Equal(1, PlanBuilder.OnShowCount(5, 20, p));
+        Assert.Equal(1, PlanBuilder.OnShowCount(p.OneOnShowScoreSum, 20, p));
+        Assert.Equal(20, PlanBuilder.OnShowCount(p.AllOnShowScoreSum, 20, p));
+        Assert.Equal(20, PlanBuilder.OnShowCount(2000, 20, p));
+        var middle = (p.OneOnShowScoreSum + p.AllOnShowScoreSum) / 2;
+        Assert.InRange(PlanBuilder.OnShowCount(middle, 20, p), 10, 11);
+        var last = 1;
+        for (var sum = 0.0; sum <= 2000; sum += 10)
+        {
+            var count = PlanBuilder.OnShowCount(sum, 20, p);
+            Assert.InRange(count, last, last + 1);
+            last = count;
+        }
+        // Never more than the region has.
+        Assert.Equal(3, PlanBuilder.OnShowCount(2000, 3, p));
+
+        // With the two sums equal the count steps from 1 to all.
+        var step = p with { OneOnShowScoreSum = 1000, AllOnShowScoreSum = 1000 };
+        Assert.Equal(1, PlanBuilder.OnShowCount(999, 20, step));
+        Assert.Equal(20, PlanBuilder.OnShowCount(1000, 20, step));
+
+        Assert.Equal(ProspectClass.Rich, PlanBuilder.ClassOf(p.RichScore, p));
+        Assert.Equal(ProspectClass.Average, PlanBuilder.ClassOf(p.PoorScore, p));
+        Assert.Equal(ProspectClass.Average, PlanBuilder.ClassOf((p.PoorScore + p.RichScore) / 2, p));
+        Assert.Equal(ProspectClass.Poor, PlanBuilder.ClassOf(p.PoorScore - 0.01, p));
     }
 
     [Fact]

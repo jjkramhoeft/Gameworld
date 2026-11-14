@@ -107,18 +107,17 @@ public static partial class MapRenderer
                 }
     }
 
-    /// <summary>A diamond for a city Prospect and a dot for a town Prospect, coloured by score. Only Prospects on show are drawn.</summary>
+    /// <summary>A diamond for a city Prospect and a dot for a town Prospect, coloured by class. Only Prospects on show are drawn.</summary>
     private static void DrawProspects(World world, Canvas canvas, MapView view, HashSet<GridCoord> regions)
     {
-        var minScore = world.Parameters.Travel.MinProspectScore;
         var zoom = Math.Clamp(2000 / view.MetresPerPixel / 7, 0.7, 1.8);
         foreach (var region in regions.OrderBy(r => r.Key))
             foreach (var prospect in world.PlanOf(new RegionId(region)).Prospects)
             {
-                if (prospect.Score < minScore) continue;
+                if (!prospect.OnShow) continue;
                 var x = view.ToPixelX(prospect.Spot.X);
                 var y = view.ToPixelY(prospect.Spot.Y);
-                var colour = ScoreColour(prospect.Score);
+                var colour = ProspectColour(prospect.Class);
                 if (prospect.ForCity)
                 {
                     canvas.Diamond(x, y, 7.5 * zoom, MarkerEdge);
@@ -132,12 +131,11 @@ public static partial class MapRenderer
             }
     }
 
-    /// <summary>Pale yellow at a score of 50, through orange, to deep red at 90.</summary>
-    public static Rgb ScoreColour(double score)
+    /// <summary>Gold for a Rich Prospect, silver for an Average one and bronze for a Poor one.</summary>
+    public static Rgb ProspectColour(ProspectClass prospectClass) => prospectClass switch
     {
-        var t = Math.Clamp((score - 50) / 40, 0, 1);
-        return t < 0.5
-            ? Rgb.Lerp(new Rgb(255, 240, 150), new Rgb(250, 150, 50), t * 2)
-            : Rgb.Lerp(new Rgb(250, 150, 50), new Rgb(190, 20, 30), t * 2 - 1);
-    }
+        ProspectClass.Rich => new Rgb(244, 196, 48),
+        ProspectClass.Average => new Rgb(228, 231, 236),
+        _ => new Rgb(170, 104, 50),
+    };
 }

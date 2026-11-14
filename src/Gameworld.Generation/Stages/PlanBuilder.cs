@@ -28,6 +28,9 @@ public sealed class PlanWork
     /// <summary>The Prospects: the ones for cities first, then the ones for towns, each in the order taken.</summary>
     public required Prospect[] Prospects { get; init; }
 
+    /// <summary>The sum of the scores of the Prospects: it decides how many of them are on show.</summary>
+    public double ScoreSum => Prospects.Sum(p => p.Score);
+
     public RegionPlan ToDomain() => new(Prospects);
 }
 
@@ -422,14 +425,45 @@ internal static class PlanBuilder
             spacing = Math.Max(patchSize, spacing * 0.85);
         }
 
+        // 15.6 On show: the sum of the scores decides how many, and the best by score are.
+        // The candidates are in that order already, ties included.
+        var onShow = OnShowCount(taken.Sum(s => s.Score), taken.Count, planning);
+        var shown = new HashSet<PatchScore>();
+        foreach (var c in candidates)
+        {
+            if (shown.Count >= onShow) break;
+            if (taken.Contains(c)) shown.Add(c);
+        }
+
         return taken.Select((s, i) => new Prospect(
             new PatchId(new PatchCellId(s.Patch.Root)),
             s.Spot,
             i < cities.Count,
             s.Score,
+            ClassOf(s.Score, planning),
+            shown.Contains(s),
             s.Factors,
             s.Facts)).ToArray();
     }
+
+    /// <summary>
+    /// 15.6 How many of a region's Prospects are on show: 1 at the low score sum, all of a full
+    /// region at the high one, evenly in between. Never more than the region has.
+    /// </summary>
+    internal static int OnShowCount(double scoreSum, int prospects, PlanningParameters planning)
+    {
+        if (prospects <= 0) return 0;
+        var all = Math.Max(1, planning.ProspectsPerRegion);
+        double low = planning.OneOnShowScoreSum, high = planning.AllOnShowScoreSum;
+        var t = high > low ? Clamp((scoreSum - low) / (high - low)) : scoreSum >= high ? 1 : 0;
+        return Math.Min(prospects, (int)Math.Floor(1 + (all - 1) * t + 0.5));
+    }
+
+    /// <summary>15.6 Rich from the rich score up, Poor below the poor score, Average between.</summary>
+    internal static ProspectClass ClassOf(double score, PlanningParameters planning) =>
+        score >= planning.RichScore ? ProspectClass.Rich
+        : score < planning.PoorScore ? ProspectClass.Poor
+        : ProspectClass.Average;
 
     private static double Clamp(double v) => Math.Clamp(v, 0, 1);
 

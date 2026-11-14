@@ -29,11 +29,8 @@ public sealed record ParameterSet
     [Description("Elevated stage: the height map and the biomes (§12, §13).")]
     public ElevationParameters Elevation { get; init; } = new();
 
-    [Description("Planned stage: Prospects for cities and towns (§15).")]
+    [Description("Planned stage: Prospects for cities and towns, and which of them are on show (§15). The Settled stage has no parameters of its own: the travel network connects the Prospects on show (§16).")]
     public PlanningParameters Planning { get; init; } = new();
-
-    [Description("Settled stage: the travel network (§16).")]
-    public TravelParameters Travel { get; init; } = new();
 
     [Description("The four Fields: noise maps that drive climate, biomes and resources. They have no stage (§9).")]
     public FieldsParameters Fields { get; init; } = new();
@@ -374,6 +371,22 @@ public sealed record PlanningParameters
 
     [Description("Weights of the five factors in the score of a patch. Only their proportions matter. A negative weight counts as 0; if all are 0 the plain mean is used (§15.4).")]
     public ProspectWeights Weights { get; init; } = new();
+
+    [Description("The sum of the scores of a region's Prospects at or below which only 1 of them is on show. The number on show grows evenly with the sum from here to AllOnShowScoreSum. Prospects on show are drawn on a map and connected by roads, river routes and sea lanes. With the defaults about 1 region in 20 shows a single Prospect and the median region shows 13 of its 20 (§15.6, §16).")]
+    [Range(0, double.MaxValue)]
+    public double OneOnShowScoreSum { get; init; } = 700;
+
+    [Description("The sum of the scores of a region's Prospects at or above which all of them are on show. With the defaults about 1 region in 10 shows all 20 (§15.6).")]
+    [Range(0, double.MaxValue)]
+    public double AllOnShowScoreSum { get; init; } = 1500;
+
+    [Description("A Prospect with at least this score (0 to 100) is Rich: a map draws it in gold. With the defaults about a quarter of the Prospects on show are Rich (§15.6, §17).")]
+    [Range(0, 100)]
+    public double RichScore { get; init; } = 75;
+
+    [Description("A Prospect with a score (0 to 100) below this is Poor: a map draws it in bronze. The ones between are Average, in silver. With the defaults about a fifth of the Prospects on show are Poor (§15.6, §17).")]
+    [Range(0, 100)]
+    public double PoorScore { get; init; } = 62;
 }
 
 public sealed record ProspectWeights
@@ -392,15 +405,6 @@ public sealed record ProspectWeights
 
     [Description("Weight of the prosperity factor: the Prosperity field at the spot (§15.3).")]
     public double Prosperity { get; init; } = 0.15;
-}
-
-/// <summary>Parameters of the Settled stage (section 16).</summary>
-public sealed record TravelParameters
-{
-    /// <summary>Only Prospects with at least this score are on show and get travel links.</summary>
-    [Description("Only Prospects with at least this score (0 to 100) are on show and are connected by roads, river routes and sea lanes. With the defaults a median of 13 of a region's 20 Prospects pass (§15.5, §16).")]
-    [Range(0, 100)]
-    public double MinProspectScore { get; init; } = 59;
 }
 
 /// <summary>The four Fields. They have no generation stage.</summary>

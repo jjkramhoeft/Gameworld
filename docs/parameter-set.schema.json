@@ -559,7 +559,7 @@
       "additionalProperties": false
     },
     "Planning": {
-      "description": "Planned stage: Prospects for cities and towns (§15).",
+      "description": "Planned stage: Prospects for cities and towns, and which of them are on show (§15). The Settled stage has no parameters of its own: the travel network connects the Prospects on show (§16).",
       "type": "object",
       "properties": {
         "ProspectsPerRegion": {
@@ -610,20 +610,32 @@
             }
           },
           "additionalProperties": false
-        }
-      },
-      "additionalProperties": false
-    },
-    "Travel": {
-      "description": "Settled stage: the travel network (§16).",
-      "type": "object",
-      "properties": {
-        "MinProspectScore": {
-          "description": "Only Prospects with at least this score (0 to 100) are on show and are connected by roads, river routes and sea lanes. With the defaults a median of 13 of a region's 20 Prospects pass (§15.5, §16).",
+        },
+        "OneOnShowScoreSum": {
+          "description": "The sum of the scores of a region's Prospects at or below which only 1 of them is on show. The number on show grows evenly with the sum from here to AllOnShowScoreSum. Prospects on show are drawn on a map and connected by roads, river routes and sea lanes. With the defaults about 1 region in 20 shows a single Prospect and the median region shows 13 of its 20 (§15.6, §16).",
+          "type": "number",
+          "minimum": 0,
+          "default": 700
+        },
+        "AllOnShowScoreSum": {
+          "description": "The sum of the scores of a region's Prospects at or above which all of them are on show. With the defaults about 1 region in 10 shows all 20 (§15.6).",
+          "type": "number",
+          "minimum": 0,
+          "default": 1500
+        },
+        "RichScore": {
+          "description": "A Prospect with at least this score (0 to 100) is Rich: a map draws it in gold. With the defaults about a quarter of the Prospects on show are Rich (§15.6, §17).",
           "type": "number",
           "minimum": 0,
           "maximum": 100,
-          "default": 59
+          "default": 75
+        },
+        "PoorScore": {
+          "description": "A Prospect with a score (0 to 100) below this is Poor: a map draws it in bronze. The ones between are Average, in silver. With the defaults about a fifth of the Prospects on show are Poor (§15.6, §17).",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 62
         }
       },
       "additionalProperties": false

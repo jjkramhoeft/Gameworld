@@ -101,11 +101,10 @@ internal static class TravelBuilder
             }
 
         // The Prospects on show, in a fixed order: by region key, then in each region's own order.
-        var minScore = world.Parameters.Travel.MinProspectScore;
         var places = new List<Place>();
         foreach (var r in around)
             foreach (var prospect in world.PlanOf(new RegionId(r)).Prospects)
-                if (prospect.Score >= minScore)
+                if (prospect.OnShow)
                     places.Add(new Place(places.Count, r, prospect));
 
         // Seeds.

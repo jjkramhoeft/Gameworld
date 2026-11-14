@@ -849,6 +849,8 @@ The generator uses Tier M "in a first, simpler form": a ranked list of scored si
 | Spacing | Per order, by K = 4 | Cities 2.5 × the spacing apart and two patches inside the region; towns at least 20 km apart, relaxed step by step when fewer than 20 fit |
 | Cross-border | Border depth | Border depth |
 | Spot | Tier T on the raster | On the patch's river (the mouth, or where the river is largest) or at the patch's site |
+| On show | Villages above a threshold | The sum of the scores of a region's Prospects sets how many are on show: 1 at a sum of 700 or less, all 20 at 1,500 or more, the best by score first. A fixed cutoff (score of at least 59) came first; it left 15 of 600 measured regions that have Prospects with none on show, and the number on show followed single scores, not the region as a whole. The two sums are near the 5 % and 93 % points of the measured sums, which keeps the median at 13 on show |
+| Class | Five orders | Rich from a score of 75, Poor below 62, Average between: about a quarter and a fifth of the Prospects on show. It only colours the map so far |
 
 | Topic | Status |
 |---|---|

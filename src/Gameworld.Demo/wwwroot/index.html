@@ -47,6 +47,7 @@
   dl { display: grid; grid-template-columns: 110px 1fr; gap: 3px 10px; margin: 0; font-size: 13px; }
   dt { color: var(--muted); }
   dd { margin: 0; overflow-wrap: anywhere; }
+  dd .muted { color: var(--muted); font-size: 12px; }
   .res { margin: 6px 0 0; padding: 0; list-style: none; font-size: 13px; }
   .res li { display: grid; grid-template-columns: 1fr 44px; gap: 8px; padding: 2px 0; border-top: 1px solid var(--line); }
   .res small { color: var(--muted); }
@@ -58,6 +59,13 @@
   .hist .track { height: 12px; }
   .hist .bar { display: block; height: 100%; min-width: 2px; border-radius: 2px; border: 1px solid #0006; }
   .hist .pct { text-align: right; font-variant-numeric: tabular-nums; }
+  .hist.counts li { grid-template-columns: 22px 1fr 40px; }
+  .hist.counts .name { text-align: right; font-variant-numeric: tabular-nums; }
+  .hist.counts .track { display: flex; }
+  .hist.counts .bar { min-width: 0; border-radius: 0; background: var(--accent); }
+  .hist.counts .bar.towns { opacity: .45; }
+  .key { display: inline-block; width: 10px; height: 10px; border-radius: 2px; border: 1px solid #0006; background: var(--accent); vertical-align: -1px; }
+  .key.towns { opacity: .45; }
   main { position: relative; overflow: hidden; background: var(--map-bg); cursor: grab; touch-action: none; }
   main.dragging { cursor: grabbing; }
   #tiles { position: absolute; inset: 0; }
@@ -205,13 +213,15 @@ function statisticsSoon() {
 async function statistics() {
   const w = map.clientWidth, h = map.clientHeight, m = mpp();
   if (!w || !h || !state.version) return;
-  const final = document.querySelector('#layers input[value=final]').checked;
-  const query = `left=${state.cx - w / 2 * m}&top=${state.cy - h / 2 * m}&width=${w * m}&height=${h * m}&final=${final}`;
+  const on = new Set(layers().split(','));
+  // The Prospects and travel layers take the regions in view to Planned anyway, so the statistics may do it too.
+  const plan = on.has('prospects') || on.has('travel');
+  const query = `left=${state.cx - w / 2 * m}&top=${state.cy - h / 2 * m}&width=${w * m}&height=${h * m}&final=${on.has('final')}&plan=${plan}`;
   const key = state.version + '?' + query;
   if (key === statisticsKey) return;
   statisticsKey = key;
   const run = ++statisticsRun, body = $('statistics-body');
-  body.querySelector('.hist')?.classList.add('stale');
+  body.querySelectorAll('.hist').forEach(h => h.classList.add('stale'));
   try {
     const r = await fetch('/api/statistics?' + query);
     if (!r.ok) throw new Error(await r.text() || 'The statistics were not counted.');
@@ -228,12 +238,33 @@ async function statistics() {
           s.Biomes.map(b => `<li title="${esc(words(b.Biome))}: ${area(b.AreaKm2)} km²"><span class="name">${esc(words(b.Biome))}</span>` +
             `<span class="track"><span class="bar" style="width:${(b.Share / top * 100).toFixed(1)}%;background:${esc(b.Colour)}"></span></span>` +
             `<span class="pct">${pct(b.Share)}</span></li>`).join('') + '</ul>'
-        : '<p class="note">There is no land in view.</p>');
+        : '<p class="note">There is no land in view.</p>') +
+      (s.Biomes.length ? prospectStatistics(s) : '');
   } catch (e) {
     if (run !== statisticsRun) return;
     statisticsKey = '';
     body.innerHTML = `<p class="error">${esc(e.message)}</p>`;
   }
+}
+
+// The Prospects of the land zones in view, and a histogram of the zones by their number of Prospects on show.
+const prospectCount = c => `${c.CityOnShow} city · ${c.TownOnShow} town on show, ${c.City + c.Town} in all`;
+function prospectStatistics(s) {
+  const p = s.Prospects;
+  if (!p) return '<p class="note">Prospects are counted in Planned regions. Turn on the Prospects layer to plan the regions in view.</p>';
+  const most = Math.max(1, ...p.Zones.map(z => z.Zones));
+  const width = n => (n / most * 100).toFixed(1) + '%';
+  return `<dl style="margin-top:14px"><dt>Prospects</dt><dd>${prospectCount(p.Total)}</dd>` +
+    `<dt>Per land zone</dt><dd>${(p.Total.OnShow / Math.max(1, p.LandZones)).toFixed(2)} on show · ${p.LandZones} zone${p.LandZones === 1 ? '' : 's'}</dd></dl>` +
+    (p.PlannedRegions < s.Regions ? `<p class="note">Counted in the ${p.PlannedRegions} of ${s.Regions} regions in view that are Planned.</p>` : '') +
+    `<p class="note">Land zones in view by their number of Prospects on show: ` +
+    `<span class="key"></span> with a city Prospect, <span class="key towns"></span> towns only or none.</p>` +
+    '<ul class="hist counts">' + p.Zones.map(z =>
+      `<li title="${z.Zones} zone${z.Zones === 1 ? '' : 's'} with ${z.Prospects} Prospect${z.Prospects === 1 ? '' : 's'} on show, ${z.ZonesWithCity} of them with a city Prospect">` +
+      `<span class="name">${z.Prospects}</span><span class="track">` +
+      (z.ZonesWithCity ? `<span class="bar" style="width:${width(z.ZonesWithCity)}"></span>` : '') +
+      (z.Zones > z.ZonesWithCity ? `<span class="bar towns" style="width:${width(z.Zones - z.ZonesWithCity)}"></span>` : '') +
+      `</span><span class="pct">${z.Zones}</span></li>`).join('') + '</ul>';
 }
 
 function status(x, y) {
@@ -330,7 +361,10 @@ async function inspect(p) {
     const rows = [];
     const row = (k, v) => rows.push(`<dt>${esc(k)}</dt><dd>${v}</dd>`);
     row('Region', `(${d.Region[0]}, ${d.Region[1]}) · ${d.Stage} · ${d.RegionHasSeaAccess ? 'sea access' : 'landlocked'}`);
+    if (d.RegionProspects) row('', `Prospects: ${prospectCount(d.RegionProspects)} · score sum ${num(d.RegionScoreSum, 0)}`);
     row('Zone', `(${d.Zone.Id[0]}, ${d.Zone.Id[1]}) · ${words(d.Zone.ElevationType)} · ${d.Zone.Cells} cell${d.Zone.Cells > 1 ? 's' : ''}`);
+    if (d.Zone.Prospects) row('', 'Prospects: ' + prospectCount(d.Zone.Prospects));
+    else if (!d.Ocean && !d.RegionProspects) row('', '<span class="muted">Prospects are counted once the region is Planned (Prospects layer).</span>');
     if (d.Zone.BedrockName) row('Bedrock', esc(d.Zone.BedrockName));
     if (d.Zone.RiverPoor) row('', 'river-poor flat zone');
     const patch = d.Patch;
@@ -354,7 +388,7 @@ async function inspect(p) {
       }
       if (patch.Score != null) {
         const f = patch.Factors;
-        row('Score', `${num(patch.Score, 1)}${d.Prospect ? ' · Prospect for a ' + (d.Prospect.ForCity ? 'city' : 'town') : ''}`);
+        row('Score', `${num(patch.Score, 1)}${d.Prospect ? ` · ${d.Prospect.Class} Prospect for a ${d.Prospect.ForCity ? 'city' : 'town'}${d.Prospect.OnShow ? ' · on show' : ' · not on show'}` : ''}`);
         row('Factors', `resources ${num(f.Resources)} · geography ${num(f.Geography)} · trade ${num(f.Trade)} · climate ${num(f.Climate)} · prosperity ${num(f.Prosperity)}`);
       }
       if (patch.Resources.length)
@@ -374,6 +408,8 @@ function show(f) {
   state.version = f.Version; state.tile = f.TileSize; state.baseMpp = f.BaseMetresPerPixel;
   state.maxZoom = f.MaxZoom; state.regionSize = f.RegionSizeM;
   state.defaults = JSON.stringify(f.DefaultParameters, null, 2);
+  state.planning = f.Parameters.Planning;
+  showLegendItems();
   $('seed').value = f.Seed;
   $('parameters').value = JSON.stringify(f.Parameters, null, 2);
   $('foundation').textContent = `Seed "${f.Seed}" (${f.SeedValue}) · generator version ${f.GeneratorVersion}`;
@@ -405,12 +441,20 @@ const bandLabel = b => b.From == null ? `below ${bound(b.To)}` : b.To == null ? 
 const legend = (key, value, title, items) =>
   `<details open hidden data-${key}="${esc(value)}"><summary>${esc(title)}</summary><ul>${items.map(([colour, text]) =>
     `<li><i style="background:${esc(colour)}"></i>${esc(text)}</li>`).join('')}</ul></details>`;
-fetch('/api/legend').then(r => r.json()).then(l => {
+// The classes of the Prospects, with the scores of the foundation's Parameter Set.
+const prospectClassLabel = (c, p) => !p ? c : c === 'Rich' ? `Rich · score ${p.RichScore} or more`
+  : c === 'Poor' ? `Poor · score below ${p.PoorScore}` : `Average · score ${p.PoorScore} to ${p.RichScore}`;
+let legendData = null;
+function showLegendItems() {
+  const l = legendData;
+  if (!l) return;
   $('legend').innerHTML =
     legend('mode', 'biomes', 'Biomes', l.Biomes.map(b => [b.Colour, words(b.Biome)])) +
+    legend('layer', 'prospects', 'Prospects on show (◆ city · ● town)', l.Prospects.map(c => [c.Colour, prospectClassLabel(c.Class, state.planning)])) +
     l.Fields.map(f => legend('layer', f.Layer, `${f.Name} (${f.Unit})`, f.Bands.map(b => [b.Colour, bandLabel(b)]))).join('');
   showLegends();
-});
+}
+fetch('/api/legend').then(r => r.json()).then(l => { legendData = l; showLegendItems(); });
 fetch('/api/foundation').then(r => r.json()).then(show).catch(e => { $('foundation').textContent = 'The backend did not answer: ' + e.message; });
 </script>
 </body>

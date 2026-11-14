@@ -302,10 +302,14 @@ A potential location for a City or Town. Has information about resources, travel
 
 Every land patch of a region gets a score from five factors: resources, geography, trade, climate and prosperity. The best patches become the Prospects of the region (20 by default, of which up to 4 are for cities), with a minimum spacing between them. A Prospect never touches the land of another region, which keeps Prospects apart across region borders without reading the neighbour.
 
+The sum of the scores of a region's Prospects decides how many of them are on show: all of them in the best regions, a single one in the regions with the lowest sums. Only the Prospects on show are drawn on a map and connected by the travel network, and they are the region's best by score.
+
+A Prospect is Rich, Average or Poor by its score. A map draws a Rich Prospect in gold, an Average one in silver and a Poor one in bronze.
+
 Prospects only read the estimated biomes and resources (see Region Generation Stages).
 
 #### Travel network
-Roads, river routes and sea lanes that connect the Prospects. The network of a region is calculated from the Prospects of the region and its bordering regions. A link between Prospects in two regions is decided by exactly one region, so the network does not depend on the order the regions are generated in.
+Roads, river routes and sea lanes that connect the Prospects on show. The network of a region is calculated from the Prospects of the region and its bordering regions. A link between Prospects in two regions is decided by exactly one region, so the network does not depend on the order the regions are generated in.
     
 #### Faction
 A group of people in one region. A political grouping. Could be a Kingdom, a thieves guild or a tribe of people.

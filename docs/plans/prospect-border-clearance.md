@@ -108,8 +108,9 @@ Weighed and dropped:
    is clear at ½ · c by the rule's own test, or is the fallback of today's rule.
 6. `docs/map-generation-research.md` section 10.6: update the "Spot" row and say why (the
    largest flow is at the river's exit from the patch).
-7. Re-measure the "median of 13 of the 20 on show" of 15.5 and the parameter description of
-   `MinProspectScore`. Spacing is measured between spots and prosperity is sampled at the
+7. Re-measure the shares of 15.6 (the median of 13 of the 20 on show, the regions with 1
+   and with all, the Rich and Poor shares) and the parameter descriptions of
+   `OneOnShowScoreSum`, `AllOnShowScoreSum`, `RichScore` and `PoorScore`. Spacing is measured between spots and prosperity is sampled at the
    spot, so the selection shifts a little.
 
 ## Done when

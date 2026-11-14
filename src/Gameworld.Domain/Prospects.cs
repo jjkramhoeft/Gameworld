@@ -30,6 +30,14 @@ public sealed record ProspectFacts(
     double LakeAreaM2,
     int Depth);
 
+/// <summary>How well off a Prospect is, by its score. A map draws Rich in gold, Average in silver and Poor in bronze.</summary>
+public enum ProspectClass
+{
+    Poor,
+    Average,
+    Rich,
+}
+
 /// <summary>
 /// A potential location for a City or Town. It never touches the land of another region, and
 /// it only reads the estimated biomes and resources.
@@ -38,11 +46,18 @@ public sealed record ProspectFacts(
 /// <param name="Spot">Where in the patch the Prospect is placed.</param>
 /// <param name="ForCity">The Prospect is one of the region's Prospects for cities; otherwise it is for a town.</param>
 /// <param name="Score">0 to 100.</param>
+/// <param name="Class">Rich, Average or Poor, by the score.</param>
+/// <param name="OnShow">
+/// The Prospect is one of the region's Prospects on show: a map draws it and the travel network connects it.
+/// The sum of the scores of a region's Prospects decides how many are on show, and the best ones are.
+/// </param>
 public sealed record Prospect(
     PatchId Patch,
     WorldPoint Spot,
     bool ForCity,
     double Score,
+    ProspectClass Class,
+    bool OnShow,
     ProspectFactors Factors,
     ProspectFacts Facts);
 

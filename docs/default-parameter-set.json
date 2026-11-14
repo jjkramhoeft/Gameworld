@@ -151,10 +151,11 @@
       "Trade": 0.25,
       "Climate": 0.15,
       "Prosperity": 0.15
-    }
-  },
-  "Travel": {
-    "MinProspectScore": 59
+    },
+    "OneOnShowScoreSum": 700,
+    "AllOnShowScoreSum": 1500,
+    "RichScore": 75,
+    "PoorScore": 62
   },
   "Fields": {
     "Precipitation": {
