@@ -51,6 +51,13 @@
   .res li { display: grid; grid-template-columns: 1fr 44px; gap: 8px; padding: 2px 0; border-top: 1px solid var(--line); }
   .res small { color: var(--muted); }
   .res .amt { text-align: right; font-variant-numeric: tabular-nums; }
+  .hist { list-style: none; margin: 8px 0 0; padding: 0; font-size: 13px; transition: opacity .15s; }
+  .hist.stale { opacity: .55; }
+  .hist li { display: grid; grid-template-columns: 160px 1fr 40px; gap: 8px; align-items: center; padding: 2px 0; }
+  .hist .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hist .track { height: 12px; }
+  .hist .bar { display: block; height: 100%; min-width: 2px; border-radius: 2px; border: 1px solid #0006; }
+  .hist .pct { text-align: right; font-variant-numeric: tabular-nums; }
   main { position: relative; overflow: hidden; background: var(--map-bg); cursor: grab; touch-action: none; }
   main.dragging { cursor: grabbing; }
   #tiles { position: absolute; inset: 0; }
@@ -110,8 +117,6 @@
     <label><input type="checkbox" value="prosperity">Prosperity</label>
     <label><input type="checkbox" value="supernatural">Supernatural</label>
   </div>
-  <p class="note">The last four are the Fields. Each tints the land in the bands of its legend; on the None base map the colours are exactly those of the legend. Several fields at once mix like inks.</p>
-  <p class="note">The stages are linear. Prospects take the regions in view to Planned and the travel network to Settled, both through Elevated, so the height maps are built first. Hillshade and final biomes need Elevated too.</p>
 
   <h2>Under the pointer</h2>
   <div id="inspect"><p class="note">Click the map to see the region, zone and patch at that point.</p></div>
@@ -124,6 +129,11 @@
       <button id="reset-parameters" type="button">Defaults</button>
     </div>
     <p class="error" id="parameter-error" role="alert"></p>
+  </details>
+
+  <details id="statistics">
+    <summary>Statistics</summary>
+    <div id="statistics-body"><p class="note">Counting…</p></div>
   </details>
 </aside>
 
@@ -181,6 +191,49 @@ function draw() {
   const km = [1, 2, 5, 10, 20, 50, 100, 200].find(k => k * 1000 / m >= 90) ?? 200;
   $('scale').firstElementChild.textContent = km + ' km';
   $('scale').lastElementChild.style.width = km * 1000 / m + 'px';
+
+  statisticsSoon();
+}
+
+// Statistics of the current view. They are counted only while the section is open, a moment after the view comes to rest.
+let statisticsTimer = 0, statisticsRun = 0, statisticsKey = '';
+function statisticsSoon() {
+  if (!$('statistics').open) return;
+  clearTimeout(statisticsTimer);
+  statisticsTimer = setTimeout(statistics, 300);
+}
+async function statistics() {
+  const w = map.clientWidth, h = map.clientHeight, m = mpp();
+  if (!w || !h || !state.version) return;
+  const final = document.querySelector('#layers input[value=final]').checked;
+  const query = `left=${state.cx - w / 2 * m}&top=${state.cy - h / 2 * m}&width=${w * m}&height=${h * m}&final=${final}`;
+  const key = state.version + '?' + query;
+  if (key === statisticsKey) return;
+  statisticsKey = key;
+  const run = ++statisticsRun, body = $('statistics-body');
+  body.querySelector('.hist')?.classList.add('stale');
+  try {
+    const r = await fetch('/api/statistics?' + query);
+    if (!r.ok) throw new Error(await r.text() || 'The statistics were not counted.');
+    const s = await r.json();
+    if (run !== statisticsRun) return;
+    const area = km2 => km2 >= 100 ? Math.round(km2).toLocaleString('en') : km2.toFixed(1);
+    const pct = share => (share * 100).toFixed(share < 0.0995 ? 1 : 0) + '%';
+    const total = s.LandKm2 + s.OceanKm2, top = s.Biomes.length ? s.Biomes[0].Share : 1;
+    body.innerHTML =
+      `<dl><dt>Current view</dt><dd>${area(total)} km² · ${s.Regions} region${s.Regions > 1 ? 's' : ''}</dd>` +
+      `<dt>Land · sea</dt><dd>${pct(s.LandKm2 / total)} · ${pct(s.OceanKm2 / total)}</dd></dl>` +
+      (s.Biomes.length
+        ? `<p class="note">${s.FinalBiomes ? 'Final' : 'Estimated'} biomes, share of the land in view.</p><ul class="hist">` +
+          s.Biomes.map(b => `<li title="${esc(words(b.Biome))}: ${area(b.AreaKm2)} km²"><span class="name">${esc(words(b.Biome))}</span>` +
+            `<span class="track"><span class="bar" style="width:${(b.Share / top * 100).toFixed(1)}%;background:${esc(b.Colour)}"></span></span>` +
+            `<span class="pct">${pct(b.Share)}</span></li>`).join('') + '</ul>'
+        : '<p class="note">There is no land in view.</p>');
+  } catch (e) {
+    if (run !== statisticsRun) return;
+    statisticsKey = '';
+    body.innerHTML = `<p class="error">${esc(e.message)}</p>`;
+  }
 }
 
 function status(x, y) {
@@ -258,6 +311,7 @@ function showLegends() {
 }
 document.querySelectorAll('input[name=mode]').forEach(i => i.addEventListener('change', modeChanged));
 $('layers').addEventListener('change', () => { showLegends(); draw(); });
+$('statistics').addEventListener('toggle', statistics);
 
 // Inspect.
 const words = s => String(s).replace(/([a-z])([A-Z])/g, '$1 $2').replace(/ And /g, ' & ');

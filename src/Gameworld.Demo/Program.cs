@@ -73,6 +73,13 @@ app.MapGet("/api/legend", () => Results.Json(new
 
 app.MapGet("/api/inspect", (double x, double y, WorldHost host) => Json(host.Inspect(new WorldPoint(x, y))));
 
+// The statistics of a rectangle of the world, which the browser sets to the current view.
+app.MapGet("/api/statistics", (double left, double top, double width, double height, bool? final, WorldHost host) =>
+{
+    if (!(width > 0 && height > 0) || !double.IsFinite(left + top + width + height)) return Results.BadRequest();
+    return Results.Json(host.Statistics(left, top, width, height, final ?? false), new JsonSerializerOptions());
+});
+
 app.MapGet("/api/regions/{i:int}/{j:int}", (int i, int j, string? stage, WorldHost host) =>
 {
     if (!Enum.TryParse<RegionStage>(stage ?? "Detailed", ignoreCase: true, out var target)) return Results.BadRequest();
@@ -183,6 +190,59 @@ namespace Gameworld.Demo
             lock (_gate) return _world.Advance(id, stage).ToSnapshot();
         }
 
+        /// <summary>
+        /// The share of every biome in a rectangle of the world, by area. The rectangle is sampled on an even lattice of
+        /// points, so the shares are those of the picture the map shows. It takes the regions in the rectangle to Detailed,
+        /// or to Elevated when the final biomes are asked for.
+        /// </summary>
+        public ViewStatistics Statistics(double left, double top, double width, double height, bool finalBiomes)
+        {
+            const int MaxSamples = 160;
+            var step = Math.Max(width, height) / MaxSamples;
+            var nx = Math.Max(1, (int)Math.Round(width / step));
+            var ny = Math.Max(1, (int)Math.Round(height / step));
+            lock (_gate)
+            {
+                var world = _world;
+                var cells = world.Cells;
+                var counts = new Dictionary<Biome, int>();
+                var patchBiome = new Dictionary<long, Biome?>();
+                var regions = new HashSet<long>();
+                int land = 0, ocean = 0;
+                for (var j = 0; j < ny; j++)
+                    for (var i = 0; i < nx; i++)
+                    {
+                        var c = cells.CellAt(left + (i + 0.5) * width / nx, top + (j + 0.5) * height / ny);
+                        regions.Add(c.Region.Key);
+                        if (c.Ocean) { ocean++; continue; }
+                        land++;
+                        if (!patchBiome.TryGetValue(c.Patch.Key, out var biome))
+                        {
+                            var region = new RegionId(c.Region);
+                            biome = finalBiomes && world.ElevationOf(region).Find(c.Patch) is { } final
+                                ? final.Biome.Biome
+                                : world.DetailOf(region).Find(c.Patch)?.Biome?.Biome;
+                            patchBiome[c.Patch.Key] = biome;
+                        }
+                        if (biome is { } b) counts[b] = counts.GetValueOrDefault(b) + 1;
+                    }
+
+                var sampleKm2 = width / nx * (height / ny) / 1e6;
+                return new ViewStatistics(
+                    finalBiomes,
+                    regions.Count,
+                    land * sampleKm2,
+                    ocean * sampleKm2,
+                    counts.OrderByDescending(p => p.Value).ThenBy(p => p.Key)
+                        .Select(p =>
+                        {
+                            var (r, g, bl) = Gameworld.Generation.Biomes.BiomeRules.Colour(p.Key);
+                            return new BiomeShare(p.Key.ToString(), $"#{r:x2}{g:x2}{bl:x2}", p.Value * sampleKm2, (double)p.Value / land);
+                        })
+                        .ToArray());
+            }
+        }
+
         /// <summary>The domain data behind a point: its region, zone and patch, and what the stages the region has reached say about the patch. Looking takes the region to Detailed, no further.</summary>
         public PointInfo Inspect(WorldPoint point)
         {
@@ -244,6 +304,12 @@ namespace Gameworld.Demo
             }
         }
     }
+
+    /// <summary>The statistics of a rectangle of the world. The biomes are sorted by area, largest first.</summary>
+    public sealed record ViewStatistics(bool FinalBiomes, int Regions, double LandKm2, double OceanKm2, BiomeShare[] Biomes);
+
+    /// <param name="Share">The share of the land of the rectangle, 0–1.</param>
+    public sealed record BiomeShare(string Biome, string Colour, double AreaKm2, double Share);
 
     public sealed record PointInfo(
         WorldPoint Point,
