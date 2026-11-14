@@ -19,13 +19,11 @@ Gameworld is a sandbox, prototype and research repo for a larger PC game. It exp
 ## Lifecycle Phases
 
 1) World Generation Development
-  Algorithms and parameter settlement. With a fair amount of manual testing to evaluate look and feel.
+  Algorithms and parameter settlement. With a fair amount of manual testing to evaluate look and feel. Includes internal map demo apps.
 2) Gameplay development
   Game Client/UI interaction, and persisting player interaction with the gameworld. Here the core game mechanics for travel/exploration and progression are evolved.
 3) Playable game - initial release
   Also prelaunch automated play and statistics on the distribution and variety of the gameworld and people.
-4) Updates and new features
-  Changes in world and map parameters can occur - but then a migration plan for player data should be included.
 
 ## First Step Domain Model - Need and drivers
 
@@ -45,21 +43,22 @@ The foundation is the root of the game world. It has:
 * The seed for all the generation algorithms.
 * The generator version. This versions the generation algorithms only - not the parameters and not the storage schema.
 * A reference to exactly one Parameter Set.
+* It can load and save all parameters to and from a json file
 
-A foundation is immutable. Changing any parameter means creating a new foundation, never editing an existing one, so every generated map can be traced to exactly what produced it.
+After face 1 a foundation is immutable. Parameter will never changed after innitial load (there might be different set of parameters for different game modes or difficulty levels - but they do NOT change durring gameplay)
 
 Many foundations can coexist in storage (e.g. to compare maps side by side in phase 1). A playthrough references exactly one foundation, and the game is modelled as single-player per foundation.
 
 The world of a foundation is unbounded. Regions are not fixed up front, they come into existence lazily as play moves outward.
 
 #### Parameter Set
-An immutable set of all map and world parameters. Referenced by a foundation.
+An immutable set of all map and world parameters. Referenced by a foundation. Can be json files or exported/loaded from json files.
 
 #### Derived and Authored data
 All generated data belongs to one of two classes:
 
 * Derived data is a pure function of the foundation (seed + parameter set + generator version). Regions, zones, patches, rivers, biomes, resources, prospects and all Stubs are derived. The database is only a cache of derived data - it can be evicted and recomputed with an identical result.
-* Authored data comes from an LLM or a diffusion model. It cannot be reproduced, so it is stored as the source of truth and is never regenerated or evicted.
+* Authored data comes from an LLM or a diffusion model. It cost to produced, so it is stored as the source of truth and is never regenerated or evicted.
 
 #### Randomness
 There is no shared random stream. Every generation step seeds itself from a hash of (foundation seed, entity identity, purpose). A region gets the same result whether it is generated first or thousandth, so generation is independent of the order the player explores in.
@@ -76,6 +75,7 @@ A Cell is the Voronoi site fixed when the region is Sited, and its path never ch
 
 * A Zone is one or more zone cells. It has the identity of its surviving cell (see Zone and Patch transformation). The indices of absorbed zone cells are retired, so there can be gaps.
 * A Patch keeps the identity from its original zone cell, also when that zone cell has been absorbed by another zone. The patch refers to the zone it currently belongs to.
+* Initial merging (for gameplay the merged cells are considered to to be one large cell) of zone and patch cells are posible. This is to give greater variation in size and form.
 
 This lets player state and authored data point at derived data that may be evicted and recomputed, and it makes a Stub addressable before it is Realised.
 
@@ -107,10 +107,6 @@ Stub → Pending → Realised
 * Realised adds the authored presentation only: name, biography and portrait. Authored data must not contradict the Stub.
 
 Text and portrait are tracked separately, so a person can be shown with a name and biography before the picture arrives. A city can exist with a population count long before any individual in it is authored.
-
-#### Migration
-
-Migration is not coved yet
 
 #### Region
 The map is structured in large regions the size of Middle Ages European kingdoms (approximately 100-200km x 100-200km). The regions are divided into zones (approximately 8-12 zones per region). The zones are divided into patches (approximately 8-18 patches per zone).
@@ -156,6 +152,8 @@ The fourth step is patch merger.
 A number of patches in each zone merge with a neighboring patch in the same zone - This is to give greater variation in patch size and form.
 
 The patch merger is the first step of the Detailed stage. It runs when the zones are final, and only within a zone as it is after the zone mergers. Ocean zones keep their patch cells, but they skip patch merger, biomes and land resources - their patches only carry sea resources (e.g. fish).
+
+Se the docs/map-generation.md for details of the zone and Patch transformation
 
 #### Sea
 A sea is a connected set of ocean zones. It can span several regions. An ocean seed that never links gives an enclosed sea inside one region.
