@@ -233,7 +233,7 @@ public class CellMapTests
         for (var t = 0; t < 2000; t++)
         {
             var p = new WorldPoint((rng.Next() - 0.5) * 4e6, (rng.Next() - 0.5) * 4e6);
-            Assert.InRange(fields.InitialTemperature(p), -10, 30);
+            Assert.InRange(fields.InitialTemperature(p), -16, 30);
             Assert.InRange(fields.Precipitation(p), 100, 12000);
             Assert.InRange(fields.Sample(FieldKind.Prosperity, p), 1, 100);
             Assert.InRange(fields.Sample(FieldKind.Supernatural, p), 0, 100);
@@ -562,6 +562,78 @@ public class WorldTests
                 Assert.Equal(plain.Sample(FieldKind.Prosperity, p), warped.Sample(FieldKind.Prosperity, p));
             }
         Assert.True(moved > 400);
+    }
+
+    [Fact]
+    public void Cold_steppe_takes_the_steppe_and_sub_humid_classes_of_the_boreal_belt()
+    {
+        var rules = new Gameworld.Generation.Biomes.BiomeRules(ParameterSet.Default.Elevation.Biomes);
+        Biome At(double temperatureC, double precipitationMm) =>
+            rules.Classify(temperatureC, precipitationMm, 0, ElevationType.Lowland, coastal: false, riverPoor: false).Biome;
+
+        // At 0 °C the dryness threshold is 140 mm/yr: desert below 70, steppe to 280, forest above.
+        Assert.Equal(Biome.ColdDesert, At(0, 60));
+        Assert.Equal(Biome.ColdSteppe, At(0, 100));
+        Assert.Equal(Biome.ColdSteppe, At(0, 200));
+        Assert.Equal(Biome.BorealForest, At(0, 300));
+        // The temperate belt keeps its own sub-humid biome.
+        Assert.Equal(Biome.WoodlandAndShrubland, At(10, 500));
+    }
+
+    [Fact]
+    public void A_distribution_gives_each_share_of_the_map_its_value()
+    {
+        var parameters = ParameterSet.Default.Fields;
+        var fields = World.Create("cellgen").Fields;
+        foreach (var kind in new[] { FieldKind.InitialTemperature, FieldKind.Precipitation })
+        {
+            var points = parameters[kind].Distribution;
+            Assert.NotEmpty(points);
+            var below = new int[points.Count];
+            var samples = 0;
+            for (double y = -2e6; y < 2e6; y += 10000)
+                for (double x = -2e6; x < 2e6; x += 10000)
+                {
+                    var value = fields.Sample(kind, x, y);
+                    Assert.InRange(value, parameters[kind].Min, parameters[kind].Max);
+                    for (var k = 0; k < points.Count; k++)
+                        if (value < points[k].Value) below[k]++;
+                    samples++;
+                }
+            // The shares hold over a large area: here 4000 km × 4000 km of one seed.
+            for (var k = 0; k < points.Count; k++)
+                Assert.InRange((double)below[k] / samples, points[k].Share - 0.04, points[k].Share + 0.04);
+        }
+    }
+
+    [Fact]
+    public void A_distribution_reshapes_a_field_without_moving_its_highs_and_lows()
+    {
+        var shaped = World.Create("cellgen").Fields;
+        var bell = World.Create("cellgen", ParameterSet.Default with
+        {
+            Fields = ParameterSet.Default.Fields with
+            {
+                InitialTemperature = ParameterSet.Default.Fields.InitialTemperature with { Distribution = [] },
+                Precipitation = ParameterSet.Default.Fields.Precipitation with { Distribution = [] },
+            },
+        }).Fields;
+
+        var rng = new Sfc32(11);
+        var changed = 0;
+        for (var t = 0; t < 2000; t++)
+        {
+            var a = new WorldPoint((rng.Next() - 0.5) * 4e6, (rng.Next() - 0.5) * 4e6);
+            var b = new WorldPoint((rng.Next() - 0.5) * 4e6, (rng.Next() - 0.5) * 4e6);
+            foreach (var kind in new[] { FieldKind.InitialTemperature, FieldKind.Precipitation })
+            {
+                // The point with the higher value is the same one under both: the order is kept.
+                var order = bell.Sample(kind, a).CompareTo(bell.Sample(kind, b));
+                if (order != 0) Assert.Equal(order, Math.Sign(shaped.Sample(kind, a).CompareTo(shaped.Sample(kind, b)) + order));
+                if (Math.Abs(shaped.Sample(kind, a) - bell.Sample(kind, a)) > 1e-9) changed++;
+            }
+        }
+        Assert.True(changed > 3000);
     }
 
     [Fact]

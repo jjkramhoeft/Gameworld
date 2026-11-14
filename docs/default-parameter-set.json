@@ -58,7 +58,7 @@
       "PullPower": "Normal",
       "Inertia": 0,
       "SkipCoastalPatchCells": true,
-      "RiverPoorPrecipitationCutoffMm": 1660
+      "RiverPoorPrecipitationCutoffMm": 1470
     },
     "Lakes": {
       "Frequency": 0.06,
@@ -165,17 +165,57 @@
       "Min": 100,
       "Max": 12000,
       "WarpKm": 200,
-      "WarpFeatureSizeKm": 500
+      "WarpFeatureSizeKm": 500,
+      "Distribution": [
+        {
+          "Share": 0.05,
+          "Value": 150
+        },
+        {
+          "Share": 0.12,
+          "Value": 350
+        },
+        {
+          "Share": 0.43,
+          "Value": 700
+        },
+        {
+          "Share": 0.66,
+          "Value": 1400
+        },
+        {
+          "Share": 0.88,
+          "Value": 2800
+        }
+      ]
     },
     "InitialTemperature": {
       "FeatureSizeKm": 110,
       "Octaves": 2,
       "Lacunarity": 2,
       "Gain": 0.5,
-      "Min": -10,
+      "Min": -16,
       "Max": 30,
       "WarpKm": 300,
-      "WarpFeatureSizeKm": 800
+      "WarpFeatureSizeKm": 800,
+      "Distribution": [
+        {
+          "Share": 0.055,
+          "Value": -10
+        },
+        {
+          "Share": 0.09,
+          "Value": -3
+        },
+        {
+          "Share": 0.21,
+          "Value": 3
+        },
+        {
+          "Share": 0.59,
+          "Value": 18
+        }
+      ]
     },
     "Prosperity": {
       "FeatureSizeKm": 200,
@@ -185,7 +225,8 @@
       "Min": 1,
       "Max": 100,
       "WarpKm": 0,
-      "WarpFeatureSizeKm": 200
+      "WarpFeatureSizeKm": 200,
+      "Distribution": []
     },
     "Supernatural": {
       "FeatureSizeKm": 10,
@@ -195,7 +236,8 @@
       "Min": 0,
       "Max": 100,
       "WarpKm": 0,
-      "WarpFeatureSizeKm": 200
+      "WarpFeatureSizeKm": 200,
+      "Distribution": []
     }
   },
   "Bedrocks": [

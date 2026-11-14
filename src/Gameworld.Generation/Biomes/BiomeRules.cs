@@ -107,7 +107,7 @@ public sealed class BiomeRules
         ThermalBelt.Boreal => moisture switch
         {
             MoistureClass.Desert => Biome.ColdDesert,
-            MoistureClass.Steppe => Biome.ColdSteppe,
+            MoistureClass.Steppe or MoistureClass.SubHumid => Biome.ColdSteppe,
             _ => Biome.BorealForest,
         },
         ThermalBelt.Temperate => moisture switch

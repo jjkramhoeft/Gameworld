@@ -239,7 +239,7 @@ public sealed record RiverParameters
     public bool SkipCoastalPatchCells { get; init; } = true;
 
     [Description("A flat zone whose site gets less precipitation than this, in mm/yr, is river-poor: its patch cells get 0 or 1 attractor instead of the full number, it is drier for the biomes and it holds no lakes. Higher makes more of the flat zones dry plains (§10.1).")]
-    public double RiverPoorPrecipitationCutoffMm { get; init; } = 1660;
+    public double RiverPoorPrecipitationCutoffMm { get; init; } = 1470;
 }
 
 public sealed record LakeParameters
@@ -406,11 +406,17 @@ public sealed record TravelParameters
 /// <summary>The four Fields. They have no generation stage.</summary>
 public sealed record FieldsParameters
 {
-    [Description("Precipitation in mm/yr, on a logarithmic scale: the middle of the range is √(Min · Max), so most of the map is dry to moderate and only a few places are very wet. Warped into belts. Feeds the biomes and thins the rivers of dry flat zones (§9).")]
-    public FieldParameters Precipitation { get; init; } = new(80, 2, 2.2, 0.55, 100, 12000, 200, 500);
+    [Description("Precipitation in mm/yr, on a logarithmic scale. Its Distribution spreads the moisture classes of the biomes evenly: the points lie near the bounds between desert, steppe, sub-humid, humid and wet. Warped into belts. Feeds the biomes and thins the rivers of dry flat zones (§9, §13.2).")]
+    public FieldParameters Precipitation { get; init; } = new(80, 2, 2.2, 0.55, 100, 12000, 200, 500)
+    {
+        Distribution = [new(0.05, 150), new(0.12, 350), new(0.43, 700), new(0.66, 1400), new(0.88, 2800)],
+    };
 
-    [Description("Initial Temperature in °C at sea level, on a linear scale, warped into belts. It is cooled by the height of the patch for the biomes (§9, §13.1).")]
-    public FieldParameters InitialTemperature { get; init; } = new(110, 2, 2, 0.5, -10, 30, 300, 800);
+    [Description("Initial Temperature in °C at sea level, on a linear scale, warped into belts. It is cooled by the height of the patch for the biomes. Its Distribution has one point at each bound between two thermal belts, so the shares are the shares of the belts at sea level (§9, §13.1, §13.2).")]
+    public FieldParameters InitialTemperature { get; init; } = new(110, 2, 2, 0.5, -16, 30, 300, 800)
+    {
+        Distribution = [new(0.055, -10), new(0.09, -3), new(0.21, 3), new(0.59, 18)],
+    };
 
     [Description("Prosperity index, on a linear scale. Feeds the resources (it boosts the valuable ones) and the Prospect scores (§9).")]
     public FieldParameters Prosperity { get; init; } = new(200, 3, 2, 0.5, 1, 100);
@@ -436,7 +442,16 @@ public sealed record FieldParameters(
     [property: Description("The value at the strongest lows of the noise. At least 1 for the logarithmic Precipitation field.")] double Min,
     [property: Description("The value at the strongest highs of the noise. Only the strongest highs and lows reach Min and Max.")] double Max,
     [property: Description("Strength of the warp in km: about the furthest the position the field is read at is moved. A warp of a few feature sizes draws the round features of the noise out into winding belts. 0 turns the warp off.")] double WarpKm = 0,
-    [property: Description("Size of the features of the warp noise in km: larger gives longer, straighter belts. Only used when WarpKm is above 0.")] double WarpFeatureSizeKm = 200);
+    [property: Description("Size of the features of the warp noise in km: larger gives longer, straighter belts. Only used when WarpKm is above 0.")] double WarpFeatureSizeKm = 200)
+{
+    [Description("How the values are spread over the map: each point gives the share of the map that lies below a value. Min is the point at share 0 and Max the point at share 1, and a monotone spline runs through the points (through the logarithm of the values for Precipitation). The shares hold over a large area; a single view of the map can differ. Empty gives the bell shape of the noise: half the map lies in the middle quarter of the range between Min and Max (§9).")]
+    public IReadOnlyList<FieldShare> Distribution { get; init; } = [];
+}
+
+[Description("One point of the distribution of a field: the share of the map that lies below a value.")]
+public sealed record FieldShare(
+    [property: Description("Share of the map that lies below the value: above 0 and below 1. A point outside that is ignored.")][property: Range(0, 1)] double Share,
+    [property: Description("The value, in the unit of the field. Between Min and Max, and the values rise with the shares.")] double Value);
 
 /// <summary>A bedrock type and its weight under each elevation type.</summary>
 [Description("A bedrock type and its weight under each elevation type.")]

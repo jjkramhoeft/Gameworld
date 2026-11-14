@@ -310,7 +310,7 @@
             "RiverPoorPrecipitationCutoffMm": {
               "description": "A flat zone whose site gets less precipitation than this, in mm/yr, is river-poor: its patch cells get 0 or 1 attractor instead of the full number, it is drier for the biomes and it holds no lakes. Higher makes more of the flat zones dry plains (§10.1).",
               "type": "number",
-              "default": 1660
+              "default": 1470
             }
           },
           "additionalProperties": false
@@ -633,7 +633,7 @@
       "type": "object",
       "properties": {
         "Precipitation": {
-          "description": "Precipitation in mm/yr, on a logarithmic scale: the middle of the range is √(Min · Max), so most of the map is dry to moderate and only a few places are very wet. Warped into belts. Feeds the biomes and thins the rivers of dry flat zones (§9).",
+          "description": "Precipitation in mm/yr, on a logarithmic scale. Its Distribution spreads the moisture classes of the biomes evenly: the points lie near the bounds between desert, steppe, sub-humid, humid and wet. Warped into belts. Feeds the biomes and thins the rivers of dry flat zones (§9, §13.2).",
           "type": "object",
           "properties": {
             "FeatureSizeKm": {
@@ -675,6 +675,31 @@
               "description": "Size of the features of the warp noise in km: larger gives longer, straighter belts. Only used when WarpKm is above 0.",
               "type": "number",
               "default": 500
+            },
+            "Distribution": {
+              "description": "How the values are spread over the map: each point gives the share of the map that lies below a value. Min is the point at share 0 and Max the point at share 1, and a monotone spline runs through the points (through the logarithm of the values for Precipitation). The shares hold over a large area; a single view of the map can differ. Empty gives the bell shape of the noise: half the map lies in the middle quarter of the range between Min and Max (§9).",
+              "type": "array",
+              "items": {
+                "description": "One point of the distribution of a field: the share of the map that lies below a value.",
+                "type": "object",
+                "properties": {
+                  "Share": {
+                    "description": "Share of the map that lies below the value: above 0 and below 1. A point outside that is ignored.",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "Value": {
+                    "description": "The value, in the unit of the field. Between Min and Max, and the values rise with the shares.",
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "Share",
+                  "Value"
+                ],
+                "additionalProperties": false
+              }
             }
           },
           "required": [
@@ -688,7 +713,7 @@
           "additionalProperties": false
         },
         "InitialTemperature": {
-          "description": "Initial Temperature in °C at sea level, on a linear scale, warped into belts. It is cooled by the height of the patch for the biomes (§9, §13.1).",
+          "description": "Initial Temperature in °C at sea level, on a linear scale, warped into belts. It is cooled by the height of the patch for the biomes. Its Distribution has one point at each bound between two thermal belts, so the shares are the shares of the belts at sea level (§9, §13.1, §13.2).",
           "type": "object",
           "properties": {
             "FeatureSizeKm": {
@@ -714,7 +739,7 @@
             "Min": {
               "description": "The value at the strongest lows of the noise. At least 1 for the logarithmic Precipitation field.",
               "type": "number",
-              "default": -10
+              "default": -16
             },
             "Max": {
               "description": "The value at the strongest highs of the noise. Only the strongest highs and lows reach Min and Max.",
@@ -730,6 +755,31 @@
               "description": "Size of the features of the warp noise in km: larger gives longer, straighter belts. Only used when WarpKm is above 0.",
               "type": "number",
               "default": 800
+            },
+            "Distribution": {
+              "description": "How the values are spread over the map: each point gives the share of the map that lies below a value. Min is the point at share 0 and Max the point at share 1, and a monotone spline runs through the points (through the logarithm of the values for Precipitation). The shares hold over a large area; a single view of the map can differ. Empty gives the bell shape of the noise: half the map lies in the middle quarter of the range between Min and Max (§9).",
+              "type": "array",
+              "items": {
+                "description": "One point of the distribution of a field: the share of the map that lies below a value.",
+                "type": "object",
+                "properties": {
+                  "Share": {
+                    "description": "Share of the map that lies below the value: above 0 and below 1. A point outside that is ignored.",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "Value": {
+                    "description": "The value, in the unit of the field. Between Min and Max, and the values rise with the shares.",
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "Share",
+                  "Value"
+                ],
+                "additionalProperties": false
+              }
             }
           },
           "required": [
@@ -785,6 +835,32 @@
               "description": "Size of the features of the warp noise in km: larger gives longer, straighter belts. Only used when WarpKm is above 0.",
               "type": "number",
               "default": 200
+            },
+            "Distribution": {
+              "description": "How the values are spread over the map: each point gives the share of the map that lies below a value. Min is the point at share 0 and Max the point at share 1, and a monotone spline runs through the points (through the logarithm of the values for Precipitation). The shares hold over a large area; a single view of the map can differ. Empty gives the bell shape of the noise: half the map lies in the middle quarter of the range between Min and Max (§9).",
+              "type": "array",
+              "items": {
+                "description": "One point of the distribution of a field: the share of the map that lies below a value.",
+                "type": "object",
+                "properties": {
+                  "Share": {
+                    "description": "Share of the map that lies below the value: above 0 and below 1. A point outside that is ignored.",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "Value": {
+                    "description": "The value, in the unit of the field. Between Min and Max, and the values rise with the shares.",
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "Share",
+                  "Value"
+                ],
+                "additionalProperties": false
+              },
+              "default": []
             }
           },
           "required": [
@@ -840,6 +916,32 @@
               "description": "Size of the features of the warp noise in km: larger gives longer, straighter belts. Only used when WarpKm is above 0.",
               "type": "number",
               "default": 200
+            },
+            "Distribution": {
+              "description": "How the values are spread over the map: each point gives the share of the map that lies below a value. Min is the point at share 0 and Max the point at share 1, and a monotone spline runs through the points (through the logarithm of the values for Precipitation). The shares hold over a large area; a single view of the map can differ. Empty gives the bell shape of the noise: half the map lies in the middle quarter of the range between Min and Max (§9).",
+              "type": "array",
+              "items": {
+                "description": "One point of the distribution of a field: the share of the map that lies below a value.",
+                "type": "object",
+                "properties": {
+                  "Share": {
+                    "description": "Share of the map that lies below the value: above 0 and below 1. A point outside that is ignored.",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "Value": {
+                    "description": "The value, in the unit of the field. Between Min and Max, and the values rise with the shares.",
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "Share",
+                  "Value"
+                ],
+                "additionalProperties": false
+              },
+              "default": []
             }
           },
           "required": [

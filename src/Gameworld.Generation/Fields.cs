@@ -6,7 +6,9 @@ namespace Gameworld.Generation;
 /// <summary>
 /// The four Fields (map-generation.md section 9): stateless functions of foundation and
 /// coordinate. Each is an independent Perlin fBm stretched to a [min, max] range, read at a
-/// position that a warp noise has moved, which draws the features out into belts.
+/// position that a warp noise has moved, which draws the features out into belts. A field with
+/// a distribution spreads its values over the map as its points say, instead of in the bell
+/// shape of the noise.
 /// </summary>
 public sealed class Fields
 {
@@ -52,6 +54,7 @@ public sealed class Fields
         private readonly double _warp, _warpF;
         private readonly bool _log;
         private readonly double _lnMin, _lnMax;
+        private readonly MonotoneSpline? _distribution;
 
         public Field(uint seed, FieldParameters p, bool logarithmic)
         {
@@ -81,7 +84,19 @@ public sealed class Fields
                 amp *= p.Gain;
             }
             _spread = sum / Math.Sqrt(sumSq);
+
+            // The distribution: the value at every share of the map, from Min at 0 to Max at 1.
+            var low = Math.Min(Min, Max);
+            var high = Math.Max(Min, Max);
+            var points = new List<(double X, double Y)> { (0, Scale(Min)) };
+            foreach (var q in p.Distribution)
+                if (q.Share > 0 && q.Share < 1)
+                    points.Add((q.Share, Scale(Math.Clamp(q.Value, low, high))));
+            points.Add((1, Scale(Max)));
+            if (points.Count > 2) _distribution = new MonotoneSpline(points);
         }
+
+        private double Scale(double value) => _log ? DetMath.Ln(Math.Max(1, value)) : value;
 
         public double Min { get; }
         public double Max { get; }
@@ -98,11 +113,33 @@ public sealed class Fields
             }
             var n = Noise.PerlinFbm(_seed, x * _f, y * _f, _octaves, _lacunarity, _gain);
             n *= _spread;
+            if (_distribution != null)
+            {
+                // The share of the map with a lower noise value, then the value the distribution gives that share.
+                var d = _distribution.Evaluate(NormalShare(n / NoiseSd));
+                return Math.Clamp(_log ? DetMath.Exp(d) : d, Math.Min(Min, Max), Math.Max(Min, Max));
+            }
             n = Math.Clamp(n / 0.8, -1, 1);
             var t = (n + 1) / 2;
             if (!_log) return Min + t * (Max - Min);
             var v = DetMath.Exp(_lnMin + t * (_lnMax - _lnMin));
             return Math.Clamp(v, Math.Min(Min, Max), Math.Max(Min, Max));
+        }
+
+        /// <summary>The standard deviation of the noise after the spread: it is close to a normal distribution.</summary>
+        private const double NoiseSd = 0.305;
+
+        /// <summary>
+        /// The share of a normal distribution below z (Abramowitz &amp; Stegun 7.1.26, within 2·10⁻⁷),
+        /// built on the deterministic exp.
+        /// </summary>
+        private static double NormalShare(double z)
+        {
+            var x = Math.Abs(z) * 0.7071067811865476; // |z| / √2
+            var k = 1 / (1 + 0.3275911 * x);
+            var poly = ((((1.061405429 * k - 1.453152027) * k + 1.421413741) * k - 0.284496736) * k + 0.254829592) * k;
+            var tail = 0.5 * poly * DetMath.Exp(-x * x);
+            return z < 0 ? tail : 1 - tail;
         }
     }
 }

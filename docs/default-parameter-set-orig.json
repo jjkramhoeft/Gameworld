@@ -1,0 +1,293 @@
+{
+  "$schema": "./parameter-set.schema.json",
+  "Siting": {
+    "RegionGridSizeKm": 128,
+    "RegionJitter": 1,
+    "ZoneGridSizeKm": 32,
+    "ZoneJitter": 1,
+    "ZoneWarp": 0,
+    "ZoneWarpFrequency": 0.6,
+    "PatchGridSizeKm": 8,
+    "PatchJitter": 1,
+    "PatchWarp": 0.26,
+    "PatchWarpFrequency": 0.33,
+    "NestLevels": true,
+    "OceanSeedsPerRegion": {
+      "Min": 0,
+      "Max": 2
+    },
+    "ElevationWeights": {
+      "FlatLand": 5,
+      "Lowland": 6,
+      "Hills": 1,
+      "Mountains": 1
+    }
+  },
+  "Outline": {
+    "OceanLinkChance": 0.4,
+    "OceanDoubleLinkChance": 0.05,
+    "OceanLinkRangeRegions": 2,
+    "OceanExpansionFrom": "Linked",
+    "OceanExpansionPasses": 1,
+    "OceanExpansionWeights": [
+      23,
+      33,
+      33,
+      10
+    ],
+    "ZoneMergersPerRegion": {
+      "Min": 2,
+      "Max": 4
+    },
+    "MergeAcrossCoast": false
+  },
+  "Detail": {
+    "PatchMergersPerZoneCell": {
+      "Min": 2,
+      "Max": 4
+    },
+    "Rivers": {
+      "AttractorsPerPatchCell": 10,
+      "StepKm": 1,
+      "InfluenceKm": 47.8,
+      "KillKm": 5,
+      "RandomMotion": 0.4,
+      "Wander": 0.23,
+      "PerceptionConeDegrees": 120,
+      "MainStemDominance": 0.24,
+      "PullPower": "Normal",
+      "Inertia": 0,
+      "SkipCoastalPatchCells": true,
+      "RiverPoorPrecipitationCutoffMm": 1660
+    },
+    "Lakes": {
+      "Frequency": 0.06,
+      "MinSizeKm": 1.5,
+      "MaxSizeKm": 5
+    }
+  },
+  "Elevation": {
+    "HeightMap": {
+      "ResolutionM": 1000,
+      "ChannelSlope": 0.01,
+      "Concavity": 0.4375,
+      "HillslopeMultiplier": 1,
+      "LevelFlatZones": 1,
+      "MountainBelts": 0.5,
+      "RegionRidgeM": 80,
+      "BasinDivideM": 30,
+      "DetailNoise": 1,
+      "ChannelDepthM": 3,
+      "SeaDepthM": 300,
+      "Hillslope": {
+        "FlatLand": 0.006,
+        "Lowland": 0.06,
+        "Hills": 0.15,
+        "Mountains": 0.277
+      },
+      "RiverGradientFactor": {
+        "FlatLand": 0.7,
+        "Lowland": 1,
+        "Hills": 1.8,
+        "Mountains": 3
+      },
+      "Floodplain": {
+        "Points": [
+          {
+            "BedHeightM": 0,
+            "HalfWidthM": 400
+          },
+          {
+            "BedHeightM": 100,
+            "HalfWidthM": 200
+          },
+          {
+            "BedHeightM": 400,
+            "HalfWidthM": 90
+          },
+          {
+            "BedHeightM": 1000,
+            "HalfWidthM": 30
+          }
+        ],
+        "ScaleWithRiverSize": true
+      }
+    },
+    "Biomes": {
+      "Cooling": [
+        {
+          "HeightM": 0,
+          "CoolingC": 0
+        },
+        {
+          "HeightM": 200,
+          "CoolingC": 1
+        },
+        {
+          "HeightM": 400,
+          "CoolingC": 5
+        },
+        {
+          "HeightM": 900,
+          "CoolingC": 11
+        },
+        {
+          "HeightM": 1250,
+          "CoolingC": 20
+        }
+      ],
+      "RiverPoorPrecipitationFactor": 0.2,
+      "MangroveMinTemperatureC": 20,
+      "MangroveMinAridity": 0.5
+    }
+  },
+  "Planning": {
+    "ProspectsPerRegion": 20,
+    "CityProspectsPerRegion": 4,
+    "SpacingKm": 20,
+    "Weights": {
+      "Resources": 0.3,
+      "Geography": 0.15,
+      "Trade": 0.25,
+      "Climate": 0.15,
+      "Prosperity": 0.15
+    }
+  },
+  "Travel": {
+    "MinProspectScore": 59
+  },
+  "Fields": {
+    "Precipitation": {
+      "FeatureSizeKm": 80,
+      "Octaves": 2,
+      "Lacunarity": 2.2,
+      "Gain": 0.55,
+      "Min": 100,
+      "Max": 12000,
+      "WarpKm": 200,
+      "WarpFeatureSizeKm": 500
+    },
+    "InitialTemperature": {
+      "FeatureSizeKm": 110,
+      "Octaves": 2,
+      "Lacunarity": 2,
+      "Gain": 0.5,
+      "Min": -10,
+      "Max": 30,
+      "WarpKm": 300,
+      "WarpFeatureSizeKm": 800
+    },
+    "Prosperity": {
+      "FeatureSizeKm": 200,
+      "Octaves": 3,
+      "Lacunarity": 2,
+      "Gain": 0.5,
+      "Min": 1,
+      "Max": 100,
+      "WarpKm": 0,
+      "WarpFeatureSizeKm": 200
+    },
+    "Supernatural": {
+      "FeatureSizeKm": 10,
+      "Octaves": 3,
+      "Lacunarity": 2,
+      "Gain": 0.5,
+      "Min": 0,
+      "Max": 100,
+      "WarpKm": 0,
+      "WarpFeatureSizeKm": 200
+    }
+  },
+  "Bedrocks": [
+    {
+      "Id": "shield",
+      "Name": "Crystalline shield",
+      "Weights": {
+        "FlatLand": 20,
+        "Lowland": 20,
+        "Hills": 20,
+        "Mountains": 10
+      }
+    },
+    {
+      "Id": "foldBelt",
+      "Name": "Fold belt",
+      "Weights": {
+        "FlatLand": 0,
+        "Lowland": 5,
+        "Hills": 30,
+        "Mountains": 40
+      }
+    },
+    {
+      "Id": "granite",
+      "Name": "Granite intrusion",
+      "Weights": {
+        "FlatLand": 0,
+        "Lowland": 3,
+        "Hills": 15,
+        "Mountains": 20
+      }
+    },
+    {
+      "Id": "volcanic",
+      "Name": "Volcanic arc",
+      "Weights": {
+        "FlatLand": 0,
+        "Lowland": 2,
+        "Hills": 10,
+        "Mountains": 30
+      }
+    },
+    {
+      "Id": "basalt",
+      "Name": "Flood basalt",
+      "Weights": {
+        "FlatLand": 10,
+        "Lowland": 10,
+        "Hills": 15,
+        "Mountains": 5
+      }
+    },
+    {
+      "Id": "ophiolite",
+      "Name": "Ophiolite",
+      "Weights": {
+        "FlatLand": 0,
+        "Lowland": 2,
+        "Hills": 10,
+        "Mountains": 15
+      }
+    },
+    {
+      "Id": "carbonate",
+      "Name": "Carbonate platform",
+      "Weights": {
+        "FlatLand": 15,
+        "Lowland": 30,
+        "Hills": 30,
+        "Mountains": 15
+      }
+    },
+    {
+      "Id": "clastic",
+      "Name": "Clastic basin",
+      "Weights": {
+        "FlatLand": 40,
+        "Lowland": 40,
+        "Hills": 20,
+        "Mountains": 5
+      }
+    },
+    {
+      "Id": "alluvium",
+      "Name": "Unconsolidated cover",
+      "Weights": {
+        "FlatLand": 60,
+        "Lowland": 40,
+        "Hills": 0,
+        "Mountains": 0
+      }
+    }
+  ]
+}

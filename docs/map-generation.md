@@ -516,11 +516,12 @@ Stage: none, the fields can be sampled at any time.
 Four scalar fields are defined over the plane. Each is an
 independent Perlin fBm stretched to a `[min, max]` range. They do not depend on the map.
 The two climate fields are warped: the fBm is read at a position that a second noise has
-moved, which draws its round features out into winding belts.
+moved, which draws its round features out into winding belts. They also have a
+distribution (9.1), which says what share of the map lies below a value.
 
 | Field | Seed | Feature size | Octaves | Lacunarity | Gain | Min | Max | Scale | Warp | Warp feature size |
 |---|---|---|---|---|---|---|---|---|---|---|
-| Initial Temperature (°C, at sea level) | `seed XOR 0x7e3a11c5` | 110 km | 2 | 2 | 0.5 | −10 | 30 | linear | 300 km | 800 km |
+| Initial Temperature (°C, at sea level) | `seed XOR 0x7e3a11c5` | 110 km | 2 | 2 | 0.5 | −16 | 30 | linear | 300 km | 800 km |
 | Precipitation (mm/yr) | `seed XOR 0x2b9d40f3` | 80 km | 2 | 2.2 | 0.55 | 100 | 12000 | logarithmic | 200 km | 500 km |
 | Prosperity (index) | `seed XOR 0x5c1f86a9` | 200 km | 3 | 2 | 0.5 | 1 | 100 | linear | 0 | – |
 | Supernatural (index) | `seed XOR 0x3ad5e217` | 10 km | 3 | 2 | 0.5 | 0 | 100 | linear | 0 | – |
@@ -533,6 +534,8 @@ fieldValue(x, y):
         y = y + warp · perlinFbm(fieldSeed XOR 0x5bd1e995, u + 31.7, v − 47.3, 2, 2, 0.5)
     n = perlinFbm(fieldSeed, x / featureSize, y / featureSize)
     n = n · (Σ aₒ / √(Σ aₒ²))        # aₒ = 1, gain, gain², … : spread independent of the octave count
+    if the field has a distribution:
+        return distributed(n)        # section 9.1
     n = clamp(n / 0.8, −1, 1)        # 0.8 ≈ the 99.7th percentile of |n|
     t = (n + 1) / 2
     linear:       return min + t·(max − min)
@@ -547,13 +550,58 @@ changes faster than its feature size says, so belts can be narrower than a zone.
 climate fields have their own warp noises, so their belts do not line up. A warp of 0
 gives the plain fBm.
 
-Only the strongest highs and lows reach `min` and `max`. The log scale for precipitation
-means the middle of the range is √(100 · 12000) ≈ 1100 mm: most of the map is dry to
-moderate and only a few places are very wet.
-
 Uses: initial temperature and precipitation feed the biomes; precipitation also thins the rivers
 of dry flat zones (next section); prosperity feeds resources and Prospect scores; the
 supernatural field feeds nothing yet.
+
+### 9.1 Distribution
+
+Without a distribution the values of a field follow the bell shape of the noise: half
+the map lies in the middle quarter of the range, and only the strongest highs and lows
+reach `min` and `max`. Prosperity and Supernatural are like that.
+
+A **distribution** is a list of points `(share, value)`. Each point says what share of the
+map lies below a value. `min` is the point at share 0 and `max` the point at share 1.
+
+```
+distributed(n):
+    u = normalShare(n / 0.305)       # the share of the map with a lower noise value
+    d = spline(u)                    # monotone spline (2.4) through (0, min), the points, (1, max)
+    return clamp(d, min, max)        # logarithmic: the spline runs through ln(value); return exp(d), clamped
+
+normalShare(z):                      # the normal distribution below z (Abramowitz & Stegun 7.1.26)
+    x = |z| / √2;  k = 1 / (1 + 0.3275911·x)
+    poly = ((((1.061405429·k − 1.453152027)·k + 1.421413741)·k − 0.284496736)·k + 0.254829592)·k
+    tail = 0.5 · poly · exp(−x²)     # the deterministic exp of Appendix A
+    return z < 0 ? tail : 1 − tail
+```
+
+The noise after the spread is close to a normal distribution with standard deviation
+0.305, so `u` is the rank of the place among all places. The distribution only changes
+the value given to a rank: a place that is warmer than another stays warmer, so the belts
+keep their shape. A point whose share is not between 0 and 1 is ignored, and the values
+must rise with the shares.
+
+The two climate fields have a distribution because the bell shape starves the biomes at
+the ends of the classification (13.2): with it the tropical belt held a ninth of the land
+and the polar belt a hundredth. The points lie on the bounds of the classification, so a
+share can be read as the share of a class.
+
+| Initial Temperature | below −10 °C | below −3 °C | below 3 °C | below 18 °C |
+|---|---|---|---|---|
+| Share of the map | 5.5 % | 9 % | 21 % | 59 % |
+
+| Precipitation | below 150 mm | below 350 mm | below 700 mm | below 1400 mm | below 2800 mm |
+|---|---|---|---|---|---|
+| Share of the map | 5 % | 12 % | 43 % | 66 % | 88 % |
+
+The temperature points are the bounds of the thermal belts, so the shares are the belts
+at sea level: 5.5 % polar, 3.5 % subpolar, 12 % boreal, 38 % temperate and 41 % tropical.
+Height cooling (13.1) then moves land to the colder belts. The precipitation points are
+close to the bounds of the moisture classes in the temperate and tropical belts.
+
+The shares hold over a large area, some thousand kilometres across. One view of a few
+regions can differ by several points, because a climate belt is as large as a region.
 
 ---
 
@@ -580,7 +628,7 @@ in the sea whose branches are the rivers. Flow direction is from the leaves to t
 | Pull power | normal | every pull has equal weight |
 | Inertia | 0 | weight of the current heading |
 | Skip coast patches | on | no attractors in coastal patches |
-| Flat sparse cutoff | 1660 mm/yr | dry flat zones get few attractors |
+| Flat sparse cutoff | 1470 mm/yr | dry flat zones get few attractors |
 
 `dₖ` is raised to at least `1.05·D` and `dᵢ` to at least `1.5·D`.
 
@@ -604,7 +652,7 @@ for each zone cell drawn in the region (sorted by key), if it is land:
 ```
 
 **River-poor flat zones.** A flat zone whose site (the site of its root cell) gets less
-precipitation than the cutoff (1660 mm/yr; about two thirds of the flat zones with the
+precipitation than the cutoff (1470 mm/yr; about two thirds of the flat zones with the
 default fields) is river-poor: each of its patch cells gets 0 or 1 attractor (a coin flip
 from the patch cell's hash) instead of 10. These become the dry plains with few rivers;
 the same flag later makes them drier for the biomes and bars lakes.
@@ -1107,11 +1155,15 @@ m    = P / P_th                   # < 0.5 desert, 0.5–1 steppe, > 1 humid
 |---|---|---|---|---|---|---|
 | Polar | below −10 | Ice & snow | Ice & snow | Ice & snow | Ice & snow | Ice & snow |
 | Subpolar | −10 to −3 | Tundra | Tundra | Tundra | Tundra | Tundra |
-| Boreal | −3 to 3 | Cold desert | Cold steppe | Boreal forest | Boreal forest | Boreal forest |
+| Boreal | −3 to 3 | Cold desert | Cold steppe | Cold steppe | Boreal forest | Boreal forest |
 | Temperate | 3 to 18 | Cold desert | Grassland | Shrubland | Mixed forest (T < 10) or broadleaf forest (T ≥ 10) | Temperate rain forest |
 | Tropical | 18 and up | Hot desert | Thorn scrub | Savanna | Tropical dry forest | Tropical rain forest |
 
 The wet bound is `m = 6` in the temperate belt and `m = 4` in the tropical belt.
+
+In the boreal belt the steppe runs up to `m = 2`. The dryness threshold is low in the
+cold (140 mm/yr at 0 °C), so `m` between 1 and 2 is 140 to 280 mm/yr there: the rainfall
+of a cold steppe, too little for a closed forest.
 
 **Mangrove** overrides the table: a patch becomes mangrove when it is coastal (one of its
 patch cells has an ocean patch as neighbour), lies in a flat or lowland zone, has
@@ -1119,6 +1171,15 @@ patch cells has an ocean patch as neighbour), lies in a flat or lowland zone, ha
 
 The same classification with `T₀` in place of `T` gives the patch's **sea-level biome**,
 which the lakes use to rule out deserts without needing the height map.
+
+**Shares.** Measured at the defaults on the final biomes of 16 seeds of 5 × 5 regions, as
+shares of the land: hot desert 11 %, boreal forest 9.5 %, cold desert 8 %, woodland &
+shrubland 8 %, temperate rain forest 7 %, ice & snow 7 %, savanna 6.5 %, tropical dry
+forest 6 %, temperate broadleaf forest 6 %, tundra 5.5 %, temperate mixed forest 5.5 %,
+thorn scrub 5 %, tropical rain forest 4.5 %, temperate grassland 4.5 %, cold steppe 3 %
+and mangrove 2 %. The shares follow from the distributions of the two climate fields
+(9.1), the cooling curve and the river-poor factor. Mangrove is the smallest because it
+is bound to warm low coasts.
 
 ### 13.3 Colours
 
@@ -1726,8 +1787,9 @@ for bit-exact output:
 **Deterministic `exp`, `ln`, `sin`, `cos`.** Platform maths functions may differ in the
 last bit between machines, so the generation uses its own, built
 from `+ − × ÷`, rounding and the float's bit pattern only. Everything else in generation
-uses `+ − × ÷ √` and comparisons. They are used in four places: `exp` and `ln` for the
-log-scaled precipitation field, `ln` for the `ideal` term of the central places (15.2),
+uses `+ − × ÷ √` and comparisons. They are used in five places: `exp` and `ln` for the
+log-scaled precipitation field, `exp` for the distribution of a field (9.1), `ln` for the
+`ideal` term of the central places (15.2),
 `cos` and `sin` for the 64 lake ray directions, and `sin(2π/64)` for the lake area.
 
 ```

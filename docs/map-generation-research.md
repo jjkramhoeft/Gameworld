@@ -577,22 +577,37 @@ CHARTS catalogues 24 charts and rule tables in six lineages: Whittaker–Ricklef
 
 | Step | Adopted | Research link |
 |---|---|---|
-| Fields | Initial Temperature −10 to 30 °C (110 km features); precipitation 100–12,000 mm/yr on a log scale (80 km), so the middle is about 1,100 mm | Fields in the schemes' own units (BIOMES §7.1) |
+| Fields | Initial Temperature −16 to 30 °C (110 km features); precipitation 100–12,000 mm/yr on a log scale (80 km) | Fields in the schemes' own units (BIOMES §7.1) |
+| Distribution | Each climate field has points "this share of the map lies below this value", on the bounds of the classification: 5.5 % below −10 °C, 9 % below −3, 21 % below 3, 59 % below 18; 5 % below 150 mm, 12 % below 350, 43 % below 700, 66 % below 1,400, 88 % below 2,800 | The generator's own rule, measured (see below) |
 | Height | The mean height of the patch's land from its terrain tile; a typical height per elevation type until the tile exists (70, 140, 270, 470 m) | Step 2 of the pipeline |
 | Cooling | `T = T₀ − cooling(h)`, a monotone spline through 5 points. The defaults are (0 m, 0°), (200, 1°), (400, 5°), (900, 11°), (1250, 20°): far steeper than 6.5 °C/km, so terrain that is mostly below 1,000 m still gets cold highlands | The lapse-rate step, made a tunable curve |
 | Moisture | P, × 0.2 in a river-poor flat zone, so those zones favour desert | The generator's own rule |
 | Aridity | `m = P / max(40, 20·T + 140)` | Köppen's evenly-spread dryness threshold (BIOMES §2.3) |
 | Belts | Polar below −10 °C, subpolar to −3, boreal to 3, temperate to 18, tropical above | Holdridge-like belts; thresholds calibrated against the `plotbiomes` grid |
-| Classes | m < 0.5 desert, 0.5–1 steppe or scrub, 1–2 woodland or savanna, then forest; rain forest from m ≥ 6 (temperate) or ≥ 4 (tropical) | The belt × aridity table |
+| Classes | m < 0.5 desert, 0.5–1 steppe or scrub, 1–2 woodland or savanna, then forest; rain forest from m ≥ 6 (temperate) or ≥ 4 (tropical). In the boreal belt cold steppe runs to m = 2 | The belt × aridity table; real cold steppes get 150–350 mm/yr, which is m 1–2 at 0 °C |
 | Result | 15 land biomes, plus **mangrove** on coastal patches of flat or lowland zones with T ≥ 20 °C and m ≥ 0.5 | Azonal override, with an annual-mean test because there is no coldest-month value |
 
 The note's own caveat applies (RES §7.5): crop altitude limits from ECOCROP assume real lapse rates, so with the steep default curve crops drop out lower than their limits suggest.
+
+**Why the fields have a distribution.** Measured on the final biomes of 8 seeds of 5 × 5 regions (2026-11-14), the plain fields gave seven biomes less than 2 % of the land each: the five tropical biomes shared 11 %, ice & snow had 1.1 %, cold steppe 1.3 % and mangrove 0.6 %, while boreal forest and temperate rain forest had 17 % and 15 %. The cause is the bell shape of the noise: half the map lies in the middle quarter of a field's range, and that middle is the temperate belt. Three remedies were weighed, each scored by the smallest share among the 15 zonal biomes and by the effective number of biomes (the exponential of the entropy of the shares; 16 when all are equal, 11.3 before):
+
+| Remedy | Smallest zonal share | Effective biomes | Verdict |
+|---|---|---|---|
+| Parameters only: wider field ranges, river-poor factor, mangrove threshold | 2.0 % | 13.1 | Needs −18 to 40 °C; the tails of the bell stay thin |
+| Flatten the bell towards an even spread, with one strength per field | 2.5 % | 12.9 | Tundra grows to 16 % and the deserts to 25 %: one belt holds one biome, another five |
+| Points "share below value" on the bounds of the classification | 1.8 % (cold steppe), the next 4.3 % | 14.6 | **Adopted** |
+
+The points were fitted on 8 seeds and confirmed on 8 others. The river-poor cutoff moved from 1,660 to 1,470 mm/yr, which is the same share of the precipitation field, so the river-poor zones stayed the same (1 zone in 1,300 changed) and with them the rivers and the height map. The river-poor factor and the mangrove threshold were left as they were: the fit did not need them.
+
+**Why cold steppe runs to m = 2.** After the distribution cold steppe still held 1.8 % of the land. The dryness threshold is low in the cold, so the steppe class (m 0.5–1) is only 70 to 140 mm/yr at 0 °C, a band no precipitation spread can fill without flooding the warm belts with desert. The boreal belt had no biome of its own for the sub-humid class (m 1–2, 140 to 280 mm/yr at 0 °C) and gave it to boreal forest. That class now goes to cold steppe, which matches the rainfall of real cold steppes. Cold steppe rose to 3.1–3.4 %, boreal forest fell from 11 % to 9.5 %, and the effective number of biomes rose to 15.0.
 
 | Topic | Status |
 |---|---|
 | Aridity × thermal belt classifier; height cooling | Adopted |
 | Mangrove override | Adopted |
 | Sea-level biome per patch (finds tropical highlands) | Adopted |
+| Distribution of the climate fields by share points | Adopted |
+| Cold steppe on the sub-humid class of the boreal belt (m 1–2) | Adopted |
 | Orographic precipitation, rain shadows | Open |
 | Seasonality field; Köppen rules; Mediterranean biome | Open |
 | Alpine, flooded-grassland and fire overrides | Open |
