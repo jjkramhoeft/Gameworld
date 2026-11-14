@@ -406,11 +406,11 @@ public sealed record TravelParameters
 /// <summary>The four Fields. They have no generation stage.</summary>
 public sealed record FieldsParameters
 {
-    [Description("Precipitation in mm/yr, on a logarithmic scale: the middle of the range is √(Min · Max), so most of the map is dry to moderate and only a few places are very wet. Feeds the biomes and thins the rivers of dry flat zones (§9).")]
-    public FieldParameters Precipitation { get; init; } = new(80, 2, 2.2, 0.55, 100, 12000);
+    [Description("Precipitation in mm/yr, on a logarithmic scale: the middle of the range is √(Min · Max), so most of the map is dry to moderate and only a few places are very wet. Warped into belts. Feeds the biomes and thins the rivers of dry flat zones (§9).")]
+    public FieldParameters Precipitation { get; init; } = new(80, 2, 2.2, 0.55, 100, 12000, 200, 500);
 
-    [Description("Initial Temperature in °C at sea level, on a linear scale. It is cooled by the height of the patch for the biomes (§9, §13.1).")]
-    public FieldParameters InitialTemperature { get; init; } = new(110, 2, 2, 0.5, -10, 30);
+    [Description("Initial Temperature in °C at sea level, on a linear scale, warped into belts. It is cooled by the height of the patch for the biomes (§9, §13.1).")]
+    public FieldParameters InitialTemperature { get; init; } = new(110, 2, 2, 0.5, -10, 30, 300, 800);
 
     [Description("Prosperity index, on a linear scale. Feeds the resources (it boosts the valuable ones) and the Prospect scores (§9).")]
     public FieldParameters Prosperity { get; init; } = new(200, 3, 2, 0.5, 1, 100);
@@ -434,7 +434,9 @@ public sealed record FieldParameters(
     [property: Description("Frequency multiplier from one octave to the next.")] double Lacunarity,
     [property: Description("Amplitude multiplier from one octave to the next: lower makes the finer octaves weaker.")] double Gain,
     [property: Description("The value at the strongest lows of the noise. At least 1 for the logarithmic Precipitation field.")] double Min,
-    [property: Description("The value at the strongest highs of the noise. Only the strongest highs and lows reach Min and Max.")] double Max);
+    [property: Description("The value at the strongest highs of the noise. Only the strongest highs and lows reach Min and Max.")] double Max,
+    [property: Description("Strength of the warp in km: about the furthest the position the field is read at is moved. A warp of a few feature sizes draws the round features of the noise out into winding belts. 0 turns the warp off.")] double WarpKm = 0,
+    [property: Description("Size of the features of the warp noise in km: larger gives longer, straighter belts. Only used when WarpKm is above 0.")] double WarpFeatureSizeKm = 200);
 
 /// <summary>A bedrock type and its weight under each elevation type.</summary>
 [Description("A bedrock type and its weight under each elevation type.")]

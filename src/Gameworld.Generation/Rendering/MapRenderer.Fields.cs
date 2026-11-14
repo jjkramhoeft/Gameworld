@@ -24,8 +24,8 @@ public static partial class MapRenderer
     private static readonly (double[] Bounds, Rgb[] Colours) PrecipitationBands = (
         [250, 500, 1000, 2000, 4000, 8000],
         [
-            new(255, 255, 204), new(199, 233, 180), new(127, 205, 187), new(65, 182, 196),
-            new(29, 145, 192), new(34, 94, 168), new(12, 44, 132),
+            new(140, 81, 10), new(191, 129, 45), new(223, 194, 125), new(199, 220, 120),
+            new(127, 198, 78), new(49, 163, 60), new(0, 109, 44),
         ]);
 
     private static readonly (double[] Bounds, Rgb[] Colours) ProsperityBands = (

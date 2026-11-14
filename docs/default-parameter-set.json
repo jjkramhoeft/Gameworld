@@ -163,7 +163,9 @@
       "Lacunarity": 2.2,
       "Gain": 0.55,
       "Min": 100,
-      "Max": 12000
+      "Max": 12000,
+      "WarpKm": 200,
+      "WarpFeatureSizeKm": 500
     },
     "InitialTemperature": {
       "FeatureSizeKm": 110,
@@ -171,7 +173,9 @@
       "Lacunarity": 2,
       "Gain": 0.5,
       "Min": -10,
-      "Max": 30
+      "Max": 30,
+      "WarpKm": 300,
+      "WarpFeatureSizeKm": 800
     },
     "Prosperity": {
       "FeatureSizeKm": 200,
@@ -179,7 +183,9 @@
       "Lacunarity": 2,
       "Gain": 0.5,
       "Min": 1,
-      "Max": 100
+      "Max": 100,
+      "WarpKm": 0,
+      "WarpFeatureSizeKm": 200
     },
     "Supernatural": {
       "FeatureSizeKm": 10,
@@ -187,7 +193,9 @@
       "Lacunarity": 2,
       "Gain": 0.5,
       "Min": 0,
-      "Max": 100
+      "Max": 100,
+      "WarpKm": 0,
+      "WarpFeatureSizeKm": 200
     }
   },
   "Bedrocks": [

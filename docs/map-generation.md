@@ -515,16 +515,22 @@ Stage: none, the fields can be sampled at any time.
 
 Four scalar fields are defined over the plane. Each is an
 independent Perlin fBm stretched to a `[min, max]` range. They do not depend on the map.
+The two climate fields are warped: the fBm is read at a position that a second noise has
+moved, which draws its round features out into winding belts.
 
-| Field | Seed | Feature size | Octaves | Lacunarity | Gain | Min | Max | Scale |
-|---|---|---|---|---|---|---|---|---|
-| Initial Temperature (°C, at sea level) | `seed XOR 0x7e3a11c5` | 110 km | 2 | 2 | 0.5 | −10 | 30 | linear |
-| Precipitation (mm/yr) | `seed XOR 0x2b9d40f3` | 80 km | 2 | 2.2 | 0.55 | 100 | 12000 | logarithmic |
-| Prosperity (index) | `seed XOR 0x5c1f86a9` | 200 km | 3 | 2 | 0.5 | 1 | 100 | linear |
-| Supernatural (index) | `seed XOR 0x3ad5e217` | 10 km | 3 | 2 | 0.5 | 0 | 100 | linear |
+| Field | Seed | Feature size | Octaves | Lacunarity | Gain | Min | Max | Scale | Warp | Warp feature size |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Initial Temperature (°C, at sea level) | `seed XOR 0x7e3a11c5` | 110 km | 2 | 2 | 0.5 | −10 | 30 | linear | 300 km | 800 km |
+| Precipitation (mm/yr) | `seed XOR 0x2b9d40f3` | 80 km | 2 | 2.2 | 0.55 | 100 | 12000 | logarithmic | 200 km | 500 km |
+| Prosperity (index) | `seed XOR 0x5c1f86a9` | 200 km | 3 | 2 | 0.5 | 1 | 100 | linear | 0 | – |
+| Supernatural (index) | `seed XOR 0x3ad5e217` | 10 km | 3 | 2 | 0.5 | 0 | 100 | linear | 0 | – |
 
 ```
 fieldValue(x, y):
+    if warp > 0 and warpFeatureSize > 0:
+        u = x / warpFeatureSize;  v = y / warpFeatureSize        # both from the unmoved position
+        x = x + warp · perlinFbm(fieldSeed XOR 0x2f6b1e3d, u, v, 2, 2, 0.5)
+        y = y + warp · perlinFbm(fieldSeed XOR 0x5bd1e995, u + 31.7, v − 47.3, 2, 2, 0.5)
     n = perlinFbm(fieldSeed, x / featureSize, y / featureSize)
     n = n · (Σ aₒ / √(Σ aₒ²))        # aₒ = 1, gain, gain², … : spread independent of the octave count
     n = clamp(n / 0.8, −1, 1)        # 0.8 ≈ the 99.7th percentile of |n|
@@ -532,6 +538,14 @@ fieldValue(x, y):
     linear:       return min + t·(max − min)
     logarithmic:  return exp(ln(min) + t·(ln(max) − ln(min)))   # min and max at least 1; result clamped to [min, max]
 ```
+
+The warp is domain warping, the same idea as the border warp of the cell levels (3.2).
+`warp` is about the furthest a position is moved; a typical move is a third of it. The
+belts appear when the warp is a few feature sizes of the field, and they get longer and
+straighter as the warp feature size grows. Where the warp squeezes the plane the field
+changes faster than its feature size says, so belts can be narrower than a zone. The two
+climate fields have their own warp noises, so their belts do not line up. A warp of 0
+gives the plain fBm.
 
 Only the strongest highs and lows reach `min` and `max`. The log scale for precipitation
 means the middle of the range is √(100 · 12000) ≈ 1100 mm: most of the map is dry to
@@ -1535,7 +1549,7 @@ the pixel's world position with `cellAt` and colour it.
   | Field | Bounds | Band colours, lowest band first |
   |---|---|---|
   | Initial Temperature (°C) | −5, 0, 5, 10, 15, 20, 25 | (69, 117, 180), (116, 173, 209), (171, 217, 233), (224, 243, 248), (254, 224, 144), (253, 174, 97), (244, 109, 67), (215, 48, 39) |
-  | Precipitation (mm/yr) | 250, 500, 1000, 2000, 4000, 8000 | (255, 255, 204), (199, 233, 180), (127, 205, 187), (65, 182, 196), (29, 145, 192), (34, 94, 168), (12, 44, 132) |
+  | Precipitation (mm/yr) | 250, 500, 1000, 2000, 4000, 8000 | (140, 81, 10), (191, 129, 45), (223, 194, 125), (199, 220, 120), (127, 198, 78), (49, 163, 60), (0, 109, 44) |
   | Prosperity (index) | 20, 40, 60, 80 | (255, 255, 212), (254, 217, 142), (254, 153, 41), (217, 95, 14), (153, 52, 4) |
   | Supernatural (index) | 20, 40, 60, 80 | (254, 235, 226), (251, 180, 185), (247, 104, 161), (197, 27, 138), (122, 1, 119) |
 - **Borders**, found by comparing each pixel with its left and upper neighbour: coastline

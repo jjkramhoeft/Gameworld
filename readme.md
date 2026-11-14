@@ -216,7 +216,7 @@ Lakes are placed per region after the rivers. A lake always sits on a river, so 
 Lakes do not change the height map. They count as fresh water for resources and prospects.
 
 #### Fields
-Perlin Noise Maps that are used to drive climate, biomes and resources. They are Fields: stateless functions of foundation and coordinate that can be sampled anywhere at any time. Fields are never stored and have no generation stage - a stage only records the values it sampled.
+Perlin Noise Maps that are used to drive climate, biomes and resources. They are Fields: stateless functions of foundation and coordinate that can be sampled anywhere at any time. Fields are never stored and have no generation stage - a stage only records the values it sampled. Precipitation and Initial Temperature are warped, so their highs and lows form winding belts instead of round spots.
 * Precipitation
 * Initial Temperature
 * Prosperity

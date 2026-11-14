@@ -535,6 +535,36 @@ public class WorldTests
     }
 
     [Fact]
+    public void The_warp_moves_where_a_field_is_read_and_keeps_its_range()
+    {
+        ParameterSet With(double warpKm) => ParameterSet.Default with
+        {
+            Fields = ParameterSet.Default.Fields with
+            {
+                InitialTemperature = ParameterSet.Default.Fields.InitialTemperature with { WarpKm = warpKm },
+            },
+        };
+        var plain = World.Create("cellgen", With(0)).Fields;
+        var warped = World.Create("cellgen", With(300)).Fields;
+        var builtIn = World.Create("cellgen").Fields;
+        var range = ParameterSet.Default.Fields.InitialTemperature;
+
+        var moved = 0;
+        for (double y = 0; y < 640000; y += 16000)
+            for (double x = 0; x < 640000; x += 16000)
+            {
+                var p = new WorldPoint(x, y);
+                var t = warped.InitialTemperature(p);
+                Assert.InRange(t, range.Min, range.Max);
+                Assert.Equal(builtIn.InitialTemperature(p), t); // 300 km is the default
+                if (Math.Abs(t - plain.InitialTemperature(p)) > 1) moved++;
+                // A field without warp is the plain noise: the temperature warp does not touch it.
+                Assert.Equal(plain.Sample(FieldKind.Prosperity, p), warped.Sample(FieldKind.Prosperity, p));
+            }
+        Assert.True(moved > 400);
+    }
+
+    [Fact]
     public void A_field_band_holds_its_lower_bound_and_not_its_upper()
     {
         var bands = MapRenderer.FieldBands(FieldKind.Precipitation);

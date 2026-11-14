@@ -5,7 +5,8 @@ namespace Gameworld.Generation;
 
 /// <summary>
 /// The four Fields (map-generation.md section 9): stateless functions of foundation and
-/// coordinate. Each is an independent Perlin fBm stretched to a [min, max] range.
+/// coordinate. Each is an independent Perlin fBm stretched to a [min, max] range, read at a
+/// position that a warp noise has moved, which draws the features out into belts.
 /// </summary>
 public sealed class Fields
 {
@@ -48,6 +49,7 @@ public sealed class Fields
         private readonly double _f;
         private readonly double _octaves, _lacunarity, _gain;
         private readonly double _spread;
+        private readonly double _warp, _warpF;
         private readonly bool _log;
         private readonly double _lnMin, _lnMax;
 
@@ -59,6 +61,8 @@ public sealed class Fields
             _lacunarity = p.Lacunarity;
             _gain = p.Gain;
             _log = logarithmic;
+            _warp = p.WarpFeatureSizeKm > 0 ? Math.Max(0, p.WarpKm) * 1000 : 0;
+            _warpF = _warp > 0 ? 1 / (p.WarpFeatureSizeKm * 1000) : 0;
             Min = logarithmic ? Math.Max(1, p.Min) : p.Min;
             Max = logarithmic ? Math.Max(1, p.Max) : p.Max;
             if (logarithmic)
@@ -84,6 +88,14 @@ public sealed class Fields
 
         public double Value(double x, double y)
         {
+            if (_warp > 0)
+            {
+                // The warp moves the position the field is read at; both offsets come from the unmoved position.
+                var wx = x * _warpF;
+                var wy = y * _warpF;
+                x += _warp * Noise.PerlinFbm(_seed ^ 0x2f6b1e3du, wx, wy, 2, 2, 0.5);
+                y += _warp * Noise.PerlinFbm(_seed ^ 0x5bd1e995u, wx + 31.7, wy - 47.3, 2, 2, 0.5);
+            }
             var n = Noise.PerlinFbm(_seed, x * _f, y * _f, _octaves, _lacunarity, _gain);
             n *= _spread;
             n = Math.Clamp(n / 0.8, -1, 1);
