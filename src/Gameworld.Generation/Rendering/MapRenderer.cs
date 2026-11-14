@@ -14,6 +14,8 @@ public enum MapMode
     Biomes,
     /// <summary>A hypsometric tint of the height map.</summary>
     Height,
+    /// <summary>A blank white base, land and sea alike, for looking at the layers alone.</summary>
+    None,
 }
 
 /// <summary>The layers drawn on top of the base colour.</summary>
@@ -27,6 +29,20 @@ public sealed record MapLayers
     public bool Hillshade { get; init; } = false;
     /// <summary>Biomes mode shows the final biomes (Elevated) instead of the estimated ones (Detailed).</summary>
     public bool FinalBiomes { get; init; } = false;
+    /// <summary>The field layers: each tints the land in the bands of one field (section 9).</summary>
+    public bool InitialTemperature { get; init; } = false;
+    public bool Precipitation { get; init; } = false;
+    public bool Prosperity { get; init; } = false;
+    public bool Supernatural { get; init; } = false;
+
+    public bool Shows(FieldKind kind) => kind switch
+    {
+        FieldKind.InitialTemperature => InitialTemperature,
+        FieldKind.Precipitation => Precipitation,
+        FieldKind.Prosperity => Prosperity,
+        FieldKind.Supernatural => Supernatural,
+        _ => false,
+    };
 
     public static MapLayers None { get; } = new() { Borders = false, Rivers = false, Lakes = false };
     public static MapLayers All { get; } = new() { Prospects = true, Travel = true };
@@ -91,7 +107,8 @@ public static partial class MapRenderer
         var needHeight = mode == MapMode.Height || layers.Hillshade;
         var heights = needHeight ? HeightBuffer(world, view, info, bw, bh, margin) : null;
 
-        // Base colour.
+        // Base colour, then the field layers on the land.
+        var fields = FieldLayers(layers);
         var patchColour = new Dictionary<long, Rgb>();
         for (var y = 0; y < view.Height; y++)
             for (var x = 0; x < view.Width; x++)
@@ -102,10 +119,21 @@ public static partial class MapRenderer
                 {
                     colour = HeightColour(heights![(y + margin) * bw + x + margin]);
                 }
+                else if (mode == MapMode.None)
+                {
+                    colour = BlankColour;
+                }
                 else if (!patchColour.TryGetValue(c.PatchCell.Key, out colour))
                 {
                     colour = BaseColour(world, c, mode, layers.FinalBiomes);
                     patchColour[c.PatchCell.Key] = colour;
+                }
+                if (fields.Length > 0 && !c.Ocean)
+                {
+                    var wx = view.Left + (x + 0.5) * mpp;
+                    var wy = view.Top + (y + 0.5) * mpp;
+                    foreach (var kind in fields)
+                        colour = colour.Multiply(FieldColour(kind, world.Fields.Sample(kind, wx, wy)));
                 }
                 if (layers.Hillshade && heights != null)
                     colour = colour.Scale(Shade(heights, bw, x + margin, y + margin, mpp));

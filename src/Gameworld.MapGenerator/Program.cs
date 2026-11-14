@@ -170,7 +170,7 @@ internal sealed record Options
           --stage <stage>             Outlined, Detailed, Elevated, Planned or Settled (default Settled)
           --out <folder>              where to write (default "out")
           --scale <m/px>              metres per pixel of the maps (default 250)
-          --modes <list>              map,biomes,height (default all three)
+          --modes <list>              map,biomes,height,none (default the first three)
           --no-regions                do not write the regions as json
           --export-parameters <file>  write the default Parameter Set to a json file and stop
           --export-schema <file>      write the JSON Schema of the Parameter Set (the help text of

@@ -54,12 +54,22 @@ app.MapGet("/api/tiles/{version:int}/{z:int}/{x:int}/{y:int}.png",
         return Results.Bytes(png, "image/png");
     });
 
-// The legend of the Biomes base map: every biome with the colour the renderer draws it in.
-app.MapGet("/api/biomes", () => Results.Json(Enum.GetValues<Biome>().Select(b =>
+// The legends: every biome with the colour the renderer draws it in, and the bands of every field layer.
+app.MapGet("/api/legend", () => Results.Json(new
 {
-    var (r, g, bl) = Gameworld.Generation.Biomes.BiomeRules.Colour(b);
-    return new { Biome = b.ToString(), Colour = $"#{r:x2}{g:x2}{bl:x2}" };
-}), new JsonSerializerOptions()));
+    Biomes = Enum.GetValues<Biome>().Select(b =>
+    {
+        var (r, g, bl) = Gameworld.Generation.Biomes.BiomeRules.Colour(b);
+        return new { Biome = b.ToString(), Colour = $"#{r:x2}{g:x2}{bl:x2}" };
+    }),
+    Fields = WorldHost.FieldLayers.Select(f => new
+    {
+        f.Layer,
+        f.Name,
+        f.Unit,
+        Bands = MapRenderer.FieldBands(f.Kind).Select(b => new { b.From, b.To, Colour = $"#{b.Colour.R:x2}{b.Colour.G:x2}{b.Colour.B:x2}" }),
+    }),
+}, new JsonSerializerOptions()));
 
 app.MapGet("/api/inspect", (double x, double y, WorldHost host) => Json(host.Inspect(new WorldPoint(x, y))));
 
@@ -123,6 +133,15 @@ namespace Gameworld.Demo
             }
         }
 
+        /// <summary>The field layers: the name of the layer in a tile address, and the name and unit its legend shows.</summary>
+        public static readonly (FieldKind Kind, string Layer, string Name, string Unit)[] FieldLayers =
+        [
+            (FieldKind.InitialTemperature, "temperature", "Initial temperature", "°C"),
+            (FieldKind.Precipitation, "precipitation", "Precipitation", "mm/yr"),
+            (FieldKind.Prosperity, "prosperity", "Prosperity", "index"),
+            (FieldKind.Supernatural, "supernatural", "Supernatural", "index"),
+        ];
+
         public static MapLayers ParseLayers(string? layers)
         {
             var set = (layers ?? "borders,rivers,lakes").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
@@ -136,6 +155,10 @@ namespace Gameworld.Demo
                 Travel = set.Contains("travel"),
                 Hillshade = set.Contains("hillshade"),
                 FinalBiomes = set.Contains("final"),
+                InitialTemperature = set.Contains("temperature"),
+                Precipitation = set.Contains("precipitation"),
+                Prosperity = set.Contains("prosperity"),
+                Supernatural = set.Contains("supernatural"),
             };
         }
 
@@ -212,7 +235,12 @@ namespace Gameworld.Demo
                         score?.Score,
                         score?.Factors),
                     prospect,
-                    elevation?.Heights.Map.Sample(point));
+                    elevation?.Heights.Map.Sample(point),
+                    new FieldValues(
+                        world.Fields.Sample(FieldKind.InitialTemperature, point),
+                        world.Fields.Sample(FieldKind.Precipitation, point),
+                        world.Fields.Sample(FieldKind.Prosperity, point),
+                        world.Fields.Sample(FieldKind.Supernatural, point)));
             }
         }
     }
@@ -226,7 +254,11 @@ namespace Gameworld.Demo
         ZoneInfo Zone,
         PatchInfo? Patch,
         Prospect? Prospect,
-        double? HeightM);
+        double? HeightM,
+        FieldValues Fields);
+
+    /// <summary>The four Fields sampled at the point itself, not at the site of its patch.</summary>
+    public sealed record FieldValues(double InitialTemperatureC, double PrecipitationMm, double Prosperity, double Supernatural);
 
     public sealed record ZoneInfo(ZoneId Id, ElevationType ElevationType, string? Bedrock, string? BedrockName, int Cells, bool RiverPoor);
 

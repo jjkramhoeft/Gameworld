@@ -7,6 +7,9 @@ public readonly record struct Rgb(byte R, byte G, byte B)
 {
     public Rgb Scale(double factor) => new(Clamp(R * factor), Clamp(G * factor), Clamp(B * factor));
 
+    /// <summary>Channel by channel, as one transparent ink over another: white leaves the other colour as it is.</summary>
+    public Rgb Multiply(Rgb other) => new(Clamp(R * other.R / 255.0), Clamp(G * other.G / 255.0), Clamp(B * other.B / 255.0));
+
     public static Rgb Lerp(Rgb a, Rgb b, double t)
     {
         t = Math.Clamp(t, 0, 1);

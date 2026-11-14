@@ -506,4 +506,42 @@ public class WorldTests
         Assert.Equal((byte)'P', a[1]);
         Assert.True(a.Length > 1000);
     }
+
+    [Fact]
+    public void The_none_mode_is_white_and_a_field_layer_draws_its_band_colours_on_it()
+    {
+        var world = World.Create("cellgen");
+        var view = new MapView(128000, 128000, 1000, 96, 96);
+
+        var blank = MapRenderer.Render(world, view, MapMode.None, MapLayers.None);
+        Assert.All(blank.Pixels, b => Assert.Equal(255, b));
+
+        var layers = MapLayers.None with { InitialTemperature = true };
+        var tinted = MapRenderer.Render(world, view, MapMode.None, layers);
+        var land = 0;
+        for (var y = 0; y < view.Height; y++)
+            for (var x = 0; x < view.Width; x++)
+            {
+                var wx = view.Left + (x + 0.5) * view.MetresPerPixel;
+                var wy = view.Top + (y + 0.5) * view.MetresPerPixel;
+                var ocean = world.Cells.CellAt(wx, wy).Ocean;
+                var expected = ocean
+                    ? new Rgb(255, 255, 255)
+                    : MapRenderer.FieldColour(FieldKind.InitialTemperature, world.Fields.Sample(FieldKind.InitialTemperature, wx, wy));
+                Assert.Equal(expected, tinted.Get(x, y));
+                if (!ocean) land++;
+            }
+        Assert.True(land > 0);
+    }
+
+    [Fact]
+    public void A_field_band_holds_its_lower_bound_and_not_its_upper()
+    {
+        var bands = MapRenderer.FieldBands(FieldKind.Precipitation);
+        Assert.Null(bands[0].From);
+        Assert.Null(bands[^1].To);
+        Assert.Equal(bands[0].Colour, MapRenderer.FieldColour(FieldKind.Precipitation, 249.9));
+        Assert.Equal(bands[1].Colour, MapRenderer.FieldColour(FieldKind.Precipitation, 250));
+        Assert.Equal(bands[^1].Colour, MapRenderer.FieldColour(FieldKind.Precipitation, 12000));
+    }
 }

@@ -33,7 +33,7 @@
   button:focus-visible, input:focus-visible, textarea:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .row { display: flex; gap: 8px; align-items: center; }
   .row > input { flex: 1; }
-  .segmented { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+  .segmented { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
   .segmented label { text-align: center; padding: 6px 0; cursor: pointer; background: var(--field); border-right: 1px solid var(--line); }
   .segmented label:last-child { border-right: 0; }
   .segmented input { position: absolute; opacity: 0; }
@@ -61,13 +61,14 @@
             font: 12px ui-monospace, Consolas, monospace; pointer-events: none; }
   #zoom { position: absolute; right: 10px; top: 10px; display: grid; gap: 4px; }
   #zoom button { width: 34px; height: 34px; padding: 0; font-size: 18px; background: #fffd; color: #111; border-color: #0003; }
-  #legend { position: absolute; left: 10px; top: 10px; max-height: calc(100% - 60px); overflow-y: auto; background: var(--panel);
-            color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 0 10px; font-size: 12.5px; cursor: default;
+  #legend { position: absolute; left: 10px; top: 10px; max-height: calc(100% - 60px); overflow-y: auto; display: grid; gap: 6px;
+            justify-items: start; font-size: 12.5px; cursor: default; }
+  #legend details { background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 0 10px;
             box-shadow: 0 1px 4px #0005; }
-  #legend[hidden] { display: none; }
+  #legend details[hidden] { display: none; }
   #legend summary { margin: 7px 0; }
   #legend ul { list-style: none; margin: 0 0 8px; padding: 0; }
-  #legend li { display: flex; align-items: center; gap: 8px; padding: 1.5px 0; white-space: nowrap; }
+  #legend li { display: flex; align-items: center; gap: 8px; padding: 1.5px 0; white-space: nowrap; font-variant-numeric: tabular-nums; }
   #legend i { width: 14px; height: 14px; border-radius: 3px; border: 1px solid #0006; flex: none; }
   #scale { position: absolute; right: 10px; bottom: 10px; color: #fff; font: 12px ui-monospace, Consolas, monospace; text-align: center; pointer-events: none; }
   #scale div { height: 6px; border: 2px solid #fff; border-top: 0; margin-top: 2px; box-shadow: 0 1px 0 #0008; }
@@ -91,6 +92,7 @@
     <label><input type="radio" name="mode" value="map" checked>Map</label>
     <label><input type="radio" name="mode" value="biomes">Biomes</label>
     <label><input type="radio" name="mode" value="height">Height</label>
+    <label><input type="radio" name="mode" value="none">None</label>
   </div>
   <p class="note" id="mode-note"></p>
 
@@ -103,7 +105,12 @@
     <label><input type="checkbox" value="travel">Travel network</label>
     <label><input type="checkbox" value="hillshade">Hillshade</label>
     <label><input type="checkbox" value="final">Final biomes</label>
+    <label><input type="checkbox" value="temperature">Initial temperature</label>
+    <label><input type="checkbox" value="precipitation">Precipitation</label>
+    <label><input type="checkbox" value="prosperity">Prosperity</label>
+    <label><input type="checkbox" value="supernatural">Supernatural</label>
   </div>
+  <p class="note">The last four are the Fields. Each tints the land in the bands of its legend; on the None base map the colours are exactly those of the legend. Several fields at once mix like inks.</p>
   <p class="note">The stages are linear. Prospects take the regions in view to Planned and the travel network to Settled, both through Elevated, so the height maps are built first. Hillshade and final biomes need Elevated too.</p>
 
   <h2>Under the pointer</h2>
@@ -123,7 +130,7 @@
 <main id="map" aria-label="Map">
   <div id="tiles"></div>
   <div id="pin"></div>
-  <details id="legend" open hidden><summary>Biomes</summary><ul></ul></details>
+  <div id="legend"></div>
   <div id="zoom"><button id="zoom-in" type="button" aria-label="Zoom in">+</button><button id="zoom-out" type="button" aria-label="Zoom out">−</button></div>
   <div id="scale"><span></span><div></div></div>
   <div id="status"></div>
@@ -235,15 +242,22 @@ const modeNotes = {
   map: 'The elevation type of the zones. Rivers and lakes take the regions in view to Detailed.',
   biomes: 'The biome of each patch: estimated (Detailed stage), or final with the "Final biomes" layer (Elevated stage).',
   height: 'The height map. Each region in view is taken to the Elevated stage first, which takes a moment.',
+  none: 'A blank white base, land and sea alike, for looking at the layers alone.',
 };
 function modeChanged() {
   state.mode = document.querySelector('input[name=mode]:checked').value;
   $('mode-note').textContent = modeNotes[state.mode];
-  $('legend').hidden = state.mode !== 'biomes';
+  showLegends();
   draw();
 }
+// A legend shows while its base map or its layer is on.
+function showLegends() {
+  const on = new Set(layers().split(','));
+  for (const d of $('legend').children)
+    d.hidden = d.dataset.mode ? d.dataset.mode !== state.mode : !on.has(d.dataset.layer);
+}
 document.querySelectorAll('input[name=mode]').forEach(i => i.addEventListener('change', modeChanged));
-$('layers').addEventListener('change', draw);
+$('layers').addEventListener('change', () => { showLegends(); draw(); });
 
 // Inspect.
 const words = s => String(s).replace(/([a-z])([A-Z])/g, '$1 $2').replace(/ And /g, ' & ');
@@ -293,6 +307,8 @@ async function inspect(p) {
         resources = '<ul class="res">' + patch.Resources.map(x =>
           `<li><span>${esc(words(x.Resource))} <small>${esc(x.Variant ?? '')} · ${x.Group}${x.Origin === 'Deposit' ? ' · deposit' : ''}</small></span><span class="amt">${num(x.Amount)}</span></li>`).join('') + '</ul>';
     }
+    const f = d.Fields;
+    row('Fields', `${num(f.InitialTemperatureC, 1)} °C · ${num(f.PrecipitationMm, 0)} mm · prosperity ${num(f.Prosperity, 0)} · supernatural ${num(f.Supernatural, 0)}`);
     box.innerHTML = `<dl>${rows.join('')}</dl>${resources}`;
   } catch (e) {
     box.innerHTML = `<p class="error">${esc(e.message)}</p>`;
@@ -330,9 +346,16 @@ $('apply-parameters').addEventListener('click', replaceFoundation);
 $('reset-parameters').addEventListener('click', () => { $('parameters').value = state.defaults; });
 
 $('mode-note').textContent = modeNotes.map;
-fetch('/api/biomes').then(r => r.json()).then(biomes => {
-  $('legend').querySelector('ul').innerHTML = biomes.map(b =>
-    `<li><i style="background:${esc(b.Colour)}"></i>${esc(words(b.Biome))}</li>`).join('');
+const bound = v => String(v).replace('-', '−');
+const bandLabel = b => b.From == null ? `below ${bound(b.To)}` : b.To == null ? `${bound(b.From)} and above` : `${bound(b.From)} to ${bound(b.To)}`;
+const legend = (key, value, title, items) =>
+  `<details open hidden data-${key}="${esc(value)}"><summary>${esc(title)}</summary><ul>${items.map(([colour, text]) =>
+    `<li><i style="background:${esc(colour)}"></i>${esc(text)}</li>`).join('')}</ul></details>`;
+fetch('/api/legend').then(r => r.json()).then(l => {
+  $('legend').innerHTML =
+    legend('mode', 'biomes', 'Biomes', l.Biomes.map(b => [b.Colour, words(b.Biome)])) +
+    l.Fields.map(f => legend('layer', f.Layer, `${f.Name} (${f.Unit})`, f.Bands.map(b => [b.Colour, bandLabel(b)]))).join('');
+  showLegends();
 });
 fetch('/api/foundation').then(r => r.json()).then(show).catch(e => { $('foundation').textContent = 'The backend did not answer: ' + e.message; });
 </script>

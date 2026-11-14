@@ -1522,7 +1522,22 @@ the pixel's world position with `cellAt` and colour it.
 - **Base colour** ("Map" mode): the elevation type colour (section 8), with the lightness
   varied by ±8 % per patch from a hash so the patches read. Ocean: its colour varied ±7 %
   per zone and ±3 % per patch. "Biomes" mode: the exact biome colour (13.3), not
-  varied, so a patch can be matched against a legend.
+  varied, so a patch can be matched against a legend. "None" mode: white (255, 255, 255),
+  land and sea alike, for looking at the layers alone.
+- **Fields** (optional on any mode, one layer per field of section 9): on land pixels the
+  field is sampled at the pixel itself, not at the site of its patch, and the colour of
+  the band the value falls in is multiplied onto the base colour, channel by channel
+  (`base · band / 255`). On the None mode the result is exactly the band colour; several
+  field layers at once mix like inks. The sea is not tinted. A band holds the values from
+  its lower bound up to, not including, its upper bound; the bounds are fixed values, so
+  a band means the same under every Parameter Set.
+
+  | Field | Bounds | Band colours, lowest band first |
+  |---|---|---|
+  | Initial Temperature (°C) | −5, 0, 5, 10, 15, 20, 25 | (69, 117, 180), (116, 173, 209), (171, 217, 233), (224, 243, 248), (254, 224, 144), (253, 174, 97), (244, 109, 67), (215, 48, 39) |
+  | Precipitation (mm/yr) | 250, 500, 1000, 2000, 4000, 8000 | (255, 255, 204), (199, 233, 180), (127, 205, 187), (65, 182, 196), (29, 145, 192), (34, 94, 168), (12, 44, 132) |
+  | Prosperity (index) | 20, 40, 60, 80 | (255, 255, 212), (254, 217, 142), (254, 153, 41), (217, 95, 14), (153, 52, 4) |
+  | Supernatural (index) | 20, 40, 60, 80 | (254, 235, 226), (251, 180, 185), (247, 104, 161), (197, 27, 138), (122, 1, 119) |
 - **Borders**, found by comparing each pixel with its left and upper neighbour: coastline
   in near-black (14, 20, 30); region borders as a dotted red line (235, 28, 36): a 3 px dot on every point of a 6 px
   lattice, anchored to world pixels, that the border passes within 3 px of;
