@@ -5,7 +5,7 @@ using Gameworld.Generation.Races;
 
 namespace Gameworld.Tests;
 
-/// <summary>The races of the Parameter Set and the potential population of map-generation.md section 19.</summary>
+/// <summary>The races of the Parameter Set and the potential population of society-generation.md sections 2 and 3.</summary>
 public class PopulationTests
 {
     private static readonly string[] ClassicSix = ["human", "elf", "dwarf", "halfling", "orc", "goblin"];

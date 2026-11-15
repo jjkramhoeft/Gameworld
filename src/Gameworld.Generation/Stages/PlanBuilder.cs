@@ -39,7 +39,7 @@ public sealed class PlanWork
 
 /// <summary>
 /// Prospects for cities and towns (map-generation.md section 15) and the potential population
-/// (section 19). The Prospects only read the estimated biomes and resources, so they never
+/// (society-generation.md section 3). The Prospects only read the estimated biomes and resources, so they never
 /// depend on the height map. The potential population reads the final form: the mean height
 /// of each patch and the biomes and resources calculated with it.
 /// </summary>
@@ -242,7 +242,7 @@ internal static class PlanBuilder
             };
         }
 
-        // 19.3 Potential population: every land patch of the region in its final form, in key order.
+        // society-generation.md 3.3 Potential population: every land patch of the region in its final form, in key order.
         var patchKm = cells.PatchSize / 1000;
         var population = world.PopulationRules.Region(elevation.Patches.Select(x =>
             (x.Biome.Biome, x.HeightM, x.Patch.Shape.Cells.Length * patchKm * patchKm, x.Resources, x.Patch.Prosperity)));

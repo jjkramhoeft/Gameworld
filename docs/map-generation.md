@@ -2,13 +2,17 @@
 
 This document describes every step that turns a foundation seed into the map: the cell
 hierarchy, oceans, elevation types, fields, rivers, lakes, the height map, biomes,
-resources, Prospects for cities and towns, the travel network and the potential
-population per race. It is the specification
-of the generation algorithms. The [readme](../readme.md) holds the domain model around
+resources, Prospects for cities and towns and the travel network. It is the specification
+of the map generation algorithms. The [readme](../readme.md) defines the concepts around
 them (foundation, Parameter Set, identity, region generation stages), and the names in
 this document follow the readme. Default parameter values are given in parentheses or in
 tables. The parameters and their defaults are collected in
 [default-parameter-set.json](default-parameter-set.json), grouped by region generation stage.
+
+The society that lives on the map (races, the potential population, factions, cities and
+towns, families and persons) is specified in [society-generation.md](society-generation.md).
+The races and the potential population were section 19 and Appendix E of this document
+until 2026-11-15.
 
 Each section states the region generation stage that its result belongs to. The reasons
 behind the algorithms are in [map-generation-research.md](map-generation-research.md).
@@ -34,13 +38,15 @@ The algorithms were first worked out in an earlier prototype called Sandbox 4.
 16. [Travel network](#16-travel-network)
 17. [Drawing the map](#17-drawing-the-map)
 18. [Order of work and pitfalls](#18-order-of-work-and-pitfalls)
-19. [Races and potential population](#19-races-and-potential-population)
+19. [Races and potential population](#19-races-and-potential-population) (moved to society-generation.md)
 
 Appendices: [A. Exact generators](#appendix-a-exact-generators) ·
 [B. Crop tables](#appendix-b-crop-tables) ·
 [C. Factors by biome](#appendix-c-factors-by-biome) ·
 [D. Resource rules in full](#appendix-d-resource-rules-in-full) ·
-[E. The default races](#appendix-e-the-default-races)
+[E. The default races](#appendix-e-the-default-races) (moved to society-generation.md) ·
+[F. Bedrock types](#appendix-f-bedrock-types) ·
+[G. Resource groups and catalogue](#appendix-g-resource-groups-and-catalogue)
 
 ---
 
@@ -74,7 +80,6 @@ seed ──► fields (initial temperature, precipitation, prosperity, supernatu
           ├─► biomes      per patch: fields + height
           ├─► resources   per patch: biome, water, elevation type, bedrock, prosperity
           ├─► Prospects   per region: scored patches → Prospects for cities and towns
-          ├─► population  per region: what the land can feed, shared between the races by biome and height
           └─► travel      roads, river routes, sea lanes between Prospects
 ```
 
@@ -83,6 +88,11 @@ where land and sea are and how the land is divided. Everything after it is a lay
 that reads the map but never changes it. In particular the **height map is derived from
 the rivers**, not the other way round: rivers are drawn first as branching trees, and the
 height map is then built so that those rivers run downhill.
+
+The society is one more layer on top: the potential population of a region is what its
+land can feed, shared between the races by biome and height. It reads the height map and
+the final biomes and resources, and it is specified in
+[society-generation.md](society-generation.md).
 
 A **region** is the unit of work for most layers: rivers, lakes, Prospects and the height
 map are computed one region at a time, and rivers never cross from one region's land into
@@ -557,7 +567,7 @@ gives the plain fBm.
 
 Uses: initial temperature and precipitation feed the biomes; precipitation also thins the rivers
 of dry flat zones (next section); prosperity feeds resources, Prospect scores and the
-potential population (section 19); the
+potential population ([society-generation.md](society-generation.md) section 3); the
 supernatural field feeds nothing yet.
 
 ### 9.1 Distribution
@@ -1703,8 +1713,8 @@ the pixel's world position with `cellAt` and colour it.
    ridges, then levelling and the bed caps.
 9. Biomes (section 13), lakes (section 11).
 10. Resources, Prospects, travel (sections 14–16), in that order.
-11. Potential population (section 19). It only needs the height map and the final biomes
-    and resources.
+11. Potential population ([society-generation.md](society-generation.md) section 3). It
+    only needs the height map and the final biomes and resources.
 
 ### 18.2 What gives the map its look
 
@@ -1750,109 +1760,9 @@ the pixel's world position with `cellAt` and colour it.
 
 ## 19. Races and potential population
 
-Stage: Planned.
-
-The races are a list in the Parameter Set. Each race has an id, a name, a toggle (on or
-off), a frequency for each of the 16 biomes and, if the height matters to it, a height
-modifier. Per region, the land gets a potential population: how many persons it can feed.
-The races that are on share it.
-
-In a Parameter Set file a race lists only the biomes it lives in. A biome that is left out
-has the frequency 0, and a frequency of 0 is not written to the file. A race without a
-height modifier does not carry one in the file.
-
-| Parameter | Default |
-|---|---|
-| Persons per km² at a food supply of 1 and a middling Prosperity | 6 |
-| Prosperity effect | 0.5 |
-| Races | 23, of which 6 are on (Appendix E) |
-| Height modifiers | dwarves only from 200 m and up, elves only below 200 m |
-
-The inputs are the final form of the region's land patches (the Elevated stage, sections
-12 to 14): the height of each patch and the biome and resources calculated with it. The
-height of a patch is its mean height in the height map, not below 0, or the typical
-height of its elevation type (section 13.1) when no raster cell centre lies in the patch.
-So the potential population depends on the height map, unlike the Prospects (section 15).
-There is no random choice in this section, so it needs no hash purpose.
-
-The ids of the races must be given and unique. A Parameter Set that breaks this is
-refused when the world is created.
-
-### 19.1 Capacity of a patch
-
-Every land patch of the region has a capacity in persons:
-
-```
-supply   = clamp(food + 0.2 · fish, 0, 1)        # food: the summary of 14.5; fish: the amount on the patch
-factor   = 1 + effect · (2 · prosperity − 1)     # prosperity at the patch's site, rescaled to 0–1
-capacity = area · personsPerKm2 · supply · factor
-```
-
-- `area` is the number of patch cells of the patch times the square of the patch grid
-  size, in km² (64 km² per patch cell at the defaults). Lakes are not taken out.
-- `effect` is the Prosperity effect, clamped to 0–1. With the default 0.5 the factor runs
-  from 0.5 in the poorest land to 1.5 in the richest. 0 turns the effect off.
-- Ocean patches have no capacity.
-
-### 19.2 Shares of the races
-
-On one patch the races that are on share the land by their frequency in its biome, each
-multiplied by the height factor of the race at the height of the patch:
-
-```
-weight(r, patch) = frequency(r, biome of patch) · heightFactor(r, height of patch)
-share(r, patch)  = weight(r, patch) / Σ weight(q, patch)   over the races q that are on
-```
-
-- A negative frequency counts as 0.
-- If the sum is 0, no race that is on lives on the patch, by its biome or its height. The
-  patch holds nobody, and its capacity is not handed to another patch.
-- A race that is off is left out of the sum. Its share goes to the races that are on, so
-  toggling a race changes how the land is shared, not how many persons it feeds.
-- Only the proportions between the races on one patch matter. Doubling every frequency
-  of one race doubles its weight against the others everywhere.
-
-**Height factor.** The height modifier of a race is a list of control points
-`(height in m, factor)`. A race without one has the factor 1 at every height.
-
-```
-heightFactor(r, h):
-    points = the control points of r, sorted by height; points at the same height keep the order of the list
-    if there are no points:        return 1
-    if h < height of the first:    return factor of the first
-    a = the last point with height ≤ h
-    if a is the last point:        return factor of a
-    b = the point after a
-    return factor(a) + (h − height(a)) / (height(b) − height(a)) · (factor(b) − factor(a))
-```
-
-- The factor runs in a straight line between two points and is constant below the first
-  and above the last.
-- Two points at the same height make a step: the first holds below that height, the
-  second from that height and up. `(200, 0), (200, 1)` is a race that only lives from
-  200 m and up. `(200, 1), (200, 0)` is a race that only lives below 200 m.
-- `(100, 0), (300, 1)` fades a race in: none below 100 m, half weight at 200 m, full
-  weight from 300 m.
-- A negative factor counts as 0. A factor above 1 makes the race more frequent at that
-  height.
-
-### 19.3 Potential population of a region
-
-```
-population(r) = round(Σ capacity(patch) · share(r, patch))   over the region's land patches, in key order
-```
-
-The result has one entry for every race that is on, in the order of the Parameter Set. A
-race that finds no land to live on has 0. Each race is rounded on its own, half up, so the
-sum over the races can differ from the rounded sum of the capacities by a few persons.
-
-The land patches of a region are the patches of its zones (section 6.2), so every land
-patch counts in exactly one region.
-
-With the defaults the median region has a potential population of about 35,100 and the
-range is 11,200 to 83,400 (measured on 50 regions of two seeds). Of all persons 66 % are
-human, 10.5 % orc, 10 % goblin, 7 % halfling, 4.5 % elf and 2 % dwarf. 39 % of the land
-patches lie at 200 m or higher, and every one of the 50 regions has both dwarves and elves.
+Moved to [society-generation.md](society-generation.md): the races are its section 2 and
+the potential population its section 3. The numbers 19.1, 19.2 and 19.3 are 3.1, 3.2 and
+3.3 there.
 
 ---
 
@@ -2344,51 +2254,109 @@ Kinds 50 and 51 use `chance · boost` and richness `0.35 + 0.65 · hash` as in 1
 
 ## Appendix E. The default races
 
-The default list of races of the Parameter Set (section 19). The frequency of a race in a
-biome is its habitat weight in that biome times how common the race is:
+Moved to [society-generation.md](society-generation.md) Appendix A.
 
-```
-frequency(race, biome) = habitat(race, biome) · common(race)
-```
+---
 
-The habitat weights are 0 avoided, 1 tolerated, 2 good and 3 native. The Parameter Set
-only holds the frequencies: the human frequency in Temperate grassland is 3 · 10 = 30. A
-biome with the weight 0 is left out of the race's entry in the file.
+## Appendix F. Bedrock types
 
-Columns: Ice & snow, Tundra, Cold steppe, Boreal forest, Cold desert, Temperate grassland,
-Woodland & shrubland, Temperate mixed forest, Temperate broadleaf forest, Temperate rain
-forest, Hot desert, Thorn scrub, Savanna, Tropical dry forest, Tropical rain forest,
-Mangrove.
+Bedrock will eventually be a fixed set of predetermined bedrock types (approximately 10).
+The generation currently uses the nine below. The weights per elevation type are in
+section 14.1, and the rules that turn a bedrock into stone, metals and gems are in
+Appendix D.
 
-| Id | Name | On | Common | Ice | Tun | CSt | Bor | CDs | TGr | WSh | TMx | TBl | TRn | HDs | Thn | Sav | TDf | TRf | Mgv |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `human` | Human | yes | 10 | 0 | 1 | 2 | 2 | 1 | 3 | 3 | 3 | 3 | 2 | 1 | 1 | 2 | 2 | 1 | 1 |
-| `elf` | Elf | yes | 2 | 0 | 0 | 0 | 2 | 0 | 1 | 1 | 3 | 3 | 3 | 0 | 0 | 0 | 1 | 2 | 0 |
-| `darkElf` | Dark elf | no | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
-| `dwarf` | Dwarf | yes | 2 | 1 | 2 | 1 | 2 | 1 | 1 | 1 | 2 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `halfling` | Halfling | yes | 2 | 0 | 0 | 1 | 1 | 0 | 3 | 3 | 2 | 2 | 1 | 0 | 0 | 1 | 1 | 1 | 0 |
-| `gnome` | Gnome | no | 1 | 0 | 1 | 1 | 2 | 1 | 1 | 2 | 2 | 3 | 1 | 0 | 1 | 1 | 1 | 0 | 0 |
-| `orc` | Orc | yes | 2 | 0 | 1 | 3 | 1 | 2 | 2 | 2 | 1 | 1 | 1 | 2 | 2 | 2 | 1 | 0 | 0 |
-| `goblin` | Goblin | yes | 2 | 0 | 1 | 1 | 2 | 1 | 2 | 2 | 2 | 2 | 1 | 1 | 2 | 1 | 1 | 1 | 0 |
-| `hobgoblin` | Hobgoblin | no | 1 | 0 | 1 | 2 | 1 | 1 | 2 | 2 | 2 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 0 |
-| `kobold` | Kobold | no | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
-| `gnoll` | Gnoll | no | 1 | 0 | 0 | 2 | 1 | 1 | 2 | 2 | 1 | 1 | 0 | 2 | 3 | 3 | 1 | 0 | 0 |
-| `giantBlooded` | Giant-blooded | no | 0.5 | 1 | 2 | 2 | 2 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 | 1 | 1 | 0 | 0 |
-| `ogre` | Ogre | no | 0.5 | 1 | 2 | 2 | 2 | 1 | 1 | 2 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 0 |
-| `troll` | Troll | no | 0.5 | 2 | 2 | 1 | 2 | 1 | 1 | 1 | 2 | 2 | 2 | 2 | 2 | 1 | 2 | 2 | 2 |
-| `lizardfolk` | Lizardfolk | no | 1 | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 1 | 1 | 2 | 1 | 1 | 1 | 2 | 3 | 3 |
-| `catfolk` | Catfolk | no | 1 | 0 | 0 | 1 | 0 | 1 | 2 | 1 | 1 | 1 | 1 | 2 | 2 | 3 | 2 | 2 | 1 |
-| `ratfolk` | Ratfolk | no | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
-| `birdfolk` | Birdfolk | no | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
-| `bullFolk` | Bull-folk | no | 1 | 0 | 1 | 2 | 1 | 1 | 3 | 2 | 1 | 1 | 1 | 1 | 1 | 3 | 1 | 0 | 0 |
-| `centaur` | Centaur | no | 1 | 0 | 0 | 3 | 1 | 1 | 3 | 2 | 2 | 2 | 1 | 1 | 1 | 3 | 1 | 0 | 0 |
-| `dragonkin` | Dragonkin | no | 0.5 | 0 | 0 | 1 | 1 | 2 | 1 | 1 | 1 | 1 | 1 | 2 | 2 | 2 | 1 | 1 | 1 |
-| `undead` | Undead | no | 0.5 | 1 | 2 | 1 | 1 | 2 | 1 | 1 | 1 | 1 | 1 | 2 | 1 | 1 | 1 | 1 | 1 |
-| `frostFolk` | Frost folk | no | 1 | 3 | 3 | 1 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+The table is an example and not binding yet.
 
-**Height modifiers.** Dwarf: `(200, 0), (200, 1)`, only from 200 m and up. Elf:
-`(200, 1), (200, 0)`, only below 200 m. The other 21 races have none.
+| Id          | Name                 | Mostly under            | Gives                                                         |
+| ----------- | -------------------- | ----------------------- | ------------------------------------------------------------- |
+| `shield`    | Crystalline shield   | flat, lowland, hills    | Granite, banded iron, lode gold (hills), diamonds, kaolin     |
+| `foldBelt`  | Fold belt            | hills, mountains        | Slate, marble, silver, lode gold, garnet, emerald             |
+| `granite`   | Granite intrusion    | hills, mountains        | Granite, tin lodes, skarn iron, topaz and beryl, kaolin       |
+| `volcanic`  | Volcanic arc         | mountains               | Basalt, obsidian, pumice, porphyry copper, gold, rock crystal |
+| `basalt`    | Flood basalt         | flat, lowland, hills    | Basalt, native copper, agate, black sands                     |
+| `ophiolite` | Ophiolite            | hills, mountains        | Soapstone, massive-sulfide copper, jade                       |
+| `carbonate` | Carbonate platform   | lowland, hills          | Limestone, chalk, flint, lead and zinc, skarn iron            |
+| `clastic`   | Clastic basin        | flat, lowland           | Sandstone, coal, lignite, red-bed copper, rock salt, amber    |
+| `alluvium`  | Unconsolidated cover | flat, lowland           | Field stone only; clay                                        |
 
-The six races that are on live in every biome between them: in Ice & snow only the
-dwarves do, in Mangrove only the humans. Ice & snow below 200 m holds nobody, since the
-dwarves do not live that low.
+---
+
+## Appendix G. Resource groups and catalogue
+
+This appendix is about the resources found in patches, which are generated together with
+the map. Resources that are produced, during gameplay for one, are only covered lightly.
+
+### G.1 Groups
+
+Resources are split in groups to make trade and the calculation of needs more manageable.
+
+| Group | Found in patches |
+|---|---|
+| Food | yes |
+| Materials | yes |
+| Fuel | yes |
+| Luxuries | yes |
+| Metals | yes |
+| Animals | yes |
+| Building | no, only produced |
+| Tools | no, only produced |
+| Gear | no, only produced |
+| Weapons | no, only produced |
+| Clothing | no, only produced |
+
+### G.2 Terms
+
+- **Potential**: what the land can yield (sections 14.2 and 14.3).
+- **Deposit**: a rare find that often needs to be mined (section 14.4).
+- **Variant**: one of several kinds of the same resource, as rye is a variant of grain.
+- **Product**: something produced from resources. Products are not generated with the map.
+
+### G.3 The catalogue and the 24 generated resources
+
+The generation gives every patch an amount for each of 24 raw resources, and a variant
+(section 14). The catalogue below is finer than these 24 in some rows:
+
+- Wild food and game are one generated resource. The same goes for solid and liquid fuel,
+  silver ore and lead ore, gems and pearls, spices and incense, furs and ivory, and mounts
+  and pack animals.
+- Salt is a generated resource of its own. In the catalogue it is a variant of Preserver.
+- Star metal and the sap from Elanor are fantasy resources. The generation has no rule for
+  them yet.
+
+The catalogue is an example and not sufficient yet. The variants the generation can
+actually pick are those of Appendices B and D.
+
+| Group | Resources | Variant |
+| --- | --- | --- |
+| Food | Grain | wheat, durum, spelt, barley, rye, oats, maize, sorghum, pearl millet, teff, buckwheat, quinoa, fonio, wild rice |
+| Food | Produce | Potato, cassava, yam, taro, banana, sago palm, breadfruit, faba bean, pea, lentil, chickpea, common bean, cowpea, pigeon pea, onion and alliums, cabbage and kale, carrot, beet, melons, tiger nut, bottle gourd |
+| Food | Orchard | Olive, grape, date palm, fig, pomegranate, almond, pistachio, carob, apple, pear, peach and stone fruit, citrus, walnut, sweet chestnut, hazel, stone pine nuts, cedar-pine nuts, coconut, oil palm, mango, avocado, tamarind, baobab, shea, Brazil nut, cashew, palmyra palm, prickly pear, jujube, mesquite pods, pineapple, soybean, groundnut, sesame, rapeseed, sunflower |
+| Food | livestock | Cattle, sheep, goats, pigs, yak, herded reindeer, water buffalo, poultry, alfalfa, dairy products |
+| Food | fish | River fish, salmon runs, sturgeon, eels, lake fish, cod banks, herring/sardine/anchovy, tuna and large pelagics, oysters and mussels, clams, crabs, lobsters, shrimp, octopus |
+| Food | wild food | Bilberry, blueberry, cloudberry and crowberry, raspberry and bramble, sea buckthorn, elderberry, forest mushrooms, acorns, wild grass seed, lotus, water chestnut, cattail, arrowhead, maple sap, edible seaweed, kelp, wild herbs |
+| Food | game | deer, wild boar, caribou, bison and wild cattle, antelope and gazelle, wild sheep and ibex, waterfowl, upland game birds, hares and rabbits |
+| Materials | Timber | Oak, beech, ash, elm, linden, willow and osier, poplar, Scots pine, spruce, fir, larch, giant conifers, cedar, yew, cypress, Mediterranean pines, cork oak, teak, sal, mahogany, Spanish cedar, rosewood, ebony, African mahogany, iroko, balsa, eucalypt-type hardwood, thorn-scrub wood, juniper, mangrove timber, driftwood, bog oak |
+| Materials | Stone | granite, basalt, limestone, chalk, marble, sandstone, slate, flint and chert, obsidian, pumice and pozzolana, soapstone, millstone and quern stone, whetstone |
+| Materials | Clay | Clay, kaolin |
+| Materials | Crystal | quartz, Rock crystal |
+| Materials | Fibre | Flax, hemp, cotton, wool, silk, wild silk, jute, ramie, kenaf, sisal and agave, abaca, New Zealand flax, esparto grass, kapok, nettle, lime-bast |
+| Materials | Preserver | Salt, Sap from the Elven flower Elanor |
+| Fuel | Solid | Firewood, charcoal, peat, dung fuel, coal, lignite, turf and sod |
+| Fuel | Liquid | oil, naphtha seeps |
+| Metals | Iron ore | Bog iron, lateritic iron and ironstone, banded iron formation, magnetite skarn iron, black sands |
+| Metals | copper ore | Porphyry copper, red-bed copper, massive-sulfide copper, native copper, malachite, azurite |
+| Metals | tin ore | Tin lode, stream tin |
+| Metals | silver ore | Silver (argentiferous galena) |
+| Metals | lead ore | lead-zinc in carbonates, lead-zinc skarns and veins, calamine |
+| Metals | gold ore | gold ore |
+| Metals | star metal | star metal |
+| Luxuries | Gems | Diamond, Ruby, Sapphire, Emerald, Aquamarine, Amethyst, Garnet, Topaz, Tourmaline, Opal, Jade, Lapis, Turquoise, Spinel, Zircon |
+| Luxuries | Pearls | Pearls |
+| Luxuries | spices | Black pepper, clove, nutmeg and mace, cinnamon, cardamom, ginger, turmeric, vanilla, allspice, chili pepper, saffron, cumin, coriander, caraway, mustard |
+| Luxuries | incense | frankincense, myrrh, gum arabic, sandalwood, agarwood, pine resin/tar/pitch, copal and dammar, camphor, lavender and rose oil, cinchona bark, mastic and balsams, rubber latex |
+| Luxuries | stimulants & sugar | Honey, sugar cane, palm sugar, tea, coffee, cacao, kola nut, betel nut, coca, tobacco |
+| Luxuries | furs | Sable and marten, beaver, fox and Arctic fox, ermine, squirrel, bear, big cats, seals, ostrich, exotic feathers, ambergris, eider down, musk deer |
+| Luxuries | ivory | walrus, narwhal tusk, elephant ivory, hippopotamus ivory |
+| Luxuries | dyes | Cochineal, kermes, lac, murex, woad, indigo, madder, weld, safflower, henna, annatto, red sanders and brazilwood, logwood, lichen dyes |
+| Animals | Mounts | Horse |
+| Animals | Pack Animals | Horses, donkeys, mules, dromedary camel, Bactrian camel, llama, alpaca-like camelids |

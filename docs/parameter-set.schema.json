@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Gameworld Parameter Set",
-  "description": "The set of all map and world parameters of a foundation, grouped by region generation stage. A parameter that is left out keeps its default. Section numbers refer to docs/map-generation.md.",
+  "description": "The set of all map and world parameters of a foundation, grouped by region generation stage. A parameter that is left out keeps its default. Section numbers refer to docs/map-generation.md, and those marked society to docs/society-generation.md.",
   "type": "object",
   "properties": {
     "$schema": {
@@ -559,7 +559,7 @@
       "additionalProperties": false
     },
     "Planning": {
-      "description": "Planned stage: Prospects for cities and towns, which of them are on show (§15), and the potential population (§19). The Settled stage has no parameters of its own: the travel network connects the Prospects on show (§16).",
+      "description": "Planned stage: Prospects for cities and towns, which of them are on show (§15), and the potential population (society §3). The Settled stage has no parameters of its own: the travel network connects the Prospects on show (§16).",
       "type": "object",
       "properties": {
         "ProspectsPerRegion": {
@@ -638,17 +638,17 @@
           "default": 62
         },
         "Population": {
-          "description": "The potential population of a region: how many persons its land can feed. The races that are on share it (§19).",
+          "description": "The potential population of a region: how many persons its land can feed. The races that are on share it (society §3).",
           "type": "object",
           "properties": {
             "PersonsPerKm2": {
-              "description": "Persons per km² on land with a food supply of 1 at a middling Prosperity. The potential population of a patch is its area × this × its food supply × its Prosperity factor (§19.1).",
+              "description": "Persons per km² on land with a food supply of 1 at a middling Prosperity. The potential population of a patch is its area × this × its food supply × its Prosperity factor (society §3.1).",
               "type": "number",
               "minimum": 0,
               "default": 6
             },
             "ProsperityEffect": {
-              "description": "How much the Prosperity field moves the potential population of a patch: the factor runs from 1 − this at the lowest Prosperity to 1 + this at the highest. 0 turns the effect of Prosperity off (§19.1).",
+              "description": "How much the Prosperity field moves the potential population of a patch: the factor runs from 1 − this at the lowest Prosperity to 1 + this at the highest. 0 turns the effect of Prosperity off (society §3.1).",
               "type": "number",
               "minimum": 0,
               "maximum": 1,
@@ -825,7 +825,7 @@
           "additionalProperties": false
         },
         "Prosperity": {
-          "description": "Prosperity index, on a linear scale. Feeds the resources (it boosts the valuable ones), the Prospect scores and the potential population (§9, §19.1).",
+          "description": "Prosperity index, on a linear scale. Feeds the resources (it boosts the valuable ones), the Prospect scores and the potential population (§9, society §3.1).",
           "type": "object",
           "properties": {
             "FeatureSizeKm": {
@@ -1042,7 +1042,7 @@
       }
     },
     "Races": {
-      "description": "The races: the peoples that can live in the world. Add a race by adding an entry, and switch a race on or off with Enabled. The potential population of a region is shared between the races that are on, by their frequency in the biome of each patch and their height modifier at its height (§19). A file that gives this list replaces the whole default list.",
+      "description": "The races: the peoples that can live in the world. Add a race by adding an entry, and switch a race on or off with Enabled. The potential population of a region is shared between the races that are on, by their frequency in the biome of each patch and their height modifier at its height (society §2 and §3.2). A file that gives this list replaces the whole default list.",
       "type": "array",
       "items": {
         "description": "A race: a people that can live in the world, and how frequent it is in each biome and at each height.",
@@ -1061,7 +1061,7 @@
             "type": "boolean"
           },
           "BiomeFrequency": {
-            "description": "How frequent the race is in each biome, relative to the other races. The potential population of a patch is shared between the races that are on in proportion to these numbers, so only the proportions between the races within one biome matter. List only the biomes the race lives in: a biome that is left out has the frequency 0, and a frequency of 0 is not written to the file. A negative number counts as 0 (§19.2).",
+            "description": "How frequent the race is in each biome, relative to the other races. The potential population of a patch is shared between the races that are on in proportion to these numbers, so only the proportions between the races within one biome matter. List only the biomes the race lives in: a biome that is left out has the frequency 0, and a frequency of 0 is not written to the file. A negative number counts as 0 (society §3.2).",
             "type": "object",
             "properties": {
               "IceAndSnow": {
@@ -1132,7 +1132,7 @@
             "additionalProperties": false
           },
           "HeightModifier": {
-            "description": "How the height of the land changes the frequency of the race: control points from the mean height of a patch to a factor on its biome frequencies. The factor runs in a straight line between two points and is constant beyond the first and the last. Two points at the same height make a step: the first holds below that height, the second from that height and up. So [200 → 0, 200 → 1] is a race that only lives from 200 m and up, and [200 → 1, 200 → 0] one that only lives below 200 m. Left out, the height does not matter to the race (§19.2).",
+            "description": "How the height of the land changes the frequency of the race: control points from the mean height of a patch to a factor on its biome frequencies. The factor runs in a straight line between two points and is constant beyond the first and the last. Two points at the same height make a step: the first holds below that height, the second from that height and up. So [200 → 0, 200 → 1] is a race that only lives from 200 m and up, and [200 → 1, 200 → 0] one that only lives below 200 m. Left out, the height does not matter to the race (society §3.2).",
             "type": [
               "array",
               "null"

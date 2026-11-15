@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 namespace Gameworld.Domain;
 
 // Every parameter carries a [Description]: what it does, its unit and the section of
-// docs/map-generation.md it belongs to. docs/parameter-set.schema.json is generated from these
+// docs/map-generation.md or docs/society-generation.md it belongs to. docs/parameter-set.schema.json is generated from these
 // (ParameterSetSchema), so a description is written once, here.
 
 /// <summary>
@@ -14,7 +14,7 @@ namespace Gameworld.Domain;
 /// a foundation and immutable after phase 1 like the foundation. The defaults are the same as
 /// docs/default-parameter-set.json and the text of docs/map-generation.md.
 /// </summary>
-[Description("The set of all map and world parameters of a foundation, grouped by region generation stage. A parameter that is left out keeps its default. Section numbers refer to docs/map-generation.md.")]
+[Description("The set of all map and world parameters of a foundation, grouped by region generation stage. A parameter that is left out keeps its default. Section numbers refer to docs/map-generation.md, and those marked society to docs/society-generation.md.")]
 public sealed record ParameterSet
 {
     [Description("Sited stage: the three levels of cells, the ocean seeds and the elevation types (§3, §4, §5.1, §8).")]
@@ -29,7 +29,7 @@ public sealed record ParameterSet
     [Description("Elevated stage: the height map and the biomes (§12, §13).")]
     public ElevationParameters Elevation { get; init; } = new();
 
-    [Description("Planned stage: Prospects for cities and towns, which of them are on show (§15), and the potential population (§19). The Settled stage has no parameters of its own: the travel network connects the Prospects on show (§16).")]
+    [Description("Planned stage: Prospects for cities and towns, which of them are on show (§15), and the potential population (society §3). The Settled stage has no parameters of its own: the travel network connects the Prospects on show (§16).")]
     public PlanningParameters Planning { get; init; } = new();
 
     [Description("The four Fields: noise maps that drive climate, biomes and resources. They have no stage (§9).")]
@@ -38,7 +38,7 @@ public sealed record ParameterSet
     [Description("The bedrock types and their relative weight under each elevation type. The bedrock of a zone is drawn by these weights (§14.1). The resource rules know the nine ids of the defaults; a bedrock with another id gives no bedrock-bound resources.")]
     public IReadOnlyList<BedrockParameters> Bedrocks { get; init; } = BedrockParameters.Defaults;
 
-    [Description("The races: the peoples that can live in the world. Add a race by adding an entry, and switch a race on or off with Enabled. The potential population of a region is shared between the races that are on, by their frequency in the biome of each patch and their height modifier at its height (§19). A file that gives this list replaces the whole default list.")]
+    [Description("The races: the peoples that can live in the world. Add a race by adding an entry, and switch a race on or off with Enabled. The potential population of a region is shared between the races that are on, by their frequency in the biome of each patch and their height modifier at its height (society §2 and §3.2). A file that gives this list replaces the whole default list.")]
     public IReadOnlyList<RaceParameters> Races { get; init; } = RaceParameters.Defaults;
 
     public static ParameterSet Default => new();
@@ -435,17 +435,17 @@ public sealed record PlanningParameters
     [Range(0, 100)]
     public double PoorScore { get; init; } = 62;
 
-    [Description("The potential population of a region: how many persons its land can feed. The races that are on share it (§19).")]
+    [Description("The potential population of a region: how many persons its land can feed. The races that are on share it (society §3).")]
     public PopulationParameters Population { get; init; } = new();
 }
 
 public sealed record PopulationParameters
 {
-    [Description("Persons per km² on land with a food supply of 1 at a middling Prosperity. The potential population of a patch is its area × this × its food supply × its Prosperity factor (§19.1).")]
+    [Description("Persons per km² on land with a food supply of 1 at a middling Prosperity. The potential population of a patch is its area × this × its food supply × its Prosperity factor (society §3.1).")]
     [Range(0, double.PositiveInfinity)]
     public double PersonsPerKm2 { get; init; } = 6;
 
-    [Description("How much the Prosperity field moves the potential population of a patch: the factor runs from 1 − this at the lowest Prosperity to 1 + this at the highest. 0 turns the effect of Prosperity off (§19.1).")]
+    [Description("How much the Prosperity field moves the potential population of a patch: the factor runs from 1 − this at the lowest Prosperity to 1 + this at the highest. 0 turns the effect of Prosperity off (society §3.1).")]
     [Range(0, 1)]
     public double ProsperityEffect { get; init; } = 0.5;
 }
@@ -483,7 +483,7 @@ public sealed record FieldsParameters
         Distribution = [new(0.055, -10), new(0.09, -3), new(0.21, 3), new(0.59, 18)],
     };
 
-    [Description("Prosperity index, on a linear scale. Feeds the resources (it boosts the valuable ones), the Prospect scores and the potential population (§9, §19.1).")]
+    [Description("Prosperity index, on a linear scale. Feeds the resources (it boosts the valuable ones), the Prospect scores and the potential population (§9, society §3.1).")]
     public FieldParameters Prosperity { get; init; } = new(200, 3, 2, 0.5, 1, 100);
 
     [Description("Supernatural index, on a linear scale. Its Distribution keeps the supernatural rare: most of the map is low and 1 % lies above 80. It feeds nothing yet (§9).")]
@@ -556,9 +556,9 @@ public sealed record RaceParameters(
     [property: Description("The id the generated data knows the race by. Unique in the list; keep it when the name changes.")] string Id,
     [property: Description("The name shown for the race.")] string Name,
     [property: Description("Whether the race lives in the world. A race that is off gets no population, and the races that are on share the land without it.")] bool Enabled,
-    [property: Description("How frequent the race is in each biome, relative to the other races. The potential population of a patch is shared between the races that are on in proportion to these numbers, so only the proportions between the races within one biome matter. List only the biomes the race lives in: a biome that is left out has the frequency 0, and a frequency of 0 is not written to the file. A negative number counts as 0 (§19.2).")] PerBiome<double> BiomeFrequency)
+    [property: Description("How frequent the race is in each biome, relative to the other races. The potential population of a patch is shared between the races that are on in proportion to these numbers, so only the proportions between the races within one biome matter. List only the biomes the race lives in: a biome that is left out has the frequency 0, and a frequency of 0 is not written to the file. A negative number counts as 0 (society §3.2).")] PerBiome<double> BiomeFrequency)
 {
-    [Description("How the height of the land changes the frequency of the race: control points from the mean height of a patch to a factor on its biome frequencies. The factor runs in a straight line between two points and is constant beyond the first and the last. Two points at the same height make a step: the first holds below that height, the second from that height and up. So [200 → 0, 200 → 1] is a race that only lives from 200 m and up, and [200 → 1, 200 → 0] one that only lives below 200 m. Left out, the height does not matter to the race (§19.2).")]
+    [Description("How the height of the land changes the frequency of the race: control points from the mean height of a patch to a factor on its biome frequencies. The factor runs in a straight line between two points and is constant beyond the first and the last. Two points at the same height make a step: the first holds below that height, the second from that height and up. So [200 → 0, 200 → 1] is a race that only lives from 200 m and up, and [200 → 1, 200 → 0] one that only lives below 200 m. Left out, the height does not matter to the race (society §3.2).")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public IReadOnlyList<HeightFactorPoint>? HeightModifier { get; init; }
 
@@ -569,7 +569,7 @@ public sealed record RaceParameters(
     public static IReadOnlyList<HeightFactorPoint> OnlyBelow(double heightM) => [new(heightM, 1), new(heightM, 0)];
 
     /// <summary>
-    /// The default list (map-generation.md Appendix E): the six classic races are on, the rest are off.
+    /// The default list (society-generation.md Appendix A): the six classic races are on, the rest are off.
     /// Each frequency is the habitat weight of the race in the biome (0 avoided, 1 tolerated,
     /// 2 good, 3 native) times how common the race is in the world. Dwarves only live from 200 m
     /// and up and elves only below 200 m; the height does not matter to the other races.

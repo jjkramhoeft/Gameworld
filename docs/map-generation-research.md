@@ -871,7 +871,7 @@ The generator uses Tier M "in a first, simpler form": a ranked list of scored si
 
 ### 10.7 Races and potential population
 
-This section rests on a later note, RACES (see §1). It was added on 2026-11-14 with the rule of [map-generation.md](map-generation.md) section 19.
+This section rests on a later note, RACES (see §1). It was added on 2026-11-14 with the rule that is now [society-generation.md](society-generation.md) sections 2 and 3 (it was map-generation.md section 19 until 2026-11-15).
 
 **What the note found.** The core roster is stable: humans are in all 20 surveyed rosters, elves and dwarves in 17, orcs in 12, goblins in 10 and halflings in 9 (RACES §1.3). The strategy games make habitat a rule: each race has terrain or climate it likes, dislikes or cannot live in (RACES §1.4). The note turns that into a table of habitat weights from 0 to 3 for 23 races and the 16 biomes (RACES §4.1). The weights are the note's own judgement, anchored on sourced claims.
 

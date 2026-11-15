@@ -3,8 +3,8 @@ using Gameworld.Domain;
 namespace Gameworld.Generation.Races;
 
 /// <summary>
-/// The potential population of the land and how the races share it (map-generation.md
-/// section 19). There is no random choice in it: it is a plain function of the Parameter Set
+/// The potential population of the land and how the races share it (society-generation.md
+/// section 3). There is no random choice in it: it is a plain function of the Parameter Set
 /// and of the biome, the height, the resources and the Prosperity of a patch.
 /// </summary>
 public sealed class PopulationRules
@@ -43,11 +43,11 @@ public sealed class PopulationRules
     /// <summary>The races that are on, in the order of the Parameter Set.</summary>
     public IReadOnlyList<RaceParameters> Races => _races;
 
-    /// <summary>19.1 The food supply of a land patch, 0 to 1: the food summary of its resources and a share of its fish.</summary>
+    /// <summary>3.1 The food supply of a land patch, 0 to 1: the food summary of its resources and a share of its fish.</summary>
     public static double FoodSupply(PatchResources resources) =>
         Math.Clamp(resources.Food + FishShare * resources.AmountOf(Resource.Fish), 0, 1);
 
-    /// <summary>19.1 How many persons a land patch can feed.</summary>
+    /// <summary>3.1 How many persons a land patch can feed.</summary>
     /// <param name="areaKm2">The area of the patch.</param>
     /// <param name="prosperity">The Prosperity field at the site of the patch, rescaled to 0–1.</param>
     public double Capacity(double areaKm2, PatchResources resources, double prosperity)
@@ -58,7 +58,7 @@ public sealed class PopulationRules
     }
 
     /// <summary>
-    /// 19.2 The height factor of a race that is on (by its index in <see cref="Races"/>) at a height:
+    /// 3.2 The height factor of a race that is on (by its index in <see cref="Races"/>) at a height:
     /// a straight line between its control points and constant beyond them. Of two points at the
     /// same height the first holds below that height and the second from it and up. 1 for a
     /// race without a height modifier.
@@ -80,7 +80,7 @@ public sealed class PopulationRules
     }
 
     /// <summary>
-    /// 19.2 The share of each race that is on in a biome at a height, in the order of
+    /// 3.2 The share of each race that is on in a biome at a height, in the order of
     /// <see cref="Races"/>: its frequency in the biome times its height factor, over the sum of
     /// these. Empty when none of them lives there.
     /// </summary>
@@ -98,7 +98,7 @@ public sealed class PopulationRules
         return shares;
     }
 
-    /// <summary>19.3 The potential population of a region from its land patches, taken in the given order.</summary>
+    /// <summary>3.3 The potential population of a region from its land patches, taken in the given order.</summary>
     public PotentialPopulation Region(
         IEnumerable<(Biome Biome, double HeightM, double AreaKm2, PatchResources Resources, double Prosperity)> landPatches)
     {

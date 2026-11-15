@@ -1,393 +1,301 @@
 # Gameworld
 
-## Purpose
+Gameworld generates a map-based fantasy world on demand: an unbounded map of regions with seas, rivers, heights, biomes and resources, and a society of races, factions, cities, families and persons that lives on it. It is a sandbox, prototype and research repo for a larger PC game.
 
-Gameworld is a sandbox, prototype and research repo for a larger PC game. It explores new gameplay and generation algorithms for map-based generated worlds, using diffusion models and LLMs to populate huge worlds on demand. A priority is an aesthetically pleasing and believable (but fantasy/magical elements are allowed) base map that can support the desired gameplay.
+This readme defines the concepts of the world and is the source of every name. The rules of the generation are in two documents:
 
-## Aim
+| Subject | Document | Covers |
+| --- | --- | --- |
+| The map | [docs/map-generation.md](docs/map-generation.md) | Geography, climate, biomes, resources, Prospects and the travel network |
+| The society | [docs/society-generation.md](docs/society-generation.md) | Races, the potential population, factions, cities and towns, families, persons, vocations and looks |
+
+Contents: [Overview](#overview) · [Concepts](#concepts) · [Documentation](#documentation) · [Build and run](#build-and-run)
+
+## Overview
+
+### Purpose
+
+Gameworld explores new gameplay and generation algorithms for map-based generated worlds, using diffusion models and LLMs to populate huge worlds on demand. A priority is an aesthetically pleasing and believable base map that can support the desired gameplay. Fantasy and magical elements are allowed.
+
+### Goals
 
 * The game world should be larger than any player reasonably can explore, even if playing multiple hours per day for half a year.
-
-* There should be a very large number of people in the gameworld known to an active player.
-
+* There should be a very large number of people in the game world known to an active player.
 * The geography, map, cities, factions, families and people should be procedurally generated.
-
 * A fine balance between believability and wonder.
-
 * Variation, exploration and progression that foster continued play and replayability.
 
-## Lifecycle Phases
+### Phases
 
-1) World Generation Development
-  Algorithms and parameter settlement. With a fair amount of manual testing to evaluate look and feel. Includes internal map demo apps.
-2) Gameplay development
-  Game Client/UI interaction, and persisting player interaction with the gameworld. Here the core game mechanics for travel/exploration and progression are evolved.
-3) Playable game - initial release
-  Also prelaunch automated play and statistics on the distribution and variety of the gameworld and people.
+| Phase | What happens in it |
+| --- | --- |
+| 1. World generation development | Algorithms and parameter settlement, with a fair amount of manual testing to evaluate look and feel. Includes internal map demo apps. |
+| 2. Gameplay development | Game client and UI interaction, and persisting player interaction with the game world. Here the core game mechanics for travel, exploration and progression are evolved. |
+| 3. Playable game, initial release | Also prelaunch automated play, and statistics on the distribution and variety of the game world and its people. |
 
-## First Step Domain Model - Need and drivers
+The project is in phase 1.
 
-* Phase 1 will include changing map and world parameters and evaluating the resulting maps and worlds, so parameters need to be easily configurable and testable.
+### What drives the design
 
-* Storage. At game start a big area of the game world and map are calculated to facilitate the populating with Cities, Factions, Families and individual People. To avoid repetitive map and world generation calculation significant data are persisted and stored in a database.
+* **Parameters must be easy to change and test.** Phase 1 consists of changing map and world parameters and evaluating the resulting maps and worlds.
+* **Storage.** At game start a big area of the game world and map is calculated, to facilitate the populating with cities, factions, families and persons. To avoid repeating that calculation, significant data is persisted in a database.
+* **Generation on demand.** The game supports a large number of persons, towns and cities, but only a small and relevant set is precalculated. Persons and locations depend on LLMs for text and diffusion models for pictures. As play progresses, more persons and locations are calculated.
+* **Data transfer** between the backend and the frontend clients.
 
-  A large number of people and town/cities are supported by the game - but only a small and relevant set is precalculated. The generation of people and locations is dependent on LLMs for text and diffusion models for pictures. As play progresses, more people and locations are calculated.
+### Status
 
-* Data transfer between backend and frontend clients
+The map is generated through all its stages, from the cells to the travel network. Of the society, the races, the potential population and the person names are generated. Factions, cities and towns, families and persons are defined below but not generated yet, and neither is there a database: the apps compute everything in memory.
 
-### Some High Level Details - Decided in advance
+## Concepts
+
+Each concept below says what the thing is, what it is called and how it relates to the others. The rules behind a concept are in the document its group links to.
+
+```text
+Foundation = seed + generator version + Parameter Set
+└─ World, unbounded
+   ├─ Map                               docs/map-generation.md
+   │  ├─ Region ▸ Zone ▸ Patch          three nested levels, each built from Cells
+   │  ├─ Zone                           elevation type, bedrock; ocean zones form Seas
+   │  ├─ Patch                          biome, resources
+   │  ├─ Region                         rivers, lakes, height map, Prospects, travel network
+   │  └─ Fields                         precipitation, initial temperature, prosperity, supernatural
+   └─ Society                           docs/society-generation.md
+      ├─ Race                           shares the potential population of each region
+      └─ Faction, City and Town, Family, Person with a vocation and looks
+```
+
+### The world
+
+These concepts hold for the map and the society alike.
 
 #### Foundation
 
-The foundation is the root of the game world. It has:
+The root of a game world. It holds the seed for all the generation algorithms, the generator version and a reference to exactly one Parameter Set. The generator version versions the generation algorithms only, not the parameters and not the storage schema. A foundation can load and save its parameters from and to a json file.
 
-* The seed for all the generation algorithms.
-* The generator version. This versions the generation algorithms only - not the parameters and not the storage schema.
-* A reference to exactly one Parameter Set.
-* It can load and save all parameters to and from a json file
+During phase 1 the parameters of a foundation can be changed and reloaded. All derived data of the foundation is then discarded and recomputed. After phase 1 a foundation is immutable: there can be different sets of parameters for different game modes or difficulty levels, but they do not change during gameplay.
 
-During phase 1 the parameters of a foundation can be changed and reloaded. All derived data of the foundation is then discarded and recomputed.
-
-After phase 1 a foundation is immutable. Parameters will never change after the initial load (there might be different sets of parameters for different game modes or difficulty levels - but they do NOT change during gameplay)
-
-Many foundations can coexist in storage (e.g. to compare maps side by side in phase 1). A playthrough references exactly one foundation, and the game is modelled as single-player per foundation.
-
-The world of a foundation is unbounded. Regions are not fixed up front, they come into existence lazily as play moves outward.
+Many foundations can coexist in storage, for one to compare maps side by side in phase 1. A playthrough references exactly one foundation, and the game is modelled as single-player per foundation. The world of a foundation is unbounded: regions are not fixed up front, they come into existence lazily as play moves outward.
 
 #### Parameter Set
 
-The set of all map and world parameters. Referenced by a foundation, and immutable after phase 1 like the foundation. Can be json files or exported/loaded from json files.
+The set of all map and world parameters. It is referenced by a foundation and is immutable after phase 1, like the foundation. It is a json file, or is exported to and loaded from one.
 
-The Parameter Set also holds the lists that are expected to change: the bedrock types and the races (see Race). A change to a list after phase 1 is a new Parameter Set, and with it a new foundation. Foundations that exist are not touched.
+The Parameter Set also holds the lists that are expected to change: the bedrock types and the races. A change to a list after phase 1 is a new Parameter Set, and with it a new foundation. Foundations that exist are not touched.
 
-#### Derived and Authored data
+#### Derived and authored data
 
 All generated data belongs to one of two classes:
 
-* Derived data is a pure function of the foundation (seed + parameter set + generator version). Regions, zones, patches, rivers, lakes, heights, biomes, resources, prospects, the potential population, the travel network and all Stubs are derived. The database is only a cache of derived data - it can be evicted and recomputed with an identical result.
-* Authored data comes from an LLM or a diffusion model. It costs to produce, so it is stored as the source of truth and is never regenerated or evicted.
+* **Derived data** is a pure function of the foundation (seed + Parameter Set + generator version). Regions, zones, patches, rivers, lakes, heights, biomes, resources, Prospects, the potential population, the travel network and all Stubs are derived. The database is only a cache of derived data: it can be evicted and recomputed with an identical result.
+* **Authored data** comes from an LLM or a diffusion model. It costs to produce, so it is stored as the source of truth and is never regenerated or evicted.
 
 #### Randomness
 
 There is no shared random stream. Every generation step seeds itself from a hash of (foundation seed, entity identity, purpose). A region gets the same result whether it is generated first or thousandth, so generation is independent of the order the player explores in.
 
-Where a step needs a sequence of random numbers (e.g. pick 3 of the zone cells of a region), a small generator is seeded from the hash of that one cell and consumed in a fixed order.
+Where a step needs a sequence of random numbers (pick 3 of the zone cells of a region, say), a small generator is seeded from the hash of that one cell and consumed in a fixed order.
 
 #### Identity
 
 All structural identities are deterministic. No database generated ids appear in the domain.
 
-* Region = coordinate in the region grid
-* Zone cell = coordinate in the zone grid
-* Patch cell = coordinate in the patch grid
-* City, Faction, Family and Person = parent + slot index
-
-Each of the three levels has its own grid, and every grid square holds exactly one Voronoi site. A Cell is that site. It is a pure function of the foundation and its coordinate never changes.
-
-The parent of a cell is not part of its identity, it is derived: a zone cell is owned by the region that contains its site, and a patch cell is owned by the zone cell that contains its site.
-
-Zones and patches are built from cells and take their identity from them:
-
-* A Zone is one or more zone cells that have merged. It has the identity of its root cell - the cell the others have merged into (see Zone and Patch transformation).
-* A Patch is one or more patch cells that have merged. It has the identity of its root cell, and it belongs to the zone of that cell.
-* For gameplay a merged zone or patch is considered to be one large cell. The merging is there to give greater variation in size and form.
+* Region, zone cell and patch cell = coordinate in the grid of its level
+* Zone and patch = the identity of its root cell (see Zone)
+* City, faction, family and person = parent + slot index
 
 This lets player state and authored data point at derived data that may be evicted and recomputed, and it makes a Stub addressable before it is Realised.
 
-#### Region Generation Stages
+#### Region generation stage
 
-A region moves through the stages below, in the order of the table and one stage at a time. No stage is skipped: a region is Elevated before it is Planned. Stages only advance - a region never moves backwards. Evicting derived data from storage and recomputing it is not a stage change.
-
-Sited is not a state a region is in. It needs only the seed, so it is a pure function that can be calculated for any region at any time, and it is never persisted. Stored regions start at Outlined. The Sited row describes what the function yields.
+A region moves through the stages below, in the order of the table and one stage at a time. No stage is skipped: a region is Elevated before it is Planned. Stages only advance, a region never moves backwards. Evicting derived data from storage and recomputing it is not a stage change.
 
 | Stage | Contains | Needs |
 | --- | --- | --- |
-| Sited | Region, Zone and Patch cell location, Zone cells initial type and bedrock. Ocean seeds, Determined number of links, expansions and mergers | foundation only |
+| Sited | Region, zone and patch cell location, zone cells' initial elevation type and bedrock. Ocean seeds, the determined number of links, expansions and mergers | The foundation only |
 | Outlined | Zones linked, expanded and merged. Sea access | All regions within the link range + 5 rings Sited (7 rings at the defaults) |
 | Detailed | Patch mergers, rivers, lakes. Estimated biomes and resources | All bordering regions Outlined |
 | Elevated | Height map. Final biomes and resources | All bordering regions Detailed |
 | Planned | Factions and Prospects for cities and towns. Potential population per race | The region Elevated |
-| Settled | Travel network. Actual Cities and towns, families and important persons | The region and all bordering regions Planned |
+| Settled | Travel network. Actual cities and towns, families and important persons | The region and all bordering regions Planned |
 
-The sites of all three levels come from seed-hashed jittered grids, so the cell of any region, zone or patch and its neighbours can be computed locally without generating the rest of the world.
+Sited is not a state a region is in. It needs only the seed, so it is a pure function that can be calculated for any region at any time, and it is never persisted. Stored regions start at Outlined. The Sited row describes what the function yields.
 
-Biomes and resources exist in two forms. The estimated form is calculated in the Detailed stage with a typical height per elevation type instead of the real height. The final form is calculated in the Elevated stage with the height from the height map. Lakes, Prospects and the travel network only read the estimated form, so they never depend on the height map. The potential population reads the final form and the height of each patch. The region is still Elevated before it is Planned: the Planned stage reads the Detailed data, but it does not come before the Elevated stage.
+Biomes and resources exist in two forms. The estimated form is calculated in the Detailed stage with a typical height per elevation type, and the final form in the Elevated stage with the height from the height map. Lakes, Prospects and the travel network only read the estimated form, so they never depend on the height map. The potential population reads the final form. The region is still Elevated before it is Planned.
 
-The policy for when a region advances (e.g. Detailed within some distance of the player) is not part of the domain model. The model only knows the stage and its preconditions.
+The policy for when a region advances (Detailed within some distance of the player, say) is not part of the domain model. The model only knows the stage and its preconditions.
 
-#### Entity Generation States
+#### Entity generation state
 
-Cities, factions, families and people each have their own generation state, independent of the region stage:
+Cities, factions, families and persons each have their own generation state, independent of the region generation stage: Stub → Pending → Realised.
 
-Stub → Pending → Realised
+A Stub holds every gameplay-relevant fact and is derived data. Pending means the authoring by LLM or diffusion model is in flight, and on failure the entity returns to Stub. Realised adds the authored presentation only, which must not contradict the Stub. Text and portrait are tracked separately. See [docs/society-generation.md](docs/society-generation.md) section 1.2.
 
-* A Stub holds every gameplay-relevant fact, and is derived data. For a person: name, age, sex, role, family links, faction membership and home.
-* Pending means the authoring by LLM or diffusion model is in flight. On failure the entity returns to Stub.
-* Realised adds the authored presentation only. For a person: the textual description, the history and the portrait. Authored data must not contradict the Stub.
+### The map
 
-The name of a person is not authored. It comes from the name generator (see [docs/NameGenerator-Reuse.md](docs/NameGenerator-Reuse.md)), so a person has a name already as a Stub.
-
-Text and portrait are tracked separately, so a person can be shown with a description and history before the picture arrives. A city can exist with a population count long before any individual in it is authored.
+The geography, the climate and what the land holds. Everything in this group is derived data. The rules are in [docs/map-generation.md](docs/map-generation.md), and the reasons behind them in [docs/map-generation-research.md](docs/map-generation-research.md).
 
 #### Region
 
-The map is structured in large regions the size of Middle Ages European kingdoms (approximately 100-200km x 100-200km, 128 km by default). The regions are divided into zones (32 km by default). The zones are divided into patches (8 km by default).
+The top level of the map, the size of a Middle Ages European kingdom (approximately 100-200 km by 100-200 km, 128 km by default). A region is divided into zones.
 
-The cell sizes are the Parameter Set values - not the counts. With the default sizes a region owns about 16 zone cells and a zone cell owns about 16 patch cells, and the exact count varies with where the sites fall. After the mergers the resulting number of zones and patches is lower - that is an outcome to evaluate in phase 1, not a parameter.
-
-A region is the generation unit: rivers, lakes, the height map and prospects are calculated one region at a time. A region is not fully self contained:
-
-* Ocean links and ocean expansion convert zone cells in any region.
-* A zone cell can merge into a zone of a neighbouring region. It then moves to that region, so region borders follow the merged zones.
-
-So the zones of a region are the zones whose root cell the region owns - not the zone cells the region owns.
-
-A region can be Outlined when all regions within the link range + 5 rings are Sited, and it can be Detailed when all bordering regions are Outlined (see Region Generation Stages).
-
-A Region is the top level of three levels of nested Voronoi cells. The levels are nested through the patch: a point belongs to a patch, the patch to a zone and the zone to a region. Zone borders, region borders and coastlines therefore all run along patch borders.
+The region is the generation unit: rivers, lakes, the height map and Prospects are calculated one region at a time, and the region is what moves through the region generation stages. It is not fully self contained: ocean links and ocean expansion convert zone cells in any region, and a zone cell can merge into a zone of a neighbouring region and then moves to that region. So the zones of a region are the zones whose root cell the region owns, and region borders follow the merged zones.
 
 #### Zone
 
-Zones have an elevation type: Ocean, Flat Land, Lowland, Hills or Mountains. And zones also have a bedrock type that drives mined resources in its patches
+The middle level of the map (32 km by default): one or more zone cells that have merged. A zone is the unit of land and ocean. It has an elevation type and a bedrock, and it is divided into patches.
 
-The elevation type is the authoritative elevation class of the zone, and it is an input to river generation. The actual height is calculated in the Elevated stage from the rivers. The elevation type does not give a height band - it gives how steeply the land rises from rivers and coast, the gradient of the rivers and the roughness of the surface. Ocean zones are never touched by river-driven height, their depth follows the distance from the coast.
-
-The elevation type and the bedrock are drawn by configured weights per zone cell when the region is Sited. The bedrock weights depend on the elevation type.
-
-A zone is the middle level of three levels of nested Voronoi cells.
+A zone has the identity of its root cell, the cell the others have merged into, and it takes everything from that cell: ocean or land, the region, the elevation type and the bedrock. For gameplay a merged zone is considered to be one large cell. The merging is there to give greater variation in size and form.
 
 #### Patch
 
-Patches have one biome associated with them. The biome drives the patch flora and fauna.
+The bottom level of the map (8 km by default): one or more patch cells of the same zone that have merged. A patch has the identity of its root cell and belongs to the zone of that cell, and like a merged zone it is considered to be one large cell for gameplay. A land patch has one biome, which drives its flora and fauna, and an amount of each resource. An ocean patch only carries sea resources.
 
-A patch is the bottom level of three levels of nested Voronoi cells. The patch level of Voronoi cells has its borders warped - to give the map a more natural aesthetic. Because the levels are nested through the patch, the coastlines and the zone and region borders get the same warped shape.
+The three levels are nested through the patch: a point belongs to a patch, the patch to a zone and the zone to a region. The borders of the patch cells are warped to give the map a more natural look, so the coastlines and the zone and region borders run along patch borders and get the same warped shape.
 
-#### Zone and Patch transformation
+#### Cell
 
-To give greater variation in zone and patch size and to give larger oceans - zones and patches undergo mergers.
-When a region is initialised a number of the zone cells it owns are determined to be of the ocean type - these initial ocean zone cells are marked as ocean seeds.
+Each of the three levels has its own grid, and every grid square holds exactly one Voronoi site. A cell is that site: a region, a zone cell or a patch cell. It is a pure function of the foundation and its coordinate never changes. The sites come from seed-hashed jittered grids, so any cell and its neighbours can be computed locally, without generating the rest of the world.
 
-The first step in the transformation is ocean linking.
-When linking, each ocean seed makes zero, one or two links by configured chances. It links to its nearest other ocean seeds. When linking, all zone cells in a straight line between the two ocean seeds are changed to ocean type.
+The parent of a cell is not part of its identity, it is derived: a zone cell is owned by the region that contains its site, and a patch cell by the zone cell that contains its site. The cell sizes are Parameter Set values, the counts are not. With the default sizes a region owns about 16 zone cells and a zone cell about 16 patch cells, and the exact count varies with where the sites fall. After the mergers the number of zones and patches is lower, which is an outcome to evaluate in phase 1 and not a parameter.
 
-* A link converts every zone cell under the line, whichever region owns it.
-* There is a configured link range, counted in regions (2 by default). An ocean seed only links to the seeds of regions within that range, and an ocean seed with no other seed within the range does not link.
-* A zone cell can be converted by a link that starts several regions away. So all regions within the link range + 5 rings must be Sited before a region can be Outlined.
+#### Elevation type
 
-The second step is ocean expansion. Every zone cell on a link - the two ocean seeds and the cells between them - converts a number of its nearest land neighbours to ocean. The number is 0 to 3 and it is drawn by configured weights. The neighbours can be in another region. An ocean seed that is not on any link does not expand. The expansion can run in a configured number of passes (1 by default), where each pass expands from the cells the previous pass converted.
+The authoritative elevation class of a zone: Ocean, Flat Land, Lowland, Hills or Mountains. It is drawn by configured weights per zone cell when the region is Sited, and apart from the conversion to ocean and the mergers it is final.
 
-The third step is zone mergers. In each region a configured number of mergers are determined. That number of the zone cells the region owns is randomly chosen, and each merges into its nearest neighbour on the same side of the coast. Only land-land or ocean-ocean mergers are allowed - so some mergers can not be completed (but still count). The neighbour can be owned by another region.
-
-The neighbour is the survivor of a merger. It can itself have merged into a third zone cell. The cell at the end of that chain is the root, and all zone cells with the same root are one zone. The zone takes everything from its root: ocean or land, the region, the elevation type and the bedrock. Apart from this and the conversion to ocean, the elevation type a zone cell got when Sited is final.
-
-These three steps make the region Outlined.
-
-The fourth step is patch merger.
-A number of the patch cells of each zone cell merge into their nearest neighbour patch in the same zone - This is to give greater variation in patch size and form. Roots are found as for zones.
-
-The patch merger is the first step of the Detailed stage. It runs when the zones are final, and only within a zone as it is after the zone mergers. Ocean zones have patch mergers like land zones, but they skip biomes and land resources - their patches only carry sea resources (e.g. fish).
-
-See [docs/map-generation.md](docs/map-generation.md) for the details of the zone and patch transformation (sections 5 and 6), and for all the later generation steps. The reasons behind the algorithms are in [docs/map-generation-research.md](docs/map-generation-research.md).
-
-#### Sea
-
-A sea is a connected set of ocean zones. It can span several regions. An ocean seed that is not on any link gives a small enclosed sea of one zone.
-
-A region has sea access if an ocean zone touches its land when it is Outlined. The ocean zone can belong to a neighbouring region. A region without sea access is landlocked. Whether two coasts are on the same sea is not stored as a region fact, because the world is unbounded. It is answered by a search over Outlined regions when gameplay needs it.
+The elevation type is an input to river generation, and it does not give a height band. It gives how steeply the land rises from rivers and coast, the gradient of the rivers and the roughness of the surface.
 
 #### Bedrock
 
-Bedrock will eventually be a fixed set of predetermined bedrock types (approximately 10). The generation currently uses the nine below, with weights per elevation type (see docs/map-generation.md section 14.1).
+The rock under a zone. It drives the mined resources of the patches of the zone. The bedrock is drawn per zone cell when the region is Sited, by configured weights that depend on the elevation type.
 
-Example table (not binding yet)
+Bedrock will eventually be a fixed set of about 10 predetermined types. The generation currently uses nine (docs/map-generation.md Appendix F).
 
-| Id          | Name                 | Mostly under            | Gives                                                         |
-| ----------- | -------------------- | ----------------------- | ------------------------------------------------------------- |
-| `shield`    | Crystalline shield   | flat, lowland, hills    | Granite, banded iron, lode gold (hills), diamonds, kaolin     |
-| `foldBelt`  | Fold belt            | hills, mountains        | Slate, marble, silver, lode gold, garnet, emerald             |
-| `granite`   | Granite intrusion    | hills, mountains        | Granite, tin lodes, skarn iron, topaz and beryl, kaolin       |
-| `volcanic`  | Volcanic arc         | mountains               | Basalt, obsidian, pumice, porphyry copper, gold, rock crystal |
-| `basalt`    | Flood basalt         | flat, lowland, hills    | Basalt, native copper, agate, black sands                     |
-| `ophiolite` | Ophiolite            | hills, mountains        | Soapstone, massive-sulfide copper, jade                       |
-| `carbonate` | Carbonate platform   | lowland, hills          | Limestone, chalk, flint, lead and zinc, skarn iron            |
-| `clastic`   | Clastic basin        | flat, lowland           | Sandstone, coal, lignite, red-bed copper, rock salt, amber    |
-| `alluvium`  | Unconsolidated cover | flat, lowland           | Field stone only; clay                                        |
+#### Ocean seed, link and merger
 
-#### Biome
+How the zone cells and patch cells of the Sited stage become the zones and patches of the map. It gives larger oceans and greater variation in size and form. There are four steps:
 
-Biomes will eventually be a fixed set of predetermined biomes (10-20). Geography and climate will drive biomes.
+1. **Ocean linking.** Some of the zone cells of a region are ocean from the start: the ocean seeds. An ocean seed links to its nearest other ocean seeds within the link range, and every zone cell under the straight line between them becomes ocean, whichever region owns it.
+2. **Ocean expansion.** The zone cells on a link convert some of their nearest land neighbours to ocean. The neighbours can be in another region.
+3. **Zone mergers.** A number of the zone cells of each region merge into their nearest neighbour on the same side of the coast.
+4. **Patch mergers.** A number of the patch cells of each zone cell merge into their nearest neighbour patch in the same zone. Ocean zones have patch mergers like land zones.
 
-The biome of a patch comes from its temperature and its aridity. The temperature is the Initial Temperature field cooled by the height of the patch. The aridity is the precipitation relative to what the temperature demands. Mangrove is an override on warm, wet and low coasts.
+The first three steps make the region Outlined. The patch mergers are the first step of the Detailed stage, when the zones are final.
 
-The current set (not binding yet) is 15 land biomes and Mangrove:
+#### Sea
 
-Ice & snow, Tundra, Cold steppe, Boreal forest, Cold desert, Temperate grassland, Woodland & shrubland, Temperate mixed forest, Temperate broadleaf forest, Temperate rain forest, Hot desert, Thorn scrub, Savanna, Tropical dry forest, Tropical rain forest, Mangrove
+A connected set of ocean zones. A sea can span several regions, and an ocean seed that is not on any link gives a small enclosed sea of one zone.
 
-#### Rivers
+A region has sea access if an ocean zone touches its land when it is Outlined. The ocean zone can belong to a neighbouring region. A region without sea access is landlocked. Whether two coasts are on the same sea is not stored as a region fact, because the world is unbounded. It is answered by a search over Outlined regions when gameplay needs it.
 
-Rivers are calculated per region with a space-colonization algorithm, growing from the sea into the land. It is the rivers that drive the height of the landscape.
+#### Field
 
-A river never runs on the land of another region. Region borders are therefore watersheds, and the height map puts a ridge on them. The exception is a landlocked region: its rivers search up to 4 zones away for an ocean, and they cross the land of a neighbouring region to reach it.
+A noise map that drives climate, biomes and resources: a stateless function of foundation and coordinate that can be sampled anywhere at any time. Fields are never stored and have no generation stage. A stage only records the values it sampled.
 
-#### Lakes
+There are four Fields: Precipitation, Initial Temperature, Prosperity and Supernatural. Precipitation and Initial Temperature are warped, so their highs and lows form winding belts instead of round spots. They also have a distribution in the Parameter Set, which decides how the land is shared between the biomes. The height map uses two more noise functions of the same kind, a relief field and a detail noise.
+
+#### River
+
+Rivers are calculated per region, growing from the sea into the land. It is the rivers that drive the height of the landscape, not the other way round.
+
+A river never runs on the land of another region, so region borders are watersheds. The exception is a landlocked region: its rivers cross the land of a neighbouring region to reach an ocean.
+
+#### Lake
 
 Lakes are placed per region after the rivers. A lake always sits on a river, so every lake has a river running in and out. There are no lakes in mountain zones, in deserts or in river-poor flat zones (dry flat zones that get few rivers).
 
-Lakes do not change the height map. They count as fresh water for resources and prospects.
+Lakes do not change the height map. They count as fresh water for resources and Prospects.
 
-#### Fields
+#### Height map
 
-Perlin Noise Maps that are used to drive climate, biomes and resources. They are Fields: stateless functions of foundation and coordinate that can be sampled anywhere at any time. Fields are never stored and have no generation stage - a stage only records the values it sampled. Precipitation and Initial Temperature are warped, so their highs and lows form winding belts instead of round spots. They also have a distribution in the Parameter Set: what share of the map lies below a value. It decides how the land is shared between the biomes.
+The actual height of the land of a region. It is calculated in the Elevated stage from the rivers, so that the rivers run downhill, and from the elevation type of the zones. It puts a ridge on the region borders. Ocean zones are never touched by river-driven height: their depth follows the distance from the coast.
 
-* Precipitation
-* Initial Temperature
-* Prosperity
-* Supernatural
+#### Biome
 
-The height map uses two more noise functions of the same kind: a relief field that makes neighbouring zones rugged or gentle together, and a detail noise on the surface.
+The kind of nature of a land patch. It comes from the temperature of the patch (the Initial Temperature field cooled by the height) and its aridity (the precipitation relative to what the temperature demands). Mangrove is an override on warm, wet and low coasts.
+
+Biomes will eventually be a fixed set of 10-20 predetermined biomes. The current set, not binding yet, is 15 land biomes and Mangrove:
+
+Ice & snow, Tundra, Cold steppe, Boreal forest, Cold desert, Temperate grassland, Woodland & shrubland, Temperate mixed forest, Temperate broadleaf forest, Temperate rain forest, Hot desert, Thorn scrub, Savanna, Tropical dry forest, Tropical rain forest, Mangrove
 
 #### Resource
 
-This section focuses on resources found in patches, these are generated together with the map and world. Resources that are produced (e.g during gameplay) are only covered lightly in this section.
+What a patch holds for people to use. The generation gives every patch an amount for each of 24 raw resources, and a variant of each: rye is a variant of grain. A potential is what the land can yield. A deposit is a rare find that often needs to be mined.
 
-##### Groups
-
-Resources are split in groups to make trade and needs calculation more manageable.
-
-* Food
-* Materials
-* Fuel
-* Luxuries
-* Metals
-* Animals
-* Building (Only produced)
-* Tools (Only produced)
-* Gear (Only produced)
-* Weapons (Only produced)
-* Clothing (Only produced)
-
-##### Potentials or Deposits
-
-Potentials are what the land can yield. Deposits are rare finds that often need to be mined.
-
-##### Variants
-
-Variants of the same resource group
-
-##### Product
-
-Products are produced from resources
-
-##### Generated resources
-
-The generation gives every patch an amount for each of 24 raw resources, and a variant (see docs/map-generation.md section 14). The example table below is finer than these 24 in some rows:
-
-* Wild food and game are one generated resource. The same goes for solid and liquid fuel, silver ore and lead ore, gems and pearls, spices and incense, furs and ivory, and mounts and pack animals.
-* Salt is a generated resource of its own. In the table it is a variant of Preserver.
-* Star metal and the sap from Elanor are fantasy resources. The generation has no rule for them yet.
-
-Example table (not sufficient)
-
-| Group | Resources | Variant |
-| --- | --- | --- |
-| Food | Grain | wheat, durum, spelt, barley, rye, oats, maize, sorghum, pearl millet, teff, buckwheat, quinoa, fonio, wild rice |
-| Food | Produce | Potato, cassava, yam, taro, banana, sago palm, breadfruit, faba bean, pea, lentil, chickpea, common bean, cowpea, pigeon pea, onion and alliums, cabbage and kale, carrot, beet, melons, tiger nut, bottle gourd |
-| Food | Orchard | Olive, grape, date palm, fig, pomegranate, almond, pistachio, carob, apple, pear, peach and stone fruit, citrus, walnut, sweet chestnut, hazel, stone pine nuts, cedar-pine nuts, coconut, oil palm, mango, avocado, tamarind, baobab, shea, Brazil nut, cashew, palmyra palm, prickly pear, jujube, mesquite pods, pineapple, soybean, groundnut, sesame, rapeseed, sunflower |
-| Food | livestock | Cattle, sheep, goats, pigs, yak, herded reindeer, water buffalo, poultry, alfalfa, dairy products |
-| Food | fish | River fish, salmon runs, sturgeon, eels, lake fish, cod banks, herring/sardine/anchovy, tuna and large pelagics, oysters and mussels, clams, crabs, lobsters, shrimp, octopus |
-| Food | wild food | Bilberry, blueberry, cloudberry and crowberry, raspberry and bramble, sea buckthorn, elderberry, forest mushrooms, acorns, wild grass seed, lotus, water chestnut, cattail, arrowhead, maple sap, edible seaweed, kelp, wild herbs |
-| Food | game | deer, wild boar, caribou, bison and wild cattle, antelope and gazelle, wild sheep and ibex, waterfowl, upland game birds, hares and rabbits |
-| Materials | Timber | Oak, beech, ash, elm, linden, willow and osier, poplar, Scots pine, spruce, fir, larch, giant conifers, cedar, yew, cypress, Mediterranean pines, cork oak, teak, sal, mahogany, Spanish cedar, rosewood, ebony, African mahogany, iroko, balsa, eucalypt-type hardwood, thorn-scrub wood, juniper, mangrove timber, driftwood, bog oak |
-| Materials | Stone | granite, basalt, limestone, chalk, marble, sandstone, slate, flint and chert, obsidian, pumice and pozzolana, soapstone, millstone and quern stone, whetstone |
-| Materials | Clay | Clay, kaolin |
-| Materials | Crystal | quartz, Rock crystal |
-| Materials | Fibre | Flax, hemp, cotton, wool, silk, wild silk, jute, ramie, kenaf, sisal and agave, abaca, New Zealand flax, esparto grass, kapok, nettle, lime-bast |
-| Materials | Preserver | Salt, Sap from the Elven flower Elanor |
-| Fuel | Solid | Firewood, charcoal, peat, dung fuel, coal, lignite, turf and sod |
-| Fuel | Liquid | oil, naphtha seeps |
-| Metals | Iron ore | Bog iron, lateritic iron and ironstone, banded iron formation, magnetite skarn iron, black sands |
-| Metals | copper ore | Porphyry copper, red-bed copper, massive-sulfide copper, native copper, malachite, azurite |
-| Metals | tin ore | Tin lode, stream tin |
-| Metals | silver ore | Silver (argentiferous galena) |
-| Metals | lead ore | lead-zinc in carbonates, lead-zinc skarns and veins, calamine |
-| Metals | gold ore | gold ore |
-| Metals | star metal | star metal |
-| Luxuries | Gems | Diamond, Ruby, Sapphire, Emerald, Aquamarine, Amethyst, Garnet, Topaz, Tourmaline, Opal, Jade, Lapis, Turquoise, Spinel, Zircon |
-| Luxuries | Pearls | Pearls |
-| Luxuries | spices | Black pepper, clove, nutmeg and mace, cinnamon, cardamom, ginger, turmeric, vanilla, allspice, chili pepper, saffron, cumin, coriander, caraway, mustard |
-| Luxuries | incense | frankincense, myrrh, gum arabic, sandalwood, agarwood, pine resin/tar/pitch, copal and dammar, camphor, lavender and rose oil, cinchona bark, mastic and balsams, rubber latex |
-| Luxuries | stimulants & sugar | Honey, sugar cane, palm sugar, tea, coffee, cacao, kola nut, betel nut, coca, tobacco |
-| Luxuries | furs | Sable and marten, beaver, fox and Arctic fox, ermine, squirrel, bear, big cats, seals, ostrich, exotic feathers, ambergris, eider down, musk deer |
-| Luxuries | ivory | walrus, narwhal tusk, elephant ivory, hippopotamus ivory |
-| Luxuries | dyes | Cochineal, kermes, lac, murex, woad, indigo, madder, weld, safflower, henna, annatto, red sanders and brazilwood, logwood, lichen dyes |
-| Animals | Mounts | Horse |
-| Animals | Pack Animals | Horses, donkeys, mules, dromedary camel, Bactrian camel, llama, alpaca-like camelids |
+Resources are split in groups to make trade and needs manageable: Food, Materials, Fuel, Luxuries, Metals and Animals are found in patches, and Building, Tools, Gear, Weapons and Clothing are only produced. A product is produced from resources and is not generated with the map. The groups and the catalogue of variants are in docs/map-generation.md Appendix G.
 
 #### Prospect
 
-A potential location for a City or Town. Has information about resources, travel options etc.
+A potential location for a city or a town, with information about its resources, its travel options and so on. Every land patch of a region gets a score, and the best patches become the Prospects of the region (20 by default, of which up to 4 are for cities), with a minimum spacing between them. A Prospect never touches the land of another region.
 
-Every land patch of a region gets a score from five factors: resources, geography, trade, climate and prosperity. The best patches become the Prospects of the region (20 by default, of which up to 4 are for cities), with a minimum spacing between them. A Prospect never touches the land of another region, which keeps Prospects apart across region borders without reading the neighbour.
-
-The sum of the scores of a region's Prospects decides how many of them are on show: all of them in the best regions, a single one in the regions with the lowest sums. Only the Prospects on show are drawn on a map and connected by the travel network, and they are the region's best by score.
-
-A Prospect is Rich, Average or Poor by its score. A map draws a Rich Prospect in gold, an Average one in silver and a Poor one in bronze.
-
-Prospects only read the estimated biomes and resources (see Region Generation Stages).
+A Prospect is Rich, Average or Poor by its score. The sum of the scores of a region decides how many of its Prospects are on show: all of them in the best regions, a single one in the poorest. Only the Prospects on show are drawn on a map and connected by the travel network.
 
 #### Travel network
 
 Roads, river routes and sea lanes that connect the Prospects on show. The network of a region is calculated from the Prospects of the region and its bordering regions. A link between Prospects in two regions is decided by exactly one region, so the network does not depend on the order the regions are generated in.
 
+### The society
+
+The peoples that live on the map. The Stub of every entity in this group is derived data, and its presentation is authored. The rules are in [docs/society-generation.md](docs/society-generation.md). Only the races and the potential population are specified there so far. Detailing the rest is a later task.
+
 #### Race
 
-A people that can live in the world: humans, elves, dwarves and so on. Races are needed to generate factions, families and people.
+A people that can live in the world: humans, elves, dwarves and so on. Races are needed to generate factions, families and persons.
 
-The races are a list in the Parameter Set, not a fixed set in the code. The list is expected to change late in phase 2, so a race is added or changed by editing the list. Each race has:
-
-* An id and a name. Generated data points at a race by its id.
-* A toggle: the race is on or off. A race that is off does not live in the world.
-* A frequency for each biome: how frequent the race is in that biome, relative to the other races. 0 means the race does not live there. In a Parameter Set file a race lists only the biomes it lives in: a biome that is left out has the frequency 0.
-* A height modifier: a factor on the frequencies of the race that depends on the height of the land. It can cut a race off at a height or fade it in and out. A race without a height modifier lives at every height.
-
-The default list holds 23 races. Human, Elf, Dwarf, Halfling, Orc and Goblin are on. The other 17 are off until they are toggled on:
-
-Dark elf, Gnome, Hobgoblin, Kobold, Gnoll, Giant-blooded, Ogre, Troll, Lizardfolk, Catfolk, Ratfolk, Birdfolk, Bull-folk, Centaur, Dragonkin, Undead, Frost folk
-
-By default dwarves only live from 200 m and up and elves only below 200 m. The height does not matter to the other races.
-
-How a faction, a family or a person gets its race is not decided yet.
+The races are a list in the Parameter Set, not a fixed set in the code. Each race has an id, a name, a toggle (on or off), a frequency for each biome and a height modifier. The default list holds 23 races, of which Human, Elf, Dwarf, Halfling, Orc and Goblin are on (docs/society-generation.md Appendix A). How a faction, a family or a person gets its race is not decided yet.
 
 #### Potential population
 
 An estimate of how many persons the land of a region can feed, for each race that is on. It is not a count of people that exist: cities, families and persons come in the Settled stage.
 
-Every land patch has a capacity in persons. It comes from the area of the patch, its food resources and the Prosperity field. The races that are on share the capacity of a patch in proportion to their frequency in the biome of the patch, each multiplied by the height modifier of the race at the height of the patch. The potential population of a race in a region is the sum of its shares over the land patches of the region.
-
-So the races compete for the same land. Toggling a race off does not lower the potential population of a region, it leaves its share to the other races. Land where no race that is on lives, by its biome or its height, holds nobody.
-
-The potential population is calculated in the Planned stage. It reads the height map: the height of a patch is its mean height, and the biomes and resources are the final ones (see Region Generation Stages). See [docs/map-generation.md](docs/map-generation.md) section 19 for the rule and Appendix E for the default list.
+Every land patch has a capacity that comes from its area, its food resources and the Prosperity field. The races that are on share it by their frequency in the biome of the patch and their height modifier at its height. So the races compete for the same land, and toggling a race off leaves its share to the others. The potential population is calculated in the Planned stage.
 
 #### Faction
 
-A group of people in one region. A political grouping. Could be a Kingdom, a thieves guild or a tribe of people.
+A group of people in one region: a political grouping. It could be a kingdom, a thieves' guild or a tribe. Factions belong to the Planned stage.
+
+#### City and town
+
+An actual settlement on a Prospect. Cities and towns belong to the Settled stage. A city can exist with a population count long before any individual in it is authored.
 
 #### Family
 
-A family of NPCs. Typically living together in a household. Can include servants or slaves.
+A family of NPCs, typically living together in a household. It can include servants or slaves.
 
 #### Person
 
-An NPC in the game. A person. The name is generated and belongs to the Stub. The textual description, the history and the portrait are authored.
+An NPC in the game. The Stub of a person holds name, age, sex, role, family links, faction membership and home. The name is not authored: it comes from the name generator, so a person has a name already as a Stub. The textual description, the history and the portrait are authored.
 
-## Setup and run
+#### Vocation
+
+The work a person does. Vocations are not specified yet, and how a vocation stands to the role of a person is not decided.
+
+#### Looks
+
+What a portrait of a person must show: the body and the face, the hair, the outfit and the accessories. Looks are not specified yet.
+
+## Documentation
+
+| Document | What it holds |
+| --- | --- |
+| [docs/map-generation.md](docs/map-generation.md) | The rules of the map generation, section by section, with the data tables as appendices |
+| [docs/society-generation.md](docs/society-generation.md) | The rules of the society generation, with the default race list as an appendix |
+| [docs/map-generation-research.md](docs/map-generation-research.md) | Why a rule is as it is, what was weighed against it and what is still open |
+| [docs/default-parameter-set.json](docs/default-parameter-set.json) | The default Parameter Set |
+| [docs/parameter-set.schema.json](docs/parameter-set.schema.json) | The JSON Schema of a Parameter Set file. Generated, do not edit |
+| [docs/adding-a-race.md](docs/adding-a-race.md) | The steps to add a race |
+| [docs/races-basis.md](docs/races-basis.md) | A proposal for a reworked race list of 32 races |
+| [docs/NameGenerator-Reuse.md](docs/NameGenerator-Reuse.md) | The person-name generator |
+| [docs/research/](docs/research/) | The source notes behind the research document |
+| [docs/plans/](docs/plans/) | Plans for changes that are not implemented yet |
+
+## Build and run
 
 The code is one .NET solution, `Gameworld.slnx`. It needs the .NET 11 SDK and nothing else: no database and no external services. The NuGet packages of the test project are restored on the first build.
 
 | Project | What it is |
 | --- | --- |
 | `src/Gameworld.Domain` | The domain model of this readme |
-| `src/Gameworld.Generation` | The generation algorithms of [docs/map-generation.md](docs/map-generation.md) and the map renderer |
+| `src/Gameworld.Generation` | The generation algorithms of [docs/map-generation.md](docs/map-generation.md) and [docs/society-generation.md](docs/society-generation.md), and the map renderer |
 | `src/Gameworld.MapGenerator` | The map generation app (console) |
 | `src/Gameworld.Demo` | The demo app (web map viewer) |
 | `tests/Gameworld.Tests` | The tests |
@@ -444,7 +352,7 @@ dotnet run --project src/Gameworld.MapGenerator -c Release -- --parameters my-pa
 
 ### Help text for the parameters
 
-Every parameter has a description: what it does, its unit and the section of [docs/map-generation.md](docs/map-generation.md) it belongs to. The descriptions are written once, on the `ParameterSet` types in `src/Gameworld.Domain/ParameterSet.cs`, and [docs/parameter-set.schema.json](docs/parameter-set.schema.json) is generated from them as a JSON Schema, together with the default, the range and the allowed values of each parameter.
+Every parameter has a description: what it does, its unit and the section of [docs/map-generation.md](docs/map-generation.md) or [docs/society-generation.md](docs/society-generation.md) it belongs to. The descriptions are written once, on the `ParameterSet` types in `src/Gameworld.Domain/ParameterSet.cs`, and [docs/parameter-set.schema.json](docs/parameter-set.schema.json) is generated from them as a JSON Schema, together with the default, the range and the allowed values of each parameter.
 
 An editor that knows the schema shows the description when you hover a name, completes names and values, and underlines unknown names and values out of range.
 

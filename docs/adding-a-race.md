@@ -8,8 +8,9 @@ ways to add one, and they differ a lot in work:
 - **To the default list**: change the built-in defaults, so every world without its own
   Parameter Set file has the race. This touches code, tests and four docs.
 
-The rules behind both are in [map-generation.md](map-generation.md) section 19, and the
-default list is its Appendix E. The term Race is defined in the [readme](../readme.md).
+The rules behind both are in [society-generation.md](society-generation.md) sections 2
+and 3, and the default list is its Appendix A. The term Race is defined in the
+[readme](../readme.md).
 
 A change to the list is a new Parameter Set, and with it a new foundation. Foundations
 that exist are not touched.
@@ -188,9 +189,9 @@ Do step 2 first and look at the numbers. Then change these together:
 |---|---|
 | [src/Gameworld.Domain/ParameterSet.cs](../src/Gameworld.Domain/ParameterSet.cs) | Add a `Make(...)` line to `RaceParameters.Defaults`: id, name, on or off, `common`, then the 16 habitat weights in the order of the column header. Add `with { HeightModifier = ... }` for a height modifier; `OnlyFrom` and `OnlyBelow` make the two steps. |
 | [default-parameter-set.json](default-parameter-set.json) | Add the same entry to `Races`, at the same place in the list, with the frequencies multiplied out. A test checks that this file equals `ParameterSet.Default`. |
-| [map-generation.md](map-generation.md) Appendix E | Add the row to the table. Update the height modifier note below it ("The other 21 races have none"). |
-| [map-generation.md](map-generation.md) section 19 | Update the count in the parameter table ("23, of which 6 are on"). |
-| [readme.md](../readme.md), Race | Update the count ("The default list holds 23 races") and the list of races that are on or off. |
+| [society-generation.md](society-generation.md) Appendix A | Add the row to the table. Update the height modifier note below it ("The other 21 races have none"). |
+| [society-generation.md](society-generation.md) section 2 | Update the count in the parameter table ("23, of which 6 are on"). |
+| [readme.md](../readme.md), Race | Update the count ("The default list holds 23 races") and the races that are on. |
 | [map-generation-research.md](map-generation-research.md) section 10.7 | Update "All 23" and say where the weights of the new race come from. The 23 came from the research note RACES §4.1; a race from elsewhere is a new decision. |
 | [tests/Gameworld.Tests/PopulationTests.cs](../tests/Gameworld.Tests/PopulationTests.cs) | The count 23 is asserted in two tests. |
 
@@ -202,9 +203,9 @@ race list, so it is not regenerated.
 - `ClassicSix` in PopulationTests.cs is the list of races that are on. The tests around it
   also assume that only dwarves and elves have a height modifier, and compute shares from
   the six frequencies in one biome.
-- map-generation.md section 19.3 quotes measured shares per race (66 % human and so on).
-  Measure them again. The readme and Appendix E also describe which of the races that are
-  on live in which biome.
+- society-generation.md section 3.3 quotes measured shares per race (66 % human and so on).
+  Measure them again. Its Appendix A also describes which of the races that are on live in
+  which biome.
 - Every world on the defaults changes, since the new race takes land from the other six.
 
 Then run the tests:

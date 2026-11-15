@@ -1,11 +1,12 @@
 # Gameworld
 
-[readme.md](readme.md) is the domain model and the source of every name. Read it first.
+[readme.md](readme.md) defines every concept of the domain model in a few lines and is the source of every name. Read it first. The detail of a concept is in one of the two generation docs: the map or the society.
 
 ## Docs
 
-- [docs/map-generation.md](docs/map-generation.md): the generation rules. Read the section for the layer at hand; each section states its region generation stage. Sections 1 and 3-8 hold the structure. Section 19 is the races and the potential population. Appendices B-D are crop and resource data tables, and Appendix E is the default race list.
-- [docs/default-parameter-set.json](docs/default-parameter-set.json): the default Parameter Set, grouped by region generation stage. map-generation.md quotes the same defaults in its text; change both together.
+- [docs/map-generation.md](docs/map-generation.md): the generation rules of the map (geography, climate, biomes, resources, Prospects, travel network). Read the section for the layer at hand; each section states its region generation stage. Sections 1 and 3-8 hold the structure. Appendices B-D are crop and resource data tables, F is the bedrock types and G the resource groups and catalogue. Section 19 and Appendix E are only pointers: the races moved to society-generation.md.
+- [docs/society-generation.md](docs/society-generation.md): the generation rules of the society (races, potential population, factions, cities and towns, families, persons, vocations, looks). Only sections 2 and 3, the races and the potential population, are specified and implemented; sections 4-9 hold what is decided and what is open. Appendix A is the default race list, and Appendix B lists the other society docs (races-basis.md, the research notes).
+- [docs/default-parameter-set.json](docs/default-parameter-set.json): the default Parameter Set, grouped by region generation stage. map-generation.md and society-generation.md quote the same defaults in their text; change them together.
 - [docs/parameter-set.schema.json](docs/parameter-set.schema.json): generated, do not edit. It is the JSON Schema of a Parameter Set file: the description, default and range of every parameter. The descriptions live in `[Description]` attributes in `src/Gameworld.Domain/ParameterSet.cs`; give every new parameter one, then regenerate with `dotnet run --project src/Gameworld.MapGenerator -c Release -- --export-schema docs/parameter-set.schema.json`.
 - [docs/map-generation-research.md](docs/map-generation-research.md): why a rule is as it is, what was weighed against it and what is still open. Read it when a rule is questioned or changed.
 - [docs/adding-a-race.md](docs/adding-a-race.md): the steps to add a race, to one world through a Parameter Set file or to the default list, and every place that must change with the default list.
@@ -14,14 +15,14 @@
 
 ## Authority
 
-The readme decides the domain model and the names. map-generation.md decides the generation rules. When the two disagree, report it to the user before changing either.
+The readme decides the domain model and the names. map-generation.md decides the generation rules of the map, and society-generation.md those of the society. When two of them disagree, report it to the user before changing either.
 
 ## Code
 
 .NET 11, one solution: `Gameworld.slnx`.
 
 - `src/Gameworld.Domain`: the domain model of the readme. No generation logic. `ParameterSet.Default` must equal docs/default-parameter-set.json (a test checks it).
-- `src/Gameworld.Generation`: the algorithms of map-generation.md, one folder per layer. `World` is the entry point: it holds one foundation and computes and caches every layer on demand.
+- `src/Gameworld.Generation`: the algorithms of map-generation.md and society-generation.md, one folder per layer. `World` is the entry point: it holds one foundation and computes and caches every layer on demand.
 - `src/Gameworld.MapGenerator`: the map generation app (console). `dotnet run --project src/Gameworld.MapGenerator -c Release -- --help`. It writes maps and regions to `out/`.
 - `src/Gameworld.Demo`: the demo app (web map viewer). `dotnet run --project src/Gameworld.Demo -c Release`, then open http://localhost:5062.
 - `tests/Gameworld.Tests`: `dotnet test -c Release`.

@@ -9,7 +9,7 @@ facts needed to place it in the biomes and to draw vocations and factions from i
   [races-and-worldbuilding.md](races-and-worldbuilding.md).
 
 This document is a proposal. It does not change the default list of
-[map-generation.md](map-generation.md) Appendix E, the Parameter Set or the code.
+[society-generation.md](society-generation.md) Appendix A, the Parameter Set or the code.
 [adding-a-race.md](adding-a-race.md) lists what must change when a race is adopted.
 The biome weights are judgement. The shares they give are measured on 50 regions (see
 Measured shares), and the weights have not been tuned afterwards.
@@ -25,7 +25,7 @@ Every entry has the same parts.
 | History and lore | Where the race comes from and what it tells about itself |
 | Way of life | Housing, food, family, law and custom. For a new race: how the hidden trait shapes them |
 | Relations | How the race stands to the human races and to its neighbours |
-| Biomes | Habitat weights as in Appendix E: **native (3)**, **good (2)**, **tolerated (1)**. A biome that is not named is 0. Then the height modifier, `common`, and what the race wants that a race cannot ask for yet |
+| Biomes | Habitat weights as in society-generation.md Appendix A: **native (3)**, **good (2)**, **tolerated (1)**. A biome that is not named is 0. Then the height modifier, `common`, and what the race wants that a race cannot ask for yet |
 | Vocations | Work the race is known for. A source for the roles of persons |
 | Factions | The kinds of group the race forms. A source for the factions of a region |
 
@@ -2486,7 +2486,7 @@ The Seasoned.
 
 ## Habitat weights
 
-The 32 races in the format of [map-generation.md](map-generation.md) Appendix E. The
+The 32 races in the format of [society-generation.md](society-generation.md) Appendix A. The
 frequency of a race in a biome is its habitat weight times `common`. Columns: Ice &
 snow, Tundra, Cold steppe, Boreal forest, Cold desert, Temperate grassland, Woodland &
 shrubland, Temperate mixed forest, Temperate broadleaf forest, Temperate rain forest,
