@@ -17,7 +17,7 @@ vocations and the factions of each race. That part is material for sections 4 to
 society-generation.md and binds nothing yet.
 [adding-a-race.md](adding-a-race.md) lists what must change with the list.
 
-The biome weights are judgement. The shares they give are measured on 50 regions (see
+The biome weights are judgement. The shares they give are measured on 1,079 regions (see
 Measured shares), and the weights have not been tuned afterwards.
 
 Five races of the first version of this document were left out of the list and are not
@@ -2281,90 +2281,103 @@ biomes. The other new races have a weight in 3 to 9 biomes.
 
 ## Measured shares
 
-Measured on 50 regions: the 25 regions around region (0, 0) of the seeds `cellgen` and
-`gameworld`, taken to the Planned stage with the default Parameter Set. The 50 regions
-hold 1,824,336 persons, 35,157 in a median region. The shares are sums of the
-potential population per race of the region files.
+Measured on 1,079 regions: the 18 × 15 regions around region (0, 0) (i from −9 to 8, j
+from −7 to 7) of the seeds `cellgen`, `gameworld`, `atlas` and `ember`, taken to the
+Planned stage with the default Parameter Set. One of the 1,080 regions has no land. The
+regions hold 40,758,804 persons, 36,412 in a median region.
 
-| # | Race | Group | Share of all persons | Persons in a median region | Regions with 1 % or more (of 50) | Largest race in |
+A region holds six races: four main races and two minority races
+([society-generation.md](society-generation.md) section 3.3). The plain share is what a
+race would hold if every race shared every region, by the frequencies and the height
+modifiers alone. It is what the measurement gave before the regions were limited to six
+races.
+
+| # | Race | Group | Plain share | Share of all persons | Regions that hold it | As a main race | Largest race in (of 1,079) | Persons in a median region that holds it |
+|---|---|---|---|---|---|---|---|---|
+| 1 | Northmen | Human | 5.44 % | 4.18 % | 33 % | 25.4 % | 29 | 4,711 |
+| 2 | Midlanders | Human | 11.16 % | 19.21 % | 80 % | 77.8 % | 352 | 8,813 |
+| 3 | Saltroad folk | Human | 9.10 % | 15.13 % | 64 % | 60.2 % | 244 | 8,290 |
+| 4 | Sunlanders | Human | 8.99 % | 13.55 % | 63 % | 58.9 % | 90 | 7,933 |
+| 5 | Grass riders | Human | 4.62 % | 1.94 % | 18 % | 9.5 % | 6 | 3,602 |
+| 6 | Rainkeepers | Human | 7.43 % | 7.54 % | 45 % | 39.1 % | 3 | 6,024 |
+| 7 | Canal folk | Human | 11.97 % | 21.93 % | 90 % | 88.8 % | 340 | 9,029 |
+| 8 | Elves | Classic | 3.04 % | 0.65 % | 10 % | 1.7 % | 0 | 2,214 |
+| 9 | Dwarves | Classic | 1.46 % | 0.36 % | 8 % | 0.2 % | 0 | 1,565 |
+| 10 | Halflings | Classic | 5.50 % | 2.44 % | 20 % | 10.9 % | 0 | 4,462 |
+| 11 | Gnomes | Classic | 3.04 % | 0.72 % | 9 % | 0.0 % | 0 | 2,763 |
+| 12 | Orcs | Classic | 7.14 % | 6.23 % | 35 % | 26.7 % | 15 | 6,279 |
+| 13 | Hoarkin | New | 0.47 % | 0.27 % | 8 % | 0.4 % | 0 | 1,136 |
+| 14 | Hearthbloods | New | 0.31 % | 0.24 % | 7 % | 0.1 % | 0 | 1,306 |
+| 15 | Widegaze | New | 1.17 % | 0.37 % | 8 % | 0.0 % | 0 | 1,631 |
+| 16 | Amberbloods | New | 1.65 % | 0.41 % | 8 % | 0.0 % | 0 | 1,895 |
+| 17 | Brinefolk | New | 1.35 % | 0.38 % | 9 % | 0.1 % | 0 | 1,490 |
+| 18 | Duskreaders | New | 1.71 % | 0.41 % | 8 % | 0.2 % | 0 | 1,740 |
+| 19 | Noonfolk | New | 2.38 % | 0.48 % | 8 % | 0.0 % | 0 | 2,020 |
+| 20 | Boughwalkers | New | 0.89 % | 0.31 % | 8 % | 0.0 % | 0 | 1,430 |
+| 21 | Shoalfolk | New | 0.20 % | 0.18 % | 6 % | 0.0 % | 0 | 1,129 |
+| 22 | Swiftborn | New | 2.08 % | 0.40 % | 8 % | 0.0 % | 0 | 1,854 |
+| 23 | Flinchless | New | 0.81 % | 0.38 % | 8 % | 0.0 % | 0 | 1,986 |
+| 24 | Lanternkin | New | 0.95 % | 0.35 % | 8 % | 0.0 % | 0 | 1,771 |
+| 25 | Stillfaces | New | 1.68 % | 0.44 % | 9 % | 0.0 % | 0 | 1,767 |
+| 26 | Twofold | New | 1.57 % | 0.34 % | 8 % | 0.1 % | 0 | 1,667 |
+| 27 | Bitterbloods | New | 0.43 % | 0.29 % | 7 % | 0.0 % | 0 | 1,573 |
+| 28 | Catfolk | New | 3.45 % | 0.89 % | 10 % | 0.0 % | 0 | 3,220 |
+
+| Group | Plain share | Share of all persons | Seed `cellgen` | Seed `gameworld` | Seed `atlas` | Seed `ember` |
 |---|---|---|---|---|---|---|
-| 1 | Northmen | Human | 5.61 % | 1,936 | 47 | 3 |
-| 2 | Midlanders | Human | 10.97 % | 3,999 | 50 | 13 |
-| 3 | Saltroad folk | Human | 8.61 % | 2,769 | 49 | 5 |
-| 4 | Sunlanders | Human | 9.19 % | 2,859 | 49 | 8 |
-| 5 | Grass riders | Human | 4.38 % | 1,391 | 50 | 0 |
-| 6 | Rainkeepers | Human | 7.88 % | 2,312 | 48 | 0 |
-| 7 | Canal folk | Human | 12.35 % | 4,384 | 50 | 21 |
-| 8 | Elves | Classic | 3.26 % | 1,076 | 47 | 0 |
-| 9 | Dwarves | Classic | 1.43 % | 518 | 36 | 0 |
-| 10 | Halflings | Classic | 5.43 % | 1,792 | 50 | 0 |
-| 11 | Gnomes | Classic | 3.04 % | 1,080 | 50 | 0 |
-| 12 | Orcs | Classic | 6.90 % | 2,243 | 50 | 0 |
-| 13 | Hoarkin | New | 0.52 % | 175 | 8 | 0 |
-| 14 | Hearthbloods | New | 0.33 % | 116 | 2 | 0 |
-| 15 | Widegaze | New | 1.08 % | 320 | 25 | 0 |
-| 16 | Amberbloods | New | 1.70 % | 603 | 41 | 0 |
-| 17 | Brinefolk | New | 1.28 % | 402 | 26 | 0 |
-| 18 | Duskreaders | New | 1.60 % | 466 | 31 | 0 |
-| 19 | Noonfolk | New | 2.27 % | 707 | 45 | 0 |
-| 20 | Boughwalkers | New | 0.98 % | 292 | 19 | 0 |
-| 21 | Shoalfolk | New | 0.21 % | 58 | 0 | 0 |
-| 22 | Swiftborn | New | 1.98 % | 666 | 50 | 0 |
-| 23 | Flinchless | New | 0.78 % | 254 | 8 | 0 |
-| 24 | Lanternkin | New | 0.98 % | 340 | 19 | 0 |
-| 25 | Stillfaces | New | 1.69 % | 628 | 41 | 0 |
-| 26 | Twofold | New | 1.67 % | 490 | 36 | 0 |
-| 27 | Bitterbloods | New | 0.47 % | 156 | 4 | 0 |
-| 28 | Catfolk | New | 3.41 % | 1,094 | 50 | 0 |
-
-| Group | Share of all persons | Seed `cellgen` | Seed `gameworld` |
-|---|---|---|---|
-| Human races (7) | 59.0 % | 58.7 % | 59.3 % |
-| Classic races (5) | 20.1 % | 20.4 % | 19.7 % |
-| New races (16) | 20.9 % | 20.9 % | 21.0 % |
+| Human races (7) | 58.7 % | 83.5 % | 82.5 % | 83.4 % | 84.1 % | 83.9 % |
+| Classic races (5) | 20.2 % | 10.4 % | 11.5 % | 10.7 % | 9.7 % | 9.8 % |
+| New races (16) | 21.1 % | 6.1 % | 5.9 % | 5.9 % | 6.3 % | 6.3 % |
 
 | Per region | Lowest | Median | Highest |
 |---|---|---|---|
-| Races with 1 % or more of the persons | 15 | 20 | 23 |
-| Share of the largest race | 10 % | 15 % | 19 % |
+| Races of the region | 6 | 6 | 6 |
+| Races with 1 % or more of the persons | 5 | 6 | 6 |
+| Share of the largest race | 19 % | 27 % | 43 % |
+| Share of a minority race | 0.4 % | 4.9 % | 25 % |
+| Persons | 680 | 36,412 | 118,787 |
 
 What the numbers show:
 
-- **Humans hold 59.0 %.** The earlier default list gave its single `human` 66 %,
-  against five other races. Here the seven human races share the land with 21 others.
-- **No region has a homeland race.** No race has a majority in any region, the largest
-  race of a median region has 15 %, and a median region holds 20 races at 1 % or
-  more. The rule shares each patch by its biome, and a region has many biomes. A
-  Canal folk kingdom or a Brinefolk pan town needs something the rule does not have:
-  a presence per race and region. This is the open topic of
+- **Humans hold 83.5 %.** By the plain shares it is 58.7 %. The main races of a
+  region are its four largest, and in most regions those are human races. The share a
+  minority race is lifted towards (0.05) moves this: the two minority races of a region
+  hold about a tenth of it between them.
+- **A region has a few peoples.** The largest race holds 27 % of a median region, and
+  between 19 % and 43 % over all regions. No race has a majority anywhere. By the plain
+  shares the largest race of a median region had 15 %, and the region held 20 races at
+  1 % or more.
+- **Canal folk and Midlanders are main races nearly everywhere**, in 89 % and 78 % of
+  the regions. Both have `common` 5 and share the temperate biomes. A region that is the
+  homeland of one race needs something the rule does not have: a presence per race and
+  region. This is the open topic of
   [map-generation-research.md](map-generation-research.md) section 10.7.
-- **Grass riders and Rainkeepers are never the largest race of a region.** Grass riders
-  are native to Cold steppe and Temperate grassland, which are 3 % and 4.5 % of the
-  land, and in the grassland the Midlanders outweigh them 15 to 9. Rainkeepers share
-  five of their six biomes with the Sunlanders, at an equal or lower frequency
-  everywhere except Mangrove, which is 2 % of the land.
-- **Orcs (6.9 %) outnumber Northmen and Grass riders.** They have a weight of 2 in six
-  biomes and live in 13 of the 16. Halflings (5.4 %) are level with Northmen for a
-  like reason. Both keep the weights of the earlier default list, where they stood
-  against one human race with `common` 10.
-- **Catfolk (3.4 %) are the largest new race.** They outnumber Elves and Gnomes and
-  reach 1 % in all 50 regions. Their row has a weight in 13 biomes (see Catfolk above),
-  which is wider than the homeland their entry describes.
-- **Two races are close to absent.** Shoalfolk (0.21 %) reach 1 % in no region:
-  only 15 % of the land lies below 50 m, and the modifier does not ask for a coast.
-  Hearthbloods (0.33 %) reach 1 % in 2 regions: they have `common` 0.5 in the cold,
-  thinly peopled biomes.
-- **The new races are minorities, as meant.** Together they hold 20.9 %. After the
-  Catfolk the largest is the Noonfolk, with 2.3 %.
+- **Grass riders and Rainkeepers are seldom the largest race of a region**, in 6 and 3
+  regions. Grass riders are native to Cold steppe and Temperate grassland, which are 3 %
+  and 4.5 % of the land, and in the grassland the Midlanders outweigh them 15 to 9.
+  Rainkeepers share five of their six biomes with the Sunlanders, at an equal or lower
+  frequency everywhere except Mangrove, which is 2 % of the land.
+- **Orcs are a main race in 27 % of the regions**, more often than Northmen and Grass
+  riders. They have a weight of 2 in six biomes and live in 13 of the 16. Halflings are
+  a main race in 11 %. Both keep the weights of the earlier default list, where they
+  stood against one human race with `common` 10.
+- **Elves, Dwarves and Gnomes are minority races.** They are a main race in 1.7 %, 0.2 %
+  and 0.0 % of the regions, and a race of the region in 10 %, 8 % and 9 %. By the plain
+  shares nearly every region has both elves and dwarves.
+- **Each new race is in 6 to 10 % of the regions**, always as a minority race or nearly so.
+  Together the new races hold 6.1 % of the persons. Where a new race is present it
+  has 1,129 to 3,220 persons in the median region.
+- **The turns even out the rare races.** By the plain shares the Shoalfolk hold 0.20 %
+  and the Catfolk 3.45 %, 17 times as much. As minority races they are in 6 % and 10 % of
+  the regions. The Shoalfolk miss a turn where no coast below 80 m feeds 10 of them.
 
-To repeat the measurement:
+The numbers were read from the Planned regions of a `World` in a throwaway program. The
+map generation app writes the same data for a block of regions: the region files hold
+the potential population per race, with the standing of each race, and the races of each
+Prospect. This gives the 25 regions around region (0, 0) of one seed:
 
 ```bash
 dotnet run --project src/Gameworld.MapGenerator -c Release -- --seed cellgen --rings 2 --stage Planned --modes biomes --out out/races/cellgen
-```
-
-```bash
-dotnet run --project src/Gameworld.MapGenerator -c Release -- --seed gameworld --rings 2 --stage Planned --modes biomes --out out/races/gameworld
 ```
 
 ## What the entries ask for that a race cannot say yet

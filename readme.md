@@ -44,7 +44,7 @@ The project is in phase 1.
 
 ### Status
 
-The map is generated through all its stages, from the cells to the travel network. Of the society, the races, the potential population and the person names are generated. Factions, cities and towns, families and persons are defined below but not generated yet, and neither is there a database: the apps compute everything in memory.
+The map is generated through all its stages, from the cells to the travel network. Of the society, the races of each region, their potential population, the races of a city or a town on each Prospect and the person names are generated. Factions, cities and towns, families and persons are defined below but not generated yet, and neither is there a database: the apps compute everything in memory.
 
 ## Concepts
 
@@ -60,7 +60,7 @@ Foundation = seed + generator version + Parameter Set
    │  ├─ Region                         rivers, lakes, height map, Prospects, travel network
    │  └─ Fields                         precipitation, initial temperature, prosperity, supernatural
    └─ Society                           docs/society-generation.md
-      ├─ Race                           shares the potential population of each region
+      ├─ Race                           six of them share the potential population of a region
       └─ Faction, City and Town, Family, Person with a vocation and looks
 ```
 
@@ -115,7 +115,7 @@ A region moves through the stages below, in the order of the table and one stage
 | Outlined | Zones linked, expanded and merged. Sea access | All regions within the link range + 5 rings Sited (7 rings at the defaults) |
 | Detailed | Patch mergers, rivers, lakes. Estimated biomes and resources | All bordering regions Outlined |
 | Elevated | Height map. Final biomes and resources | All bordering regions Detailed |
-| Planned | Factions and Prospects for cities and towns. Potential population per race | The region Elevated |
+| Planned | Factions and Prospects for cities and towns. The races of the region, their potential population and the races of a city or a town on each Prospect | The region Elevated |
 | Settled | Travel network. Actual cities and towns, families and important persons | The region and all bordering regions Planned |
 
 Sited is not a state a region is in. It needs only the seed, so it is a pure function that can be calculated for any region at any time, and it is never persisted. Stored regions start at Outlined. The Sited row describes what the function yields.
@@ -243,11 +243,15 @@ A people that can live in the world: Northmen, Elves, Dwarves and so on. Races a
 
 The races are a list in the Parameter Set, not a fixed set in the code. Each race has an id, a name, a toggle (on or off), a frequency for each biome and a height modifier. The default list holds 28 races, all on: seven human races (Northmen, Midlanders, Saltroad folk, Sunlanders, Grass riders, Rainkeepers, Canal folk), five classic races (Elves, Dwarves, Halflings, Gnomes, Orcs) and sixteen new near-human races (docs/society-generation.md Appendix A). How a faction, a family or a person gets its race is not decided yet.
 
+#### Main race and minority race
+
+A region does not hold every race. It holds up to six: four main races and two minority races. The main races are the largest by how well the land of the region suits them. A minority place goes to the race whose turn it is in the region. The turns follow a pattern over the region grid that gives every race a turn in every cluster of about 30 regions, so a race that is nowhere large can still be met within reach. A city holds up to five of the races of its region and a town up to four. All these numbers are Parameter Set values.
+
 #### Potential population
 
-An estimate of how many persons the land of a region can feed, for each race that is on. It is not a count of people that exist: cities, families and persons come in the Settled stage.
+An estimate of how many persons the land of a region can feed, for each race of the region. It is not a count of people that exist: cities, families and persons come in the Settled stage.
 
-Every land patch has a capacity that comes from its area, its food resources and the Prosperity field. The races that are on share it by their frequency in the biome of the patch and their height modifier at its height. So the races compete for the same land, and toggling a race off leaves its share to the others. The potential population is calculated in the Planned stage.
+Every land patch has a capacity that comes from its area, its food resources and the Prosperity field. The races of the region share it by their frequency in the biome of the patch and their height modifier at its height. So the races compete for the same land, and toggling a race off leaves its share to the others. A minority race is lifted towards a twentieth of the region, so that it is large enough to be met. A patch where no race of the region lives holds nobody. The potential population is calculated in the Planned stage.
 
 #### Faction
 
@@ -256,6 +260,8 @@ A group of people in one region: a political grouping. It could be a kingdom, a 
 #### City and town
 
 An actual settlement on a Prospect. Cities and towns belong to the Settled stage. A city can exist with a population count long before any individual in it is authored.
+
+A city or a town holds some of the races of its region: the largest around its Prospect, and a last one that is drawn with the minority races weighted up. Which races a city or a town on a Prospect holds is worked out in the Planned stage, with the Prospects.
 
 #### Family
 
@@ -286,7 +292,7 @@ What a portrait of a person must show: the body and the face, the hair, the outf
 | [docs/races-basis.md](docs/races-basis.md) | The 28 default races: looks, history, way of life, vocations and factions |
 | [docs/NameGenerator-Reuse.md](docs/NameGenerator-Reuse.md) | The person-name generator |
 | [docs/research/](docs/research/) | The source notes behind the research document |
-| [docs/plans/](docs/plans/) | Plans for changes that are not implemented yet |
+| [docs/plans/](docs/plans/) | Plans for changes, each with its status |
 
 ## Build and run
 

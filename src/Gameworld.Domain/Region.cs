@@ -26,18 +26,31 @@ public sealed record PatchElevation(PatchId Patch, double? MeanHeightM, BiomeRec
 /// <summary>What the Elevated stage adds: the height map and the final biomes and resources.</summary>
 public sealed record RegionElevation(HeightMap HeightMap, IReadOnlyList<PatchElevation> Patches);
 
+/// <summary>How a race stands in a region.</summary>
+public enum RaceStanding
+{
+    /// <summary>The race is not a race of the region: it holds none of its potential population.</summary>
+    Absent,
+    /// <summary>One of the largest races of the region by the plain shares.</summary>
+    Main,
+    /// <summary>A race that holds one of the last places of the region, by its turn or by a draw.</summary>
+    Minority,
+}
+
 /// <summary>The potential population of one race in a region.</summary>
 /// <param name="Race">The id of the race in the Parameter Set.</param>
-/// <param name="Persons">How many persons of the race the land of the region can feed.</param>
-public sealed record RacePopulation(string Race, long Persons);
+/// <param name="Persons">How many persons of the race the land of the region can feed. 0 for a race that is not a race of the region.</param>
+/// <param name="Standing">Whether the race is a main race or a minority race of the region, or not a race of it.</param>
+public sealed record RacePopulation(string Race, long Persons, RaceStanding Standing = RaceStanding.Main);
 
 /// <summary>
 /// The potential population of a region: how many persons its land can feed, by its food
-/// resources and the Prosperity field, shared between the races that are on by their frequency
-/// in the biome of each patch and their height modifier at its height. It is an estimate of
-/// what the land can carry, not a count of people that exist.
+/// resources and the Prosperity field, shared between the races of the region by their
+/// frequency in the biome of each patch and their height modifier at its height. A region holds
+/// a few races only: its main races and its minority races. It is an estimate of what the land
+/// can carry, not a count of people that exist.
 /// </summary>
-/// <param name="Races">One entry for every race that is on, in the order of the Parameter Set. A race that finds no land to live on has 0 persons.</param>
+/// <param name="Races">One entry for every race that is on, in the order of the Parameter Set. A race that is not a race of the region has 0 persons.</param>
 public sealed record PotentialPopulation(IReadOnlyList<RacePopulation> Races)
 {
     public static PotentialPopulation None { get; } = new([]);
@@ -45,13 +58,29 @@ public sealed record PotentialPopulation(IReadOnlyList<RacePopulation> Races)
     /// <summary>The potential population of all races together.</summary>
     public long Total => Races.Sum(r => r.Persons);
 
-    /// <summary>The potential population of one race; 0 for a race that is off or not in the Parameter Set.</summary>
+    /// <summary>The potential population of one race; 0 for a race that is off, not in the Parameter Set or not a race of the region.</summary>
     public long Of(string race) => Races.FirstOrDefault(r => r.Race == race)?.Persons ?? 0;
+
+    /// <summary>The ids of the races of the region, main and minority, in the order of the Parameter Set.</summary>
+    public IEnumerable<string> RegionRaces => Races.Where(r => r.Standing != RaceStanding.Absent).Select(r => r.Race);
+
+    /// <summary>The ids of the main races of the region, in the order of the Parameter Set.</summary>
+    public IEnumerable<string> MainRaces => Races.Where(r => r.Standing == RaceStanding.Main).Select(r => r.Race);
+
+    /// <summary>The ids of the minority races of the region, in the order of the Parameter Set.</summary>
+    public IEnumerable<string> MinorityRaces => Races.Where(r => r.Standing == RaceStanding.Minority).Select(r => r.Race);
 }
 
-/// <summary>What the Planned stage adds: the Prospects for cities and towns, and the potential population per race.</summary>
+/// <summary>
+/// What the Planned stage adds: the Prospects for cities and towns, the potential population
+/// per race, and the races a city or a town on each Prospect holds.
+/// </summary>
+/// <param name="ProspectRaces">For each Prospect, in the order of <paramref name="Prospects"/>: the ids of the races of a city or a town on it, the largest first and the drawn one last. They are races of the region.</param>
 /// <remarks>Factions belong to this stage too. The readme does not yet say what a faction holds, so they are not modelled.</remarks>
-public sealed record RegionPlan(IReadOnlyList<Prospect> Prospects, PotentialPopulation Population);
+public sealed record RegionPlan(
+    IReadOnlyList<Prospect> Prospects,
+    PotentialPopulation Population,
+    IReadOnlyList<IReadOnlyList<string>> ProspectRaces);
 
 /// <summary>What the Settled stage adds: the travel network.</summary>
 /// <remarks>Actual cities and towns, families and important persons belong to this stage too and are not modelled yet.</remarks>

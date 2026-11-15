@@ -27,9 +27,10 @@ A race is five things:
 | `BiomeFrequency` | How frequent the race is in each of the 16 biomes, relative to the other races. |
 | `HeightModifier` | Optional. How the height of the land changes the frequency. Leave it out when the height does not matter to the race. |
 
-**The frequencies.** On one patch the races that are on share the land in proportion to
-their frequency in its biome. Only the proportions between the races within one biome
-matter. The default list builds each frequency as
+**The frequencies.** By the plain shares, the races that are on share a patch in proportion
+to their frequency in its biome. Only the proportions between the races within one biome
+matter. The plain shares decide the main races of a region and are the weights its races
+share the land by (society-generation.md sections 3.2 to 3.4). The default list builds each frequency as
 
 ```
 frequency(race, biome) = habitat(race, biome) · common(race)
@@ -128,10 +129,22 @@ So a hot desert race that only lives from 200 m and up has about a fifth of the 
 desert, and a tundra race with the same limit keeps more than half of the tundra.
 
 **What a new race does to the world.** Adding a race, or toggling one on, does not change
-how many persons the land feeds. It changes how the land is shared: the new race takes its
-share from the races already there. The one exception is land where nobody lived before.
-With the default races there is no such land: the seven human races live in every biome
-and at every height between them. In a world with fewer races a new race can add persons.
+how many persons the land could feed. It changes how the land is shared: the new race takes
+its share from the races already there. The one exception is land where nobody lived before.
+With the default races there is no such land by the plain shares: the seven human races
+live in every biome and at every height between them. In a world with fewer races a new
+race can add persons.
+
+**Where the new race shows up.** A region holds six races: its four main races and two
+minority races (society-generation.md section 3.3). The new race is a race of a region
+where it is among the four largest by the plain shares, or where it has its turn for a
+minority place and the land feeds at least 10 of it. A race that is never among the four
+largest is in about one region in ten. Elsewhere it has 0 persons.
+
+**The turns move.** The order of the turns and the stride of the turn pattern follow from
+the races that are on. So one more race gives other minority races to regions all over
+the world, not only where the new race lives. With 29 races a race has its turn in a
+minority place once in every 29 regions.
 
 ## 2. Add the race to one world
 
@@ -171,10 +184,14 @@ and at every height between them. In a world with fewer races a new race can add
    ```
 
    Or use the demo app: paste the entry into the `Races` list under "Parameter Set (json)"
-   and press Apply. The potential population of a region then lists the race.
+   and press Apply. The potential population of a region then lists the race where it is
+   a main race or a minority race of the region.
 
-4. Check the result. The region files in `out/` hold the potential population per race.
-   A race that is on but has 0 persons everywhere finds no land: check its biomes and its
+4. Check the result. The region files in `out/` hold the potential population per race,
+   with the standing of the race in the region: `Main`, `Minority` or `Absent`. A race has
+   0 persons in a region it is not a race of, so look at more than the nine regions of
+   the default block: `--rings 3` gives 49. A race that is on but is `Absent` everywhere
+   and never has 10 persons by the plain shares finds no land: check its biomes and its
    height modifier against each other, with the tables of step 1. A race that only lives
    from 1,000 m and up has 1.4 % of the land, and no patch lies above 2,000 m.
 
@@ -194,7 +211,7 @@ Do step 2 first and look at the numbers. Then change these together:
 | [races-basis.md](races-basis.md) | Add the entry of the race, its row in the list and in the habitat table, and the counts at the top. |
 | [readme.md](../readme.md), Race | Update the count ("The default list holds 28 races") and the groups. |
 | [map-generation-research.md](map-generation-research.md) section 10.7 | Update the count of 28 and say where the weights of the new race come from. |
-| [tests/Gameworld.Tests/PopulationTests.cs](../tests/Gameworld.Tests/PopulationTests.cs) | `DefaultRaces` lists the ids in order, and the count 28 is asserted in four tests. |
+| [tests/Gameworld.Tests/PopulationTests.cs](../tests/Gameworld.Tests/PopulationTests.cs) | `DefaultRaces` lists the ids in order, and the count 28 is asserted in several tests. |
 
 The JSON Schema ([parameter-set.schema.json](parameter-set.schema.json)) does not hold the
 race list, so it is not regenerated.
@@ -204,10 +221,12 @@ Every race of the default list is on, so more changes with it:
 - PopulationTests.cs computes shares from the frequencies in Temperate broadleaf forest
   and in Ice & snow. A race that lives in one of them changes those sums. Another test
   names the five races with a height modifier.
-- society-generation.md section 3.3 and races-basis.md "Measured shares" quote measured
-  shares. Measure them again, with the two commands at the end of that part of
-  races-basis.md.
-- Every world on the defaults changes, since the new race takes land from the other 28.
+- society-generation.md sections 3.3, 3.4 and 5.1 and races-basis.md "Measured shares" quote
+  measured shares. Measure them again (see the end of that part of races-basis.md).
+- PopulationTests.cs asserts the turn pattern of 28 races: the stride 6, and a turn for
+  each of the 28 races in every 6 × 5 block of regions. With 29 races both change.
+- Every world on the defaults changes, since the new race takes land from the other 28
+  and moves the turns of the minority races.
 
 Then run the tests:
 

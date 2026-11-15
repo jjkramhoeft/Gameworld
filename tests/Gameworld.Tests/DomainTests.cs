@@ -166,7 +166,7 @@ public class DomainTests
         var region = new Region(new RegionId(2, 3), new RegionOutline([], HasSeaAccess: false));
         Assert.Equal(RegionStage.Outlined, region.Stage);
 
-        var plan = new RegionPlan([], new PotentialPopulation([new RacePopulation("midlanders", 1200)]));
+        var plan = new RegionPlan([], new PotentialPopulation([new RacePopulation("midlanders", 1200)]), []);
         Assert.Throws<InvalidOperationException>(() => region.Advance(plan));
 
         region.Advance(new RegionDetail([], new Rivers([], false), []));

@@ -653,6 +653,56 @@
               "minimum": 0,
               "maximum": 1,
               "default": 0.5
+            },
+            "RacesPerRegion": {
+              "description": "The most races a region holds: its main races and its minority races. Only they share the potential population of the region. A number at or above the number of races that are on, with no minority races, gives every race its plain share (society §3.3).",
+              "type": "integer",
+              "minimum": 0,
+              "default": 6
+            },
+            "MinorityRacesPerRegion": {
+              "description": "How many of the races of a region are minority races: the last places, which go to the race whose turn it is in the region. The other places go to the main races, the largest by their plain shares. Every race that is on has one turn per place in every 6 × 5 block of regions with the default 28 races (society §3.3).",
+              "type": "integer",
+              "minimum": 0,
+              "default": 2
+            },
+            "RacesPerCity": {
+              "description": "The most races a city holds. They are races of its region: the largest around the Prospect, and a last one drawn with the minority races weighted up (society §5.1).",
+              "type": "integer",
+              "minimum": 0,
+              "default": 5
+            },
+            "RacesPerTown": {
+              "description": "The most races a town holds. They are races of its region: the largest around the Prospect, and a last one drawn with the minority races weighted up (society §5.1).",
+              "type": "integer",
+              "minimum": 0,
+              "default": 4
+            },
+            "MinorityMinPersons": {
+              "description": "How many persons of a race the land of a region must feed by the plain shares for the race to take a minority place there (society §3.3).",
+              "type": "number",
+              "minimum": 0,
+              "default": 10
+            },
+            "MinorityShare": {
+              "description": "The share of the potential population of a region that a minority race is lifted towards, 0 to 0.9. A minority race that already holds more keeps its share, and one that lives on a few patches only stays below it. 0 turns the lift off (society §3.4).",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 0.9,
+              "default": 0.05
+            },
+            "MinorityBoost": {
+              "description": "The factor on a minority race of the region in the draw for the last race of a city or a town. 1 gives it no advantage (society §5.1).",
+              "type": "number",
+              "minimum": 0,
+              "default": 5
+            },
+            "HinterlandShare": {
+              "description": "How much of the potential population of the whole region a city or a town draws on, beside the patch of its Prospect and the land patches around it, 0 to 1. It lets a race of the region that does not live nearby into the city or town (society §5.1).",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.02
             }
           },
           "additionalProperties": false

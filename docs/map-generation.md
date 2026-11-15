@@ -90,7 +90,7 @@ the rivers**, not the other way round: rivers are drawn first as branching trees
 height map is then built so that those rivers run downhill.
 
 The society is one more layer on top: the potential population of a region is what its
-land can feed, shared between the races by biome and height. It reads the height map and
+land can feed, shared between the races of the region by biome and height. It reads the height map and
 the final biomes and resources, and it is specified in
 [society-generation.md](society-generation.md).
 
@@ -1786,8 +1786,8 @@ the pixel's world position with `cellAt` and colour it.
 ## 19. Races and potential population
 
 Moved to [society-generation.md](society-generation.md): the races are its section 2 and
-the potential population its section 3. The numbers 19.1, 19.2 and 19.3 are 3.1, 3.2 and
-3.3 there.
+the potential population its section 3. The numbers 19.1 and 19.2 are 3.1 and 3.2 there,
+and 19.3 is 3.4.
 
 ---
 

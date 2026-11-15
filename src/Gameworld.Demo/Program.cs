@@ -300,7 +300,9 @@ namespace Gameworld.Demo
                 // Scores and Prospects belong to the Planned stage: they are shown once the region has reached it.
                 var plan = world.FindPlan(regionId);
                 var score = plan?.Scores.FirstOrDefault(s => s.Patch.Root == info.Patch);
-                var prospect = plan?.Prospects.FirstOrDefault(p => p.Patch.Coord == info.Patch);
+                var prospectAt = plan is null ? -1 : Array.FindIndex(plan.Prospects, p => p.Patch.Coord == info.Patch);
+                var prospect = prospectAt < 0 ? null : plan!.Prospects[prospectAt];
+                string NameOf(string race) => world.Parameters.Races.FirstOrDefault(x => x.Id == race)?.Name ?? race;
                 var elevation = world.FindElevation(regionId);
                 var zoneCells = world.Advance(regionId, RegionStage.Outlined).Outline.Zones
                     .FirstOrDefault(z => z.Id.Coord == info.Zone)?.Cells.Count ?? 1;
@@ -316,8 +318,7 @@ namespace Gameworld.Demo
                     plan is null ? null : ProspectCount.Of(plan.Prospects),
                     plan?.ScoreSum,
                     plan?.Population.Races
-                        .Select(r => new RacePopulationInfo(
-                            r.Race, world.Parameters.Races.FirstOrDefault(x => x.Id == r.Race)?.Name ?? r.Race, r.Persons))
+                        .Select(r => new RacePopulationInfo(r.Race, NameOf(r.Race), r.Persons, r.Standing))
                         .ToArray(),
                     info.Ocean,
                     new ZoneInfo(
@@ -348,6 +349,7 @@ namespace Gameworld.Demo
                         score?.Score,
                         score?.Factors),
                     prospect,
+                    prospectAt < 0 ? null : plan!.ProspectRaces[prospectAt].Select(NameOf).ToArray(),
                     elevation?.Heights.Map.Sample(point),
                     new FieldValues(
                         world.Fields.Sample(FieldKind.InitialTemperature, point),
@@ -396,12 +398,13 @@ namespace Gameworld.Demo
     /// <param name="ZonesWithCity">How many of the zones hold a city Prospect on show.</param>
     public sealed record ZoneBin(int Prospects, int Zones, int ZonesWithCity);
 
-    /// <summary>The potential population of one race in a region, with the name of the race.</summary>
-    public sealed record RacePopulationInfo(string Race, string Name, long Persons);
+    /// <summary>The potential population of one race in a region, with the name of the race and whether it is a main or a minority race of the region.</summary>
+    public sealed record RacePopulationInfo(string Race, string Name, long Persons, RaceStanding Standing);
 
     /// <param name="RegionProspects">Null until the region is Planned.</param>
     /// <param name="RegionScoreSum">The sum of the scores of the region's Prospects, which decides how many are on show. Null until the region is Planned.</param>
     /// <param name="RegionPopulation">The potential population of the region per race that is on, in the order of the Parameter Set. Null until the region is Planned.</param>
+    /// <param name="ProspectRaces">The names of the races of a city or a town on the Prospect of the patch, the largest first and the drawn one last. Null when the patch has no Prospect.</param>
     public sealed record PointInfo(
         WorldPoint Point,
         RegionId Region,
@@ -414,6 +417,7 @@ namespace Gameworld.Demo
         ZoneInfo Zone,
         PatchInfo? Patch,
         Prospect? Prospect,
+        string[]? ProspectRaces,
         double? HeightM,
         FieldValues Fields);
 

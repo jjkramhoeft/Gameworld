@@ -33,7 +33,7 @@ public sealed partial class World
         Cells = new CellMap(foundation);
         Fields = new Fields(foundation);
         BiomeRules = new BiomeRules(foundation.Parameters.Elevation.Biomes);
-        PopulationRules = new PopulationRules(foundation.Parameters);
+        PopulationRules = new PopulationRules(foundation.Parameters, foundation.Seed.Value);
     }
 
     /// <summary>A world for a seed text and a Parameter Set, at the current generator version.</summary>

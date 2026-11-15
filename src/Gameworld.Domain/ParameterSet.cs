@@ -448,6 +448,38 @@ public sealed record PopulationParameters
     [Description("How much the Prosperity field moves the potential population of a patch: the factor runs from 1 − this at the lowest Prosperity to 1 + this at the highest. 0 turns the effect of Prosperity off (society §3.1).")]
     [Range(0, 1)]
     public double ProsperityEffect { get; init; } = 0.5;
+
+    [Description("The most races a region holds: its main races and its minority races. Only they share the potential population of the region. A number at or above the number of races that are on, with no minority races, gives every race its plain share (society §3.3).")]
+    [Range(0, int.MaxValue)]
+    public int RacesPerRegion { get; init; } = 6;
+
+    [Description("How many of the races of a region are minority races: the last places, which go to the race whose turn it is in the region. The other places go to the main races, the largest by their plain shares. Every race that is on has one turn per place in every 6 × 5 block of regions with the default 28 races (society §3.3).")]
+    [Range(0, int.MaxValue)]
+    public int MinorityRacesPerRegion { get; init; } = 2;
+
+    [Description("The most races a city holds. They are races of its region: the largest around the Prospect, and a last one drawn with the minority races weighted up (society §5.1).")]
+    [Range(0, int.MaxValue)]
+    public int RacesPerCity { get; init; } = 5;
+
+    [Description("The most races a town holds. They are races of its region: the largest around the Prospect, and a last one drawn with the minority races weighted up (society §5.1).")]
+    [Range(0, int.MaxValue)]
+    public int RacesPerTown { get; init; } = 4;
+
+    [Description("How many persons of a race the land of a region must feed by the plain shares for the race to take a minority place there (society §3.3).")]
+    [Range(0, double.PositiveInfinity)]
+    public double MinorityMinPersons { get; init; } = 10;
+
+    [Description("The share of the potential population of a region that a minority race is lifted towards, 0 to 0.9. A minority race that already holds more keeps its share, and one that lives on a few patches only stays below it. 0 turns the lift off (society §3.4).")]
+    [Range(0, 0.9)]
+    public double MinorityShare { get; init; } = 0.05;
+
+    [Description("The factor on a minority race of the region in the draw for the last race of a city or a town. 1 gives it no advantage (society §5.1).")]
+    [Range(0, double.PositiveInfinity)]
+    public double MinorityBoost { get; init; } = 5;
+
+    [Description("How much of the potential population of the whole region a city or a town draws on, beside the patch of its Prospect and the land patches around it, 0 to 1. It lets a race of the region that does not live nearby into the city or town (society §5.1).")]
+    [Range(0, 1)]
+    public double HinterlandShare { get; init; } = 0.02;
 }
 
 public sealed record ProspectWeights

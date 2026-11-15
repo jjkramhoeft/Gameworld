@@ -252,7 +252,7 @@ public class PopulationTests
     {
         var midlanders = new RaceParameters("midlanders", "Midlanders", true, Everywhere(3));
         var elf = new RaceParameters("elf", "Elves", true, Everywhere(1));
-        (Biome, double, double, PatchResources, double)[] land = [(Biome.Savanna, 120, 64, Resources(0.5), 0.5)];
+        PopulationPatch[] land = [(Biome.Savanna, 120, 64, Resources(0.5), 0.5)];
 
         var both = new PopulationRules(With(midlanders, elf)).Region(land);
         Assert.Equal(192, both.Total); // 64 km² × 6 × 0.5
@@ -325,54 +325,354 @@ public class PopulationTests
         Assert.Throws<ArgumentException>(() => World.Create("cellgen", With(race, race)));
     }
 
+    /// <summary>Eight races that live everywhere, with the frequencies 8 down to 1, and one patch that feeds 384 persons.</summary>
+    private static readonly string[] Eight = ["a", "b", "c", "d", "e", "f", "g", "h"];
+
+    private static ParameterSet EightRaces(PopulationParameters population) => ParameterSet.Default with
+    {
+        Races = Eight.Select((id, k) => new RaceParameters(id, id, true, Everywhere(8 - k))).ToArray(),
+        Planning = ParameterSet.Default.Planning with { Population = population },
+    };
+
+    private static readonly PopulationPatch[] OnePatch = [(Biome.Savanna, 120, 64, Resources(1), 0.5)];
+
     [Fact]
-    public void A_planned_region_holds_the_potential_population_of_its_land_per_race()
+    public void The_turn_pattern_gives_every_race_a_turn_in_every_block_of_regions()
+    {
+        // The stride is the one with the longest shortest step between two regions with the same turn: 6 for 28 races.
+        Assert.Equal(6, PopulationRules.StrideFor(28));
+        Assert.Equal(0, PopulationRules.StrideFor(0));
+        Assert.Equal(0, PopulationRules.StrideFor(1));
+        Assert.Equal(1, PopulationRules.StrideFor(2));
+
+        foreach (var seed in new uint[] { 0, 7, 123456789 })
+        {
+            var rules = new PopulationRules(ParameterSet.Default, seed);
+            Assert.Equal(6, rules.TurnStride);
+            // Every 6 × 5 block of regions holds a turn for each of the 28 races, in each of the two minority places.
+            foreach (var (i0, j0) in new[] { (0, 0), (-9, -7), (13, -40), (-1000, 2000) })
+                for (var place = 0; place < 2; place++)
+                {
+                    var turns = new HashSet<int>();
+                    for (var j = j0; j < j0 + 5; j++)
+                        for (var i = i0; i < i0 + 6; i++)
+                            turns.Add(rules.TurnRace(new GridCoord(i, j), place));
+                    Assert.Equal(28, turns.Count);
+                    Assert.All(turns, k => Assert.InRange(k, 0, 27));
+                }
+            // The two places of one region are half the list apart, so they never go to the same race.
+            Assert.NotEqual(rules.TurnRace(new GridCoord(3, 4), 0), rules.TurnRace(new GridCoord(3, 4), 1));
+            // A race has its turns on a lattice: the steps (4, 4) and (−2, 5) lead to the same race.
+            Assert.Equal(rules.TurnRace(new GridCoord(3, 4), 0), rules.TurnRace(new GridCoord(7, 8), 0));
+            Assert.Equal(rules.TurnRace(new GridCoord(3, 4), 0), rules.TurnRace(new GridCoord(1, 9), 0));
+        }
+
+        // The order of the turns comes from the seed.
+        var a = new PopulationRules(ParameterSet.Default, 1);
+        var b = new PopulationRules(ParameterSet.Default, 2);
+        Assert.Contains(Enumerable.Range(0, 28), i => a.TurnRace(new GridCoord(i, 0), 0) != b.TurnRace(new GridCoord(i, 0), 0));
+
+        // Without minority places no race has a turn.
+        var p = ParameterSet.Default;
+        var none = new PopulationRules(p with
+        {
+            Planning = p.Planning with { Population = p.Planning.Population with { MinorityRacesPerRegion = 0 } },
+        });
+        Assert.Equal(-1, none.TurnRace(new GridCoord(0, 0), 0));
+    }
+
+    [Fact]
+    public void A_region_holds_its_main_races_and_a_minority_race_by_turn_or_by_draw()
+    {
+        var population = new PopulationParameters { RacesPerRegion = 4, MinorityRacesPerRegion = 1, MinorityMinPersons = 10, MinorityShare = 0.1 };
+        var rules = new PopulationRules(EightRaces(population), 42);
+        Assert.Equal(384, rules.Capacity(64, Resources(1), 0.5), 9);
+
+        var minorities = new HashSet<int>();
+        int byTurn = 0, byDraw = 0;
+        for (var j = 0; j < 8; j++)
+            for (var i = 0; i < 8; i++)
+            {
+                var region = new GridCoord(i, j);
+                var races = rules.Share(region, OnePatch);
+
+                // The plain shares: 384 persons by the frequencies 8 … 1 of 36.
+                for (var k = 0; k < 8; k++) Assert.Equal(384 * (8 - k) / 36.0, races.Plain[k], 9);
+
+                // Three main races, the largest first, and one minority race among the other five.
+                Assert.Equal([0, 1, 2], races.Races[..3]);
+                Assert.Equal(3, races.MainCount);
+                Assert.Equal(4, races.Races.Length);
+                var minority = races.Races[3];
+                Assert.InRange(minority, 3, 7);
+                Assert.True(races.IsMinority(minority));
+                Assert.False(races.IsMinority(0));
+                Assert.Equal([minority], races.Minority.ToArray());
+                minorities.Add(minority);
+
+                // The race whose turn it is takes the place, unless it is a main race already.
+                var turn = rules.TurnRace(region, 0);
+                if (turn >= 3)
+                {
+                    Assert.Equal(turn, minority);
+                    byTurn++;
+                }
+                else byDraw++;
+
+                // Only the four races of the region share the land, and they share all of it.
+                var result = races.Population;
+                Assert.Equal(Eight, result.Races.Select(r => r.Race));
+                Assert.Equal(["a", "b", "c"], result.MainRaces);
+                Assert.Equal([Eight[minority]], result.MinorityRaces);
+                Assert.Equal(4, result.RegionRaces.Count());
+                Assert.All(result.Races.Where(r => r.Standing == RaceStanding.Absent), r => Assert.Equal(0, r.Persons));
+                Assert.Equal(384, races.Persons.Sum(), 9);
+
+                // The lift: a minority race below a tenth of the region is lifted to a tenth. On one
+                // patch the lift is exact. A larger one keeps its share and its boost of 1.
+                var frequency = 8 - minority;
+                var unboosted = frequency / (21.0 + frequency);
+                Assert.Equal(Math.Max(0.1, unboosted) * 384, races.Persons[minority], 9);
+                Assert.Equal(unboosted < 0.1 ? 0.1 * (1 - unboosted) / (unboosted * 0.9) : 1, races.Boost[3], 9);
+                Assert.Equal([1.0, 1.0, 1.0], races.Boost[..3]);
+                Assert.Equal(races.Persons[minority], races.PatchPersons[0][3], 9);
+            }
+        // Over 64 regions every one of the five other races holds the place somewhere, most often by its turn.
+        Assert.Equal(5, minorities.Count);
+        Assert.Equal(40, byTurn); // five of the eight races have their turn in a region whose place they can take
+        Assert.Equal(24, byDraw);
+
+        // The region does not matter to a rule without minority places, and the lift can be turned off.
+        var plainRules = new PopulationRules(EightRaces(population with { MinorityShare = 0 }), 42);
+        var unlifted = plainRules.Share(new GridCoord(0, 0), OnePatch);
+        var last = unlifted.Races[3];
+        Assert.Equal(384 * (8 - last) / (21.0 + 8 - last), unlifted.Persons[last], 9);
+
+        // A race takes a minority place only where the land would feed enough of it: h has 10.67 persons.
+        var strict = new PopulationRules(EightRaces(population with { MinorityMinPersons = 11 }), 42);
+        for (var i = 0; i < 16; i++)
+            Assert.NotEqual(7, strict.Share(new GridCoord(i, 0), OnePatch).Races[3]);
+        // When no race would be fed enough, the place stays empty.
+        var empty = new PopulationRules(EightRaces(population with { MinorityMinPersons = 100 }), 42).Share(new GridCoord(0, 0), OnePatch);
+        Assert.Equal([0, 1, 2], empty.Races);
+        Assert.Empty(empty.Population.MinorityRaces);
+
+        // Enough places for every race, and none of them a minority place: the plain shares of every race.
+        var open = new PopulationRules(EightRaces(new PopulationParameters { RacesPerRegion = 8, MinorityRacesPerRegion = 0 }), 42)
+            .Share(new GridCoord(5, 5), OnePatch);
+        Assert.Equal(8, open.MainCount);
+        for (var k = 0; k < 8; k++) Assert.Equal(open.Plain[k], open.Persons[k], 9);
+
+        // No places at all: the region holds nobody.
+        var closed = new PopulationRules(EightRaces(new PopulationParameters { RacesPerRegion = 0 }), 42).Share(new GridCoord(5, 5), OnePatch);
+        Assert.Empty(closed.Races);
+        Assert.Equal(0, closed.Population.Total);
+    }
+
+    [Fact]
+    public void A_patch_where_none_of_the_races_of_the_region_lives_holds_nobody()
+    {
+        var warm = new RaceParameters("warm", "Warm folk", true, Everywhere(0) with { Savanna = 5 });
+        var cold = new RaceParameters("cold", "Cold folk", true, Everywhere(0) with { IceAndSnow = 1 });
+        var p = ParameterSet.Default with { Races = [warm, cold] };
+        PopulationPatch[] land =
+        [
+            (Biome.Savanna, 120, 128, Resources(0.5), 0.5), // 384 persons
+            (Biome.IceAndSnow, 120, 64, Resources(0.25), 0.5), // 96 persons
+        ];
+
+        // With a place for each, each race holds the land it lives on.
+        var both = new PopulationRules(p).Region(land);
+        Assert.Equal(384, both.Of("warm"));
+        Assert.Equal(96, both.Of("cold"));
+
+        // With one place the region holds the larger race only, and the ice is left empty.
+        var one = new PopulationRules(p with
+        {
+            Planning = p.Planning with { Population = new PopulationParameters { RacesPerRegion = 1, MinorityRacesPerRegion = 0 } },
+        }).Share(new GridCoord(0, 0), land);
+        Assert.Equal(["warm"], one.Population.RegionRaces);
+        Assert.Equal(384, one.Population.Total);
+        Assert.Equal(RaceStanding.Absent, one.Population.Races[1].Standing);
+        Assert.Equal(96, one.Plain[1], 9);
+        Assert.Equal([0.0], one.PatchPersons[1]);
+    }
+
+    [Fact]
+    public void A_city_or_a_town_holds_the_largest_races_around_it_and_one_drawn_race_of_its_region()
+    {
+        // a, b, c and e live everywhere; d only on the tundra. With five places of which one is a minority
+        // place, the four largest are main races and e, the smallest, is the minority race.
+        RaceParameters[] races =
+        [
+            new("a", "a", true, Everywhere(4)), new("b", "b", true, Everywhere(3)), new("c", "c", true, Everywhere(2)),
+            new("d", "d", true, Everywhere(0) with { Tundra = 30 }), new("e", "e", true, Everywhere(1)),
+        ];
+        PopulationPatch[] land =
+        [
+            (Biome.Savanna, 120, 64, Resources(1), 0.5),
+            (Biome.Savanna, 120, 64, Resources(1), 0.5),
+            (Biome.Tundra, 120, 64, Resources(1), 0.5),
+        ];
+        PopulationRules Rules(double minorityBoost, double hinterland, int perCity = 3, int perTown = 2) => new(ParameterSet.Default with
+        {
+            Races = races,
+            Planning = ParameterSet.Default.Planning with
+            {
+                Population = new PopulationParameters
+                {
+                    RacesPerRegion = 5, MinorityRacesPerRegion = 1, MinorityShare = 0, RacesPerCity = perCity, RacesPerTown = perTown,
+                    MinorityBoost = minorityBoost, HinterlandShare = hinterland,
+                },
+            },
+        }, 99);
+
+        var rules = Rules(minorityBoost: 1e12, hinterland: 0);
+        var region = rules.Share(new GridCoord(0, 0), land);
+        Assert.Equal(4, region.MainCount);
+        Assert.Equal([4], region.Minority.ToArray());
+
+        // On the savanna d does not live. A town holds the largest race and the drawn one, a city two and the drawn one.
+        // With a very large boost the drawn one is the minority race.
+        var spot = new GridCoord(11, 12);
+        Assert.Equal([0, 4], rules.SettlementRaces(region, [0, 1], forCity: false, spot));
+        Assert.Equal([0, 1, 4], rules.SettlementRaces(region, [0, 1], forCity: true, spot));
+        // On the tundra d is the largest: 30 of 40.
+        Assert.Equal([3, 4], rules.SettlementRaces(region, [2], forCity: false, spot));
+
+        // Without a boost the draw goes by the weights, and with a boost of 0 the minority race is never drawn.
+        var never = Rules(minorityBoost: 0, hinterland: 0);
+        var drawn = new HashSet<int>();
+        for (var i = 0; i < 200; i++)
+        {
+            var town = never.SettlementRaces(never.Share(new GridCoord(0, 0), land), [0, 1], forCity: false, new GridCoord(i, 3));
+            Assert.Equal(2, town.Length);
+            Assert.Equal(0, town[0]);
+            drawn.Add(town[1]);
+        }
+        Assert.Equal([1, 2], drawn.Order());
+
+        // The hinterland lets a race of the region that does not live nearby into the draw.
+        var wide = Rules(minorityBoost: 1, hinterland: 1);
+        var wideRegion = wide.Share(new GridCoord(0, 0), land);
+        Assert.Contains(Enumerable.Range(0, 200), i => wide.SettlementRaces(wideRegion, [0, 1], false, new GridCoord(i, 3))[1] == 3);
+
+        // A city or a town never holds more races than the region has, and none without a place.
+        var roomy = Rules(minorityBoost: 5, hinterland: 0.02, perCity: 9, perTown: 0);
+        var roomyRegion = roomy.Share(new GridCoord(0, 0), land);
+        Assert.Equal([0, 1, 2, 3, 4], roomy.SettlementRaces(roomyRegion, [0, 1, 2], forCity: true, spot).Order());
+        Assert.Empty(roomy.SettlementRaces(roomyRegion, [0, 1, 2], forCity: false, spot));
+    }
+
+    [Fact]
+    public void A_planned_region_holds_six_races_that_share_its_potential_population()
     {
         var world = World.Create("cellgen");
         var rules = world.PopulationRules;
         var patchKm = world.Cells.PatchSize / 1000;
-        long people = 0, dwarves = 0, elves = 0;
+        long people = 0;
         foreach (var id in RegionStageRules.RegionsWithin(new RegionId(0, 0), 1))
         {
-            var population = world.Advance(id, RegionStage.Planned).Plan!.Population;
+            var plan = world.Advance(id, RegionStage.Planned).Plan!;
+            var population = plan.Population;
             Assert.Equal(DefaultRaces, population.Races.Select(r => r.Race));
             Assert.All(population.Races, r => Assert.True(r.Persons >= 0));
             Assert.Same(population, world.PlanOf(id).Population);
 
-            // The same sum from the Elevated data: the mean height of the land patches and their final biomes and resources.
+            // Four main races and two minority races; the other 22 hold nobody.
+            Assert.Equal(4, population.MainRaces.Count());
+            Assert.Equal(2, population.MinorityRaces.Count());
+            Assert.All(population.Races.Where(r => r.Standing == RaceStanding.Absent), r => Assert.Equal(0, r.Persons));
+
+            // The plain shares from the Elevated data: the mean height of the land patches and their final biomes and resources.
             var land = world.ElevationOf(id).Patches;
             Assert.Equal(world.DetailOf(id).Patches.Count(x => !x.Shape.Ocean), land.Length);
-            var expected = new double[DefaultRaces.Length];
+            var plain = new double[DefaultRaces.Length];
+            var capacity = 0.0;
             foreach (var patch in land)
             {
                 if (patch.MeanHeightM is { } mean) Assert.Equal(Math.Max(0, mean), patch.HeightM);
-                var capacity = rules.Capacity(patch.Patch.Shape.Cells.Length * patchKm * patchKm, patch.Resources, patch.Patch.Prosperity);
+                var c = rules.Capacity(patch.Patch.Shape.Cells.Length * patchKm * patchKm, patch.Resources, patch.Patch.Prosperity);
                 var shares = rules.Shares(patch.Biome.Biome, patch.HeightM);
-                for (var k = 0; k < shares.Length; k++) expected[k] += capacity * shares[k];
+                if (shares.Length > 0) capacity += c;
+                for (var k = 0; k < shares.Length; k++) plain[k] += c * shares[k];
             }
-            for (var k = 0; k < expected.Length; k++)
-                Assert.Equal((long)Math.Floor(expected[k] + 0.5), population.Races[k].Persons);
+            var races = world.PlanOf(id).Races;
+            for (var k = 0; k < plain.Length; k++) Assert.Equal(plain[k], races.Plain[k], 6);
+
+            // The main races are the four largest by the plain shares, the largest first.
+            var largest = Enumerable.Range(0, plain.Length).OrderByDescending(k => plain[k]).ThenBy(k => k).Take(4).ToArray();
+            Assert.Equal(largest, races.Races[..4]);
+            // A minority race is the one whose turn it is, or a drawn one, and the land would feed at least 10 of it.
+            for (var place = 0; place < 2; place++)
+            {
+                var minority = races.Races[4 + place];
+                Assert.True(plain[minority] >= 10);
+                var turn = rules.TurnRace(id.Coord, place);
+                if (!largest.Contains(turn) && plain[turn] >= 10 && turn != races.Races[4]) Assert.Equal(turn, minority);
+            }
+
+            // The six races share the capacity of the land they live on: never more than all of it.
+            Assert.InRange(population.Total, 0.8 * capacity, capacity + 6);
+            for (var k = 0; k < plain.Length; k++)
+                Assert.Equal((long)Math.Floor(races.Persons[k] + 0.5), population.Races[k].Persons);
+            // A main race holds more than its plain share, since fewer races share the land.
+            foreach (var k in largest) Assert.True(races.Persons[k] > plain[k]);
 
             // A region without land from 200 m and up has no dwarves; one without land below it no elves.
             if (!land.Any(x => x.HeightM >= 200)) Assert.Equal(0, population.Of("dwarf"));
             if (!land.Any(x => x.HeightM < 200)) Assert.Equal(0, population.Of("elf"));
 
+            // A city holds up to five and a town up to four of the races of the region.
+            Assert.Equal(plan.Prospects.Count, plan.ProspectRaces.Count);
+            var ofRegion = population.RegionRaces.ToHashSet();
+            for (var n = 0; n < plan.Prospects.Count; n++)
+            {
+                var held = plan.ProspectRaces[n];
+                Assert.Equal(plan.Prospects[n].ForCity ? 5 : 4, held.Count);
+                Assert.Equal(held.Count, held.Distinct().Count());
+                Assert.All(held, race => Assert.Contains(race, ofRegion));
+            }
+
             people += population.Total;
-            dwarves += population.Of("dwarf");
-            elves += population.Of("elf");
         }
-        // Nine regions of the default world: a few tens of thousands of persons each, with both highland and lowland.
+        // Nine regions of the default world: a few tens of thousands of persons each.
         Assert.InRange(people / 9, 10_000, 100_000);
-        Assert.True(dwarves > 0);
-        Assert.True(elves > 0);
+    }
+
+    [Fact]
+    public void A_cluster_of_thirty_regions_holds_nearly_every_race_in_its_regions_and_its_settlements()
+    {
+        var world = World.Create("cellgen");
+        var inRegions = new HashSet<string>();
+        var inSettlements = new HashSet<string>();
+        for (var j = -2; j <= 2; j++)
+            for (var i = -3; i <= 2; i++)
+            {
+                var plan = world.Advance(new RegionId(i, j), RegionStage.Planned).Plan!;
+                Assert.InRange(plan.Population.RegionRaces.Count(), 1, 6);
+                inRegions.UnionWith(plan.Population.RegionRaces);
+                for (var n = 0; n < plan.Prospects.Count; n++)
+                    if (plan.Prospects[n].OnShow)
+                        inSettlements.UnionWith(plan.ProspectRaces[n]);
+            }
+        // 6 × 5 regions hold a turn for each of the 28 races in both minority places. A race can
+        // miss its turns where the land does not feed it, so one race may be missing.
+        Assert.InRange(inRegions.Count, 27, 28);
+        Assert.InRange(inSettlements.Count, 26, 28);
     }
 
     [Fact]
     public void Turning_races_off_shares_the_same_land_between_fewer_races()
     {
         var region = new RegionId(0, 0);
-        var all = World.Create("cellgen").Advance(region, RegionStage.Planned).Plan!;
-        var humans = World.Create("cellgen", OnlyOn(HumanRaces)).Advance(region, RegionStage.Planned).Plan!;
+        // With a place for every race and no minority places, every race that is on has its plain share.
+        ParameterSet Open(ParameterSet p) => p with
+        {
+            Planning = p.Planning with { Population = p.Planning.Population with { RacesPerRegion = 28, MinorityRacesPerRegion = 0 } },
+        };
+        var all = World.Create("cellgen", Open(ParameterSet.Default)).Advance(region, RegionStage.Planned).Plan!;
+        var humans = World.Create("cellgen", Open(OnlyOn(HumanRaces))).Advance(region, RegionStage.Planned).Plan!;
 
         Assert.Equal(28, all.Population.Races.Count);
         Assert.Equal(HumanRaces, humans.Population.Races.Select(r => r.Race));
@@ -384,5 +684,14 @@ public class PopulationTests
         Assert.True(humans.Population.Of("midlanders") > all.Population.Of("midlanders"));
         // The races do not move the Prospects.
         Assert.Equal(DomainJson.Serialize(all.Prospects), DomainJson.Serialize(humans.Prospects));
+
+        // With the default places a region holds six of the races that are on, and the Prospects stay where they are.
+        var capped = World.Create("cellgen").Advance(region, RegionStage.Planned).Plan!;
+        var cappedHumans = World.Create("cellgen", OnlyOn(HumanRaces)).Advance(region, RegionStage.Planned).Plan!;
+        Assert.Equal(6, capped.Population.RegionRaces.Count());
+        Assert.Equal(6, cappedHumans.Population.RegionRaces.Count());
+        Assert.All(cappedHumans.Population.RegionRaces, race => Assert.Contains(race, HumanRaces));
+        Assert.True(capped.Population.Total <= all.Population.Total + 6);
+        Assert.Equal(DomainJson.Serialize(all.Prospects), DomainJson.Serialize(capped.Prospects));
     }
 }

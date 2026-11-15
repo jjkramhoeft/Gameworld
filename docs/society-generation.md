@@ -6,9 +6,10 @@ their looks. It is the specification of the society generation, as
 [map-generation.md](map-generation.md) is of the map. The [readme](../readme.md) defines
 the concepts and holds the names, and the names in this document follow the readme.
 
-Only the first step is specified and implemented: the races and the potential population
-(sections 2 and 3). Sections 4 to 9 hold what is decided about the rest and what is still
-open. Detailing them is a later task.
+Only the first steps are specified and implemented: the races (section 2), the races of a
+region with their potential population (section 3) and the races of a city or a town
+(section 5.1). The rest of sections 4 to 9 holds what is decided and what is still open.
+Detailing it is a later task.
 
 Sections 2 and 3 and Appendix A were section 19 and Appendix E of map-generation.md until
 2026-11-15. The research notes cite them under those numbers.
@@ -39,9 +40,9 @@ and the travel network are its inputs.
 | Step | Region generation stage | Status |
 |---|---|---|
 | Races | none: a list in the Parameter Set | Specified and implemented (section 2) |
-| Potential population | Planned | Specified and implemented (section 3) |
+| The races of a region and its potential population | Planned | Specified and implemented (section 3) |
 | Factions | Planned | Not specified (section 4) |
-| Cities and towns | Settled | Not specified (section 5) |
+| Cities and towns | Settled; their races Planned | The races of a city or a town are specified and implemented (section 5.1), the rest is not specified |
 | Families | Settled | Not specified (section 6) |
 | Persons | Settled for the important persons, later for the rest | The names are implemented, the rest is not specified (section 7) |
 | Vocations | Planned for the countryside, Settled for the cities and towns | Decided in part, not specified (section 8) |
@@ -140,7 +141,8 @@ Open:
 - What a race can ask for beyond the biome and the height: coast, river, elevation type,
   bedrock, the Supernatural and Prosperity fields, a town, another race to live among
   (collected in races-basis.md, "What the entries ask for that a race cannot say yet").
-- A presence per race, so that a race clusters in some regions and is absent from others.
+- A presence per race, so that a race clusters in some regions. A region holds six races
+  (section 3.3), but the turns spread a minority race evenly over the world.
 - Size, lifespan and fertility per race.
 - The factors per vocation, the switch for the division of work by sex and whether the
   race keeps slaves. They are decided in section 8 and are not in the Parameter Set yet.
@@ -152,21 +154,32 @@ Open:
 Stage: Planned.
 
 The potential population is an estimate of how many persons the land of a region can
-feed, for each race that is on. It is not a count of people that exist: cities, families
+feed, for each race of the region. It is not a count of people that exist: cities, families
 and persons come in the Settled stage.
+
+A region does not hold every race that is on. It holds its **main races**, the largest by
+the plain shares of section 3.2, and its **minority races**, which get their place by turn
+(section 3.3). Only the races of the region share its land (section 3.4).
 
 | Parameter | Default |
 |---|---|
 | Persons per km² at a food supply of 1 and a middling Prosperity | 6 |
 | Prosperity effect | 0.5 |
+| Races per region | 6 |
+| Minority races per region | 2 |
+| Persons a race needs in a region to take a minority place | 10 |
+| Share of the region a minority race is lifted towards | 0.05 |
+
+Races per region 28 with no minority races gives every race that is on its plain share.
 
 The inputs are the final form of the region's land patches (the Elevated stage,
 map-generation.md sections 12 to 14): the height of each patch and the biome and resources
 calculated with it. The height of a patch is its mean height in the height map, not below
 0, or the typical height of its elevation type (map-generation.md section 13.1) when no
 raster cell centre lies in the patch. So the potential population depends on the height
-map, unlike the Prospects (map-generation.md section 15). There is no random choice in
-this section, so it needs no hash purpose.
+map, unlike the Prospects (map-generation.md section 15). Sections 3.1, 3.2 and 3.4 hold no
+random choice. The turns and the draws of section 3.3 use the hash purposes 0x4a01 and
+0x4a02.
 
 ### 3.1 Capacity of a patch
 
@@ -184,7 +197,11 @@ capacity = area · personsPerKm2 · supply · factor
   from 0.5 in the poorest land to 1.5 in the richest. 0 turns the effect off.
 - Ocean patches have no capacity.
 
-### 3.2 Shares of the races
+### 3.2 Plain shares of the races
+
+The plain shares say how well a patch suits each race. They decide the main races of a
+region (section 3.3), and their weights are what the races of a region share a patch by
+(section 3.4).
 
 On one patch the races that are on share the land by their frequency in its biome, each
 multiplied by the height factor of the race at the height of the patch:
@@ -228,26 +245,100 @@ heightFactor(r, h):
 - A negative factor counts as 0. A factor above 1 makes the race more frequent at that
   height.
 
-### 3.3 Potential population of a region
+### 3.3 The races of a region
+
+A region holds up to 6 races: 4 main races and 2 minority races.
 
 ```
-population(r) = round(Σ capacity(patch) · share(r, patch))   over the region's land patches, in key order
+plain(r) = Σ capacity(patch) · share(r, patch)        # sections 3.1 and 3.2, over the region's land patches in key order
+
+M      = the number of races that are on
+b      = minority races per region, not above races per region
+order  = the races that are on, sorted by hash4(seed, 0x4a01, k, 0), then by k   # k: index among the races that are on
+offset = hash4(seed, 0x4a01, −1, 0) mod M
+W      = the stride of the turn pattern (below); 6 for 28 races
+
+main races:
+    the (races per region − b) races with the largest plain(r) > 0; ties in the order of the Parameter Set
+
+minority place z = 0 … b−1 of region (i, j):
+    eligible = the races that are on, are not yet a race of the region, and have plain(r) > 0 and plain(r) ≥ 10
+    turn     = order[(i + W·j + offset + z·⌊M / b⌋) mod M]
+    if turn is eligible:     turn takes the place
+    else if any is eligible: one is drawn, each with the weight plain(r)
+    else:                    the place stays empty
 ```
 
-The result has one entry for every race that is on, in the order of the Parameter Set. A
-race that finds no land to live on has 0. Each race is rounded on its own, half up, so the
-sum over the races can differ from the rounded sum of the capacities by a few persons.
+- **The main races** follow the frequencies and the height modifiers alone: they are the
+  races the land of the region suits best.
+- **The turn** is how an under-represented race is boosted: it takes the place by its
+  turn, not by its size. It only needs the land of the region to feed 10 of it by the
+  plain shares.
+- **The turn pattern.** The regions where one race has its turn form a lattice: the
+  regions with the same `(i + W·j) mod M`. `W` is the number in 1 … M−1 for which the
+  shortest step between two such regions is the longest, and the lowest such number. With
+  28 races `W` is 6 and the steps are (−2, 5) and (4, 4) regions, about 5.5 regions or
+  700 km. Every 6 × 5 block of regions then holds a turn for every race, in each of the two
+  minority places.
+- **The draw** uses one sfc32 generator per region, seeded with
+  `hash4(seed, 0x4a02, i, j)`. It gives one number per minority place, in the order of the
+  places, also for a place that is taken by turn. The eligible races are walked in the
+  order of the Parameter Set, and the first whose running sum of weights passes
+  `u · the sum of the weights` is drawn.
+- The order and the offset come from the seed, so two worlds do not share a pattern. They
+  also depend on which races are on: toggling a race moves every turn.
+- The region is identified by its grid coordinate `(i, j)`. Nothing is read from another
+  region, so the result does not depend on the order the regions are generated in.
+
+### 3.4 Potential population of a region
+
+Only the races of the region share its land. A minority race is lifted towards a share
+of the region, so that it is large enough to be met.
+
+```
+boost(r) = 1                                           for a main race
+s(r)     = the share of r in the region when every boost is 1
+boost(r) = t · (1 − s) / (s · (1 − t))  if 0 < s < t   for a minority race, t = the minority share (0.05)
+           1                            otherwise
+
+weight(r, patch) = frequency(r, biome of patch) · heightFactor(r, height of patch) · boost(r)
+share(r, patch)  = weight(r, patch) / Σ weight(q, patch)   over the races q of the region
+population(r)    = round(Σ capacity(patch) · share(r, patch))   over the region's land patches, in key order
+```
+
+- The result has one entry for every race that is on, in the order of the Parameter Set,
+  and says whether the race is a main race or a minority race of the region or not a race
+  of it. A race that is not a race of the region has 0.
+- If the sum is 0 on a patch, none of the races of the region lives there. The patch holds
+  nobody, and its capacity is not handed to another patch or another race.
+- The lift is exact for a race that is spread evenly over the region. A race that lives on
+  a few patches takes those patches and stays below the share: the Shoalfolk hold the low
+  coast of a region, not a twentieth of all of it. A minority share of 0 turns the lift
+  off, and it is clamped to 0–0.9.
+- Each race is rounded on its own, half up, so the sum over the races can differ from the
+  rounded sum of the capacities by a few persons.
 
 The land patches of a region are the patches of its zones (map-generation.md section
 6.2), so every land patch counts in exactly one region.
 
-With the defaults the median region has a potential population of about 35,100 and the
-range is 11,200 to 83,400 (measured on 50 regions of two seeds). Of all persons 59 % are
-of the seven human races, 20 % of the five classic races and 21 % of the sixteen new
-races. The largest race is the Canal folk with 12 %, and no race has a majority in any of
-the 50 regions. The shares per race are in [races-basis.md](races-basis.md), "Measured
-shares". 39 % of the land patches lie at 200 m or higher, and every one of the 50 regions
-has both dwarves and elves.
+With the defaults the median region has a potential population of about 36,400 and the
+range is 700 to 118,800 (measured on 1,079 regions of four seeds). Every one of them holds
+six races. The largest race of a region holds 27 % of it in the median region and 19 to
+43 % over all regions, so no race has a majority anywhere. A minority race holds 4.9 % of
+its region in the median case, and 2,000 persons. 0.9 % of the capacity lies on patches
+that hold nobody.
+
+Of all persons 83.5 % are of the seven human races, 10.4 % of the five classic races and
+6.1 % of the sixteen new races. By the plain shares it would be 58.7 %, 20.2 % and 21.1 %:
+the main races are human in most regions. The largest race is the Canal folk with 22 %.
+They are a race of 90 % of the regions, the Elves of 10 %, the Dwarves of 8 % and each
+new race of 6 to 10 %.
+
+A cluster of 30 regions holds all 28 races in 96 % of the cases and 27 in nearly all the
+others (the 30 regions nearest a region, 432 clusters). With one minority race per region
+it is about a quarter, whether the region holds five or six races. The shares per race are in
+[races-basis.md](races-basis.md), "Measured shares", and the test of the rule in
+[plans/race-caps.md](plans/race-caps.md).
 
 ---
 
@@ -274,7 +365,7 @@ entry of [races-basis.md](races-basis.md) lists the kinds of group the race form
 
 ## 5. Cities and towns
 
-Stage: Settled. Not specified yet.
+Stage: Settled. Not specified yet, apart from the races of a city or a town (section 5.1).
 
 A city or a town is an actual settlement on a Prospect. The Prospects are the map's
 answer to where a settlement can lie, and how good the place is
@@ -289,6 +380,50 @@ Open:
 - What a city holds as a Stub, and what the parent of its identity is.
 - The names of cities and regions. [RegionNameGenerator-Reuse.md](RegionNameGenerator-Reuse.md)
   describes the region-name generator of an earlier project. It has not been ported.
+
+### 5.1 The races of a city or a town
+
+Stage: Planned. The races are worked out for every Prospect of the region, on show or not,
+so a city or a town takes them from its Prospect. They need the region itself only.
+
+| Parameter | Default |
+|---|---|
+| Races per city | 5 |
+| Races per town | 4 |
+| Minority boost | 5 |
+| Hinterland share | 0.02 |
+
+A city or a town holds races of its region only: the largest around its Prospect, and a
+last one that is drawn with the minority races of the region weighted up.
+
+```
+local(r)  = Σ capacity(patch) · share(r, patch)   # section 3.4, over the Prospect's patch and its neighbouring land patches of the region
+weight(r) = local(r) + hinterland share · population(r)        # population(r) of section 3.4, not rounded
+n         = races per city for a Prospect for a city, races per town for a Prospect for a town
+
+main races: the n − 1 races of the region with the largest weight(r) > 0; ties in the order of the Parameter Set
+last race:  one is drawn among the other races of the region with weight(r) > 0, each with
+            weight(r) · (minority boost if r is a minority race of the region, else 1)
+```
+
+- The draw uses `u = toUnit(hash4(seed, 0x4a03, I, J))`, with `(I, J)` the root cell of the
+  Prospect's patch. The races are walked in the order of the Parameter Set, as in section
+  3.3.
+- The result is the list of race ids, the largest first and the drawn one last.
+- The hinterland share lets a race of the region that does not live near the Prospect into
+  the city or town. With 0 a city or a town only holds races of its own patches.
+- A minority boost of 1 gives the minority races no advantage, and 0 keeps them out of the
+  last place.
+- With `n` 0 the city or town holds no race. It never holds more races than its region.
+
+With the defaults every city Prospect holds five races and every town Prospect four
+(measured on the same 1,079 regions: 3,652 Prospects for cities and 17,612 for towns). A
+minority race is in a city or a town on show of its region in 97 % of the cases, and in
+half of them in the median case. A cluster of 30 regions holds all 28 races in its cities
+and towns on show in 90 % of the cases.
+
+How many persons of each race a city or a town holds is open, with the population of the
+city or town itself.
 
 ---
 
@@ -516,7 +651,8 @@ and Orcs, 1 for Gnomes, and 1 or 0.5 for a new race: 1 when it has a homeland of
 0.5 when it lives scattered among others or is rare by its nature.
 
 The seven human races live in every biome and at every height between them, so no land
-is without a race. In Ice & snow there are Northmen, Hoarkin and Hearthbloods, and
+is without a race by the plain shares. A patch can still hold nobody, when none of the six
+races of its region lives on it (section 3.4). In Ice & snow there are Northmen, Hoarkin and Hearthbloods, and
 dwarves from 200 m and up.
 
 ---

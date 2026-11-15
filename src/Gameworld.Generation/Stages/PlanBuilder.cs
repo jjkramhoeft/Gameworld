@@ -1,5 +1,6 @@
 using Gameworld.Domain;
 using Gameworld.Generation.Basics;
+using Gameworld.Generation.Races;
 using Gameworld.Generation.Resources;
 
 namespace Gameworld.Generation.Stages;
@@ -31,15 +32,22 @@ public sealed class PlanWork
     /// <summary>The sum of the scores of the Prospects: it decides how many of them are on show.</summary>
     public double ScoreSum => Prospects.Sum(p => p.Score);
 
-    /// <summary>The potential population of the region, per race that is on.</summary>
-    public required PotentialPopulation Population { get; init; }
+    /// <summary>The races of the region and how they share its land patches, in the order of the Elevated patches.</summary>
+    public required RegionRaces Races { get; init; }
 
-    public RegionPlan ToDomain() => new(Prospects, Population);
+    /// <summary>The potential population of the region, per race that is on.</summary>
+    public PotentialPopulation Population => Races.Population;
+
+    /// <summary>For each Prospect, in the order of <see cref="Prospects"/>: the ids of the races of a city or a town on it.</summary>
+    public required string[][] ProspectRaces { get; init; }
+
+    public RegionPlan ToDomain() => new(Prospects, Population, ProspectRaces);
 }
 
 /// <summary>
-/// Prospects for cities and towns (map-generation.md section 15) and the potential population
-/// (society-generation.md section 3). The Prospects only read the estimated biomes and resources, so they never
+/// Prospects for cities and towns (map-generation.md section 15), the potential population
+/// (society-generation.md section 3) and the races of a city or a town on each Prospect
+/// (society-generation.md section 5.1). The Prospects only read the estimated biomes and resources, so they never
 /// depend on the height map. The potential population reads the final form: the mean height
 /// of each patch and the biomes and resources calculated with it.
 /// </summary>
@@ -242,17 +250,37 @@ internal static class PlanBuilder
             };
         }
 
-        // society-generation.md 3.3 Potential population: every land patch of the region in its final form, in key order.
+        // society-generation.md 3.3 and 3.4 The races of the region and its potential population:
+        // every land patch of the region in its final form, in key order.
+        var rules = world.PopulationRules;
         var patchKm = cells.PatchSize / 1000;
-        var population = world.PopulationRules.Region(elevation.Patches.Select(x =>
-            (x.Biome.Biome, x.HeightM, x.Patch.Shape.Cells.Length * patchKm * patchKm, x.Resources, x.Patch.Prosperity)));
+        var races = rules.Share(region, elevation.Patches.Select(x => new PopulationPatch(
+            x.Biome.Biome, x.HeightM, x.Patch.Shape.Cells.Length * patchKm * patchKm, x.Resources, x.Patch.Prosperity)).ToArray());
+
+        // society-generation.md 5.1 The races of a city or a town on each Prospect: from the patch
+        // of the Prospect and its neighbouring land patches of the region.
+        var final = new Dictionary<long, int>();
+        for (var i = 0; i < elevation.Patches.Length; i++) final[elevation.Patches[i].Patch.Root.Key] = i;
+        var prospects = Select(world, scores);
+        var prospectRaces = prospects.Select(prospect =>
+        {
+            var root = prospect.Patch.Coord;
+            var around = new List<int>();
+            if (final.TryGetValue(root.Key, out var own)) around.Add(own);
+            foreach (var k in landNeighbours[index[root.Key]])
+                if (final.TryGetValue(land[k].Root.Key, out var neighbour)) around.Add(neighbour);
+            return rules.SettlementRaces(races, around, prospect.ForCity, root)
+                .Select(k => rules.Races[k].Id)
+                .ToArray();
+        }).ToArray();
 
         return new PlanWork
         {
             Region = region,
             Scores = scores,
-            Prospects = Select(world, scores),
-            Population = population,
+            Prospects = prospects,
+            Races = races,
+            ProspectRaces = prospectRaces,
         };
     }
 

@@ -365,8 +365,8 @@ async function inspect(p) {
     if (d.RegionPopulation) {
       const people = n => Math.round(n).toLocaleString('en-US');
       const total = d.RegionPopulation.reduce((sum, r) => sum + r.Persons, 0);
-      const races = d.RegionPopulation.filter(r => r.Persons > 0).sort((a, b) => b.Persons - a.Persons)
-        .map(r => `${esc(r.Name)} ${people(r.Persons)}`).join(' · ');
+      const races = d.RegionPopulation.filter(r => r.Standing !== 'Absent').sort((a, b) => b.Persons - a.Persons)
+        .map(r => `${esc(r.Name)} ${people(r.Persons)}${r.Standing === 'Minority' ? ' <span class="muted">(minority)</span>' : ''}`).join(' · ');
       row('', `Potential population: ${people(total)}${races ? ' (' + races + ')' : ''}`);
     }
     row('Zone', `(${d.Zone.Id[0]}, ${d.Zone.Id[1]}) · ${words(d.Zone.ElevationType)} · ${d.Zone.Cells} cell${d.Zone.Cells > 1 ? 's' : ''}`);
@@ -397,6 +397,7 @@ async function inspect(p) {
         const f = patch.Factors;
         row('Score', `${num(patch.Score, 1)}${d.Prospect ? ` · ${d.Prospect.Class} Prospect for a ${d.Prospect.ForCity ? 'city' : 'town'}${d.Prospect.OnShow ? ' · on show' : ' · not on show'}` : ''}`);
         row('Factors', `resources ${num(f.Resources)} · geography ${num(f.Geography)} · trade ${num(f.Trade)} · climate ${num(f.Climate)} · prosperity ${num(f.Prosperity)}`);
+        if (d.ProspectRaces) row('Races', d.ProspectRaces.length ? d.ProspectRaces.map(esc).join(' · ') : 'none');
       }
       if (patch.Resources.length)
         resources = '<ul class="res">' + patch.Resources.map(x =>
