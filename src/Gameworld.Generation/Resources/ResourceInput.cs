@@ -34,6 +34,7 @@ public readonly record struct WaterSite(
 /// <param name="RiverPoor">The patch lies in a river-poor flat zone ("sparse").</param>
 /// <param name="Water">The water site.</param>
 /// <param name="Prosperity">The Prosperity field at the patch's site, rescaled to 0–1.</param>
+/// <param name="Supernatural">The Supernatural field at the patch's site, 0–100.</param>
 public readonly record struct LandResourceInput(
     uint Seed,
     GridCoord Patch,
@@ -44,7 +45,8 @@ public readonly record struct LandResourceInput(
     bool Coastal,
     bool RiverPoor,
     WaterSite Water,
-    double Prosperity);
+    double Prosperity,
+    double Supernatural);
 
 /// <summary>Everything the resource rules read for one ocean patch (Appendix D.3).</summary>
 /// <param name="Seed">The foundation seed.</param>

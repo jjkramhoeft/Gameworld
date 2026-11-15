@@ -1,18 +1,28 @@
 # Races basis
 
-The basis for a reworked race list: 32 races, each with a description, a history and the
+The basis of the default race list: 28 races, each with a description, a history and the
 facts needed to place it in the biomes and to draw vocations and factions from it.
 
-- 7 human races (1 to 7), each built on a real historical people.
+- 7 human races (1 to 7), each built on a real historical people. There is no plain
+  human race.
 - 5 classic races (8 to 12): Elves, Dwarves, Halflings, Gnomes and Orcs.
-- 20 new near-human races (13 to 32), built with the framework of
+- 16 new near-human races (13 to 28), built with the framework of
   [races-and-worldbuilding.md](races-and-worldbuilding.md).
 
-This document is a proposal. It does not change the default list of
-[society-generation.md](society-generation.md) Appendix A, the Parameter Set or the code.
-[adding-a-race.md](adding-a-race.md) lists what must change when a race is adopted.
+These 28 races are the default list of [society-generation.md](society-generation.md)
+Appendix A, decided on 2026-11-15. The ids, the names, the habitat weights, the `common`
+values and the height modifiers here are those of the Parameter Set. This document adds
+what the Parameter Set does not hold: the looks, the history, the way of life, the
+vocations and the factions of each race. That part is material for sections 4 to 9 of
+society-generation.md and binds nothing yet.
+[adding-a-race.md](adding-a-race.md) lists what must change with the list.
+
 The biome weights are judgement. The shares they give are measured on 50 regions (see
 Measured shares), and the weights have not been tuned afterwards.
+
+Five races of the first version of this document were left out of the list and are not
+described here: Tinefolk, Hushfolk, Longsleepers, Eyrie folk and Lineminds. The Catfolk
+were added from the earlier default list, with a new look.
 
 ## How to read an entry
 
@@ -37,9 +47,10 @@ English compounds. None has been searched for earlier use.
 places (a salt flat, a fjord coast, a river plain) and ages, never one location. Any
 region can hold a hall, a hold or a court of a race.
 
-**Ids.** The five classic races keep the ids of the default list. `halfling` stands for
-the Hobbits that were asked for: "Hobbit" is a protected name of the Tolkien estate, so
-the race is called Halfling, as in the default list, and its lore is written fresh.
+**Ids.** The ids are those of the Parameter Set. The five classic races and the Catfolk
+keep the ids of the earlier default list. `halfling` stands for the Hobbits that were
+asked for: "Hobbit" is a protected name of the Tolkien estate, so the race is called
+Halfling, and its lore is written fresh.
 
 ## The four ages
 
@@ -74,25 +85,21 @@ The histories share four ages, so that they fit together.
 | 11 | Gnomes | `gnome` | Classic | Divergent evolution | Temperate broadleaf forest |
 | 12 | Orcs | `orc` | Classic | Divergent evolution | Cold steppe |
 | 13 | Hoarkin | `hoarkin` | New | Divergent evolution | Ice & snow |
-| 14 | Tinefolk | `tinefolk` | New | Divine shaping | Tundra |
-| 15 | Hearthbloods | `hearthbloods` | New | Magical shaping | Tundra |
-| 16 | Widegaze | `widegaze` | New | Divergent evolution | Cold steppe, Temperate grassland |
-| 17 | Amberbloods | `amberbloods` | New | Magical shaping | Boreal forest, Temperate mixed forest |
-| 18 | Brinefolk | `brinefolk` | New | Convergent evolution | Cold desert |
-| 19 | Duskreaders | `duskreaders` | New | Divergent evolution | Hot desert |
-| 20 | Noonfolk | `noonfolk` | New | Artificial creation | Savanna, Thorn scrub |
-| 21 | Boughwalkers | `boughwalkers` | New | Divergent evolution | Tropical rain forest |
-| 22 | Shoalfolk | `shoalfolk` | New | Divergent evolution | Mangrove |
-| 23 | Hushfolk | `hushfolk` | New | Divergent evolution | Temperate rain forest |
-| 24 | Swiftborn | `swiftborn` | New | Artificial creation | Woodland & shrubland |
-| 25 | Flinchless | `flinchless` | New | Artificial creation | Temperate grassland and farmland |
-| 26 | Longsleepers | `longsleepers` | New | Magical shaping | Temperate broadleaf forest |
-| 27 | Eyrie folk | `eyrieFolk` | New | Convergent evolution | High land of any belt |
-| 28 | Lanternkin | `lanternkin` | New | Magical shaping | Wet forests, and towns everywhere |
-| 29 | Stillfaces | `stillfaces` | New | Convergent evolution | Temperate mixed forest |
-| 30 | Lineminds | `lineminds` | New | Divine shaping | Settled temperate land |
-| 31 | Twofold | `twofold` | New | Divine shaping | Tropical dry forest |
-| 32 | Bitterbloods | `bitterbloods` | New | Artificial creation | Tropical rain forest, Mangrove |
+| 14 | Hearthbloods | `hearthbloods` | New | Magical shaping | Tundra |
+| 15 | Widegaze | `widegaze` | New | Divergent evolution | Cold steppe, Temperate grassland |
+| 16 | Amberbloods | `amberbloods` | New | Magical shaping | Boreal forest, Temperate mixed forest |
+| 17 | Brinefolk | `brinefolk` | New | Convergent evolution | Cold desert |
+| 18 | Duskreaders | `duskreaders` | New | Divergent evolution | Hot desert |
+| 19 | Noonfolk | `noonfolk` | New | Artificial creation | Savanna, Thorn scrub |
+| 20 | Boughwalkers | `boughwalkers` | New | Divergent evolution | Tropical rain forest |
+| 21 | Shoalfolk | `shoalfolk` | New | Divergent evolution | Mangrove |
+| 22 | Swiftborn | `swiftborn` | New | Artificial creation | Woodland & shrubland |
+| 23 | Flinchless | `flinchless` | New | Artificial creation | Temperate grassland and farmland |
+| 24 | Lanternkin | `lanternkin` | New | Magical shaping | Wet forests, and towns everywhere |
+| 25 | Stillfaces | `stillfaces` | New | Convergent evolution | Temperate mixed forest |
+| 26 | Twofold | `twofold` | New | Divine shaping | Tropical dry forest |
+| 27 | Bitterbloods | `bitterbloods` | New | Artificial creation | Tropical rain forest, Mangrove |
+| 28 | Catfolk | `catfolk` | New | Divine shaping | Savanna |
 
 ---
 
@@ -154,9 +161,8 @@ carve, mend gear and tell stories.
 
 **Relations.** To the Midlanders they are raiders in bad years and the best customers
 in good ones, and more than one Midlander port began as a Northmen winter camp. They buy
-ivory from the Hoarkin and furs from the Tinefolk, and they honour Dwarves as the only
-smiths better than their own. Elves make them uneasy: a people that needs no poets to be
-remembered.
+ivory from the Hoarkin, and they honour Dwarves as the only smiths better than their
+own. Elves make them uneasy: a people that needs no poets to be remembered.
 
 **Biomes.** Native (3): Boreal forest, Temperate mixed forest. Good (2): Tundra,
 Temperate rain forest. Tolerated (1): Ice & snow, Cold steppe, Temperate grassland,
@@ -579,8 +585,8 @@ beyond their borders unfinished.
 
 **Relations.** The Grass riders are the danger their walls face, and the source of
 about one dynasty in three. They trade silk and porcelain to the Saltroad folk and the
-Rainkeepers. They employ Lineminds as archivists and Lanternkin as notaries, register
-every other race in a named category, and tax each accordingly.
+Rainkeepers. They employ Lanternkin as notaries, register every other race in a named
+category, and tax each accordingly.
 
 **Biomes.** Native (3): Temperate broadleaf forest, Temperate rain forest. Good (2):
 Temperate grassland, Temperate mixed forest, Tropical dry forest. Tolerated (1): Cold
@@ -601,8 +607,8 @@ change hands.
 
 # Classic races
 
-The five races every reader of fantasy expects. They keep the ids of the default list
-and most of its biome weights. The lore is written for this world.
+The five races every reader of fantasy expects. They keep the ids and the biome weights
+of the earlier default list. The lore is written for this world.
 
 ## 8. Elves (`elf`)
 
@@ -669,8 +675,8 @@ quite trust it.
 **Biomes.** Native (3): Temperate mixed forest, Temperate broadleaf forest, Temperate
 rain forest. Good (2): Boreal forest, Tropical rain forest. Tolerated (1): Temperate
 grassland, Woodland & shrubland, Tropical dry forest. Height: `(200, 1), (200, 0)`, only
-below 200 m, as in the default list. Common: 2. Also wants: old forest far from towns,
-and a high Supernatural value.
+below 200 m. Common: 2. Also wants: old forest far from towns, and a high Supernatural
+value.
 
 **Vocations.** Forester, tree shaper, bowyer, archer, ranger of the forest edge,
 herbalist, healer, harper, weaver, vintner, lore keeper, envoy, tutor at a human court.
@@ -731,14 +737,13 @@ its gate, where the surface peoples meet the only Dwarves most of them will ever
 have fought wars over who the nearest hold sells to. The quarrel with the Elves is
 about charcoal: a forge eats forests. Gnomes are cousins who went down the hill
 instead of into it. Orcs fight them for the passes. Hearthbloods share the cold heights
-and hire out to the forges. Lineminds are the one race whose records Dwarves accept as
-equal to their own.
+and hire out to the forges.
 
 **Biomes.** Good (2): Tundra, Boreal forest, Temperate mixed forest. Tolerated (1): Ice
 & snow, Cold steppe, Cold desert, Temperate grassland, Woodland & shrubland, Temperate
-broadleaf forest, Temperate rain forest. Height: `(200, 0), (200, 1)`, only from 200 m,
-as in the default list. Common: 2. Also wants: hill and mountain zones, and a bedrock
-with ore: fold belt, granite or volcanic arc.
+broadleaf forest, Temperate rain forest. Height: `(200, 0), (200, 1)`, only from 200 m.
+Common: 2. Also wants: hill and mountain zones, and a bedrock with ore: fold belt,
+granite or volcanic arc.
 
 **Vocations.** Miner, prospector, smith, armourer, mason, engineer, tunnel warden,
 brewer, goat herd, records clerk, vault keeper, gate merchant, heavy foot soldier for
@@ -971,17 +976,17 @@ treaty band that guards a human border. A band of outcasts.
 
 # New races
 
-Twenty near-human races, built with the framework of
+Sixteen near-human races, built with the framework of
 [races-and-worldbuilding.md](races-and-worldbuilding.md). Each has one of its four
 origins, one visible marker, one hidden trait, a culture that follows from the hidden
 trait and a defined standing with the human races. An actor could play any of them
-with light make-up.
+with light make-up, and a Catfolk with ears, a tail and a pair of lenses added.
 
 | Origin | Races |
 |---|---|
-| Divergent evolution | Hoarkin, Widegaze, Duskreaders, Boughwalkers, Shoalfolk, Hushfolk |
-| Magical or divine shaping | Tinefolk, Hearthbloods, Amberbloods, Longsleepers, Lanternkin, Lineminds, Twofold |
-| Convergent evolution | Brinefolk, Eyrie folk, Stillfaces |
+| Divergent evolution | Hoarkin, Widegaze, Duskreaders, Boughwalkers, Shoalfolk |
+| Magical or divine shaping | Hearthbloods, Amberbloods, Lanternkin, Twofold, Catfolk |
+| Convergent evolution | Brinefolk, Stillfaces |
 | Artificial creation | Noonfolk, Swiftborn, Flinchless, Bitterbloods |
 
 ## 13. Hoarkin (`hoarkin`)
@@ -1044,7 +1049,6 @@ through the pack ice. Inland humans who have never met one tell of the cold drow
 who walk out of the sea in winter, and a Hoarkin who strays south is likely to be
 taken for a corpse. The Hearthbloods are their opposite, and an old tale makes the two
 one people who split the bargain between them. They keep a careful, courteous distance.
-The Tinefolk are neighbours and carry their goods.
 
 **Biomes.** Native (3): Ice & snow. Good (2): Tundra. Tolerated (1): Boreal forest.
 Height: no modifier. Common: 1. Also wants: a coast with sea ice. They live on land
@@ -1058,76 +1062,7 @@ courier, keeper of an ice cellar in a southern town.
 bright months. The summer moot on the shore. A brotherhood of ice pilots. A cold table
 partnership with a port. A stranded glacier band.
 
-## 14. Tinefolk (`tinefolk`)
-
-> Antlered herders who follow the reindeer on routes they own, and who sicken if they stay in one place.
-
-| | |
-|---|---|
-| **Group** | New |
-| **Origin** | Divine shaping: a blessing that is also a leash |
-| **Visible marker** | A pair of small antlers, grown and shed each year by both sexes |
-| **Hidden trait** | A sense of north and a need to move. One who stays put for more than a season falls ill |
-| **Lifespan** | About 60 years |
-
-**Appearance.** Lean and long-legged, built to walk all day. The skin is wind-browned
-and the hair dark and straight. From the brow above each temple grows an antler,
-between a hand's length and a forearm's, with two to five points. The antlers are
-covered in grey velvet through the summer, bare and polished in the autumn, and shed
-at midwinter. The eyes are a second sign: gold in summer, turning deep blue for the
-dark months. They wear fitted reindeer hide with the hair turned inward.
-
-**History and lore.** The Tinefolk were human once, and they know the winter it
-changed. A people of the cold edge, they lived by hunting the reindeer herds, and in
-one starving year in the Dawn the herds passed out of reach. The elders went out and
-begged the Herd Mother, the spirit that walks ahead of the herds, to let the people
-follow her animals for ever. She agreed. To make it true she marked them. She gave them
-antlers so the herds would know them as their own, and she gave them the Pull: a
-knowledge of where north lies and where the herd is, and an ache that grows in anyone
-who stops moving. They call it a gift on feast days and a leash the rest of the year.
-
-In the Ashen Years the tundra had no summer and the herds went south, a thousand miles
-through the lands of farmers, and the Tinefolk went with them. They call it the Long
-Trek. When the herds turned north again the Tinefolk had learned the routes of half
-the world. They have sold that knowledge ever since.
-
-**Way of life.** A herd-clan is a few dozen families that follow one half-wild herd on
-its yearly round, from the summer tundra to the winter forest and back. They live in
-cone tents of hide on poles, which a sled can carry. They own no land. They own
-routes: the right to pass and to graze along a fixed line, marked with cairns. A route
-is inherited, given as a marriage gift, sold and fought over.
-
-The antlers keep their calendar and their records. A child's first pair, at about
-twelve, makes an adult. The days after the midwinter shedding are the bare days, when
-no oath is sworn and no quarrel is pursued. A marriage is sealed by an exchange of
-that year's antlers. A contract is an antler split down its length, each party keeping
-a half. The racks of the dead hang in the winter camp and are the family's archive.
-
-Nobody among them can be lost, and nobody can be imprisoned: a Tinefolk held in one
-place for more than a season grows restless, then sleepless, then wastes away. Their
-heaviest penalty short of death is to be bound to a camp for one moon. A few in each
-generation are born without the Pull. They are called the Stayed, and they run the
-trading posts.
-
-**Relations.** Humans hire them as guides, carriers, couriers and surveyors, and
-kingdoms that try to count and tax them find they have left. The standing quarrel is
-with farmers who plough across a route. The Tinefolk answer that the road was there
-before the fence, and they drive the herd through. Northmen and Hoarkin are trading
-partners. Grass riders respect them as another people that will not be fenced.
-
-**Biomes.** Native (3): Tundra. Good (2): Cold steppe, Boreal forest. Tolerated (1):
-Ice & snow, Cold desert. Height: no modifier. Common: 1. Also wants: nothing fixed. A
-herd-clan is in a different region in winter than in summer.
-
-**Vocations.** Reindeer herder, guide, carrier, sled driver, courier, pathfinder,
-surveyor, antler carver, hide tanner, trapper, tracker, route judge, keeper of a
-trading post.
-
-**Factions.** A herd-clan. A route league: the clans that share one great route, under
-a route judge. The council of a winter camp. A company of carriers under contract to a
-kingdom. The Stayed of a trading post.
-
-## 15. Hearthbloods (`hearthbloods`)
+## 14. Hearthbloods (`hearthbloods`)
 
 > A people of the high cold who took the fire inside them, and must now feed it twice a day or die.
 
@@ -1198,7 +1133,7 @@ hungry year.
 kingdom. A league of halls that share granaries. A company of forge hands in a dwarven
 hold. A raiding band of a famine winter.
 
-## 16. Widegaze (`widegaze`)
+## 15. Widegaze (`widegaze`)
 
 > Bar-eyed watchers of the open plain, who see nearly the whole horizon at once and sell what they see to every side.
 
@@ -1271,7 +1206,7 @@ road warden.
 it. A herding kindred. A sworn company of sentries. A guild of witnesses. A circle of
 star watchers.
 
-## 17. Amberbloods (`amberbloods`)
+## 16. Amberbloods (`amberbloods`)
 
 > Forest wardens with resin in their veins, who cannot bleed to death and who end their lives standing as trees.
 
@@ -1343,7 +1278,7 @@ wound healer, bowyer, archer, woodcarver, beekeeper, fire-watcher, tracker, herb
 timber court that sells felling rights. A band of the Unrooted. A hidden refuge
 founded by those who fled the tappers.
 
-## 18. Brinefolk (`brinefolk`)
+## 17. Brinefolk (`brinefolk`)
 
 > Children of a sea that dried up, who weep salt, drink brine and hold the salt flats in trust until the water comes back.
 
@@ -1417,7 +1352,7 @@ across several regions. A brotherhood of miners. A company of carriers. A tax fa
 that collects a king's salt duty. The Keepers of the Bed, who tend the dead and wait
 for the sea.
 
-## 19. Duskreaders (`duskreaders`)
+## 18. Duskreaders (`duskreaders`)
 
 > A night people of the hot desert, black-eyed, who see warmth as others see light and have sworn to keep quiet about it.
 
@@ -1491,7 +1426,7 @@ goat herd, trader of the midnight market.
 Day-and-Night Pact with a Noonfolk settlement. A house of examiners for hire. A guild
 of kiln readers. The Discreet.
 
-## 20. Noonfolk (`noonfolk`)
+## 19. Noonfolk (`noonfolk`)
 
 > A people made to live on sunlight so that a king need not feed them, who fall asleep at sunset and have never seen the stars.
 
@@ -1549,12 +1484,12 @@ treated as holy.
 Having been made as slaves, they will not keep any. A village is governed by a council
 that meets at noon, so that nothing is decided in the dark.
 
-**Relations.** Sunlander herders guard their nights for a fee, and so do Orcs. The
-Duskreaders keep the Day-and-Night Pact with them. Saltroad caravans buy their grain.
-In a few regions the heirs of the old kingdom still claim Noonfolk as property under a
-law no one else recognises, and there the Noonfolk are held or hunted. Humans find
-them unsettling at two hours of the day: at noon, when they stand like statues, and
-after dusk, when they lie like the dead.
+**Relations.** Sunlander herders guard their nights for a fee, and so do Orcs and
+Catfolk. The Duskreaders keep the Day-and-Night Pact with them. Saltroad caravans buy
+their grain. In a few regions the heirs of the old kingdom still claim Noonfolk as
+property under a law no one else recognises, and there the Noonfolk are held or hunted.
+Humans find them unsettling at two hours of the day: at noon, when they stand like
+statues, and after dusk, when they lie like the dead.
 
 **Biomes.** Native (3): Savanna, Thorn scrub. Good (2): Hot desert. Tolerated (1):
 Temperate grassland, Woodland & shrubland, Tropical dry forest. Height: no modifier.
@@ -1569,7 +1504,7 @@ of the noon council. Never sailor, miner or sentry.
 whole region. A night guard company and the village that hires it. The keepers of the
 sealed granary. Those who have kept the Vigil. An estate where Noonfolk are still held.
 
-## 21. Boughwalkers (`boughwalkers`)
+## 20. Boughwalkers (`boughwalkers`)
 
 > Long-armed people of the forest canopy, who see a colour nobody else can and write in it.
 
@@ -1643,7 +1578,7 @@ taster, rigger, topman, steeplejack, bridge builder, runner of the high roads.
 secret patterns. A root market, held jointly with a ground people. A company of
 riggers that serves the ships of one port. The wardens of a high road.
 
-## 22. Shoalfolk (`shoalfolk`)
+## 21. Shoalfolk (`shoalfolk`)
 
 > Divers of the tidal shallows, who live on stilts and boats beyond the reach of any land law.
 
@@ -1715,80 +1650,7 @@ ferryman, smuggler, reef warden.
 that holds a reef. The pilots' guild of a harbour. A salvage company. A ring of
 smugglers. A pearl cooperative that sells to one merchant house.
 
-## 23. Hushfolk (`hushfolk`)
-
-> White-eyed people of cave and fog, who see by the echo of their own voices and talk above the range of human ears.
-
-| | |
-|---|---|
-| **Group** | New |
-| **Origin** | Divergent evolution |
-| **Visible marker** | Milk-white eyes that seem blind |
-| **Hidden trait** | Hearing far above the human range. They find their way by the echoes of clicks that others cannot hear |
-| **Lifespan** | About 70 years |
-
-**Appearance.** Slight, with pale grey skin that has seen little sun, and fine white
-or silver hair. The eyes are clouded white from edge to edge and tell light from dark
-and little else. The ears are a little large and set forward. A Hushfolk's head is
-never quite still. It tilts and turns in small movements, and the lips move with no
-sound a human can hear. They dress in soft felted cloth that does not rustle and wear
-nothing that jingles.
-
-**History and lore.** Under the fog forests of the wet temperate hills the limestone
-is hollow, and in the Dawn a people went down into it. They lived there in complete
-darkness for hundreds of generations. Their eyes dimmed and their ears sharpened. When
-their descendants came back up, it was into forest so thick with mist that eyes are
-not much use there either. They stayed in both worlds: the caves below and the fog
-above.
-
-Other peoples took them for blind beggars and left them alone, and the Hushfolk saw
-no reason to correct it. The Old Realms never counted them.
-
-The Ashen Years hardly touched them. They had never relied on the sun. They had cave
-mushrooms, blind fish, bats and stored nuts, in halls where the temperature never
-changes. What marks those years for them is the people they took in. Starving farmers
-from the hills above were led down by the hand into the dark, fed, and kept for seven
-years. The Hushfolk call it the Guests' Winter. Many human families of the fog country
-descend from cave guests, and they still send a child down for a year of fostering to
-keep the bond.
-
-**Way of life.** A Hushfolk town lies half in the caves and half in the forest. It has
-no windows and no lamps. Visitors bring their own light and are asked to keep it
-hooded. Every building is shaped for sound. A council hall carries a whisper to every
-seat. Each crossing of streets has its own chime of stone or shell, so that a
-Hushfolk always knows where they are by what they hear.
-
-Their speech is quick clicks and trills, most of it above human hearing. To a human
-two Hushfolk in talk are sitting in silence. For outsiders they have a low speech,
-slow and breathy. Loud noise is violence to them: a shout is a blow, and a struck bell
-at close range is torture. Their one prison is a room where a drum is beaten.
-
-Their ears earn their living. They hear rock creak before it falls, a flaw in a blade
-or a bell when it is tapped, base metal in a coin when it rings, water under ground,
-and a heartbeat across a room. They found bells, tune instruments and pilot ships
-through fog. In the caves they grow mushrooms and keep bat colonies, whose dung they
-sell as the best manure there is.
-
-**Relations.** Dwarves pay well for a Hushfolk listener in a deep mine. Midlander and
-Canal folk towns employ them as coin testers, bell founders and fog pilots, and the
-Northmen take them aboard in misty waters. Because they are thought blind they are
-underrated, and they overhear a great deal. Some sell what they hear. Thieves fear
-them more than dogs. With the Stillfaces, who speak by scent, they share a forest and
-almost no means of talking.
-
-**Biomes.** Native (3): Temperate rain forest. Good (2): Temperate mixed forest.
-Tolerated (1): Boreal forest, Temperate broadleaf forest, Tropical rain forest. Height:
-no modifier. Common: 1. Also wants: a carbonate bedrock, for the caves, and hill zones.
-
-**Vocations.** Cave guide, mine listener, fog pilot, bell founder, tuner, instrument
-maker, coin tester, blade tester, water finder, mushroom grower, bat keeper, listening
-watchman, eavesdropper, physician who listens to the chest, builder of halls for sound.
-
-**Factions.** A cave town under its quiet council. A guild of listeners hired out to
-mines. A pilots' lodge on a foggy coast. A house of bell founders. The human families
-bound to a town by the Guests' Winter. A ring of eavesdroppers for hire.
-
-## 24. Swiftborn (`swiftborn`)
+## 22. Swiftborn (`swiftborn`)
 
 > A people made to fill an empty land in one generation, who are grown at seven and old at thirty and spend every day accordingly.
 
@@ -1850,7 +1712,7 @@ general treat them as children, which a magistrate of ten resents. The long-live
 outwait them: a human lord has only to delay for fifteen years to be dealing with
 people who never met the ones he promised. Elves are drawn to them and grieved by
 them. An Elf may stand as friend and trustee to twenty generations of one family.
-Lineminds keep their archives. The other made races count them as kin.
+The other made races count them as kin.
 
 **Biomes.** Native (3): Woodland & shrubland. Good (2): Temperate grassland, Temperate
 broadleaf forest. Tolerated (1): Temperate mixed forest, Thorn scrub, Savanna. Height:
@@ -1863,9 +1725,9 @@ chronicler, magistrate for a season.
 
 **Factions.** A town and its Long Work. A harvest gang that follows the season. A
 company of players. A relay of runners. A free company of soldiers. A year-class. A
-trust held for a town by an Elf, a Gnome or a Linemind.
+trust held for a town by an Elf or a Gnome.
 
-## 25. Flinchless (`flinchless`)
+## 23. Flinchless (`flinchless`)
 
 > The descendants of a legion bred to feel no pain, who survive by examining each other at dawn and dusk and have become the world's surgeons.
 
@@ -1943,160 +1805,7 @@ secrets.
 The Oathkept in the service of a crown. The Released. A surgeons' hall in a town of
 another race. A fellowship of the made races.
 
-## 26. Longsleepers (`longsleepers`)
-
-> A people who sleep fourteen hours a day and meet in one shared dream, where their council sits, their children are taught and no one can lie.
-
-| | |
-|---|---|
-| **Group** | New |
-| **Origin** | Magical shaping: generations lived where the world is thin |
-| **Visible marker** | Lilac eyes that darken to black as sleep comes near |
-| **Hidden trait** | They need fourteen hours of sleep. All who sleep under one roof share a single dream |
-| **Lifespan** | About 80 years, a third of it awake |
-
-**Appearance.** Soft-featured, unhurried and pale from a life spent mostly indoors.
-The eyelids are heavy. The irises are a pale lilac on waking and darken through the
-day, to violet by afternoon and to black in the last hour before sleep, so that anyone
-can read a Longsleeper's remaining day in their face. They dress in loose layered
-robes that serve for day and night alike, and they go barefoot indoors.
-
-**History and lore.** In the Dawn a farming people settled a wooded valley of the kind
-where the world is thin and odd things happen. Those who slept there began to meet one
-another in their dreams. It was a chance meeting at first, and after a while they did
-it on purpose. Children born in the valley dreamed in company from the cradle. Over
-the generations the shared dream grew larger and steadier than any one sleeper, and
-the people slept longer to be in it. By the time of the Old Realms they were what they
-are now, and they had carried the gift with them to other valleys.
-
-The sorcerer-kings feared them, for a plain reason: here was a people that met where
-no spy could listen. One king decided to rule them from inside. He had himself laid
-in a Longsleeper hall, entered the dream, and did not come out. The Longsleepers say
-that he is still in there, that he is quite harmless now, and that children are taken
-to see him.
-
-In the Ashen Years they slept twenty hours in the day, since a sleeper needs little
-food, and the dream kept a summer when the world had none. They call that time the
-Deep Years. Some sleepers did not wake at the end of it. These are the Stayers. Their
-bodies died long ago and they are still met in the dream, along with others who have
-died asleep since. For a Longsleeper the dream is also where the dead are.
-
-**Way of life.** At the centre of every village stands the Dormitory, a great round
-hall with thick walls and one door, where the whole village sleeps in rings around a
-central pillar. It is temple, court, school and archive in one. The waking day is
-about ten hours long and is spent briskly on what the body needs. They keep orchards,
-nut trees, bees and pigs, which ask for little labour, and they hire others for the
-harvest.
-
-The real business is done asleep. The council sits in the dream. Children are taught
-there, and a craft is rehearsed there before the hands attempt it. A dreamer cannot
-lie, since the dream shows what is meant, so trials are dreamt, and a bargain is slept
-on in the literal sense. A stranger who sleeps in the Dormitory joins the village
-dream for that night. Longsleepers therefore host treaty talks for other peoples,
-since it is the one place where both sides know that what is said is true.
-
-A sleeping village is defenceless. The Dormitory is built like a keep, and it is
-guarded by the Wakeful, hired families of another race whose post is passed down from
-parent to child.
-
-**Relations.** Midlanders call them idle and half-bewitched, and send them their
-envoys anyway. Some guests cannot give up the dream after one night and never go home,
-and each village keeps a house for them. The Swiftborn work their harvests. The
-Lineminds are rivals in the keeping of memory. Elves treat them with a respect they
-show few others.
-
-**Biomes.** Native (3): Temperate broadleaf forest. Good (2): Woodland & shrubland,
-Temperate mixed forest. Tolerated (1): Temperate grassland, Temperate rain forest.
-Height: no modifier. Common: 0.5. Also wants: a high Supernatural value, more than any
-biome.
-
-**Vocations.** Dream counsellor, healer of nightmares, dream judge, host of treaty
-talks, tutor, keeper of memory, orchard keeper, beekeeper, swineherd, quilt maker,
-brewer of sleeping draughts. The Wakeful are of other races.
-
-**Factions.** A Dormitory village under its dreamt council. A treaty hall. A family
-of the Wakeful. A circle of healers. The house of the guests who stayed. The Stayers,
-who are a faction only in the dream.
-
-## 27. Eyrie folk (`eyrieFolk`)
-
-> Light-boned people of crag and cliff, who weigh half what they should, glide from valley to valley and break like dry sticks.
-
-| | |
-|---|---|
-| **Group** | New |
-| **Origin** | Convergent evolution: not kin to humans |
-| **Visible marker** | Soft down in place of hair, on the scalp, the nape and the forearms |
-| **Hidden trait** | Hollow bones. They weigh half as much as a human of their height, can leap three times as far, and break a bone in a fall a human would walk away from |
-| **Lifespan** | About 60 years |
-
-**Appearance.** Tall, narrow and long-limbed, with a deep keeled chest and almost no
-flesh on the frame. Where a human has hair, an Eyrie person has down: fine, soft and
-close, in grey, buff, white or barred brown, thick on the scalp and nape and thinning
-along the forearms. The eyes are large, amber or dark, and set under a strong brow.
-They move in quick, light steps, and perch more than they sit. They dress in close
-quilted silk and wear nothing loose.
-
-**History and lore.** The Eyrie folk are not kin to the humans. Their own account is
-that they flew in the Dawn and that the crags of the world were theirs. No one can
-say how much of it is true. Their bones are hollow like a bird's, their breastbone has
-a keel that no human has, and their old carvings show figures with wide arms that may
-be wings or may be cloaks. Whatever they were, they came to stand and walk and look
-like tall thin people, and they remained on the heights.
-
-The Old Realms wanted them as messengers. The makers of a sorcerer-king built a
-frame of split cane and silk that an Eyrie person could wear, and a courier who leapt
-from a high station could cross a valley in the time a rider took to saddle up. The
-Realms called this the Sky Post, and manned it by taking children hostage. When the
-Realms fell the Eyrie folk kept the wings and burned the stations' registers.
-
-In the Ashen Years the high country froze, and they came down to the foothills. There
-they learned what their bones were worth in a crowd of heavier peoples. A shove broke
-an arm. A tavern brawl killed. They went back up as soon as the snow allowed. From
-that winter they took a rule that still holds: an Eyrie person never fights at arm's
-length, and never strikes one of their own at all.
-
-**Way of life.** A village sits on a cliff ledge or the top of a crag. It is reached
-by ladders that are drawn up at night, or by leaps that nobody else can make. They
-terrace the slopes for barley and buckwheat, keep goats, hang beehives on the rock
-face, and gather the eggs and down of cliff birds. They fly falcons.
-
-A child is given wings at twelve and is expected to know the winds of the home valley
-as a farmer knows fields. A glide of several miles is ordinary, and a good flyer on a
-warm day can stay up for an hour. Because they see the land from above, they draw the
-best maps there are, and they sell them.
-
-Across a valley they speak by whistling, in a language of pitch that carries for a
-couple of miles. They settle quarrels by the long leap, a contest of distance, since
-a blow may cripple. Bonesetters are their most honoured craft. A flyer whose bones
-have healed crooked can no longer fly, and goes to live at the foot of the cliff.
-These are the Grounded. They run the market where their people meet everyone else.
-
-They cannot carry loads, and hire porters for anything heavy.
-
-**Relations.** Dwarves live inside the mountain and Eyrie folk on top of it, and the
-two trade metal for warnings and messages. Kings pay heavily for them as couriers,
-scouts and map makers, and a single Eyrie scout has decided more than one campaign.
-The Widegaze are partners in the business of watching, and a signal can pass from the
-Watch on the plain to a crag village and onward. They dread crowds, low ground and a
-hearty handshake. Humans think them brittle and flighty. They think humans heavy, and
-rather sad for it.
-
-**Biomes.** Good (2): Tundra, Woodland & shrubland, Temperate mixed forest. Tolerated
-(1): Cold steppe, Boreal forest, Cold desert, Temperate grassland, Temperate broadleaf
-forest, Thorn scrub, Savanna. Height: `(250, 0), (600, 1)`: none below 250 m, full
-weight from 600 m. Common: 1. Also wants: mountain zones. The height decides, not the
-biome.
-
-**Vocations.** Glider courier, scout from the air, map maker, lookout, whistler,
-falconer, cliff beekeeper, down gatherer, goat herd, terrace farmer, wing maker, rope
-maker, weather reader, bonesetter, steeplejack.
-
-**Factions.** A crag village under its council. A courier league, heir to the Sky
-Post. A loft of map makers. A house of falconers. The Grounded, and the market they
-keep at the cliff foot.
-
-## 28. Lanternkin (`lanternkin`)
+## 24. Lanternkin (`lanternkin`)
 
 > Pale people with light in their veins, whose shed blood glows for as long as they live, and who became the notaries, bankers and envoys of the world on the strength of it.
 
@@ -2156,8 +1865,7 @@ be turned down.
 
 **Relations.** Gnomes build their vaults. The Canal folk use them as notaries
 throughout the bureaucracy, and Saltroad merchants honour their letters across the
-desert. Lineminds work beside them: one race supplies the memory and the other the
-proof. Humans owe them money, and resent it in the usual way. Old superstition holds
+desert. Humans owe them money, and resent it in the usual way. Old superstition holds
 that lamp blood lengthens life, and Lanternkin have been hunted for it. Some lords
 still keep one as a hostage, to serve as a living lamp.
 
@@ -2174,7 +1882,7 @@ keeper of the lamp hall, clerk, bookkeeper, assayer, vial blower, fungus gardene
 covers the ships of one port. An envoy service. A home village in the forest. A
 secret society that frees Lanternkin who are held as living lamps.
 
-## 29. Stillfaces (`stillfaces`)
+## 25. Stillfaces (`stillfaces`)
 
 > A forest people with faces that never move, who say everything by scent and think humans lie with the face and tell the truth with the skin.
 
@@ -2235,8 +1943,8 @@ purpose, so as to work in human towns. Their own people call them the Learned Fa
 and find the result slightly indecent. The work is there, though. Stillfaces smell
 illness before a physician sees it. They find lost children, hidden cargo, truffles
 and poison, and can tell one vineyard's wine from the next. Amberbloods are neighbours
-whose resin smell they like. With the Hushfolk they can barely talk. Bitterbloods
-smell to them of every warning there is.
+whose resin smell they like. Catfolk they find restful: a people whose ears and tail
+say what the mouth says. Bitterbloods smell to them of every warning there is.
 
 **Biomes.** Native (3): Temperate mixed forest. Good (2): Boreal forest, Temperate
 broadleaf forest. Tolerated (1): Woodland & shrubland, Temperate rain forest. Height:
@@ -2250,86 +1958,7 @@ customs searcher, grader of wine, tea and spice, beekeeper, swineherd.
 sells to the towns. A circle of diagnosticians. A customs service under contract to a
 kingdom. The Learned Faces.
 
-## 30. Lineminds (`lineminds`)
-
-> A people whose children inherit a parent's memories, so that each family line is one long life and nothing is ever lost, including what its members would like to forget.
-
-| | |
-|---|---|
-| **Group** | New |
-| **Origin** | Divine shaping: an answered prayer |
-| **Visible marker** | A mark of fine dark lines on the brow, the same in every member of a line, with one stroke added in each generation |
-| **Hidden trait** | Between the ages of seven and fourteen a child comes into the memories of one parent, up to the day the child was conceived |
-| **Lifespan** | About 65 years |
-
-**Appearance.** In build and colouring they look like the human peoples they live
-among, for they were human once and have married widely. Two things mark them. At the
-hairline every Linemind carries a band of fine dark strokes, like a line of close
-script, identical to that of the parent whose line they continue, but for one new
-stroke. The other mark is the eyes of the children. A Linemind of twelve looks at the
-world with the patience of someone who has already been old.
-
-**History and lore.** In the age of the Old Realms there was a people of scribes, the
-hereditary archivists of one Realm. Late in that age a sorcerer-king came to the
-throne by a crime that the archive recorded. He burned the archive. Forty generations
-of record went up in a night, and the scribes stood in the street and watched.
-
-They prayed to the god they served, the Recorder, that nothing should ever be lost
-again. The god answered as gods do, and gave them exactly what they asked: then you
-will be the archive. The children conceived after that night grew up remembering the
-fire, although they had not been born when it burned.
-
-In each generation since, the child has received the parent. The memories arrive in
-dreams over seven years, and this is called the Opening. A parent's memory holds that
-parent's own inheritance, so a line reaches back and back. The nearest three or four
-lives are clear and the older ones fade, as anyone's childhood does, except for the
-great moments, which stay sharp. Every living Linemind remembers the fire.
-
-In the Ashen Years they knew where the old granaries had stood, and the wells, and
-how each thing had been done before. Kings sought them out, and some kings caged them.
-
-**Way of life.** The unit is the line, more than the family. A Linemind says "when I
-was my grandmother", and means it. Which parent's line a child will continue is
-settled in the marriage contract, and shows in the mark at birth. Brothers and
-sisters of one line share the parent up to their own conceptions, so the youngest
-knows the most and the eldest was there first, and both facts get used in argument.
-
-A child of a line of smiths knows the craft in the head at fourteen and must still
-train the hands. But a line that has kept one trade for thirty generations is beyond
-competition in it. There are lines of physicians, advocates, pilots, master builders
-and heralds.
-
-Nothing can be hidden from one's heir. To conceive a child is to confess to it.
-Lineminds are, as a result, either very careful how they live or very frank. Some
-with too much to hand on choose to have no child and let the line end, and these are
-called the Closed. A few in each generation are overwhelmed by the weight of what
-arrives. They are called the Crowded and are cared for in houses kept for them.
-
-To kill the last of a line is counted the same as burning a library, and it is their
-gravest crime.
-
-**Relations.** The Canal folk and the Midlanders employ them as archivists, heralds
-and witnesses, and a Linemind's "I was there" settles disputes about a treaty two
-centuries old. Dwarves accept their word as equal to an engraved plate. They hold the
-charters of Swiftborn towns in trust and work alongside the Lanternkin. The Elves
-remember because they were there, and the Lineminds because their grandmother was,
-and each side is a little jealous of the other. Humans are uneasy with children who
-know adult things, and with a people who remember, in person, every insult ever
-offered to an ancestor.
-
-**Biomes.** Good (2): Temperate grassland, Woodland & shrubland, Temperate mixed
-forest, Temperate broadleaf forest. Tolerated (1): Temperate rain forest, Savanna,
-Tropical dry forest. Height: no modifier. Common: 0.5. Also wants: a town or a court.
-They live where records are wanted.
-
-**Vocations.** Archivist, herald, genealogist, witness, judge of precedent, advocate,
-adviser, physician, pilot, master builder, tutor, chronicler, surveyor of old
-boundaries, keeper of a craft's secrets.
-
-**Factions.** A line. A college of lines in the service of a court. An archive house
-for hire. The Closed. A house for the Crowded. The avengers of a murdered line.
-
-## 31. Twofold (`twofold`)
+## 26. Twofold (`twofold`)
 
 > A people who each live the first half of adult life as a man and the second as a woman, and who have built their houses, their law and their god on it.
 
@@ -2403,7 +2032,7 @@ wealth.
 houses. The court of the Turning. A temple of the Pair. A council of the Staying. A
 war band under one of the long Going.
 
-## 32. Bitterbloods (`bitterbloods`)
+## 27. Bitterbloods (`bitterbloods`)
 
 > Bred as the poison tasters of a court that ruled by poison, they became poisonous themselves, fled to the swamps, and now sell the cure.
 
@@ -2480,13 +2109,118 @@ villages disown.
 ports. The office of a court taster. The Clean Hands. A hidden school of poisoners.
 The Seasoned.
 
+## 28. Catfolk (`catfolk`)
+
+> A people with the ears and the tail of a cat and the body of a hunter, who cannot eat grain and so are trusted to guard it.
+
+| | |
+|---|---|
+| **Group** | New |
+| **Origin** | Divine shaping |
+| **Visible marker** | Furred cat ears set high on the head, a furred cat tail, and eyes with the slit pupil of a cat |
+| **Hidden trait** | A hunter's body. They live on meat and fish and cannot live on grain. They sleep in short naps by day and by night, and are most awake at dusk and at dawn |
+| **Lifespan** | About 65 years |
+
+**Appearance.** Apart from the ears, the tail and the eyes, a Catfolk looks like a human.
+The skin is human skin, bare and smooth, with no fur on the face or the body. There are
+no whiskers, no muzzle and no claws: the nose, the mouth, the teeth, the hands and the
+nails are human. They are lean, a little under middling height, and light on their
+feet.
+
+The ears are a cat's ears: upright, pointed and furred, set high on the head. A Catfolk
+has no other ears, and the sides of the head are smooth under the hair. The ears turn
+toward a sound. The tail is as long as the leg, furred all over, and never quite still.
+Ears and tail show what the person feels, and a Catfolk cannot stop them.
+
+The colouring follows the cat. The skin runs through the colours of a cat's coat: cream,
+sand, tawny gold, russet, warm brown, smoke grey and near black. The hair is human hair,
+worn at any length, in black, brown, sand, ginger, grey or white, and often in two of
+them, streaked or patched. The fur of the ears and the tail matches the hair, sometimes
+with a darker tip or with rings. The eyes are amber, gold, copper, green or pale blue,
+brighter than a human's, and now and then one of each. The pupil is a cat's: an upright
+slit in daylight, wide and round in the dark. They wear light, loose clothes cut to
+leave the tail free, and nothing that covers the ears.
+
+**History and lore.** The Catfolk were human once. They were the granary keepers of the
+Old Realms. Every city of that age lived on its stores, and a guild of wardens watched
+them, with cats to keep down the mice. Their patron was a small goddess of the
+storehouse, the Small Huntress, who has a cat's head in the old carvings.
+
+In the Ashen Years the stores were all a city had. In the second year without a summer
+the mice and the rats bred in the granaries, and the wardens starved beside the grain
+they guarded. Their story is that they went to the Small Huntress and asked for two
+things: to keep the stores from the vermin, and to keep them from themselves. She gave
+both. The children born that winter had her ears and her tail. They heard a mouse
+through a wall, and they could not eat bread. The Catfolk call them the First Litter.
+
+A warden who cannot eat grain can be trusted with it. By the Catfolk account, the cities
+that came through the Ashen Years with their stores whole were the ones that kept such
+wardens, and the charters date from then. A grain town gives its Catfolk meat and fish,
+and they keep the town's stores. This is the Warden's Portion, and many towns of the
+Scattered Age still pay it.
+
+Not all of them stayed. When the Old Realms broke, most wardens had no city left to
+serve. They went out into the open grassland, where the game was, and became hunters.
+The two kinds, the wards of the towns and the bands of the grassland, still count
+themselves one people and marry between them.
+
+**Way of life.** A Catfolk eats meat, fish and eggs, and very little else. Bread and
+porridge pass through them and leave them hungry. So they plough nothing. A band hunts,
+fishes and keeps fowl and goats, and it needs a wide country to feed a few people. A
+ward lives on its Portion. Either way they are few, and a Catfolk settlement of more
+than a few hundred is rare.
+
+They sleep as cats do: an hour here and two there, a dozen times in a day and a night.
+They are sharpest at dusk and at dawn. A household is never all asleep and never all
+awake, and has no bedtime and no fixed meal. The house is built for it, with a flat
+roof, ledges and sleeping shelves in the sun and in the shade. Somebody is always
+watching. That makes them the best night watch there is, and thieves keep away from a
+Catfolk quarter. Business is done at the Dusk Meeting, the one hour when everyone is
+awake.
+
+They hunt by waiting and by one short rush. A Catfolk is very fast over fifty paces and
+spent after it, and marches badly. They balance like cats, and in a town their road is
+the roofs.
+
+The ears and the tail give them away, so they have no use for a straight face. They name
+the price they mean. Among themselves a lie is nearly impossible, and their law rests on
+that: a witness is watched, not sworn. A Catfolk who must deal with outsiders binds the
+tail under a sash and wears a hood. This is called going wrapped, and their own people
+think it rude.
+
+**Relations.** Every people that grows grain wants them. Midlanders, Rainkeepers, Canal
+folk and Halflings keep a Catfolk ward beside the granary. Noonfolk, who sell most of
+their harvest and sleep from sunset, hire them for the night. Sunlander herders sell
+them meat and pay them to watch the herd at dusk, when the lions come. Saltroad caravans
+carry a pair as scouts and night watch. Orcs compete with them for the game of the dry
+grassland and for the same guard contracts. Humans find them easy to like and easy to
+cheat, since anyone can read them, and call them lazy, because some of them are asleep
+whenever one looks. Sailors hold that a ship with a Catfolk in the rigging does not
+founder. Stillfaces find them restful.
+
+**Biomes.** Native (3): Savanna. Good (2): Temperate grassland, Hot desert, Thorn scrub,
+Tropical dry forest, Tropical rain forest. Tolerated (1): Cold steppe, Cold desert,
+Woodland & shrubland, Temperate mixed forest, Temperate broadleaf forest, Temperate rain
+forest, Mangrove. Height: no modifier. Common: 1. Also wants: open country with game, or
+a grain town to ward. The weights are those of the earlier default list.
+
+**Vocations.** Granary warden, ratcatcher, night watch, hunter, tracker, trapper,
+fowler, fisher, herd guard, caravan scout, rigger, roofer, steeplejack, rope dancer,
+courier over a short distance, butcher, tanner, furrier, priest of the Small Huntress.
+Never ploughman, miller or baker.
+
+**Factions.** A granary ward and the town that pays its Portion. A hunting band of the
+open grassland. A night watch company. The scouts of a caravan house. A temple of the
+Small Huntress. A roof guild that holds the roofs of a city quarter. The wrapped:
+Catfolk in the service of a court or a merchant house.
+
 ---
 
 # Summary
 
 ## Habitat weights
 
-The 32 races in the format of [society-generation.md](society-generation.md) Appendix A. The
+The 28 races in the format of [society-generation.md](society-generation.md) Appendix A. The
 frequency of a race in a biome is its habitat weight times `common`. Columns: Ice &
 snow, Tundra, Cold steppe, Boreal forest, Cold desert, Temperate grassland, Woodland &
 shrubland, Temperate mixed forest, Temperate broadleaf forest, Temperate rain forest,
@@ -2507,25 +2241,21 @@ Hot desert, Thorn scrub, Savanna, Tropical dry forest, Tropical rain forest, Man
 | 11 | `gnome` | 1 | 0 | 1 | 1 | 2 | 1 | 1 | 2 | 2 | 3 | 1 | 0 | 1 | 1 | 1 | 0 | 0 |
 | 12 | `orc` | 2 | 0 | 1 | 3 | 1 | 2 | 2 | 2 | 1 | 1 | 1 | 2 | 2 | 2 | 1 | 0 | 0 |
 | 13 | `hoarkin` | 1 | 3 | 2 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| 14 | `tinefolk` | 1 | 1 | 3 | 2 | 2 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| 15 | `hearthbloods` | 0.5 | 2 | 3 | 1 | 2 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| 16 | `widegaze` | 1 | 0 | 0 | 3 | 0 | 1 | 3 | 0 | 0 | 0 | 0 | 0 | 1 | 2 | 0 | 0 | 0 |
-| 17 | `amberbloods` | 1 | 0 | 0 | 0 | 3 | 0 | 0 | 0 | 3 | 2 | 2 | 0 | 0 | 0 | 0 | 0 | 0 |
-| 18 | `brinefolk` | 1 | 0 | 0 | 1 | 0 | 3 | 0 | 0 | 0 | 0 | 0 | 2 | 1 | 0 | 0 | 0 | 1 |
-| 19 | `duskreaders` | 1 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 3 | 2 | 1 | 0 | 0 | 0 |
-| 20 | `noonfolk` | 1 | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 0 | 0 | 0 | 2 | 3 | 3 | 1 | 0 | 0 |
-| 21 | `boughwalkers` | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 2 | 3 | 1 |
-| 22 | `shoalfolk` | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 1 | 0 | 0 | 2 | 0 | 0 | 0 | 1 | 1 | 3 |
-| 23 | `hushfolk` | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 2 | 1 | 3 | 0 | 0 | 0 | 0 | 1 | 0 |
-| 24 | `swiftborn` | 1 | 0 | 0 | 0 | 0 | 0 | 2 | 3 | 1 | 2 | 0 | 0 | 1 | 1 | 0 | 0 | 0 |
-| 25 | `flinchless` | 0.5 | 0 | 0 | 1 | 0 | 0 | 2 | 2 | 1 | 2 | 0 | 0 | 0 | 1 | 0 | 0 | 0 |
-| 26 | `longsleepers` | 0.5 | 0 | 0 | 0 | 0 | 0 | 1 | 2 | 2 | 3 | 1 | 0 | 0 | 0 | 0 | 0 | 0 |
-| 27 | `eyrieFolk` | 1 | 0 | 2 | 1 | 1 | 1 | 1 | 2 | 2 | 1 | 0 | 0 | 1 | 1 | 0 | 0 | 0 |
-| 28 | `lanternkin` | 0.5 | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 1 | 1 | 2 | 0 | 0 | 1 | 2 | 2 | 1 |
-| 29 | `stillfaces` | 1 | 0 | 0 | 0 | 2 | 0 | 0 | 1 | 3 | 2 | 1 | 0 | 0 | 0 | 0 | 0 | 0 |
-| 30 | `lineminds` | 0.5 | 0 | 0 | 0 | 0 | 0 | 2 | 2 | 2 | 2 | 1 | 0 | 0 | 1 | 1 | 0 | 0 |
-| 31 | `twofold` | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 2 | 3 | 2 | 1 |
-| 32 | `bitterbloods` | 0.5 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 3 | 3 |
+| 14 | `hearthbloods` | 0.5 | 2 | 3 | 1 | 2 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| 15 | `widegaze` | 1 | 0 | 0 | 3 | 0 | 1 | 3 | 0 | 0 | 0 | 0 | 0 | 1 | 2 | 0 | 0 | 0 |
+| 16 | `amberbloods` | 1 | 0 | 0 | 0 | 3 | 0 | 0 | 0 | 3 | 2 | 2 | 0 | 0 | 0 | 0 | 0 | 0 |
+| 17 | `brinefolk` | 1 | 0 | 0 | 1 | 0 | 3 | 0 | 0 | 0 | 0 | 0 | 2 | 1 | 0 | 0 | 0 | 1 |
+| 18 | `duskreaders` | 1 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 3 | 2 | 1 | 0 | 0 | 0 |
+| 19 | `noonfolk` | 1 | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 0 | 0 | 0 | 2 | 3 | 3 | 1 | 0 | 0 |
+| 20 | `boughwalkers` | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 2 | 3 | 1 |
+| 21 | `shoalfolk` | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 1 | 0 | 0 | 2 | 0 | 0 | 0 | 1 | 1 | 3 |
+| 22 | `swiftborn` | 1 | 0 | 0 | 0 | 0 | 0 | 2 | 3 | 1 | 2 | 0 | 0 | 1 | 1 | 0 | 0 | 0 |
+| 23 | `flinchless` | 0.5 | 0 | 0 | 1 | 0 | 0 | 2 | 2 | 1 | 2 | 0 | 0 | 0 | 1 | 0 | 0 | 0 |
+| 24 | `lanternkin` | 0.5 | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 1 | 1 | 2 | 0 | 0 | 1 | 2 | 2 | 1 |
+| 25 | `stillfaces` | 1 | 0 | 0 | 0 | 2 | 0 | 0 | 1 | 3 | 2 | 1 | 0 | 0 | 0 | 0 | 0 | 0 |
+| 26 | `twofold` | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 2 | 3 | 2 | 1 |
+| 27 | `bitterbloods` | 0.5 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 3 | 3 |
+| 28 | `catfolk` | 1 | 0 | 0 | 1 | 0 | 1 | 2 | 1 | 1 | 1 | 1 | 2 | 2 | 3 | 2 | 2 | 1 |
 
 **Height modifiers.** Control points `(height in m, factor)`, as in
 [adding-a-race.md](adding-a-race.md).
@@ -2537,79 +2267,73 @@ Hot desert, Thorn scrub, Savanna, Tropical dry forest, Tropical rain forest, Man
 | Hearthbloods | `(100, 0.5), (400, 1)` | Half weight below 100 m, full weight from 400 m |
 | Widegaze | `(300, 1), (500, 0)` | Full weight below 300 m, none from 500 m |
 | Shoalfolk | `(20, 1), (80, 0)` | Full weight below 20 m, none from 80 m |
-| Eyrie folk | `(250, 0), (600, 1)` | None below 250 m, full weight from 600 m |
 
-The other 26 races have none.
+The other 23 races have none.
 
 **`common`.** 3 to 5 for the human races, 2 for four of the classic races and 1 for
-the Gnomes, as in the default list. A new race has 1 when it has a homeland of its own
-and 0.5 when it lives scattered among others or is rare by its nature. The human
-races sum to 27, against 10 for the single `human` of the default list, so humans
-weigh more against the other races here than they do there.
+the Gnomes. A new race has 1 when it has a homeland of its own and 0.5 when it lives
+scattered among others or is rare by its nature. The human races sum to 27, against 10
+for the single `human` of the earlier default list.
+
+**Catfolk.** The Catfolk keep the row of the earlier default list, which comes from
+[research/races.md](research/races.md) §4.1: `common` 1 and a weight in 13 of the 16
+biomes. The other new races have a weight in 3 to 9 biomes.
 
 ## Measured shares
 
-The 32 races as a Parameter Set file:
-[races-basis-parameter-set.json](races-basis-parameter-set.json). It holds only the
-`Races` list, so every other parameter keeps its default.
-
 Measured on 50 regions: the 25 regions around region (0, 0) of the seeds `cellgen` and
-`gameworld`, taken to the Planned stage with that file. The 50 regions hold 1,824,338
-persons, 35,159 in a median region. The shares are sums of the potential population
-per race of the region files.
+`gameworld`, taken to the Planned stage with the default Parameter Set. The 50 regions
+hold 1,824,336 persons, 35,157 in a median region. The shares are sums of the
+potential population per race of the region files.
 
 | # | Race | Group | Share of all persons | Persons in a median region | Regions with 1 % or more (of 50) | Largest race in |
 |---|---|---|---|---|---|---|
-| 1 | Northmen | Human | 5.19 % | 1,788 | 47 | 3 |
-| 2 | Midlanders | Human | 10.52 % | 3,810 | 50 | 12 |
-| 3 | Saltroad folk | Human | 8.90 % | 2,834 | 49 | 7 |
-| 4 | Sunlanders | Human | 9.62 % | 3,002 | 49 | 10 |
-| 5 | Grass riders | Human | 4.30 % | 1,372 | 50 | 0 |
-| 6 | Rainkeepers | Human | 8.13 % | 2,382 | 48 | 0 |
-| 7 | Canal folk | Human | 12.07 % | 4,288 | 50 | 18 |
-| 8 | Elves | Classic | 3.15 % | 1,040 | 47 | 0 |
-| 9 | Dwarves | Classic | 1.32 % | 484 | 36 | 0 |
-| 10 | Halflings | Classic | 5.31 % | 1,778 | 50 | 0 |
-| 11 | Gnomes | Classic | 2.95 % | 1,052 | 50 | 0 |
-| 12 | Orcs | Classic | 6.92 % | 2,264 | 50 | 0 |
-| 13 | Hoarkin | New | 0.45 % | 150 | 7 | 0 |
-| 14 | Tinefolk | New | 0.87 % | 294 | 15 | 0 |
-| 15 | Hearthbloods | New | 0.29 % | 104 | 2 | 0 |
-| 16 | Widegaze | New | 1.11 % | 327 | 25 | 0 |
-| 17 | Amberbloods | New | 1.60 % | 568 | 41 | 0 |
-| 18 | Brinefolk | New | 1.32 % | 413 | 26 | 0 |
-| 19 | Duskreaders | New | 1.68 % | 484 | 32 | 0 |
-| 20 | Noonfolk | New | 2.37 % | 734 | 45 | 0 |
-| 21 | Boughwalkers | New | 1.01 % | 300 | 23 | 0 |
-| 22 | Shoalfolk | New | 0.21 % | 55 | 0 | 0 |
-| 23 | Hushfolk | New | 1.11 % | 395 | 31 | 0 |
-| 24 | Swiftborn | New | 1.95 % | 654 | 49 | 0 |
-| 25 | Flinchless | New | 0.77 % | 246 | 6 | 0 |
-| 26 | Longsleepers | New | 0.82 % | 295 | 13 | 0 |
-| 27 | Eyrie folk | New | 0.26 % | 72 | 1 | 0 |
-| 28 | Lanternkin | New | 0.98 % | 340 | 18 | 0 |
-| 29 | Stillfaces | New | 1.60 % | 588 | 41 | 0 |
-| 30 | Lineminds | New | 1.01 % | 348 | 24 | 0 |
-| 31 | Twofold | New | 1.73 % | 510 | 38 | 0 |
-| 32 | Bitterbloods | New | 0.48 % | 160 | 4 | 0 |
+| 1 | Northmen | Human | 5.61 % | 1,936 | 47 | 3 |
+| 2 | Midlanders | Human | 10.97 % | 3,999 | 50 | 13 |
+| 3 | Saltroad folk | Human | 8.61 % | 2,769 | 49 | 5 |
+| 4 | Sunlanders | Human | 9.19 % | 2,859 | 49 | 8 |
+| 5 | Grass riders | Human | 4.38 % | 1,391 | 50 | 0 |
+| 6 | Rainkeepers | Human | 7.88 % | 2,312 | 48 | 0 |
+| 7 | Canal folk | Human | 12.35 % | 4,384 | 50 | 21 |
+| 8 | Elves | Classic | 3.26 % | 1,076 | 47 | 0 |
+| 9 | Dwarves | Classic | 1.43 % | 518 | 36 | 0 |
+| 10 | Halflings | Classic | 5.43 % | 1,792 | 50 | 0 |
+| 11 | Gnomes | Classic | 3.04 % | 1,080 | 50 | 0 |
+| 12 | Orcs | Classic | 6.90 % | 2,243 | 50 | 0 |
+| 13 | Hoarkin | New | 0.52 % | 175 | 8 | 0 |
+| 14 | Hearthbloods | New | 0.33 % | 116 | 2 | 0 |
+| 15 | Widegaze | New | 1.08 % | 320 | 25 | 0 |
+| 16 | Amberbloods | New | 1.70 % | 603 | 41 | 0 |
+| 17 | Brinefolk | New | 1.28 % | 402 | 26 | 0 |
+| 18 | Duskreaders | New | 1.60 % | 466 | 31 | 0 |
+| 19 | Noonfolk | New | 2.27 % | 707 | 45 | 0 |
+| 20 | Boughwalkers | New | 0.98 % | 292 | 19 | 0 |
+| 21 | Shoalfolk | New | 0.21 % | 58 | 0 | 0 |
+| 22 | Swiftborn | New | 1.98 % | 666 | 50 | 0 |
+| 23 | Flinchless | New | 0.78 % | 254 | 8 | 0 |
+| 24 | Lanternkin | New | 0.98 % | 340 | 19 | 0 |
+| 25 | Stillfaces | New | 1.69 % | 628 | 41 | 0 |
+| 26 | Twofold | New | 1.67 % | 490 | 36 | 0 |
+| 27 | Bitterbloods | New | 0.47 % | 156 | 4 | 0 |
+| 28 | Catfolk | New | 3.41 % | 1,094 | 50 | 0 |
 
 | Group | Share of all persons | Seed `cellgen` | Seed `gameworld` |
 |---|---|---|---|
-| Human races (7) | 58.7 % | 58.2 % | 59.3 % |
-| Classic races (5) | 19.7 % | 19.9 % | 19.4 % |
-| New races (20) | 21.6 % | 21.9 % | 21.4 % |
+| Human races (7) | 59.0 % | 58.7 % | 59.3 % |
+| Classic races (5) | 20.1 % | 20.4 % | 19.7 % |
+| New races (16) | 20.9 % | 20.9 % | 21.0 % |
 
 | Per region | Lowest | Median | Highest |
 |---|---|---|---|
-| Races with 1 % or more of the persons | 15 | 21 | 23 |
-| Share of the largest race | 10 % | 14 % | 20 % |
+| Races with 1 % or more of the persons | 15 | 20 | 23 |
+| Share of the largest race | 10 % | 15 % | 19 % |
 
 What the numbers show:
 
-- **Humans hold 58.7 %.** The default list gives its single `human` 66 %. Here the
-  seven human races share less, since 20 more races are on.
+- **Humans hold 59.0 %.** The earlier default list gave its single `human` 66 %,
+  against five other races. Here the seven human races share the land with 21 others.
 - **No region has a homeland race.** No race has a majority in any region, the largest
-  race of a median region has 14 %, and a median region holds 21 races at 1 % or
+  race of a median region has 15 %, and a median region holds 20 races at 1 % or
   more. The rule shares each patch by its biome, and a region has many biomes. A
   Canal folk kingdom or a Brinefolk pan town needs something the rule does not have:
   a presence per race and region. This is the open topic of
@@ -2620,24 +2344,27 @@ What the numbers show:
   five of their six biomes with the Sunlanders, at an equal or lower frequency
   everywhere except Mangrove, which is 2 % of the land.
 - **Orcs (6.9 %) outnumber Northmen and Grass riders.** They have a weight of 2 in six
-  biomes and live in 13 of the 16. Halflings (5.3 %) are level with Northmen for a
-  like reason. Both keep the weights of the default list, where they stood against
-  one human race with `common` 10.
-- **Three races are close to absent.** Shoalfolk (0.21 %) reach 1 % in no region:
+  biomes and live in 13 of the 16. Halflings (5.4 %) are level with Northmen for a
+  like reason. Both keep the weights of the earlier default list, where they stood
+  against one human race with `common` 10.
+- **Catfolk (3.4 %) are the largest new race.** They outnumber Elves and Gnomes and
+  reach 1 % in all 50 regions. Their row has a weight in 13 biomes (see Catfolk above),
+  which is wider than the homeland their entry describes.
+- **Two races are close to absent.** Shoalfolk (0.21 %) reach 1 % in no region:
   only 15 % of the land lies below 50 m, and the modifier does not ask for a coast.
-  Eyrie folk (0.26 %) reach 1 % in one region: 8 % of the land lies above 500 m.
-  Hearthbloods (0.29 %) have `common` 0.5 in the cold, thinly peopled biomes.
-- **The new races are minorities, as meant.** Together they hold 21.6 %, and the
-  largest of them, the Noonfolk, 2.4 %.
+  Hearthbloods (0.33 %) reach 1 % in 2 regions: they have `common` 0.5 in the cold,
+  thinly peopled biomes.
+- **The new races are minorities, as meant.** Together they hold 20.9 %. After the
+  Catfolk the largest is the Noonfolk, with 2.3 %.
 
 To repeat the measurement:
 
 ```bash
-dotnet run --project src/Gameworld.MapGenerator -c Release -- --seed cellgen --parameters docs/races-basis-parameter-set.json --rings 2 --stage Planned --modes biomes --out out/races-basis/cellgen
+dotnet run --project src/Gameworld.MapGenerator -c Release -- --seed cellgen --rings 2 --stage Planned --modes biomes --out out/races/cellgen
 ```
 
 ```bash
-dotnet run --project src/Gameworld.MapGenerator -c Release -- --seed gameworld --parameters docs/races-basis-parameter-set.json --rings 2 --stage Planned --modes biomes --out out/races-basis/gameworld
+dotnet run --project src/Gameworld.MapGenerator -c Release -- --seed gameworld --rings 2 --stage Planned --modes biomes --out out/races/gameworld
 ```
 
 ## What the entries ask for that a race cannot say yet
@@ -2649,24 +2376,23 @@ A race is an id, a name, a toggle, a frequency per biome and a height modifier. 
 |---|---|
 | Coast or tidewater | Northmen, Hoarkin, Shoalfolk, Brinefolk |
 | River, well or river plain | Midlanders, Saltroad folk, Rainkeepers, Canal folk, Halflings, Noonfolk, Bitterbloods |
-| Elevation type | Dwarves, Hearthbloods, Eyrie folk and Gnomes want hills or mountains. Halflings, Widegaze and Grass riders want flat land or lowland |
-| Bedrock | Dwarves: an ore-bearing bedrock. Sunlanders: gold and iron. Brinefolk: rock salt. Hushfolk: carbonate |
-| Supernatural field | Elves, Amberbloods, Longsleepers |
+| Elevation type | Dwarves, Hearthbloods and Gnomes want hills or mountains. Halflings, Widegaze and Grass riders want flat land or lowland |
+| Bedrock | Dwarves: an ore-bearing bedrock. Sunlanders: gold and iron. Brinefolk: rock salt |
+| Supernatural field | Elves, Amberbloods |
 | Prosperity field | High for Halflings and Swiftborn. Low for Orcs |
-| A town, a court or a trade route | Lanternkin, Lineminds, Gnomes, Saltroad folk, Duskreaders |
-| Another race to live among | Flinchless (Midlanders), and most Lanternkin and Lineminds |
-| A presence that moves with the season | Tinefolk |
+| A town, a court or a trade route | Lanternkin, Gnomes, Saltroad folk, Duskreaders, Catfolk |
+| Another race to live among | Flinchless (Midlanders), most Lanternkin, and the Catfolk wards (a people that grows grain) |
 
 Several races also carry a rule that touches how a family or a person gets its race,
-which the readme leaves undecided: a Twofold changes sex at about thirty, a Linemind
-continues the line of one parent, a Swiftborn generation is seven years, a Hoarkin
-lodge sleeps through the winter, and a Bitterblood marries an outsider only after ten
-years of seasoning.
+which the readme leaves undecided: a Twofold changes sex at about thirty, a Swiftborn
+generation is seven years, a Hoarkin lodge sleeps through the winter, and a Bitterblood
+marries an outsider only after ten years of seasoning.
 
 ## Not done
 
 - The weights and `common` values are a first proposal. They are measured (see
   Measured shares) and have not been tuned after the measurement.
-- The default list, the Parameter Set, the readme and the tests are unchanged.
+- The Catfolk weights were not written for the entry here. They are the row of the
+  earlier default list, and they give the Catfolk more land than any other new race.
 - The names have not been searched for earlier use.
 - The seven human races are built on real peoples.

@@ -63,8 +63,9 @@ public class ResourceRulesTests
         WaterSite water = default,
         double prosperity = 0.5,
         GridCoord patch = default,
-        GridCoord zone = default) =>
-        new(Seed, patch, zone, biome, zoneType, bedrock, coastal, riverPoor, water, prosperity);
+        GridCoord zone = default,
+        double supernatural = 0) =>
+        new(Seed, patch, zone, biome, zoneType, bedrock, coastal, riverPoor, water, prosperity, supernatural);
 
     private static WaterSite River(double river, double goldLoad = 0, double tinLoad = 0) =>
         new(river, 0, 0, false, goldLoad, tinLoad);
@@ -184,12 +185,12 @@ public class ResourceRulesTests
             Assert.InRange(row.RoadCost, 1, 5);
         }
 
-        Assert.Equal(new BiomeFactorRow(0, 0, 0, 0, 0, 0, 0, 0, 1, 1), BiomeFactors.Ocean);
-        Assert.Equal(new BiomeFactorRow(0, 0, 0, 0.05, 0, 0, 0, 0, 1.5, 5), BiomeFactors.Of(Biome.IceAndSnow));
-        Assert.Equal(new BiomeFactorRow(1, 1, 1, 0.4, 0.1, 0, 0.9, 0.2, 1, 1), BiomeFactors.Of(Biome.TemperateGrassland));
-        Assert.Equal(new BiomeFactorRow(0.55, 1, 0.25, 0.7, 1, 0.85, 0, 0.2, 1.3, 1.4), BiomeFactors.Of(Biome.BorealForest));
-        Assert.Equal(new BiomeFactorRow(0.6, 1, 0.8, 0.6, 0.35, 0.4, 0.3, 0.2, 1, 1.05), BiomeFactors.Of(Biome.Savanna));
-        Assert.Equal(new BiomeFactorRow(0.3, 0.4, 0.1, 0.4, 0.5, 0, 0, 0.1, 2, 3), BiomeFactors.Of(Biome.Mangrove));
+        Assert.Equal(new BiomeFactorRow(0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1), BiomeFactors.Ocean);
+        Assert.Equal(new BiomeFactorRow(0, 0, 0, 0.05, 0, 0, 0.25, 0, 0, 1.5, 5), BiomeFactors.Of(Biome.IceAndSnow));
+        Assert.Equal(new BiomeFactorRow(1, 1, 1, 0.4, 0.1, 0, 0.9, 0.2, 0.4, 1, 1), BiomeFactors.Of(Biome.TemperateGrassland));
+        Assert.Equal(new BiomeFactorRow(0.55, 1, 0.25, 0.7, 1, 0.85, 0.25, 0.2, 0.4, 1.3, 1.4), BiomeFactors.Of(Biome.BorealForest));
+        Assert.Equal(new BiomeFactorRow(0.6, 1, 0.8, 0.6, 0.35, 0.4, 0.3, 0.2, 0.4, 1, 1.05), BiomeFactors.Of(Biome.Savanna));
+        Assert.Equal(new BiomeFactorRow(0.3, 0.4, 0.1, 0.4, 0.5, 0, 0, 0.1, 0.3, 2, 3), BiomeFactors.Of(Biome.Mangrove));
     }
 
     [Theory]
@@ -482,6 +483,290 @@ public class ResourceRulesTests
     }
 
     [Fact]
+    public void Land_ClasticBasinCanRollGypsum()
+    {
+        // Flat clastic basin: kind 1 gives sandstone at 0.04 × 1.6 with richness up to 0.35; gypsum (kind 52)
+        // at 0.04 with richness 0.8 · (0.35 … 1), so it wins nearly everywhere it is present.
+        var gypsum = 0;
+        foreach (var patch in Coords(2000))
+        {
+            var stone = ResourceRules.Land(Land(Record(Biome.TemperateGrassland), ElevationType.FlatLand,
+                BedrockIds.Clastic, patch: patch))[Resource.Stone];
+            if (stone.Variant != "gypsum and alabaster") continue;
+            gypsum++;
+            Assert.Equal(ResourceOrigin.Deposit, stone.Origin);
+            Assert.InRange(stone.Amount, 0.8 * 0.35, 0.8);
+        }
+        Assert.InRange(gypsum, 45, 125); // chance 0.04 of 2000
+
+        foreach (var patch in Coords(500))
+        {
+            Assert.NotEqual("gypsum and alabaster", ResourceRules.Land(Land(Record(Biome.TemperateGrassland),
+                ElevationType.Mountains, BedrockIds.Clastic, patch: patch))[Resource.Stone].Variant);
+            Assert.NotEqual("gypsum and alabaster", ResourceRules.Land(Land(Record(Biome.TemperateGrassland),
+                ElevationType.FlatLand, BedrockIds.Carbonate, patch: patch))[Resource.Stone].Variant);
+        }
+    }
+
+    [Fact]
+    public void Land_ReagentsLieOnTheirBedrock()
+    {
+        // Volcanic highlands: alum 0.06, sulphur 0.05, quicksilver 0.015, so about 12 % of the patches.
+        var found = 0;
+        foreach (var patch in Coords(2000))
+        {
+            var reagents = ResourceRules.Land(Land(Record(Biome.TemperateMixedForest), ElevationType.Mountains,
+                BedrockIds.Volcanic, patch: patch))[Resource.Reagents];
+            if (reagents.Amount == 0) continue;
+            found++;
+            Assert.Contains(reagents.Variant, new[] { "alum", "sulphur", "quicksilver" });
+            Assert.Equal(ResourceOrigin.Deposit, reagents.Origin);
+            Assert.InRange(reagents.Amount, 0.35, 1);
+        }
+        Assert.InRange(found, 180, 300);
+
+        var shale = 0;
+        var cave = 0;
+        foreach (var patch in Coords(2000))
+        {
+            Assert.Equal(0, ResourceRules.Land(Land(Record(Biome.TemperateMixedForest), ElevationType.Mountains,
+                BedrockIds.Shield, patch: patch)).AmountOf(Resource.Reagents));
+            // The low volcanic ground has none either.
+            Assert.Equal(0, ResourceRules.Land(Land(Record(Biome.TemperateMixedForest), ElevationType.Lowland,
+                BedrockIds.Volcanic, patch: patch)).AmountOf(Resource.Reagents));
+
+            var clastic = ResourceRules.Land(Land(Record(Biome.TemperateMixedForest), ElevationType.Lowland,
+                BedrockIds.Clastic, patch: patch))[Resource.Reagents];
+            if (clastic.Amount > 0)
+            {
+                shale++;
+                Assert.Equal("alum shale and vitriol", clastic.Variant);
+                Assert.InRange(clastic.Amount, 0.7 * 0.35, 0.7);
+            }
+
+            var carbonate = ResourceRules.Land(Land(Record(Biome.TemperateMixedForest), ElevationType.Hills,
+                BedrockIds.Carbonate, patch: patch))[Resource.Reagents];
+            if (carbonate.Amount > 0)
+            {
+                cave++;
+                Assert.Equal("cave saltpetre", carbonate.Variant);
+            }
+        }
+        Assert.InRange(shale, 30, 100); // chance 0.03 of 2000
+        Assert.InRange(cave, 30, 100);
+    }
+
+    [Fact]
+    public void Land_SaltpetreSharesTheZoneGateOfThePlayaSalt()
+    {
+        // Hot desert, 150 mm: m = 150 / 660 < 0.5. The salt and the reagents pass the same 8 % gate.
+        var gated = 0;
+        foreach (var zone in Coords(1000))
+        {
+            var saltHere = false;
+            var reagentsHere = false;
+            foreach (var patch in Coords(60))
+            {
+                var result = ResourceRules.Land(Land(Record(Biome.HotDesert), ElevationType.FlatLand,
+                    BedrockIds.Alluvium, riverPoor: true, patch: patch, zone: zone));
+                saltHere |= result.AmountOf(Resource.Salt) > 0;
+                var reagents = result[Resource.Reagents];
+                if (reagents.Amount == 0) continue;
+                reagentsHere = true;
+                Assert.Contains(reagents.Variant, new[] { "saltpetre", "borax" });
+            }
+            Assert.Equal(saltHere, reagentsHere); // 60 patches at 0.3 and at 0.15: both show where the gate is open
+            if (saltHere) gated++;
+        }
+        Assert.InRange(gated, 50, 115);
+    }
+
+    [Fact]
+    public void Land_HerbsFollowTheBiomeAndTheHeight()
+    {
+        var shrubland = ResourceRules.Land(Land(Record(Biome.WoodlandAndShrubland), ElevationType.Lowland, BedrockIds.Shield));
+        Assert.Equal(0.8, shrubland.AmountOf(Resource.Herbs), 12);
+        Assert.Contains(shrubland[Resource.Herbs].Variant, new[] { "sage", "thyme and rosemary", "poppy" });
+        Assert.Equal(ResourceOrigin.Potential, shrubland[Resource.Herbs].Origin);
+
+        // + 0.15 in hills and mountains.
+        var hills = ResourceRules.Land(Land(Record(Biome.WoodlandAndShrubland), ElevationType.Hills, BedrockIds.Shield));
+        Assert.Equal(0.95, hills.AmountOf(Resource.Herbs), 12);
+        Assert.Contains(hills[Resource.Herbs].Variant, new[] { "sage", "thyme and rosemary", "poppy" });
+
+        var mountains = ResourceRules.Land(Land(Record(Biome.TemperateBroadleafForest), ElevationType.Mountains, BedrockIds.Shield));
+        Assert.Equal(0.75, mountains.AmountOf(Resource.Herbs), 12);
+        Assert.Contains(mountains[Resource.Herbs].Variant, new[] { "gentian", "arnica" });
+
+        // A desert keeps its own herbs in the mountains, and reaches the listing only there.
+        var desert = ResourceRules.Land(Land(Record(Biome.HotDesert), ElevationType.Mountains, BedrockIds.Shield));
+        Assert.Equal(0.25, desert.AmountOf(Resource.Herbs), 12);
+        Assert.Contains(desert[Resource.Herbs].Variant, new[] { "aloe", "senna" });
+
+        foreach (var type in LandTypes)
+            Assert.Equal(0, ResourceRules.Land(Land(Record(Biome.IceAndSnow), type, BedrockIds.Shield)).AmountOf(Resource.Herbs));
+
+        // Every other land biome has herbs, with a variant.
+        foreach (var climate in Climates)
+        {
+            if (climate.Biome == Biome.IceAndSnow) continue;
+            var herbs = ResourceRules.Land(Land(Record(climate.Biome), ElevationType.Lowland, BedrockIds.Shield))[Resource.Herbs];
+            Assert.True(herbs.Amount > 0);
+            Assert.NotNull(herbs.Variant);
+        }
+    }
+
+    [Fact]
+    public void Land_PackAnimalsOfTheColdAndOfTheTropicalForests()
+    {
+        var tundra = ResourceRules.Land(Land(Record(Biome.Tundra), ElevationType.Lowland, BedrockIds.Shield));
+        Assert.Equal(0.3, tundra.AmountOf(Resource.HorsesAndPackAnimals), 12);
+        Assert.Contains(tundra[Resource.HorsesAndPackAnimals].Variant, new[] { "reindeer", "sled dogs" });
+
+        var boreal = ResourceRules.Land(Land(Record(Biome.BorealForest), ElevationType.Lowland, BedrockIds.Shield));
+        Assert.Equal(0.25, boreal.AmountOf(Resource.HorsesAndPackAnimals), 12);
+        Assert.Equal("reindeer", boreal[Resource.HorsesAndPackAnimals].Variant);
+
+        // Ice: sled dogs on the coast only.
+        var inland = ResourceRules.Land(Land(Record(Biome.IceAndSnow), ElevationType.FlatLand, BedrockIds.Shield));
+        Assert.Equal(0, inland.AmountOf(Resource.HorsesAndPackAnimals));
+        var coast = ResourceRules.Land(Land(Record(Biome.IceAndSnow), ElevationType.FlatLand, BedrockIds.Shield, coastal: true));
+        Assert.Equal(0.25, coast.AmountOf(Resource.HorsesAndPackAnimals), 12);
+        Assert.Equal("sled dogs", coast[Resource.HorsesAndPackAnimals].Variant);
+
+        var rainForest = ResourceRules.Land(Land(Record(Biome.TropicalRainForest), ElevationType.Lowland, BedrockIds.Shield));
+        Assert.Equal(0.25, rainForest.AmountOf(Resource.HorsesAndPackAnimals), 12);
+        Assert.Equal("elephants", rainForest[Resource.HorsesAndPackAnimals].Variant);
+
+        var dryForest = ResourceRules.Land(Land(Record(Biome.TropicalDryForest), ElevationType.FlatLand, BedrockIds.Shield));
+        Assert.Equal(0.3, dryForest.AmountOf(Resource.HorsesAndPackAnimals), 12);
+        Assert.Equal("elephants", dryForest[Resource.HorsesAndPackAnimals].Variant);
+
+        // The high ground keeps its mules: mounts 0.3 × 0.7 against 0.3 × pasture 0.45.
+        var dryHills = ResourceRules.Land(Land(Record(Biome.TropicalDryForest), ElevationType.Hills, BedrockIds.Shield));
+        Assert.Equal(0.21, dryHills.AmountOf(Resource.HorsesAndPackAnimals), 12);
+        Assert.Equal("donkeys and mules", dryHills[Resource.HorsesAndPackAnimals].Variant);
+
+        var grassland = ResourceRules.Land(Land(Record(Biome.TemperateGrassland), ElevationType.Lowland, BedrockIds.Shield));
+        Assert.Equal("horses", grassland[Resource.HorsesAndPackAnimals].Variant);
+    }
+
+    [Fact]
+    public void Power_IsZeroUpToSixtyAndOneFromNinety()
+    {
+        Assert.Equal(0, ResourceRules.Power(0));
+        Assert.Equal(0, ResourceRules.Power(60));
+        Assert.Equal(0.5, ResourceRules.Power(75), 12);
+        Assert.Equal(1, ResourceRules.Power(90), 12);
+        Assert.Equal(1, ResourceRules.Power(100));
+    }
+
+    [Fact]
+    public void Land_ArcaneMaterialsNeedTheSupernaturalField()
+    {
+        var water = new WaterSite(9, 3, 6e6, true, 0.5, 0.5);
+
+        // At a Supernatural of 60 and below there is none, whatever the patch.
+        foreach (var supernatural in new[] { 0.0, 30, 60 })
+        foreach (var climate in Climates)
+        foreach (var type in LandTypes)
+        foreach (var bedrock in Bedrocks)
+        foreach (var patch in Coords(4))
+        {
+            var result = ResourceRules.Land(Land(Record(climate.Biome), type, bedrock, coastal: true, water: water,
+                prosperity: 0.2, patch: patch, zone: patch, supernatural: supernatural));
+            Assert.Equal(0, result.AmountOf(Resource.ArcaneMaterials));
+        }
+
+        // Cold desert on shield lowland: star metal is the only kind that fits, at 0.4 × power.
+        int StarMetal(double supernatural)
+        {
+            var found = 0;
+            foreach (var patch in Coords(2000))
+            {
+                var arcane = ResourceRules.Land(Land(Record(Biome.ColdDesert), ElevationType.Lowland, BedrockIds.Shield,
+                    patch: patch, supernatural: supernatural))[Resource.ArcaneMaterials];
+                if (arcane.Amount == 0) continue;
+                found++;
+                Assert.Equal("star metal", arcane.Variant);
+                Assert.Equal(ResourceOrigin.Deposit, arcane.Origin);
+                Assert.InRange(arcane.Amount, 0.35, 1);
+            }
+            return found;
+        }
+
+        Assert.InRange(StarMetal(100), 720, 880);  // chance 0.4
+        Assert.InRange(StarMetal(75), 340, 460);   // chance 0.2
+        Assert.Equal(0, StarMetal(60));
+
+        // The prosperity boost does not apply: poor land has as much.
+        var poor = 0;
+        foreach (var patch in Coords(2000))
+            if (ResourceRules.Land(Land(Record(Biome.ColdDesert), ElevationType.Lowland, BedrockIds.Shield,
+                    prosperity: 0, patch: patch, supernatural: 100)).AmountOf(Resource.ArcaneMaterials) > 0)
+                poor++;
+        Assert.Equal(StarMetal(100), poor);
+    }
+
+    [Fact]
+    public void Land_ArcaneKindsLieWhereTheirConditionsHold()
+    {
+        string[] Variants(BiomeRecord biome, ElevationType type, string bedrock, bool coastal = false,
+            WaterSite water = default, double prosperity = 0.5)
+        {
+            var found = new SortedSet<string>(StringComparer.Ordinal);
+            foreach (var patch in Coords(1500))
+            {
+                var arcane = ResourceRules.Land(Land(biome, type, bedrock, coastal: coastal, water: water,
+                    prosperity: prosperity, patch: patch, supernatural: 100))[Resource.ArcaneMaterials];
+                if (arcane.Amount > 0) found.Add(arcane.Variant!);
+            }
+            return [.. found];
+        }
+
+        Assert.Equal(new[] { "truesilver" }, Variants(Record(Biome.TemperateGrassland), ElevationType.Mountains, BedrockIds.Granite));
+        Assert.Equal(new[] { "stormglass" }, Variants(Record(Biome.TemperateGrassland), ElevationType.Lowland, BedrockIds.Shield));
+        Assert.Empty(Variants(Record(Biome.TemperateGrassland), ElevationType.Hills, BedrockIds.Shield));
+
+        // Broadleaf lowland, T = 12: the sap of Elanor, and elderwood only where the prosperity is low.
+        Assert.Equal(new[] { "sap of Elanor" }, Variants(Record(Biome.TemperateBroadleafForest), ElevationType.Lowland, BedrockIds.Shield));
+        Assert.Equal(new[] { "elderwood", "sap of Elanor" },
+            Variants(Record(Biome.TemperateBroadleafForest), ElevationType.Lowland, BedrockIds.Shield, prosperity: 0.2));
+
+        // Hot desert at 26 °C: star metal and sunstone. Clastic hills add dragonbone (m < 1).
+        Assert.Equal(new[] { "star metal", "sunstone" },
+            Variants(Record(Biome.HotDesert), ElevationType.Lowland, BedrockIds.Shield));
+        Assert.Contains("dragonbone", Variants(Record(Biome.HotDesert), ElevationType.Hills, BedrockIds.Clastic));
+
+        // Tundra: the frost-lotus needs water; in subpolar mountains there is windcrystal.
+        Assert.Empty(Variants(Record(Biome.Tundra), ElevationType.Lowland, BedrockIds.Shield));
+        Assert.Equal(new[] { "frost-lotus" }, Variants(Record(Biome.Tundra), ElevationType.Lowland, BedrockIds.Shield, water: River(2)));
+        Assert.Equal(new[] { "windcrystal" }, Variants(Record(Biome.Tundra), ElevationType.Mountains, BedrockIds.Shield));
+
+        // Rain forest at T₀ = 26: moonpearls on the coast.
+        Assert.Empty(Variants(Record(Biome.TropicalRainForest), ElevationType.Lowland, BedrockIds.Shield));
+        Assert.Equal(new[] { "moonpearls" }, Variants(Record(Biome.TropicalRainForest), ElevationType.Lowland, BedrockIds.Shield, coastal: true));
+
+        // Wet volcanic and carbonate highlands (rain forest, m > 2).
+        Assert.Equal(new[] { "mana crystal" }, Variants(Record(Biome.TropicalRainForest), ElevationType.Hills, BedrockIds.Volcanic));
+        Assert.Equal(new[] { "glowcap fungi" }, Variants(Record(Biome.TropicalRainForest), ElevationType.Hills, BedrockIds.Carbonate));
+    }
+
+    [Fact]
+    public void Ocean_HasNoneOfTheThreeNewResources()
+    {
+        foreach (var patch in Coords(300))
+        foreach (var onShelf in new[] { false, true })
+        {
+            var result = ResourceRules.Ocean(new OceanResourceInput(Seed, patch, onShelf, 24, 1));
+            Assert.Equal(ResourceCatalog.Count, result.Amounts.Count);
+            Assert.Equal(0, result.AmountOf(Resource.Reagents));
+            Assert.Equal(0, result.AmountOf(Resource.Herbs));
+            Assert.Equal(0, result.AmountOf(Resource.ArcaneMaterials));
+        }
+    }
+
+    [Fact]
     public void Land_SummariesFollowTheFormulas()
     {
         var water = new WaterSite(9, 3, 6e6, true, 0.8, 0.8);
@@ -508,6 +793,9 @@ public class ResourceRulesTests
 
         Assert.Equal(1, ResourceRules.TradeValue(Resource.Gold));
         Assert.Equal(0.9, ResourceRules.TradeValue(Resource.Tin));
+        Assert.Equal(0.9, ResourceRules.TradeValue(Resource.ArcaneMaterials));
+        Assert.Equal(0.5, ResourceRules.TradeValue(Resource.Reagents));
+        Assert.Equal(0, ResourceRules.TradeValue(Resource.Herbs));
         Assert.Equal(0.7, ResourceRules.TradeValue(Resource.Salt));
         Assert.Equal(0.1, ResourceRules.TradeValue(Resource.Fibre));
         Assert.Equal(0, ResourceRules.TradeValue(Resource.Grain));

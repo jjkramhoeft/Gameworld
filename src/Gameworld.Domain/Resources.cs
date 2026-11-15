@@ -17,8 +17,9 @@ public enum ResourceGroup
 }
 
 /// <summary>
-/// The 24 raw resources the generation gives every patch an amount for. The order is the
-/// resource index of map-generation.md Appendix D.
+/// The 27 raw resources the generation gives every patch an amount for. The order is the
+/// resource index of map-generation.md Appendix D: a new resource goes last, so the picks of
+/// the others keep their hashes.
 /// </summary>
 public enum Resource
 {
@@ -46,6 +47,9 @@ public enum Resource
     FursAndIvory,
     Dyes,
     HorsesAndPackAnimals,
+    Reagents,
+    Herbs,
+    ArcaneMaterials,
 }
 
 /// <summary>Potentials are what the land can yield. Deposits are rare finds that often need to be mined.</summary>
@@ -57,7 +61,7 @@ public enum ResourceOrigin
 
 public static class ResourceCatalog
 {
-    public const int Count = 24;
+    public const int Count = 27;
 
     /// <summary>A resource is listed for a patch when its amount is at least this.</summary>
     public const double ListedAmount = 0.25;
@@ -75,12 +79,12 @@ public static class ResourceCatalog
             or Resource.Fish or Resource.WildFoodAndGame => ResourceGroup.Food,
         // Salt is a generated resource of its own; the readme table lists it under Materials (Preserver).
         Resource.Timber or Resource.Stone or Resource.Clay or Resource.Crystal
-            or Resource.Fibre or Resource.Salt => ResourceGroup.Materials,
+            or Resource.Fibre or Resource.Salt or Resource.Reagents or Resource.Herbs => ResourceGroup.Materials,
         Resource.Fuel => ResourceGroup.Fuel,
         Resource.IronOre or Resource.CopperOre or Resource.Tin or Resource.SilverAndLead
             or Resource.Gold => ResourceGroup.Metals,
         Resource.GemsAndPearls or Resource.Spices or Resource.StimulantsAndSugar
-            or Resource.FursAndIvory or Resource.Dyes => ResourceGroup.Luxuries,
+            or Resource.FursAndIvory or Resource.Dyes or Resource.ArcaneMaterials => ResourceGroup.Luxuries,
         Resource.HorsesAndPackAnimals => ResourceGroup.Animals,
         _ => throw new ArgumentOutOfRangeException(nameof(resource)),
     };
@@ -93,7 +97,7 @@ public readonly record struct ResourceAmount(double Amount, string? Variant, Res
 }
 
 /// <summary>
-/// The resources of one patch: an amount and a variant for each of the 24 raw resources, and
+/// The resources of one patch: an amount and a variant for each of the 27 raw resources, and
 /// the two summary numbers that feed the Prospect scores.
 /// </summary>
 public sealed record PatchResources(IReadOnlyList<ResourceAmount> Amounts, double Food, double Wealth)

@@ -6,7 +6,7 @@ ways to add one, and they differ a lot in work:
 - **To one world**: add an entry to the `Races` list of a Parameter Set file. No code
   changes. Use this to try a race out.
 - **To the default list**: change the built-in defaults, so every world without its own
-  Parameter Set file has the race. This touches code, tests and four docs.
+  Parameter Set file has the race. This touches code, tests and five docs.
 
 The rules behind both are in [society-generation.md](society-generation.md) sections 2
 and 3, and the default list is its Appendix A. The term Race is defined in the
@@ -36,11 +36,11 @@ frequency(race, biome) = habitat(race, biome) · common(race)
 ```
 
 - `habitat` is 0 avoided, 1 tolerated, 2 good or 3 native.
-- `common` is how common the race is in the world: 10 for humans, 2 for the other five
-  races that are on, and 1 or 0.5 for the rest.
+- `common` is how common the race is in the world: 3 to 5 for the human races, 2 for
+  Elves, Dwarves, Halflings and Orcs, 1 for Gnomes, and 1 or 0.5 for the new races.
 
-Follow the same scheme, so the new race compares to the others. A race with `common` 2
-that is native to a biome gets 6 there, against 30 for humans in Temperate grassland.
+Follow the same scheme, so the new race compares to the others. A race with `common` 1
+that is native to a biome gets 3 there, against 15 for Midlanders in Temperate grassland.
 
 The biome keys of a Parameter Set file are: `IceAndSnow`, `Tundra`, `ColdSteppe`,
 `BorealForest`, `ColdDesert`, `TemperateGrassland`, `WoodlandAndShrubland`,
@@ -130,8 +130,8 @@ desert, and a tundra race with the same limit keeps more than half of the tundra
 **What a new race does to the world.** Adding a race, or toggling one on, does not change
 how many persons the land feeds. It changes how the land is shared: the new race takes its
 share from the races already there. The one exception is land where nobody lived before.
-With the six default races, Ice & snow below 200 m holds nobody, so a race that lives there
-adds persons.
+With the default races there is no such land: the seven human races live in every biome
+and at every height between them. In a world with fewer races a new race can add persons.
 
 ## 2. Add the race to one world
 
@@ -161,7 +161,7 @@ adds persons.
    }
    ```
 
-   Keep the other 23 entries. A file that gives `Races` replaces the whole default list,
+   Keep the other 28 entries. A file that gives `Races` replaces the whole default list,
    so a file with only the new race is a world with only that race.
 
 3. Generate with the file:
@@ -187,26 +187,27 @@ Do step 2 first and look at the numbers. Then change these together:
 
 | Where | What |
 |---|---|
-| [src/Gameworld.Domain/ParameterSet.cs](../src/Gameworld.Domain/ParameterSet.cs) | Add a `Make(...)` line to `RaceParameters.Defaults`: id, name, on or off, `common`, then the 16 habitat weights in the order of the column header. Add `with { HeightModifier = ... }` for a height modifier; `OnlyFrom` and `OnlyBelow` make the two steps. |
+| [src/Gameworld.Domain/ParameterSet.cs](../src/Gameworld.Domain/ParameterSet.cs) | Add a `Make(...)` line to `RaceParameters.Defaults`: id, name, `common`, then the 16 habitat weights in the order of the column header. Every race of the default list is on. Add `with { HeightModifier = ... }` for a height modifier; `OnlyFrom` and `OnlyBelow` make the two steps. |
 | [default-parameter-set.json](default-parameter-set.json) | Add the same entry to `Races`, at the same place in the list, with the frequencies multiplied out. A test checks that this file equals `ParameterSet.Default`. |
-| [society-generation.md](society-generation.md) Appendix A | Add the row to the table. Update the height modifier note below it ("The other 21 races have none"). |
-| [society-generation.md](society-generation.md) section 2 | Update the count in the parameter table ("23, of which 6 are on"). |
-| [readme.md](../readme.md), Race | Update the count ("The default list holds 23 races") and the races that are on. |
-| [map-generation-research.md](map-generation-research.md) section 10.7 | Update "All 23" and say where the weights of the new race come from. The 23 came from the research note RACES §4.1; a race from elsewhere is a new decision. |
-| [tests/Gameworld.Tests/PopulationTests.cs](../tests/Gameworld.Tests/PopulationTests.cs) | The count 23 is asserted in two tests. |
+| [society-generation.md](society-generation.md) section 2 | Update the count in the parameter table ("28, all on") and the list of names below it. |
+| [society-generation.md](society-generation.md) Appendix A | Add the row to the table. Update the height modifier table and the note below it ("The other 23 races have none"). |
+| [races-basis.md](races-basis.md) | Add the entry of the race, its row in the list and in the habitat table, and the counts at the top. |
+| [readme.md](../readme.md), Race | Update the count ("The default list holds 28 races") and the groups. |
+| [map-generation-research.md](map-generation-research.md) section 10.7 | Update the count of 28 and say where the weights of the new race come from. |
+| [tests/Gameworld.Tests/PopulationTests.cs](../tests/Gameworld.Tests/PopulationTests.cs) | `DefaultRaces` lists the ids in order, and the count 28 is asserted in four tests. |
 
 The JSON Schema ([parameter-set.schema.json](parameter-set.schema.json)) does not hold the
 race list, so it is not regenerated.
 
-**If the race is on by default**, more changes:
+Every race of the default list is on, so more changes with it:
 
-- `ClassicSix` in PopulationTests.cs is the list of races that are on. The tests around it
-  also assume that only dwarves and elves have a height modifier, and compute shares from
-  the six frequencies in one biome.
-- society-generation.md section 3.3 quotes measured shares per race (66 % human and so on).
-  Measure them again. Its Appendix A also describes which of the races that are on live in
-  which biome.
-- Every world on the defaults changes, since the new race takes land from the other six.
+- PopulationTests.cs computes shares from the frequencies in Temperate broadleaf forest
+  and in Ice & snow. A race that lives in one of them changes those sums. Another test
+  names the five races with a height modifier.
+- society-generation.md section 3.3 and races-basis.md "Measured shares" quote measured
+  shares. Measure them again, with the two commands at the end of that part of
+  races-basis.md.
+- Every world on the defaults changes, since the new race takes land from the other 28.
 
 Then run the tests:
 

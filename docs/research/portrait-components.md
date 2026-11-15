@@ -1,12 +1,14 @@
 # Portrait Components: Hairstyles, Outfits, Hair Colours and Skin Colours for Generated Persons
 
-*Research date: 2026-11-15. Question: which fixed lists of **hairstyles**, **outfits**, **hair colours** and **skin colours** can a person be described from, so that every portrait of that person is prompted with the same words? Scope: a pre-industrial fantasy world, roughly antiquity to the early Renaissance, across several cultural models, plus fantasy convention where history has no model. §1 states the method and the findings. §2 and §3 are the hairstyles (20 for women, 10 for men). §4 and §5 are the outfits (30 for women, 20 for men). §6 and §7 are the hair colours (24) and the skin colours (34). §8 is the lists added for the races of `races-basis.md`: hairstyles (17), outfits (25), eye colours (25) and race markers (25). §9 is the accessories (54): 45 drawn from history and nine written for single races, with their fit to the races and their clashes with the other lists. §10 is what the image-model vendors' own documentation says about keeping a character consistent. §11 is a suggested fit to the races and climates of this repo. §12 lists where the existing docs constrained the lists and what could not be sourced. §13 lists the sources. §14 is the open questions.*
+*Research date: 2026-11-15. Question: which fixed lists of **hairstyles**, **outfits**, **hair colours** and **skin colours** can a person be described from, so that every portrait of that person is prompted with the same words? Scope: a pre-industrial fantasy world, roughly antiquity to the early Renaissance, across several cultural models, plus fantasy convention where history has no model. §1 states the method and the findings. §2 and §3 are the hairstyles (20 for women, 10 for men). §4 and §5 are the outfits (30 for women, 20 for men). §6 and §7 are the hair colours (25) and the skin colours (35). §8 is the lists added for the races of `races-basis.md`: hairstyles (17), outfits (27), eye colours (31) and race markers (26). §9 is the accessories (54): 45 drawn from history and nine written for single races, with their fit to the races and their clashes with the other lists. §10 is what the image-model vendors' own documentation says about keeping a character consistent. §11 is a suggested fit to the races and climates of this repo. §12 lists where the existing docs constrained the lists and what could not be sourced. §13 lists the sources. §14 is the open questions.*
 
 **Extended 2026-11-15.** The lists were extended to fit the 32 races of `races-basis.md`: 22 skin colours (§7.2), nine hair colours (HC16 to HC24), 17 hairstyles (§8.1) and 25 outfits (§8.2). Two kinds of component were added after that: 25 eye colours (§8.3) and 25 race markers (§8.4). All of these rest on the Appearance paragraphs of that doc, not on outside sources, and §11.2 now maps every one of its races.
 
 **Extended 2026-11-15 (accessories).** A seventh kind of component was added: 54 accessories (§9), which are necklaces, earrings, bracelets, rings, brooches, crowns, body jewellery and hair jewellery. Forty-five are drawn from history, and each carries a few lines of invented in-world lore. Nine are written for single races of `races-basis.md`. §9.3 fits them to the 32 races and §9.4 lists where they repeat or clash with the older lists. Their sources are in §13.8.
 
-**Summary.** The note gives six lists of components drawn from history, and extensions of them for the races of `races-basis.md`. Every hairstyle and outfit has a short stable name, a description written to be pasted into an image prompt, and a line on who wears it: rank, occupation, age or marital status, climate and occasion. The entries are spread over rank (beggar to ruler), occupation, climate and cultural model (north and west European, Mediterranean, Near Eastern, steppe, South Asian, East Asian, sub-Saharan African, Arctic and Andean), so that many different races can draw on them. Seventy-one of the 80 hairstyle and outfit entries of §2 to §5 have a historical model with a cited source. Nine are fantasy convention or composed types and are marked as such. The 92 entries of §8 have no historical model: each quotes the race it was written for. The existing docs describe looks only in the Appearance paragraphs of `races-basis.md` and the Appearance column of `human-races.md`; §11 maps the lists onto those and says where they give too little to go on. The accessories of §9 came later and are not counted in the figures above: 44 of the 45 in §9.1 have a historical model with a cited source, and one is a composed type.
+**Extended 2026-11-15 (Catfolk).** On 2026-11-15 the default race list was fixed at 28 races, and `races-basis.md` now describes those 28. The Catfolk are new to that doc: humans with furred cat ears, a furred cat tail and the slit pupil of a cat. They were added here with one skin colour (SC35), one hair colour (HC25), two outfits (RO26, RO27), six eye colours (EC26 to EC31) and one race marker (RM26), and with a row in §9.3, §9.4 and §11.2. The counts in this note include them. Five races of the first version of that doc were left out of the list: Tinefolk, Hushfolk, Longsleepers, Eyrie folk and Lineminds. Their entries are kept here, and the words quoted for them are those of the first version, which the doc no longer holds (§12.1 item 22).
+
+**Summary.** The note gives six lists of components drawn from history, and extensions of them for the races of `races-basis.md`. Every hairstyle and outfit has a short stable name, a description written to be pasted into an image prompt, and a line on who wears it: rank, occupation, age or marital status, climate and occasion. The entries are spread over rank (beggar to ruler), occupation, climate and cultural model (north and west European, Mediterranean, Near Eastern, steppe, South Asian, East Asian, sub-Saharan African, Arctic and Andean), so that many different races can draw on them. Seventy-one of the 80 hairstyle and outfit entries of §2 to §5 have a historical model with a cited source. Nine are fantasy convention or composed types and are marked as such. The 101 entries of §8 have no historical model: each quotes the race it was written for. The existing docs describe looks only in the Appearance paragraphs of `races-basis.md` and the Appearance column of `human-races.md`; §11 maps the lists onto those and says where they give too little to go on. The accessories of §9 came later and are not counted in the figures above: 44 of the 45 in §9.1 have a historical model with a cited source, and one is a composed type.
 
 **How to read the citations**
 
@@ -180,9 +182,9 @@ Each description gives what a head-and-shoulders to waist-up portrait shows firs
 
 ---
 
-## 6. Hair colours (24)
+## 6. Hair colours (25)
 
-Natural colours only. Hair colour comes from two pigments: more of the dark one gives brown and black, more of the red one gives red, and little of either gives blond; grey and white hair has lost its pigment [HAIRCOL]. Greying can start in the twenties and ends in grey and then white [HAIRCOL]. The first ten entries are base colours. HC11 to HC14 are for age. HC15 is not an age colour. HC16 to HC24 were added for the races of `races-basis.md`: each takes its colour from the Appearance paragraph of the race named in the note, and no outside source was read for them.
+Natural colours only. Hair colour comes from two pigments: more of the dark one gives brown and black, more of the red one gives red, and little of either gives blond; grey and white hair has lost its pigment [HAIRCOL]. Greying can start in the twenties and ends in grey and then white [HAIRCOL]. The first ten entries are base colours. HC11 to HC14 are for age. HC15 is not an age colour. HC16 to HC25 were added for the races of `races-basis.md`: each takes its colour from the Appearance paragraph of the race named in the note, and no outside source was read for them.
 
 | # | Name | Prompt-ready description | Note |
 |---|---|---|---|
@@ -210,12 +212,13 @@ Natural colours only. Hair colour comes from two pigments: more of the dark one 
 | HC22 | Buff | soft buff, a pale yellow-brown | Down of the Eyrie folk ("grey, buff, white or barred brown") |
 | HC23 | Barred Brown | brown crossed with narrow darker bars, like the feathers of a hawk | Down of the Eyrie folk. The hawk comparison is my addition |
 | HC24 | Brindled Brown-grey | thick hair streaked unevenly in brown and grey | Not from age. Stillfaces ("brindled in brown and grey") |
+| HC25 | Patched Two-colour | hair of two colours, black broken by uneven patches and streaks of ginger | Catfolk: the hair is "often in two of them, streaked or patched". The two colours should be drawn per person from black, brown, sand, ginger, grey and white; this text takes one pair. The single colours are HC1, HC3, HC6, HC9, HC16 and HC17 |
 
 ---
 
-## 7. Skin colours (34)
+## 7. Skin colours (35)
 
-§7.1 holds the twelve tones of human skin. §7.2 holds 22 tones added for the races of `races-basis.md` whose skin §7.1 does not reach.
+§7.1 holds the twelve tones of human skin. §7.2 holds 23 tones added for the races of `races-basis.md` whose skin §7.1 does not reach.
 
 ### 7.1 Human tones (12)
 
@@ -238,7 +241,7 @@ Food words are avoided, with one exception: "olive" is kept because it is the st
 | SC11 | Dark Brown, Warm | dark brown skin with a warm red undertone | Type VI [FITZ] |
 | SC12 | Deep Brown, Cool | very deep brown skin, near black, with a cool blue sheen in the highlights | Type VI. "A black with a blue sheen" Sunlanders in `races-basis.md` |
 
-### 7.2 Tones added for the races of `races-basis.md` (22)
+### 7.2 Tones added for the races of `races-basis.md` (23)
 
 Every entry takes its colour from the Appearance paragraph of the race in the last column, and the quoted words are that paragraph's. No outside source was read for them. Where the visible marker of a race is a colouring of the skin itself (blue-grey lips, a green-bronze veining, bright patches), the entry carries it, because a skin colour without it would be wrong for that race. Markers that are not skin colour are in §8.3 (eyes) and §8.4 (antlers, tusks, ears, salt crust, scars).
 
@@ -268,8 +271,9 @@ SC13 and SC14 are ordinary human tones that §7.1 lacked. The rest belong to one
 | SC32 | Clear Pale | very pale, thin skin that seems almost clear, with a faint blue-green tracery of veins at the wrists, the throat and the temples | Lanternkin. The tracery shows only in shadow and glows faintly there; in daylight the skin looks only sickly |
 | SC33 | Tawny-grey | tawny-grey skin, a light yellow-brown dulled with grey | Stillfaces |
 | SC34 | Olive-brown, Bright-patched | dark olive-brown skin broken by patches of bright colour, sky blue and sulphur yellow, across the throat, the shoulders and the outer arms | Bitterbloods. Orange patches occur. The brighter the patches, the stronger the blood |
+| SC35 | Smoke Grey | smooth, even grey skin with a cool cast, the colour of wood smoke | Catfolk ("smoke grey"). The comparison is my addition |
 
-Races that need no entry of their own: Northmen, Midlanders, Sunlanders, Grass riders, Rainkeepers, Canal folk, Elves and Twofold are covered by §7.1. Flinchless and Lineminds have skin "of every kind" and "like the human peoples they live among". The skin of Halflings and Gnomes is not stated.
+Races that need no entry of their own: Northmen, Midlanders, Sunlanders, Grass riders, Rainkeepers, Canal folk, Elves and Twofold are covered by §7.1. Flinchless and Lineminds have skin "of every kind" and "like the human peoples they live among". The skin of Halflings and Gnomes is not stated. Catfolk skin "runs through the colours of a cat's coat". SC35 is the one colour of it that the other rows lack. The rest are SC2 ("cream"), SC4 ("sand"), SC22 ("tawny gold"), SC9 ("russet"), SC8 and SC11 ("warm brown") and SC12 ("near black").
 
 ---
 
@@ -280,6 +284,7 @@ Races that need no entry of their own: Northmen, Midlanders, Sunlanders, Grass r
 - **Source.** Each entry rests on the Appearance paragraph of the race in the last column, and the quoted words are that paragraph's. No outside source was read. Whatever the description adds beyond the quoted words (a cut, a material, a number) is my addition and is named as such.
 - **Sex.** Every entry is for either sex unless "Worn by" says otherwise. The paragraphs split dress by sex for no classic or new race.
 - **Labels.** RH is a hairstyle and RO an outfit, numbered apart from the lists of §2 to §5. EC is an eye colour and RM a race marker.
+- **Catfolk.** RO26, RO27, EC26 to EC31 and RM26 were added later on 2026-11-15, when the Catfolk came into `races-basis.md` with a human look. RO27 rests on the Way of life paragraph, not on the Appearance paragraph.
 
 ### 8.1 Hairstyles (17)
 
@@ -310,9 +315,9 @@ Hair that §2 and §3 already cover:
 - Swiftborn, "worn long" so that an age can be counted "off a braid": WH2 with hair colour HC21, for men too.
 - Grass riders: MH7. Canal folk: WH15 and MH6.
 
-Races whose paragraph gives a hair colour or texture and no style: Midlanders, Saltroad folk, Tinefolk, Amberbloods, Brinefolk, Hushfolk, Lanternkin and Stillfaces. The hair of Duskreaders, Longsleepers, Flinchless and Lineminds is not described.
+Races whose paragraph gives a hair colour or texture and no style: Midlanders, Saltroad folk, Tinefolk, Amberbloods, Brinefolk, Hushfolk, Lanternkin, Stillfaces and Catfolk, whose hair is "worn at any length". The hair of Duskreaders, Longsleepers, Flinchless and Lineminds is not described.
 
-### 8.2 Outfits (25)
+### 8.2 Outfits (27)
 
 | # | Name | Description | Worn by | From `races-basis.md` |
 |---|---|---|---|---|
@@ -341,14 +346,16 @@ Races whose paragraph gives a hair colour or texture and no style: Midlanders, S
 | RO23 | Wrapped Cotton, Indigo Sash | Plain cotton cloth wrapped around the body and over one shoulder, cut the same for everyone, tied at the waist with a deep indigo sash. | Twofold after the Turning. | Twofold, as RO22 |
 | RO24 | Bare-shouldered Home Wrap | A cloth wrapped under the arms and tied at the chest, leaving the throat, the shoulders and the arms bare, so that the patches of bright skin show. | Bitterbloods at home. | Bitterbloods: the patches are "worn uncovered with pride at home". The garment is my addition |
 | RO25 | Gloves and Waxed Skin | Long-sleeved robe closed at the throat, thin leather gloves, a dull waxy coating on the skin of the face and neck, and a small cup hung at the belt. | Bitterbloods among other peoples. | Bitterbloods: "gloves and a coat of wax on the skin, and carries a cup of their own". The robe is my addition |
+| RO26 | Loose Tail-slit Clothes | A loose, light tunic of thin cloth with short sleeves, and loose trousers cut with a slit at the back that the tail passes through. The head is bare. | Catfolk at home and among their own. | Catfolk: "light, loose clothes cut to leave the tail free, and nothing that covers the ears". The garments and the slit are my addition |
+| RO27 | Hood and Bound Tail | A long plain coat tied at the waist with a broad cloth sash, the tail wound around the waist and hidden under the sash, and a deep hood drawn up over the head so that it covers the ears. | Catfolk who deal with outsiders, in a court or a merchant house. | Catfolk, Way of life: one "binds the tail under a sash and wears a hood. This is called going wrapped". The coat is my addition. It hides RM26 |
 
 Dress that §4 and §5 already cover: Northmen (WO2, MO11), Midlander peasants and nobility (WO1, MO1; WO3, WO4, MO4, MO8), Saltroad folk (WO13, MO15), Grass riders (WO15), Rainkeepers (WO16, MO16) and Canal folk (MO19 for both sexes, WO19, MO17).
 
 Races whose paragraph names no dress: Amberbloods, Swiftborn, Flinchless, Stillfaces and Lineminds.
 
-### 8.3 Eye colours (25)
+### 8.3 Eye colours (31)
 
-Eye colour is picked per person, like hair and skin colour. EC1 to EC8 are ordinary human colours. EC9 to EC12 are plain colours that only a non-human race has. EC13 to EC25 belong to one race each and carry that race's marker where the marker is in the eye.
+Eye colour is picked per person, like hair and skin colour. EC1 to EC8 are ordinary human colours. EC9 to EC12 are plain colours that only a non-human race has. EC13 to EC25 belong to one race each and carry that race's marker where the marker is in the eye. EC26 to EC31 are the Catfolk's and carry their slit pupil.
 
 | # | Name | Prompt-ready description | Race and its words |
 |---|---|---|---|
@@ -377,12 +384,18 @@ Eye colour is picked per person, like hair and skin colour. EC1 to EC8 are ordin
 | EC23 | Violet | violet eyes | Longsleepers by afternoon ("to violet by afternoon") |
 | EC24 | Light Grey-blue | light grey-blue eyes | Lanternkin ("a light grey-blue") |
 | EC25 | Yellow-ringed Dark | dark eyes with a narrow yellow ring around the iris | Bitterbloods ("dark with a yellow ring"). Where the ring sits is my addition |
+| EC26 | Slit-pupil Amber | bright amber eyes whose pupil is a narrow upright slit, like a cat's | Catfolk: "amber, gold, copper, green or pale blue, brighter than a human's"; "The pupil is a cat's: an upright slit in daylight, wide and round in the dark". Narrow is my addition |
+| EC27 | Slit-pupil Gold | bright gold eyes whose pupil is a narrow upright slit, like a cat's | Catfolk |
+| EC28 | Slit-pupil Copper | bright copper eyes, a red-gold, whose pupil is a narrow upright slit, like a cat's | Catfolk. Red-gold is my addition |
+| EC29 | Slit-pupil Green | bright green eyes whose pupil is a narrow upright slit, like a cat's | Catfolk |
+| EC30 | Slit-pupil Pale Blue | bright pale blue eyes whose pupil is a narrow upright slit, like a cat's | Catfolk |
+| EC31 | Odd Slit-pupil Eyes | one bright amber eye and one bright pale blue eye, each with a pupil that is a narrow upright slit, like a cat's | Catfolk: "now and then one of each". The two colours should be drawn per person; this text takes one pair |
 
-The eye colour of Sunlanders, Dwarves, Halflings, Swiftborn and Twofold is not stated, nor that of Elves of the cold woods. Lineminds have the eyes of the human race they live among.
+The eye colour of Sunlanders, Dwarves, Halflings, Swiftborn and Twofold is not stated, nor that of Elves of the cold woods. Lineminds have the eyes of the human race they live among. The six Catfolk entries give the pupil as it is in daylight. In a dark scene it is "wide and round", and the words about the slit should be left out.
 
-### 8.4 Race markers (25)
+### 8.4 Race markers (26)
 
-A marker is what a portrait must show of a race beyond skin, hair, eyes and dress. It is fixed for the race, not picked for the person: every person of the race gets the same text, or one of two texts where the marker changes with age or season. RM1 to RM5 are for the classic races, which have a Looks line and no "visible marker"; the word is extended to them here. RM6 to RM23 are for the new races. RM24 and RM25 are not marks of the body: they are things two human races always wear.
+A marker is what a portrait must show of a race beyond skin, hair, eyes and dress. It is fixed for the race, not picked for the person: every person of the race gets the same text, or one of two texts where the marker changes with age or season. RM1 to RM5 are for the classic races, which have a Looks line and no "visible marker"; the word is extended to them here. RM6 to RM23 are for the new races. RM24 and RM25 are not marks of the body: they are things two human races always wear. RM26 is for the Catfolk, who were added later.
 
 "Seen in" says how much of the figure a picture must show before the marker is visible.
 
@@ -413,6 +426,7 @@ A marker is what a portrait must show of a race beyond skin, hair, eyes and dres
 | RM23 | Indigo Throat Patch | a thumb-sized patch of deep indigo skin in the hollow of the throat, and even features that could be a man's or a woman's | Twofold after the Turning | Head and shoulders, throat bare |
 | RM24 | Silver Arm-rings | twisted silver rings on the upper arms and wrists, some cut through | Northmen: "wear their wealth as silver arm-rings that are cut up when a payment falls due". Twisted, and where they sit, are my addition. MO11 already names arm rings | Waist-up |
 | RM25 | Brow Paste Mark | a small mark of coloured paste on the brow | Rainkeepers: "A mark of coloured paste on the brow shows which god the wearer follows". The colour and the shape should follow the god, which the doc does not list | Head and shoulders |
+| RM26 | Cat Ears and Tail | upright, pointed, furred cat ears set high on the head in place of human ears, the sides of the head smooth under the hair, and a furred cat tail as long as the leg, the fur the same colour as the hair | Catfolk: "upright, pointed and furred, set high on the head. A Catfolk has no other ears, and the sides of the head are smooth under the hair"; the tail is "as long as the leg, furred all over"; "The fur of the ears and the tail matches the hair, sometimes with a darker tip or with rings". The tip and the rings should be drawn per person; this text takes neither. With HC25 the fur is patched as the hair is. The pupil is in EC26 to EC31 | Ears: head and shoulders. Tail: full figure |
 
 Races whose marker is wholly in another list and that have no entry here:
 
@@ -425,7 +439,7 @@ The human races other than Northmen and Rainkeepers have no marker. Their Appear
 
 ## 9. Accessories (54)
 
-An **accessory** is a piece of jewellery worn on the body or in the hair. It is picked per person, like a hairstyle, and it differs from the other components in one way: a person can have none, one or several (§9.5). §9.1 holds 45 accessories drawn from history. §9.2 holds nine written for single races of `races-basis.md`. §9.3 fits the list to the 32 races of that doc, §9.4 lists where an accessory repeats or clashes with an entry of §2 to §8, and §9.5 is a design note on how many a person carries.
+An **accessory** is a piece of jewellery worn on the body or in the hair. It is picked per person, like a hairstyle, and it differs from the other components in one way: a person can have none, one or several (§9.5). §9.1 holds 45 accessories drawn from history. §9.2 holds nine written for single races of `races-basis.md`. §9.3 fits the list to the 32 races of the first version of that doc and to the Catfolk, §9.4 lists where an accessory repeats or clashes with an entry of §2 to §8, and §9.5 is a design note on how many a person carries.
 
 - **Kind.** One of eight: necklace, earrings, bracelet, ring, brooch, crown, body jewellery, hair jewellery. A bracelet includes bangles and the ring worn on the upper arm. A crown includes circlets, diadems and wreaths. Body jewellery is whatever sits elsewhere: on the nose, the ankle, a tusk, an antler or the brow, or hung from the belt.
 - **Description.** One material is written into each description, so that the text stays fixed. Where the same piece is made cheaper or dearer, the Worn by column names the other material; a prompt for it needs the one word changed (§14 item 11).
@@ -544,6 +558,7 @@ The four middle columns give the accessories for common women, common men, wealt
 | Lineminds | As the human race they live among | As that race | As that race | As that race | None for AC35, AC36, AC38, AC43 and AC45: each lies across "a band of fine dark strokes" at the hairline (RM21) |
 | Twofold | None | None | None | None | "Everyone dresses alike, in wrapped cotton. Only the sash differs". An ornament picked per person would break that, and one that everybody wore would be a marker. A necklace would also cover the patch "In the hollow of the throat" (RM22, RM23) |
 | Bitterbloods | AC12 | AC12 | AC12, AC25 | AC12, AC25 | None for necklaces and for AC17 and AC20: the patches of the throat, the shoulders and the outer arms are "worn uncovered with pride at home". Among other peoples a Bitterblood "wears gloves and a coat of wax on the skin", which hides AC25 |
+| Catfolk | AC6, AC21 | AC4, AC17 | As common | As common | AC4 is for the hunting bands, and AC17 for the granary wardens and the night watch. The doc names no rank beyond the ward and the band. None for earrings: AC12 to AC16 hang from a human ear, and a Catfolk "has no other ears" than the cat's. None for crowns and for AC45: they wear "nothing that covers the ears", and I extend that to what sits beside them. Going wrapped (RO27) hides the ears altogether |
 
 - **AC16 is not assigned.** No race of `races-basis.md` is built on the model of the high valleys. It goes with WO24, which §11.2 gives to the Terrace folk of `human-races.md`.
 - **Seven races have a None.** Duskreaders, Boughwalkers, Hushfolk and Twofold have nothing at all. Elves and Amberbloods have nothing in two columns, and Canal folk nothing for common men.
@@ -600,6 +615,7 @@ The components are picked independently. An accessory can repeat a piece that an
 | RO18 Soft Felt | No metal, bead or ornament | | All accessories |
 | RO20 Close Quilted Silk | Nothing loose | | Everything that hangs: all necklaces except AC3, and AC13, AC14, AC18, AC41, AC42, AC45 |
 | RO21; RO25 | Gloves; a deep hood on RO21 | | All rings; earrings, crowns and hair jewellery with RO21 |
+| RO27 Hood and Bound Tail | A deep hood over the head and the ears | | All earrings, crowns and hair jewellery |
 | RO10; RO15; RO17 | Bare chest and arms, no cloak | | All brooches. AC17 and AC20 fit these and clash with every outfit that has sleeves |
 | RM5 Tusks and Ashed Scars | Tusks | AC52 adds to it | |
 | RM6; RM7 | Antlers above the temples | AC53 adds to RM7 | All crowns; AC45; AC53 with RM6 |
@@ -608,6 +624,7 @@ The components are picked independently. An accessory can repeat a piece that an
 | RM21 Hairline Script | A band of strokes at the hairline | | AC35, AC36, AC38, AC43, AC45 |
 | RM22; RM23 | A patch in the hollow of the throat | | All necklaces |
 | RM25 Brow Paste Mark | A mark of paste on the brow | | AC43; AC35, AC36 |
+| RM26 Cat Ears and Tail | Cat ears high on the head, and no human ear | | All earrings; all crowns; AC45 |
 | SC26; SC27; SC34 | Veining or bright patches on the throat, shoulders and arms | | AC3, AC7, AC10, AC17, AC20 |
 
 Three clashes are not with one entry:
@@ -665,7 +682,7 @@ The entries of §8 and §7.2 belong to a race, not to a climate, and are not in 
 
 ### 11.2 By race
 
-Human peoples are separate races in this project. The table covers all 32 races of `races-basis.md`, because its Appearance paragraphs are the only place that says "what a portrait must show". The default list of Appendix E still has one `human`, with no looks (§12.1 item 1).
+Human peoples are separate races in this project. The table covers the 32 races of the first version of `races-basis.md` and the Catfolk, because its Appearance paragraphs are the only place that says "what a portrait must show". The default list is now the 28 races that the doc describes (§12.1 item 22).
 
 "Not stated" means the Appearance paragraph says nothing, so nothing is suggested. The Marker column names the entry of §8.4 and, where the marker of the race is carried by a skin, eye or hair entry, that entry.
 
@@ -703,8 +720,10 @@ Human peoples are separate races in this project. The table covers all 32 races 
 | Lineminds | As the human race they live among | As that race | As that race | As that race | As that race | RM21 |
 | Twofold | SC10, SC11 | HC1 | RH4 | RO22, RO23 | Not stated | RM22 before the Turning; RM23 after it |
 | Bitterbloods | SC34 | HC1 | RH17 | RO24, RO25 | EC25 | In SC34 and EC25 |
+| Catfolk | SC2, SC4, SC8, SC9, SC11, SC12, SC22, SC35 | HC1, HC3, HC6, HC9, HC16, HC17, HC25 | Not stated: "worn at any length" | RO26; RO27 among outsiders | EC26 to EC31 | RM26; the pupil is in EC26 to EC31 |
 
-- **Goblin** is on in the default list, but it is not a race of `races-basis.md` and no doc describes how a goblin looks. Nothing to map.
+- **Goblin** was on in the first default list and is in no list now. No doc describes how a goblin looks. Nothing to map.
+- **Catfolk hairstyles.** Any entry of §2 and §3 fits that leaves the top of the head clear for the ears. A style that bares the side of the head shows smooth skin where a human ear would be. WH6, WH7, WH10, WH14 and WH18 are coverings or include one, and a Catfolk covers the ears only when going wrapped (RO27).
 - **WH16 and WO18** (the Heian court model) have no race in the docs built on that model. The Canal folk are the nearest; the fit is loose.
 - **The 16 human peoples of `human-races.md`** can be matched by way of life only: Floe hunters to WO7, Snow herders to WO8, Grass riders to WO15 and MH7, Terrace folk to WO24, Wellkeepers and Dunefarers to WO13 and MO15, Thornfold folk to WO23 and MH9, Rainkeepers to WO16 and MO16, Clearing folk and Stilt folk to WO20, Ploughlanders and Holt folk to the temperate entries. Their skin and hair must come from their own Appearance column, not from the model culture (§12.1 item 3).
 - **Group N of `human-races.md`** was not mapped.
@@ -738,6 +757,8 @@ Human peoples are separate races in this project. The table covers all 32 races 
 19. **Gnome gem cutters and the period limit.** `races-basis.md` makes Gnomes gem cutters. Stones were polished, not cut, until the late 14th century [VAM-JEWEL], and the faceted cuts a reader pictures are later than these lists go. No accessory has a faceted stone, and AC25 is polished. A cut stone for Gnomes would break the limit as the waistcoats of the Halflings do (item 5).
 20. **The lore of §9 is new text about the races.** The Lore column says who gives a piece, when it comes off and what it means. Nothing in it contradicts `races-basis.md`, and none of it is in that doc, apart from the quoted words. That doc is where the lore of a race lives. If the lore is kept, it should be moved there or checked against it by the user (§14 item 18).
 21. **Accessories that follow a state.** Like the dress of item 10, some accessories are worn only in a state the Stub may or may not hold: married (AC8, AC24, AC40, AC46, AC47), on a feast day (AC43), in autumn (AC53), or while a post is held (AC10, AC38, AC52).
+22. **The default list was fixed after this note was written.** Since 2026-11-15 the default list is the 28 races that `races-basis.md` now describes: seven human races, five classic races and sixteen new ones, with no plain `human`. That settles item 1. Goblin is gone. Tinefolk, Hushfolk, Longsleepers, Eyrie folk and Lineminds were left out of the list and of that doc, so the words quoted for them here can no longer be checked against it. The entries written for them alone are kept (among them SC20, SC30, SC31, EC12, EC20, EC22, EC23, RM6, RM7, RM15, RM18, RM19, RM21, AC47 and AC53), and no race of the list uses them.
+23. **The Catfolk have two looks in the docs.** `races.md` F2 gives the Catfolk a cat's head, and `human-races.md` says the same of them. `races-basis.md` gives them a human face and body with cat ears, a tail and a slit pupil, and the entries here follow it. No entry of this note is for a furred or cat-headed person.
 
 ### 12.2 Entries that rest on late evidence
 
@@ -768,7 +789,7 @@ The look is pre-industrial in each case, but the source that was read dates it l
 - **Unverified details carried in §9:** the high stacked collar (AC7); the square form and the size of the amulet case (AC9); the shape of the links (AC10); two pearls on one wire (AC13); the breaking of the bangles (AC18); the thumb ring among the Mongols (AC27); where the disc brooch sat (AC31); the pose of the stag and where the plaque is worn (AC34); the disc, the cord and the tassel (AC42); the comb standing in the dressed hair (AC44).
 - **Unverified details carried in the lists:** loose hair as the sign of a maiden (WH1); ribbon on the plaits (WH3); the cut of the wig (WH10); the curled-under bob (MH3); ermine (WO5, MO6); the scarf (WO17); the women's drape of the royal cloth (WO22); the bead collars (WO23); leather for the smith's apron (MO2); the miner's hood (MO3); the lamellar helmet (MO10); fishers and sailors in the work tunic (MO13); the official's belt and cap (MO17).
 - **Composed or fantasy entries, nine in all:** WH20, WO25, WO26, WO27, WO28, WO29, WO30, MO20, and WH19 apart from its one historical case. In §9, AC4 is a composed type, AC35 is fantasy convention when it is worn by elves and princes, and AC52 is fantasy convention.
-- **Entries with no outside source, 132 in all:** the 22 skin colours of §7.2, hair colours HC16 to HC24, the 92 entries of §8 (hairstyles, outfits, eye colours and race markers) and the nine accessories of §9.2. Each rests on a paragraph of `races-basis.md`. RH5, the garments of RO3 and AC52 are fantasy convention. Every cut, material or number that goes beyond the quoted words is named in its row as my addition.
+- **Entries with no outside source, 143 in all:** the 23 skin colours of §7.2, hair colours HC16 to HC25, the 101 entries of §8 (hairstyles, outfits, eye colours and race markers) and the nine accessories of §9.2. Each rests on a paragraph of `races-basis.md`. RH5, the garments of RO3 and AC52 are fantasy convention. Every cut, material or number that goes beyond the quoted words is named in its row as my addition.
 - **Invented:** every description, the names, the hair and skin colour names, all of §11, and in §9 the Lore column, the fit to the races (§9.3) and the rule of §9.5.
 - **No prompt was run.** Whether the descriptions give consistent pictures on any model is untested.
 
@@ -945,7 +966,7 @@ Wikipedia:
 2. **Children and the old.** The lists are for adults. Several styles are tied to an age or a rite: braids before the hair-pinning at fifteen, a topknot from the capping at twenty, ochre plaits from puberty, warrior braids until elderhood. Whether a person's hairstyle changes with the age in the Stub, and what a child wears, is open.
 3. **Facial hair.** MH5, MH10, RH1 and RH6 include a beard and the others say nothing. A beard changes a face more than a haircut does. It is probably its own component, and for Dwarves it applies to both sexes.
 4. **Headwear as its own component.** Five women's hairstyles are coverings or include one (WH6, WH7, WH10, WH14, WH18) and many outfits name a hat, hood, veil or crown. A hairstyle and an outfit picked independently can clash (WH14 with the straw hat of WO19) or repeat each other (WH6 with WO6). Either headwear is split out, or each outfit lists the hairstyles it allows. The crowns of §9 (AC35 to AC39) are headwear too, and §9.4 lists what each cannot sit on.
-5. **Sex-split lists for every race.** Eleven outfits of §4 and §5 are worn by both sexes, and none of the 92 entries of §8 is split by sex, because the paragraphs of the classic and new races do not split them. Dwarves of the two sexes look alike, and a Twofold changes sex at about thirty (`races-basis.md`). One list per race with a sex column may fit better than two lists. The accessories are already one list, with the sex in the Worn by column.
+5. **Sex-split lists for every race.** Eleven outfits of §4 and §5 are worn by both sexes, and none of the 101 entries of §8 is split by sex, because the paragraphs of the classic and new races do not split them. Dwarves of the two sexes look alike, and a Twofold changes sex at about thirty (`races-basis.md`). One list per race with a sex column may fit better than two lists. The accessories are already one list, with the sex in the Worn by column.
 6. **Hair texture.** Straight, wavy, curly and coiled hair is a property of the person, and it limits the hairstyles: WH11 and WH16 do not suit the same hair. The lists do not carry it.
 7. **Age on skin and hair.** Greying is given as four entries. It could instead be a modifier on a base colour, drawn from the age in the Stub. Skin has no entry for age at all.
 8. **What else a portrait needs.** Build, height and the shape of the face are in the Appearance paragraphs of `races-basis.md` and in no list here. So are the things a race carries, such as a bow case, and the eye colour of five races is not stated at all (§8.3).
@@ -959,4 +980,4 @@ Wikipedia:
 16. **Whether a person has accessories, and how many.** The other components are one pick each. An accessory can be absent, and a person can carry several. §9.5 suggests none or one for most common people and two or three for the wealthy, with at most one per kind. That rule needs the wealth or rank of item 10, and it is untested. Small pieces such as a ring or an earring may also be the first thing an image model drops or changes between two pictures.
 17. **The clashes as data.** §9.4 is a table for a reader. A picker needs the same as data: for each accessory the place on the body where it sits, and for each outfit, hairstyle and marker the places it covers or already fills. That is item 4 made general, and it would settle the headwear question as well.
 18. **Where the lore lives.** A prompt needs none of the Lore column. The textual description of a Realised person could use it. It is invented text about the races (§12.1 item 20), so the user decides whether it is kept here, moved into `races-basis.md` or dropped.
-19. **Accessories for the gaps of §9.3.** No entry is a string of glass beads alone, which the Brinefolk would wear. Men have no hair jewellery beyond MH6 and RH6. Nothing was written for Amberbloods, Flinchless, Longsleepers, Eyrie folk, Lineminds, Hoarkin or Hearthbloods beyond the historical entries. AC16 has no race.
+19. **Accessories for the gaps of §9.3.** No entry is a string of glass beads alone, which the Brinefolk would wear. Men have no hair jewellery beyond MH6 and RH6. Nothing was written for Amberbloods, Flinchless, Longsleepers, Eyrie folk, Lineminds, Hoarkin, Hearthbloods or Catfolk beyond the historical entries. No earring is written for a cat's ear. AC16 has no race.

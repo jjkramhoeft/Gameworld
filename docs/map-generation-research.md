@@ -71,7 +71,7 @@ One later note is used in §10.7 only. It is not part of the compilation above, 
 | Tiles | Height map in tiles of about 256 km with a 24 km halo | Measurements on the prototype (TILES) | Per-region rasters; one fixed 4 × 4 tile size |
 | Climate | Two independent Perlin fBm fields, each domain-warped into belts: temperature (°C) and precipitation (mm/yr, log scale) | The schemes all use temperature and precipitation, never relative humidity (BIOMES §3.4) | Latitude bands; wind and rain sweep; a humidity field |
 | Biomes | Thermal belt × aridity class, with aridity m = P / (20·T + 140) and height cooling; mangrove override | Köppen's dryness threshold; Holdridge's belts; Whittaker as cross-check (BIOMES §7.3, CHARTS §8) | Whittaker lookup grid; Holdridge hexagons; full Köppen rules |
-| Resources | 24 raw resources per patch: potentials from crop trapezoids and biome tables, hashed deposits on a bedrock type per zone, river placers | FAO ECOCROP; USGS deposit models; game survey (RES §7, TRADE §5) | One good per zone; climate-only deposits |
+| Resources | 27 raw resources per patch: potentials from crop trapezoids and biome tables, hashed deposits on a bedrock type per zone, river placers | FAO ECOCROP; USGS deposit models; game survey (RES §7, TRADE §5) | One good per zone; climate-only deposits |
 | Prospects | About 20 scored Prospects for cities and towns per region from five factors, selected inside the region | Break of bulk, navigable rivers, central places, Hansen accessibility (SITES §2–§6) | Global greedy placement as in Azgaar and O'Leary; one centre per grid square |
 | Travel | Roads, river routes and sea lanes on a 2 km cost grid; links between travel-cost neighbours, pruned by detour | Water is far cheaper than land; a fixed charge per mode change (TRADE §4.2, SITES §3.3, §6.8) | Straight-line graphs; a patch-graph model |
 
@@ -734,7 +734,7 @@ A `thrive` score from food, fuel, material, salt, an export and access to water 
 
 ### 9.9 What is adopted
 
-Every patch gets an amount from 0 to 1 for each of the **24 raw resources**, with the variant that fits best ("grain: barley", "iron ore: bog iron"). A resource is listed from an amount of 0.25; a typical land patch lists about eight.
+Every patch gets an amount from 0 to 1 for each of the **27 raw resources**, with the variant that fits best ("grain: barley", "iron ore: bog iron"). A resource is listed from an amount of 0.25; a typical land patch lists about eight.
 
 | Element | Adopted | Research link |
 |---|---|---|
@@ -751,14 +751,37 @@ Every patch gets an amount from 0 to 1 for each of the **24 raw resources**, wit
 
 | Topic | Status |
 |---|---|
-| 24 raw resources with variants; potentials and deposits | Adopted |
+| 27 raw resources with variants; potentials and deposits | Adopted (24 at first, three added 2026-11-15) |
 | Bedrock classes; placers; scarce salt; tin and copper apart | Adopted |
 | Ocean patches: fish, shelf, seaweed, seals, pearls, coral | Adopted |
 | Tier 2 and tier 3 goods; processing sites by Weber's rule | Open |
-| Fantasy resources on the supernatural map | Open (the field feeds nothing yet) |
+| Reagents, herbs and arcane materials; gypsum; reindeer, sled dogs and elephants | Adopted 2026-11-15 (below) |
+| Fantasy resources on the supernatural map | Adopted as the arcane materials |
 | Quantities, yields, populations | Open |
 | Location quotient, signature export, deficit check, `thrive` | Open |
 | Metallogenic province noise | Open |
+
+**The three resources of 2026-11-15.** The vocation research
+([research/vocations.md](research/vocations.md) §4) mapped 50 vocations onto the 24
+resources and found inputs the map could not show: the mordant of the dyer and the tawyer,
+the materials of the glassmaker and the alchemist, the herbs of the healer and the brewer,
+and anything for the mage. The user accepted three new resources and two sets of variants.
+The rules in map-generation.md section 14 are a first design. The chances and factors
+were set by reasoning and then measured once, over 81 regions (section 14.4 has the
+numbers); they were not tuned after the measurement. The choices:
+
+| Choice | Why | Weighed against it |
+|---|---|---|
+| The three resources are last in the resource index | The picks and the deposit kinds of the first 24 keep their hashes, so their amounts and variants do not move | Placing them by group, which would renumber the resources |
+| Reagents are one resource with seven kinds | A generator does not tell alum from vitriol; the variant carries the name. The kinds sit on bedrock the catalogue already names (`patch-resources.md` rows 172, 173, 315, 351) | Six resources |
+| Saltpetre and borax share the zone gate of the playa salt | They form in the same dry basins, and no new purpose number is needed | A gate of their own |
+| Herbs are a potential with a factor per biome, like honey | Every healer needs them, so they must be common. The wild herbs of wild food stay | Deriving herbs from wild food & game, which gives the healer no siting; removing wild herbs from wild food, which would change the variants of three biomes |
+| Arcane materials are one resource with 14 kinds | The 28 fantasy rows of `patch-resources.md` (F1 to F28) were cut to the ones whose placement needs only what a patch already knows. The rows that need a volcanic flag, hot springs, a confluence or a history layer were left out | Three resources (star metal, arcane reagents, wonder materials), as TRADE §5.2 proposed |
+| The supernatural power starts at 60 | 60 is the bound of the two highest bands of the field, a tenth of the map. A field that never passes 60 turns the layer off, so no toggle is needed | A toggle in the Parameter Set |
+| Arcane materials are in Luxuries; reagents and herbs in Materials | No new group in the readme. The catalogue's rows for star metal (Metals) and the sap of Elanor (Preserver) became variants | A group of their own |
+| Gypsum is a deposit kind of Stone, not a name in the pick of the clastic basins | A longer pick list would change the stone variant of every clastic patch | The pick list |
+| Reindeer, sled dogs and elephants raise the mounts factor of five biomes | The carter, the herder and the soldier had no animal in the cold and in the tropical forests. This is the one change to the amounts of an existing resource | New variants at the old factor 0, which would never be listed |
+| Trade values: arcane materials 0.9, reagents 0.5, herbs 0 | Alum was a monopoly good, herbs are everywhere. The wealth of a patch feeds the Prospect scores, so the Prospects move a little where the new resources lie | Leaving all three at 0, which keeps the Prospects where they are |
 
 ---
 
@@ -881,14 +904,14 @@ This section rests on a later note, RACES (see §1). It was added on 2026-11-14 
 |---|---|---|
 | Where the races live | A list in the Parameter Set, like the bedrock types. Each race has an id, a name, a toggle, a frequency per biome and a height modifier | A catalogue in the code with only the toggles in the Parameter Set: a tweak would need a new generator version. A race file beside the Parameter Set: the foundation would reference two things |
 | Tweaks after phase 1 | A changed list is a new Parameter Set and a new foundation | Reopening the Parameter Set of an existing foundation: it would break "derived data is a pure function of the foundation" |
-| Which races | All 23 of RACES §4.1 are listed. The six most common are on: human, elf, dwarf, halfling, orc, goblin | Only the six in the list; all 23 on; humans only on |
+| Which races | 28 races, all on: seven human races, five classic races and sixteen new near-human races, described in [races-basis.md](races-basis.md). No plain human race and no sub-races (decided by the user, 2026-11-15) | The first list (2026-11-14): all 23 of RACES §4.1, with the six most common on (human, elf, dwarf, halfling, orc, goblin). Only those six in the list; all 23 on; humans only on. The 32 races of the first version of races-basis.md: the user left out five of them |
 | From frequency to persons | The land has one capacity per patch, and the races that are on share it by their frequency in the biome | Each race on its own (frequency × food × Prosperity): the total of a region would grow with every race that is toggled on, so the toggles would also tune the size of the world |
 | Capacity | Area × 6 persons per km² × food supply × a Prosperity factor of 0.5 to 1.5 | The calibrated density per biome and elevation type of SITES §6 (the K term): the resource layer already holds the food, as for the Prospect scores (§10.6) |
 | Height | A height modifier per race: control points from the height of a patch to a factor on the biome frequencies, with a step where two points share a height. Asked for by the user: dwarves only from 200 m and up, elves only below 200 m | A lowest and a highest height per race: it cannot fade a race in. The elevation type weights of RACES §4.2: the user asked for a limit in metres |
 | Which height | The mean height of the patch in the height map | The typical height of the elevation type (70, 140, 270 and 470 m): a limit at 200 m would then only tell hills and mountains from flat land and lowland |
 | Biomes and resources read | The final ones, calculated with the same height. The region is Elevated when it is Planned, so they are there | The estimated ones, as the Prospects read: the biome of a patch would come from the typical height and its dwarves from the real one. The first version read the estimated ones, before the height modifier |
 
-**The default frequencies.** A frequency is the habitat weight of RACES §4.1 times how common the race is: 10 for humans, 2 for the other five that are on, and 1 or 0.5 for the rest. The habitat weight alone would give humans a quarter of a temperate grassland, level with halflings. The six weights for "common" are my own judgement and are not sourced. With the two height modifiers they give 66 % humans, 4.5 % elves and 2 % dwarves over 50 measured regions; 39 % of the land patches lie at 200 m or higher.
+**The default frequencies.** A frequency is a habitat weight from 0 to 3 times how common the race is. The five classic races and the Catfolk keep the habitat weights of RACES §4.1. The weights of the seven human races and of the other fifteen new races are those of races-basis.md. `common` is 3 to 5 for the human races (27 in all), 2 for Elves, Dwarves, Halflings and Orcs, 1 for Gnomes, and 1 or 0.5 for a new race. All of it is judgement, it is not sourced, and it has not been tuned after the measurement. With the five height modifiers the list gives 59 % to the human races, 20 % to the classic races and 21 % to the new races over 50 measured regions (races-basis.md, "Measured shares"); 39 % of the land patches lie at 200 m or higher. The Catfolk row was written for the first list. It has a weight in 13 biomes and makes the Catfolk the largest new race, with 3.4 %. The first list gave 66 % humans, 4.5 % elves and 2 % dwarves: its one human race had `common` 10 and the other five that were on had 2.
 
 **The density.** 6 persons per km² at a food supply of 1 gives a median region of about 35,100 persons. The first default was 60, which gave about 351,000 and matched the 330,000 that SITES §6 expects for a temperate region. The user found that world too populated and asked for a tenth of it (2026-11-14), so the default no longer follows SITES §6.
 
@@ -896,10 +919,10 @@ This section rests on a later note, RACES (see §1). It was added on 2026-11-14 
 |---|---|
 | A list of races in the Parameter Set, toggled per race | Adopted |
 | Potential population per region and race from biome frequency, food and Prosperity | Adopted |
-| A height modifier per race | Adopted, with defaults for dwarves and elves only |
+| A height modifier per race | Adopted, with defaults for five races: Elves, Dwarves, Hearthbloods, Widegaze and Shoalfolk |
 | Elevation type, bedrock, water and Supernatural weights per race (RACES §4.2, §5.2) | Open |
 | A presence field per race, so that a race clusters in some regions and is absent from others (RACES §5.4) | Open |
-| Variants of a race picked by the biome (RACES §5.3) | Open |
+| Variants of a race picked by the biome (RACES §5.3) | Rejected: a race has no sub-races (2026-11-15) |
 | The race of a faction, a family and a person; mixed families (RACES §5.4, §5.5) | Open |
 | Size, lifespan and fertility per race, and a density that follows from them (RACES §5.1) | Open |
 | Underground and sea peoples (RACES §5.6) | Open |
@@ -987,7 +1010,7 @@ Ordered by layer. "Value" is the notes' own assessment where they give one.
 | Biomes | Wetlands and peat bogs as overlay flags | Unlocks reeds, bog iron, peat | RES §3.1 |
 | Resources | Tier 2 and 3 goods placed by the material index | Completes the 39-resource set | TRADE §5.2 |
 | Resources | Signature export and deficit checks | Guarantees trade | TRADE §5.5 |
-| Resources | Fantasy layer triggered by the supernatural field | The field is ready and unused | RES §5 |
+| Resources | Fantasy layer triggered by the supernatural field | Done as the arcane materials (§9.9) | RES §5 |
 | Prospects | Hierarchy and populations with a rank-size test | Turns scored sites into settlements | SITES §6.5–§6.7 |
 | Prospects | Tier T site refinement; fall lines; bridging points | The exact spot; needs bed heights and the tile | SITES §6.6 |
 | Trade | Model A prices, then Model B flows | Order-independent trade on the existing network | TRADE §5.7 |

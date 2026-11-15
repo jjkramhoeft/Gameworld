@@ -906,7 +906,7 @@
           "additionalProperties": false
         },
         "Supernatural": {
-          "description": "Supernatural index, on a linear scale. Its Distribution keeps the supernatural rare: most of the map is low and 1 % lies above 80. It feeds nothing yet (§9).",
+          "description": "Supernatural index, on a linear scale. Its Distribution keeps the supernatural rare: most of the map is low and 1 % lies above 80. It feeds the arcane materials of the resources, which lie only where it is above 60 (§14.1).",
           "type": "object",
           "properties": {
             "FeatureSizeKm": {

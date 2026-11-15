@@ -356,30 +356,107 @@
   ],
   "Races": [
     {
-      "Id": "human",
-      "Name": "Human",
+      "Id": "northmen",
+      "Name": "Northmen",
       "Enabled": true,
       "BiomeFrequency": {
-        "Tundra": 10,
-        "ColdSteppe": 20,
-        "BorealForest": 20,
-        "ColdDesert": 10,
-        "TemperateGrassland": 30,
-        "WoodlandAndShrubland": 30,
-        "TemperateMixedForest": 30,
-        "TemperateBroadleafForest": 30,
-        "TemperateRainForest": 20,
-        "HotDesert": 10,
-        "ThornScrub": 10,
-        "Savanna": 20,
-        "TropicalDryForest": 20,
-        "TropicalRainForest": 10,
-        "Mangrove": 10
+        "IceAndSnow": 3,
+        "Tundra": 6,
+        "ColdSteppe": 3,
+        "BorealForest": 9,
+        "TemperateGrassland": 3,
+        "TemperateMixedForest": 9,
+        "TemperateBroadleafForest": 3,
+        "TemperateRainForest": 6
+      }
+    },
+    {
+      "Id": "midlanders",
+      "Name": "Midlanders",
+      "Enabled": true,
+      "BiomeFrequency": {
+        "ColdSteppe": 5,
+        "BorealForest": 5,
+        "TemperateGrassland": 15,
+        "WoodlandAndShrubland": 10,
+        "TemperateMixedForest": 10,
+        "TemperateBroadleafForest": 15,
+        "TemperateRainForest": 10
+      }
+    },
+    {
+      "Id": "saltroadFolk",
+      "Name": "Saltroad folk",
+      "Enabled": true,
+      "BiomeFrequency": {
+        "ColdDesert": 6,
+        "TemperateGrassland": 3,
+        "WoodlandAndShrubland": 6,
+        "HotDesert": 9,
+        "ThornScrub": 9,
+        "Savanna": 6,
+        "TropicalDryForest": 3
+      }
+    },
+    {
+      "Id": "sunlanders",
+      "Name": "Sunlanders",
+      "Enabled": true,
+      "BiomeFrequency": {
+        "HotDesert": 4,
+        "ThornScrub": 8,
+        "Savanna": 12,
+        "TropicalDryForest": 12,
+        "TropicalRainForest": 8,
+        "Mangrove": 4
+      }
+    },
+    {
+      "Id": "grassRiders",
+      "Name": "Grass riders",
+      "Enabled": true,
+      "BiomeFrequency": {
+        "Tundra": 3,
+        "ColdSteppe": 9,
+        "BorealForest": 3,
+        "ColdDesert": 6,
+        "TemperateGrassland": 9,
+        "WoodlandAndShrubland": 3,
+        "HotDesert": 3
+      }
+    },
+    {
+      "Id": "rainkeepers",
+      "Name": "Rainkeepers",
+      "Enabled": true,
+      "BiomeFrequency": {
+        "TemperateBroadleafForest": 4,
+        "ThornScrub": 4,
+        "Savanna": 8,
+        "TropicalDryForest": 12,
+        "TropicalRainForest": 8,
+        "Mangrove": 8
+      }
+    },
+    {
+      "Id": "canalFolk",
+      "Name": "Canal folk",
+      "Enabled": true,
+      "BiomeFrequency": {
+        "ColdSteppe": 5,
+        "TemperateGrassland": 10,
+        "WoodlandAndShrubland": 5,
+        "TemperateMixedForest": 10,
+        "TemperateBroadleafForest": 15,
+        "TemperateRainForest": 15,
+        "TropicalDryForest": 10,
+        "TropicalRainForest": 5,
+        "Mangrove": 5
       }
     },
     {
       "Id": "elf",
-      "Name": "Elf",
+      "Name": "Elves",
       "Enabled": true,
       "BiomeFrequency": {
         "BorealForest": 4,
@@ -403,31 +480,8 @@
       ]
     },
     {
-      "Id": "darkElf",
-      "Name": "Dark elf",
-      "Enabled": false,
-      "BiomeFrequency": {
-        "IceAndSnow": 1,
-        "Tundra": 1,
-        "ColdSteppe": 1,
-        "BorealForest": 1,
-        "ColdDesert": 1,
-        "TemperateGrassland": 1,
-        "WoodlandAndShrubland": 1,
-        "TemperateMixedForest": 1,
-        "TemperateBroadleafForest": 1,
-        "TemperateRainForest": 1,
-        "HotDesert": 1,
-        "ThornScrub": 1,
-        "Savanna": 1,
-        "TropicalDryForest": 1,
-        "TropicalRainForest": 1,
-        "Mangrove": 1
-      }
-    },
-    {
       "Id": "dwarf",
-      "Name": "Dwarf",
+      "Name": "Dwarves",
       "Enabled": true,
       "BiomeFrequency": {
         "IceAndSnow": 2,
@@ -454,7 +508,7 @@
     },
     {
       "Id": "halfling",
-      "Name": "Halfling",
+      "Name": "Halflings",
       "Enabled": true,
       "BiomeFrequency": {
         "ColdSteppe": 2,
@@ -471,8 +525,8 @@
     },
     {
       "Id": "gnome",
-      "Name": "Gnome",
-      "Enabled": false,
+      "Name": "Gnomes",
+      "Enabled": true,
       "BiomeFrequency": {
         "Tundra": 1,
         "ColdSteppe": 1,
@@ -490,7 +544,7 @@
     },
     {
       "Id": "orc",
-      "Name": "Orc",
+      "Name": "Orcs",
       "Enabled": true,
       "BiomeFrequency": {
         "Tundra": 2,
@@ -509,80 +563,100 @@
       }
     },
     {
-      "Id": "goblin",
-      "Name": "Goblin",
+      "Id": "hoarkin",
+      "Name": "Hoarkin",
       "Enabled": true,
       "BiomeFrequency": {
+        "IceAndSnow": 3,
         "Tundra": 2,
-        "ColdSteppe": 2,
-        "BorealForest": 4,
-        "ColdDesert": 2,
-        "TemperateGrassland": 4,
-        "WoodlandAndShrubland": 4,
-        "TemperateMixedForest": 4,
-        "TemperateBroadleafForest": 4,
-        "TemperateRainForest": 2,
-        "HotDesert": 2,
-        "ThornScrub": 4,
-        "Savanna": 2,
-        "TropicalDryForest": 2,
-        "TropicalRainForest": 2
+        "BorealForest": 1
       }
     },
     {
-      "Id": "hobgoblin",
-      "Name": "Hobgoblin",
-      "Enabled": false,
+      "Id": "hearthbloods",
+      "Name": "Hearthbloods",
+      "Enabled": true,
       "BiomeFrequency": {
-        "Tundra": 1,
-        "ColdSteppe": 2,
+        "IceAndSnow": 1,
+        "Tundra": 1.5,
+        "ColdSteppe": 0.5,
         "BorealForest": 1,
+        "TemperateMixedForest": 0.5
+      },
+      "HeightModifier": [
+        {
+          "HeightM": 100,
+          "Factor": 0.5
+        },
+        {
+          "HeightM": 400,
+          "Factor": 1
+        }
+      ]
+    },
+    {
+      "Id": "widegaze",
+      "Name": "Widegaze",
+      "Enabled": true,
+      "BiomeFrequency": {
+        "ColdSteppe": 3,
         "ColdDesert": 1,
-        "TemperateGrassland": 2,
-        "WoodlandAndShrubland": 2,
-        "TemperateMixedForest": 2,
-        "TemperateBroadleafForest": 1,
-        "TemperateRainForest": 1,
-        "HotDesert": 1,
+        "TemperateGrassland": 3,
         "ThornScrub": 1,
-        "Savanna": 1,
-        "TropicalDryForest": 1
+        "Savanna": 2
+      },
+      "HeightModifier": [
+        {
+          "HeightM": 300,
+          "Factor": 1
+        },
+        {
+          "HeightM": 500,
+          "Factor": 0
+        }
+      ]
+    },
+    {
+      "Id": "amberbloods",
+      "Name": "Amberbloods",
+      "Enabled": true,
+      "BiomeFrequency": {
+        "BorealForest": 3,
+        "TemperateMixedForest": 3,
+        "TemperateBroadleafForest": 2,
+        "TemperateRainForest": 2
       }
     },
     {
-      "Id": "kobold",
-      "Name": "Kobold",
-      "Enabled": false,
+      "Id": "brinefolk",
+      "Name": "Brinefolk",
+      "Enabled": true,
       "BiomeFrequency": {
-        "Tundra": 1,
         "ColdSteppe": 1,
-        "BorealForest": 1,
-        "ColdDesert": 1,
-        "TemperateGrassland": 1,
-        "WoodlandAndShrubland": 1,
-        "TemperateMixedForest": 1,
-        "TemperateBroadleafForest": 1,
-        "TemperateRainForest": 1,
-        "HotDesert": 1,
+        "ColdDesert": 3,
+        "HotDesert": 2,
         "ThornScrub": 1,
-        "Savanna": 1,
-        "TropicalDryForest": 1,
-        "TropicalRainForest": 1,
         "Mangrove": 1
       }
     },
     {
-      "Id": "gnoll",
-      "Name": "Gnoll",
-      "Enabled": false,
+      "Id": "duskreaders",
+      "Name": "Duskreaders",
+      "Enabled": true,
       "BiomeFrequency": {
-        "ColdSteppe": 2,
-        "BorealForest": 1,
-        "ColdDesert": 1,
-        "TemperateGrassland": 2,
-        "WoodlandAndShrubland": 2,
-        "TemperateMixedForest": 1,
-        "TemperateBroadleafForest": 1,
+        "ColdDesert": 2,
+        "HotDesert": 3,
+        "ThornScrub": 2,
+        "Savanna": 1
+      }
+    },
+    {
+      "Id": "noonfolk",
+      "Name": "Noonfolk",
+      "Enabled": true,
+      "BiomeFrequency": {
+        "TemperateGrassland": 1,
+        "WoodlandAndShrubland": 1,
         "HotDesert": 2,
         "ThornScrub": 3,
         "Savanna": 3,
@@ -590,91 +664,120 @@
       }
     },
     {
-      "Id": "giantBlooded",
-      "Name": "Giant-blooded",
-      "Enabled": false,
+      "Id": "boughwalkers",
+      "Name": "Boughwalkers",
+      "Enabled": true,
       "BiomeFrequency": {
-        "IceAndSnow": 0.5,
-        "Tundra": 1,
-        "ColdSteppe": 1,
-        "BorealForest": 1,
-        "ColdDesert": 0.5,
-        "TemperateGrassland": 0.5,
-        "WoodlandAndShrubland": 0.5,
-        "TemperateMixedForest": 0.5,
-        "TemperateBroadleafForest": 0.5,
-        "TemperateRainForest": 0.5,
-        "ThornScrub": 0.5,
-        "Savanna": 0.5,
-        "TropicalDryForest": 0.5
-      }
-    },
-    {
-      "Id": "ogre",
-      "Name": "Ogre",
-      "Enabled": false,
-      "BiomeFrequency": {
-        "IceAndSnow": 0.5,
-        "Tundra": 1,
-        "ColdSteppe": 1,
-        "BorealForest": 1,
-        "ColdDesert": 0.5,
-        "TemperateGrassland": 0.5,
-        "WoodlandAndShrubland": 1,
-        "TemperateMixedForest": 0.5,
-        "TemperateBroadleafForest": 0.5,
-        "TemperateRainForest": 0.5,
-        "HotDesert": 0.5,
-        "ThornScrub": 0.5,
-        "Savanna": 0.5,
-        "TropicalDryForest": 0.5
-      }
-    },
-    {
-      "Id": "troll",
-      "Name": "Troll",
-      "Enabled": false,
-      "BiomeFrequency": {
-        "IceAndSnow": 1,
-        "Tundra": 1,
-        "ColdSteppe": 0.5,
-        "BorealForest": 1,
-        "ColdDesert": 0.5,
-        "TemperateGrassland": 0.5,
-        "WoodlandAndShrubland": 0.5,
-        "TemperateMixedForest": 1,
-        "TemperateBroadleafForest": 1,
         "TemperateRainForest": 1,
-        "HotDesert": 1,
-        "ThornScrub": 1,
-        "Savanna": 0.5,
-        "TropicalDryForest": 1,
-        "TropicalRainForest": 1,
+        "TropicalDryForest": 2,
+        "TropicalRainForest": 3,
         "Mangrove": 1
       }
     },
     {
-      "Id": "lizardfolk",
-      "Name": "Lizardfolk",
-      "Enabled": false,
+      "Id": "shoalfolk",
+      "Name": "Shoalfolk",
+      "Enabled": true,
       "BiomeFrequency": {
+        "BorealForest": 1,
+        "WoodlandAndShrubland": 1,
+        "TemperateRainForest": 2,
+        "TropicalDryForest": 1,
+        "TropicalRainForest": 1,
+        "Mangrove": 3
+      },
+      "HeightModifier": [
+        {
+          "HeightM": 20,
+          "Factor": 1
+        },
+        {
+          "HeightM": 80,
+          "Factor": 0
+        }
+      ]
+    },
+    {
+      "Id": "swiftborn",
+      "Name": "Swiftborn",
+      "Enabled": true,
+      "BiomeFrequency": {
+        "TemperateGrassland": 2,
+        "WoodlandAndShrubland": 3,
+        "TemperateMixedForest": 1,
+        "TemperateBroadleafForest": 2,
+        "ThornScrub": 1,
+        "Savanna": 1
+      }
+    },
+    {
+      "Id": "flinchless",
+      "Name": "Flinchless",
+      "Enabled": true,
+      "BiomeFrequency": {
+        "ColdSteppe": 0.5,
         "TemperateGrassland": 1,
         "WoodlandAndShrubland": 1,
-        "TemperateMixedForest": 1,
+        "TemperateMixedForest": 0.5,
         "TemperateBroadleafForest": 1,
-        "TemperateRainForest": 2,
-        "HotDesert": 1,
+        "Savanna": 0.5
+      }
+    },
+    {
+      "Id": "lanternkin",
+      "Name": "Lanternkin",
+      "Enabled": true,
+      "BiomeFrequency": {
+        "TemperateGrassland": 0.5,
+        "WoodlandAndShrubland": 0.5,
+        "TemperateMixedForest": 0.5,
+        "TemperateBroadleafForest": 0.5,
+        "TemperateRainForest": 1,
+        "Savanna": 0.5,
+        "TropicalDryForest": 1,
+        "TropicalRainForest": 1,
+        "Mangrove": 0.5
+      }
+    },
+    {
+      "Id": "stillfaces",
+      "Name": "Stillfaces",
+      "Enabled": true,
+      "BiomeFrequency": {
+        "BorealForest": 2,
+        "WoodlandAndShrubland": 1,
+        "TemperateMixedForest": 3,
+        "TemperateBroadleafForest": 2,
+        "TemperateRainForest": 1
+      }
+    },
+    {
+      "Id": "twofold",
+      "Name": "Twofold",
+      "Enabled": true,
+      "BiomeFrequency": {
         "ThornScrub": 1,
-        "Savanna": 1,
-        "TropicalDryForest": 2,
-        "TropicalRainForest": 3,
-        "Mangrove": 3
+        "Savanna": 2,
+        "TropicalDryForest": 3,
+        "TropicalRainForest": 2,
+        "Mangrove": 1
+      }
+    },
+    {
+      "Id": "bitterbloods",
+      "Name": "Bitterbloods",
+      "Enabled": true,
+      "BiomeFrequency": {
+        "TemperateRainForest": 0.5,
+        "TropicalDryForest": 0.5,
+        "TropicalRainForest": 1.5,
+        "Mangrove": 1.5
       }
     },
     {
       "Id": "catfolk",
       "Name": "Catfolk",
-      "Enabled": false,
+      "Enabled": true,
       "BiomeFrequency": {
         "ColdSteppe": 1,
         "ColdDesert": 1,
@@ -689,145 +792,6 @@
         "TropicalDryForest": 2,
         "TropicalRainForest": 2,
         "Mangrove": 1
-      }
-    },
-    {
-      "Id": "ratfolk",
-      "Name": "Ratfolk",
-      "Enabled": false,
-      "BiomeFrequency": {
-        "Tundra": 1,
-        "ColdSteppe": 1,
-        "BorealForest": 1,
-        "ColdDesert": 1,
-        "TemperateGrassland": 1,
-        "WoodlandAndShrubland": 1,
-        "TemperateMixedForest": 1,
-        "TemperateBroadleafForest": 1,
-        "TemperateRainForest": 1,
-        "HotDesert": 1,
-        "ThornScrub": 1,
-        "Savanna": 1,
-        "TropicalDryForest": 1,
-        "TropicalRainForest": 1,
-        "Mangrove": 1
-      }
-    },
-    {
-      "Id": "birdfolk",
-      "Name": "Birdfolk",
-      "Enabled": false,
-      "BiomeFrequency": {
-        "Tundra": 1,
-        "ColdSteppe": 1,
-        "BorealForest": 1,
-        "ColdDesert": 1,
-        "TemperateGrassland": 1,
-        "WoodlandAndShrubland": 1,
-        "TemperateMixedForest": 1,
-        "TemperateBroadleafForest": 1,
-        "TemperateRainForest": 1,
-        "HotDesert": 1,
-        "ThornScrub": 1,
-        "Savanna": 1,
-        "TropicalDryForest": 1,
-        "TropicalRainForest": 1,
-        "Mangrove": 1
-      }
-    },
-    {
-      "Id": "bullFolk",
-      "Name": "Bull-folk",
-      "Enabled": false,
-      "BiomeFrequency": {
-        "Tundra": 1,
-        "ColdSteppe": 2,
-        "BorealForest": 1,
-        "ColdDesert": 1,
-        "TemperateGrassland": 3,
-        "WoodlandAndShrubland": 2,
-        "TemperateMixedForest": 1,
-        "TemperateBroadleafForest": 1,
-        "TemperateRainForest": 1,
-        "HotDesert": 1,
-        "ThornScrub": 1,
-        "Savanna": 3,
-        "TropicalDryForest": 1
-      }
-    },
-    {
-      "Id": "centaur",
-      "Name": "Centaur",
-      "Enabled": false,
-      "BiomeFrequency": {
-        "ColdSteppe": 3,
-        "BorealForest": 1,
-        "ColdDesert": 1,
-        "TemperateGrassland": 3,
-        "WoodlandAndShrubland": 2,
-        "TemperateMixedForest": 2,
-        "TemperateBroadleafForest": 2,
-        "TemperateRainForest": 1,
-        "HotDesert": 1,
-        "ThornScrub": 1,
-        "Savanna": 3,
-        "TropicalDryForest": 1
-      }
-    },
-    {
-      "Id": "dragonkin",
-      "Name": "Dragonkin",
-      "Enabled": false,
-      "BiomeFrequency": {
-        "ColdSteppe": 0.5,
-        "BorealForest": 0.5,
-        "ColdDesert": 1,
-        "TemperateGrassland": 0.5,
-        "WoodlandAndShrubland": 0.5,
-        "TemperateMixedForest": 0.5,
-        "TemperateBroadleafForest": 0.5,
-        "TemperateRainForest": 0.5,
-        "HotDesert": 1,
-        "ThornScrub": 1,
-        "Savanna": 1,
-        "TropicalDryForest": 0.5,
-        "TropicalRainForest": 0.5,
-        "Mangrove": 0.5
-      }
-    },
-    {
-      "Id": "undead",
-      "Name": "Undead",
-      "Enabled": false,
-      "BiomeFrequency": {
-        "IceAndSnow": 0.5,
-        "Tundra": 1,
-        "ColdSteppe": 0.5,
-        "BorealForest": 0.5,
-        "ColdDesert": 1,
-        "TemperateGrassland": 0.5,
-        "WoodlandAndShrubland": 0.5,
-        "TemperateMixedForest": 0.5,
-        "TemperateBroadleafForest": 0.5,
-        "TemperateRainForest": 0.5,
-        "HotDesert": 1,
-        "ThornScrub": 0.5,
-        "Savanna": 0.5,
-        "TropicalDryForest": 0.5,
-        "TropicalRainForest": 0.5,
-        "Mangrove": 0.5
-      }
-    },
-    {
-      "Id": "frostFolk",
-      "Name": "Frost folk",
-      "Enabled": false,
-      "BiomeFrequency": {
-        "IceAndSnow": 3,
-        "Tundra": 3,
-        "ColdSteppe": 1,
-        "BorealForest": 1,
-        "ColdDesert": 1
       }
     }
   ]

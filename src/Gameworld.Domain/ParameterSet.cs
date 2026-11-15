@@ -486,7 +486,7 @@ public sealed record FieldsParameters
     [Description("Prosperity index, on a linear scale. Feeds the resources (it boosts the valuable ones), the Prospect scores and the potential population (§9, society §3.1).")]
     public FieldParameters Prosperity { get; init; } = new(200, 3, 2, 0.5, 1, 100);
 
-    [Description("Supernatural index, on a linear scale. Its Distribution keeps the supernatural rare: most of the map is low and 1 % lies above 80. It feeds nothing yet (§9).")]
+    [Description("Supernatural index, on a linear scale. Its Distribution keeps the supernatural rare: most of the map is low and 1 % lies above 80. It feeds the arcane materials of the resources, which lie only where it is above 60 (§14.1).")]
     public FieldParameters Supernatural { get; init; } = new(10, 3, 2, 0.5, 0, 100)
     {
         Distribution = [new(0.4, 20), new(0.7, 40), new(0.9, 60), new(0.99, 80)],
@@ -569,44 +569,49 @@ public sealed record RaceParameters(
     public static IReadOnlyList<HeightFactorPoint> OnlyBelow(double heightM) => [new(heightM, 1), new(heightM, 0)];
 
     /// <summary>
-    /// The default list (society-generation.md Appendix A): the six classic races are on, the rest are off.
-    /// Each frequency is the habitat weight of the race in the biome (0 avoided, 1 tolerated,
-    /// 2 good, 3 native) times how common the race is in the world. Dwarves only live from 200 m
-    /// and up and elves only below 200 m; the height does not matter to the other races.
+    /// The default list (society-generation.md Appendix A): 28 races, all on. Seven are human
+    /// peoples; there is no plain human race. Each frequency is the habitat weight of the race
+    /// in the biome (0 avoided, 1 tolerated, 2 good, 3 native) times how common the race is in
+    /// the world. Five races have a height modifier; the height does not matter to the others.
     /// </summary>
     public static IReadOnlyList<RaceParameters> Defaults { get; } =
     [
-        //                                               common  Ice Tun CSt Bor CDs TGr WSh TMx TBl TRn HDs Thn Sav TDf TRf Mgv
-        Make("human", "Human", true, 10, /*            */ 0, 1, 2, 2, 1, 3, 3, 3, 3, 2, 1, 1, 2, 2, 1, 1),
-        Make("elf", "Elf", true, 2, /*                 */ 0, 0, 0, 2, 0, 1, 1, 3, 3, 3, 0, 0, 0, 1, 2, 0) with { HeightModifier = OnlyBelow(200) },
-        Make("darkElf", "Dark elf", false, 1, /*       */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
-        Make("dwarf", "Dwarf", true, 2, /*             */ 1, 2, 1, 2, 1, 1, 1, 2, 1, 1, 0, 0, 0, 0, 0, 0) with { HeightModifier = OnlyFrom(200) },
-        Make("halfling", "Halfling", true, 2, /*       */ 0, 0, 1, 1, 0, 3, 3, 2, 2, 1, 0, 0, 1, 1, 1, 0),
-        Make("gnome", "Gnome", false, 1, /*            */ 0, 1, 1, 2, 1, 1, 2, 2, 3, 1, 0, 1, 1, 1, 0, 0),
-        Make("orc", "Orc", true, 2, /*                 */ 0, 1, 3, 1, 2, 2, 2, 1, 1, 1, 2, 2, 2, 1, 0, 0),
-        Make("goblin", "Goblin", true, 2, /*           */ 0, 1, 1, 2, 1, 2, 2, 2, 2, 1, 1, 2, 1, 1, 1, 0),
-        Make("hobgoblin", "Hobgoblin", false, 1, /*    */ 0, 1, 2, 1, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 0, 0),
-        Make("kobold", "Kobold", false, 1, /*          */ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
-        Make("gnoll", "Gnoll", false, 1, /*            */ 0, 0, 2, 1, 1, 2, 2, 1, 1, 0, 2, 3, 3, 1, 0, 0),
-        Make("giantBlooded", "Giant-blooded", false, 0.5, 1, 2, 2, 2, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0),
-        Make("ogre", "Ogre", false, 0.5, /*            */ 1, 2, 2, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 0, 0),
-        Make("troll", "Troll", false, 0.5, /*          */ 2, 2, 1, 2, 1, 1, 1, 2, 2, 2, 2, 2, 1, 2, 2, 2),
-        Make("lizardfolk", "Lizardfolk", false, 1, /*  */ 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 1, 1, 1, 2, 3, 3),
-        Make("catfolk", "Catfolk", false, 1, /*        */ 0, 0, 1, 0, 1, 2, 1, 1, 1, 1, 2, 2, 3, 2, 2, 1),
-        Make("ratfolk", "Ratfolk", false, 1, /*        */ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
-        Make("birdfolk", "Birdfolk", false, 1, /*      */ 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
-        Make("bullFolk", "Bull-folk", false, 1, /*     */ 0, 1, 2, 1, 1, 3, 2, 1, 1, 1, 1, 1, 3, 1, 0, 0),
-        Make("centaur", "Centaur", false, 1, /*        */ 0, 0, 3, 1, 1, 3, 2, 2, 2, 1, 1, 1, 3, 1, 0, 0),
-        Make("dragonkin", "Dragonkin", false, 0.5, /*  */ 0, 0, 1, 1, 2, 1, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1),
-        Make("undead", "Undead", false, 0.5, /*        */ 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1),
-        Make("frostFolk", "Frost folk", false, 1, /*   */ 3, 3, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        //                                    common   Ice Tun CSt Bor CDs TGr WSh TMx TBl TRn HDs Thn Sav TDf TRf Mgv
+        Make("northmen", "Northmen", 3, /*          */ 1, 2, 1, 3, 0, 1, 0, 3, 1, 2, 0, 0, 0, 0, 0, 0),
+        Make("midlanders", "Midlanders", 5, /*      */ 0, 0, 1, 1, 0, 3, 2, 2, 3, 2, 0, 0, 0, 0, 0, 0),
+        Make("saltroadFolk", "Saltroad folk", 3, /* */ 0, 0, 0, 0, 2, 1, 2, 0, 0, 0, 3, 3, 2, 1, 0, 0),
+        Make("sunlanders", "Sunlanders", 4, /*      */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 3, 2, 1),
+        Make("grassRiders", "Grass riders", 3, /*   */ 0, 1, 3, 1, 2, 3, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0),
+        Make("rainkeepers", "Rainkeepers", 4, /*    */ 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 2, 3, 2, 2),
+        Make("canalFolk", "Canal folk", 5, /*       */ 0, 0, 1, 0, 0, 2, 1, 2, 3, 3, 0, 0, 0, 2, 1, 1),
+        Make("elf", "Elves", 2, /*                  */ 0, 0, 0, 2, 0, 1, 1, 3, 3, 3, 0, 0, 0, 1, 2, 0) with { HeightModifier = OnlyBelow(200) },
+        Make("dwarf", "Dwarves", 2, /*              */ 1, 2, 1, 2, 1, 1, 1, 2, 1, 1, 0, 0, 0, 0, 0, 0) with { HeightModifier = OnlyFrom(200) },
+        Make("halfling", "Halflings", 2, /*         */ 0, 0, 1, 1, 0, 3, 3, 2, 2, 1, 0, 0, 1, 1, 1, 0),
+        Make("gnome", "Gnomes", 1, /*               */ 0, 1, 1, 2, 1, 1, 2, 2, 3, 1, 0, 1, 1, 1, 0, 0),
+        Make("orc", "Orcs", 2, /*                   */ 0, 1, 3, 1, 2, 2, 2, 1, 1, 1, 2, 2, 2, 1, 0, 0),
+        Make("hoarkin", "Hoarkin", 1, /*            */ 3, 2, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        Make("hearthbloods", "Hearthbloods", 0.5, 2, 3, 1, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0) with { HeightModifier = [new(100, 0.5), new(400, 1)] },
+        Make("widegaze", "Widegaze", 1, /*          */ 0, 0, 3, 0, 1, 3, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0) with { HeightModifier = [new(300, 1), new(500, 0)] },
+        Make("amberbloods", "Amberbloods", 1, /*    */ 0, 0, 0, 3, 0, 0, 0, 3, 2, 2, 0, 0, 0, 0, 0, 0),
+        Make("brinefolk", "Brinefolk", 1, /*        */ 0, 0, 1, 0, 3, 0, 0, 0, 0, 0, 2, 1, 0, 0, 0, 1),
+        Make("duskreaders", "Duskreaders", 1, /*    */ 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 3, 2, 1, 0, 0, 0),
+        Make("noonfolk", "Noonfolk", 1, /*          */ 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 2, 3, 3, 1, 0, 0),
+        Make("boughwalkers", "Boughwalkers", 1, /*  */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 3, 1),
+        Make("shoalfolk", "Shoalfolk", 1, /*        */ 0, 0, 0, 1, 0, 0, 1, 0, 0, 2, 0, 0, 0, 1, 1, 3) with { HeightModifier = [new(20, 1), new(80, 0)] },
+        Make("swiftborn", "Swiftborn", 1, /*        */ 0, 0, 0, 0, 0, 2, 3, 1, 2, 0, 0, 1, 1, 0, 0, 0),
+        Make("flinchless", "Flinchless", 0.5, /*    */ 0, 0, 1, 0, 0, 2, 2, 1, 2, 0, 0, 0, 1, 0, 0, 0),
+        Make("lanternkin", "Lanternkin", 0.5, /*    */ 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 0, 0, 1, 2, 2, 1),
+        Make("stillfaces", "Stillfaces", 1, /*      */ 0, 0, 0, 2, 0, 0, 1, 3, 2, 1, 0, 0, 0, 0, 0, 0),
+        Make("twofold", "Twofold", 1, /*            */ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 2, 1),
+        Make("bitterbloods", "Bitterbloods", 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 3, 3),
+        Make("catfolk", "Catfolk", 1, /*            */ 0, 0, 1, 0, 1, 2, 1, 1, 1, 1, 2, 2, 3, 2, 2, 1),
     ];
 
     /// <summary>A race from its habitat weight per biome (in the order of <see cref="Biome"/>) and how common it is.</summary>
-    private static RaceParameters Make(string id, string name, bool enabled, double common, params int[] habitat) =>
+    private static RaceParameters Make(string id, string name, double common, params int[] habitat) =>
         habitat.Length != 16
             ? throw new ArgumentException($"The race {id} needs one habitat weight per biome.", nameof(habitat))
-            : new(id, name, enabled, new PerBiome<double>(
+            : new(id, name, true, new PerBiome<double>(
             common * habitat[0], common * habitat[1], common * habitat[2], common * habitat[3],
             common * habitat[4], common * habitat[5], common * habitat[6], common * habitat[7],
             common * habitat[8], common * habitat[9], common * habitat[10], common * habitat[11],

@@ -166,7 +166,7 @@ public class DomainTests
         var region = new Region(new RegionId(2, 3), new RegionOutline([], HasSeaAccess: false));
         Assert.Equal(RegionStage.Outlined, region.Stage);
 
-        var plan = new RegionPlan([], new PotentialPopulation([new RacePopulation("human", 1200)]));
+        var plan = new RegionPlan([], new PotentialPopulation([new RacePopulation("midlanders", 1200)]));
         Assert.Throws<InvalidOperationException>(() => region.Advance(plan));
 
         region.Advance(new RegionDetail([], new Rivers([], false), []));
@@ -212,6 +212,13 @@ public class DomainTests
             Assert.False(ResourceCatalog.IsOnlyProduced(ResourceCatalog.GroupOf(resource)));
         Assert.Equal(ResourceGroup.Food, ResourceCatalog.GroupOf(Resource.WildFoodAndGame));
         Assert.Equal(ResourceGroup.Animals, ResourceCatalog.GroupOf(Resource.HorsesAndPackAnimals));
+        Assert.Equal(27, ResourceCatalog.Count);
+        Assert.Equal(ResourceGroup.Materials, ResourceCatalog.GroupOf(Resource.Reagents));
+        Assert.Equal(ResourceGroup.Materials, ResourceCatalog.GroupOf(Resource.Herbs));
+        Assert.Equal(ResourceGroup.Luxuries, ResourceCatalog.GroupOf(Resource.ArcaneMaterials));
+        // A new resource goes last: the picks hash the resource index.
+        Assert.Equal(23, (int)Resource.HorsesAndPackAnimals);
+        Assert.Equal(26, (int)Resource.ArcaneMaterials);
     }
 
     [Fact]

@@ -44,7 +44,7 @@ and the travel network are its inputs.
 | Cities and towns | Settled | Not specified (section 5) |
 | Families | Settled | Not specified (section 6) |
 | Persons | Settled for the important persons, later for the rest | The names are implemented, the rest is not specified (section 7) |
-| Vocations | not decided | Not specified (section 8) |
+| Vocations | Planned for the countryside, Settled for the cities and towns | Decided in part, not specified (section 8) |
 | Looks | not decided | Not specified (section 9) |
 
 ### 1.1 What holds for every step
@@ -75,7 +75,7 @@ Stub → Pending → Realised
 ```
 
 - A **Stub** holds every gameplay-relevant fact, and is derived data. For a person: name,
-  age, sex, role, family links, faction membership and home.
+  age, sex, vocation, role, family links, faction membership and home.
 - **Pending** means the authoring by LLM or diffusion model is in flight. On failure the
   entity returns to Stub.
 - **Realised** adds the authored presentation only. For a person: the textual
@@ -89,8 +89,8 @@ any individual in it is authored.
 
 ## 2. Races
 
-A race is a people that can live in the world: humans, elves, dwarves and so on. Races are
-needed to generate factions, families and persons.
+A race is a people that can live in the world: Northmen, Elves, Dwarves and so on. Races
+are needed to generate factions, families and persons.
 
 The races are a list in the Parameter Set, not a fixed set in the code. The list is
 expected to change late in phase 2, so a race is added or changed by editing the list
@@ -111,16 +111,28 @@ height modifier does not carry one in the file.
 
 | Parameter | Default |
 |---|---|
-| Races | 23, of which 6 are on (Appendix A) |
-| Height modifiers | dwarves only from 200 m and up, elves only below 200 m |
+| Races | 28, all on (Appendix A) |
+| Height modifiers | Elves, Dwarves, Hearthbloods, Widegaze and Shoalfolk (Appendix A) |
 
-Human, Elf, Dwarf, Halfling, Orc and Goblin are on. The other 17 are off until they are
-toggled on. The height does not matter to the races without a height modifier.
+The default list was decided on 2026-11-15. It holds:
+
+- 7 human races: Northmen, Midlanders, Saltroad folk, Sunlanders, Grass riders,
+  Rainkeepers and Canal folk.
+- 5 classic races: Elves, Dwarves, Halflings, Gnomes and Orcs.
+- 16 new near-human races: Hoarkin, Hearthbloods, Widegaze, Amberbloods, Brinefolk,
+  Duskreaders, Noonfolk, Boughwalkers, Shoalfolk, Swiftborn, Flinchless, Lanternkin,
+  Stillfaces, Twofold, Bitterbloods and Catfolk.
+
+All 28 are on. The height does not matter to the races without a height modifier.
+[races-basis.md](races-basis.md) describes every race: its looks, its history, its way of
+life, its vocations and its factions.
 
 **Human peoples are separate races** (decided 2026-11-14). Race is the only term: there is
-no people or culture level under one human race. The default list does not follow this
-yet, it holds one `human` race. [races-basis.md](races-basis.md) is the proposal for a
-reworked list of 32 races, seven of them human.
+no people or culture level under one human race, and the default list has no plain human
+race.
+
+**A race has no sub-races** (decided 2026-11-15). A people that differs is a race of its
+own in the list.
 
 Open:
 
@@ -130,6 +142,8 @@ Open:
   (collected in races-basis.md, "What the entries ask for that a race cannot say yet").
 - A presence per race, so that a race clusters in some regions and is absent from others.
 - Size, lifespan and fertility per race.
+- The factors per vocation, the switch for the division of work by sex and whether the
+  race keeps slaves. They are decided in section 8 and are not in the Parameter Set yet.
 
 ---
 
@@ -228,9 +242,12 @@ The land patches of a region are the patches of its zones (map-generation.md sec
 6.2), so every land patch counts in exactly one region.
 
 With the defaults the median region has a potential population of about 35,100 and the
-range is 11,200 to 83,400 (measured on 50 regions of two seeds). Of all persons 66 % are
-human, 10.5 % orc, 10 % goblin, 7 % halfling, 4.5 % elf and 2 % dwarf. 39 % of the land
-patches lie at 200 m or higher, and every one of the 50 regions has both dwarves and elves.
+range is 11,200 to 83,400 (measured on 50 regions of two seeds). Of all persons 59 % are
+of the seven human races, 20 % of the five classic races and 21 % of the sixteen new
+races. The largest race is the Canal folk with 12 %, and no race has a majority in any of
+the 50 regions. The shares per race are in [races-basis.md](races-basis.md), "Measured
+shares". 39 % of the land patches lie at 200 m or higher, and every one of the 50 regions
+has both dwarves and elves.
 
 ---
 
@@ -295,9 +312,10 @@ Open:
 Stage: Settled for the important persons of a region. Other persons are generated later,
 as play progresses. Not specified yet, apart from the names.
 
-A person is an NPC in the game. The Stub of a person holds name, age, sex, role, family
-links, faction membership and home. The textual description, the history and the portrait
-are authored (section 1.2).
+A person is an NPC in the game. The Stub of a person holds name, age, sex, vocation, role,
+family links, faction membership and home. The vocation can have a by-work beside it
+(section 8). The textual description, the history and the portrait are authored
+(section 1.2).
 
 **Names.** The name of a person is not authored. It comes from the name generator, so a
 person has a name already as a Stub. The generator is a character-level Markov chain with
@@ -307,26 +325,100 @@ nine pregenerated models. The code is `src/Gameworld.Generation/Names`, and
 Open:
 
 - Which persons of a region are important, and how many there are.
-- How age, sex, role, family links, faction membership and home are drawn.
+- How age, sex, vocation, role, family links, faction membership and home are drawn.
 - Which name model a race uses.
 
 ---
 
 ## 8. Vocations
 
-Not specified yet.
+Stage: Planned for the countryside, Settled for the cities and towns. Not specified yet.
 
 A vocation is the work a person does: farmer, smith, priest, guard and so on.
 
+The rules below were decided on 2026-11-15. None of them is specified in detail or
+implemented.
+
+**Vocation and role are two facts.** The vocation is the work, one of the list, with a
+variant (a herder who is a shepherd). The role is the position of the person: in the
+household, in the vocation (apprentice, master) or in a faction. A slave who is a smith
+has the vocation Smith and the role slave. The Stub of a person holds both.
+
+**A person has one vocation and can have a by-work.** The by-work is a second vocation
+beside the main one: the farmer who brews, the smith with a field. Every vocation lists
+the by-works that fit it, and a person can only get one of those. By-work is more frequent
+in the countryside than in a town or a city.
+
+**The vocations are a list in the Parameter Set**, like the races. The code knows no
+vocation by name. The default list has 51 vocations in nine sectors:
+
+| Sector | Vocations |
+|---|---|
+| Land and water | Farmer, Gardener, Herder, Fisher, Hunter, Forester, Miner, Quarryman, Salter |
+| Processing | Miller, Baker, Brewer, Butcher, Charcoal burner, Smelter, Tanner, Weaver |
+| Craft | Smith, Carpenter, Shipwright, Mason, Potter, Glassmaker, Leatherworker, Tailor, Jeweller, Artist, Artificer |
+| Trade and transport | Merchant, Shopkeeper, Carter, Sailor, Innkeeper |
+| Service | Healer, Servant, Entertainer, Courtesan |
+| Governance and war | Noble, Official, Soldier, Guard |
+| Faith and learning | Priest, Scribe, Scholar |
+| Supernatural | Mage, Alchemist, Seer |
+| Margins | Labourer, Beggar, Thief, Bandit |
+
+A smaller trade is a variant of one of them: the monk of Priest, the armourer of Smith,
+the guide of Hunter, the dyer of Weaver, the boatman of Sailor and the banker of Merchant.
+
+**Products are names only.** A vocation lists what it consumes and what it produces by id.
+The ids are the resources of the map and the products made from them: iron, cloth, flour,
+and the by-products wool, hides, dairy, tallow, horn, tanbark, potash, resin and pitch. A
+product has no amount on the map and does not flow between places. The lists say which
+vocations a place can have (a smelter needs ore and fuel) and what a place must bring in
+or can send out (smiths without a smelter in reach bring in iron).
+
+**A rural person belongs to a patch.** There are no villages. The vocations of the
+countryside are worked out per land patch, from its resources and its potential
+population. The vocations of a city or a town are worked out per city or town.
+
+**The tiers are relative.** A vocation has a lowest tier in which it is found:
+countryside, town, city or capital. The tier of a place follows from what the place is,
+not from its head count.
+
+**A race shapes the vocations of its people.** A race can carry a factor per vocation:
+above 1 for the work the race is known for, and 0 for work the race never does. The
+factors live on the race, so adding a race touches one record.
+
+**Work is divided by sex as in the medieval record.** Every vocation carries a share by
+sex. A race can switch the division off for its people. The Twofold do.
+
+**Slave is a role, and slavery is a fact of the race.** Whether a race keeps slaves is
+said on the race.
+
+**The supernatural vocations are rare and follow the Supernatural Field.** Mages,
+alchemists and seers are few, and their share rises and falls with the field at the place.
+
+**The map gets the resources the vocations lack.** Three new generated resources:
+reagents (alum, sulphur, quicksilver, saltpetre), herbs, and arcane materials, which
+follow the Supernatural Field. Two sets of new variants: gypsum and alabaster of Stone,
+and elephants, reindeer and sled dogs of Horses & pack animals. Their rules are in
+[map-generation.md](map-generation.md) section 14 and Appendices C, D and G, and they
+are implemented.
+
 Open:
 
-- How the vocation stands to the role in the Stub of a person: whether they are the same
-  fact or two.
-- The list of vocations, and whether it is a list in the Parameter Set like the races.
-- How the vocations of a place follow from its resources, its size and its races.
+- What a vocation holds in the Parameter Set, and the default values: the shares, the
+  inputs and outputs, the lowest tier, the by-works and the shares by sex.
+- The rule that gives the vocations of a place from its resources, its size, its races and
+  the fields, and the purpose numbers of its draws.
+- The list of roles, and which roles fit which vocations.
+- The age at which a person gets a vocation, and what a child and an old person hold.
+- The factors per race, which races keep slaves, and which races other than the Twofold
+  switch the division by sex off.
+- What makes a city the capital.
 
-Material: every entry of [races-basis.md](races-basis.md) lists the work the race is known
-for, as a source for the roles of persons.
+Material: [research/vocations.md](research/vocations.md) describes each of the 51
+vocations (what it covers, its lore, its resources, where it is found, how frequent it is,
+its races and factions), maps the resources and the biomes to the vocations, proposes the
+new resources and holds a design note for the generator. Every entry of
+[races-basis.md](races-basis.md) lists the work the race is known for.
 
 ---
 
@@ -343,6 +435,8 @@ Open:
 - How the looks follow from the race, the sex, the age, the vocation and the climate of
   the home.
 - The lists to draw from, and where they live.
+- Whether the outfits get a list per vocation or per sector of vocations. This waits for
+  the vocation list of section 8 to be specified.
 
 Material: the Appearance part of every entry of [races-basis.md](races-basis.md) says what
 a portrait of the race must show. [research/portrait-components.md](research/portrait-components.md)
@@ -354,54 +448,76 @@ keeping a person consistent between pictures.
 
 ## Appendix A. The default races
 
-The default list of races of the Parameter Set (section 2). The frequency of a race in a
-biome is its habitat weight in that biome times how common the race is:
+The default list of races of the Parameter Set (section 2): 28 races, all on. The first
+seven are the human races, the next five the classic races and the last sixteen the new
+races. [races-basis.md](races-basis.md) describes each of them.
+
+The frequency of a race in a biome is its habitat weight in that biome times how common
+the race is:
 
 ```
 frequency(race, biome) = habitat(race, biome) · common(race)
 ```
 
 The habitat weights are 0 avoided, 1 tolerated, 2 good and 3 native. The Parameter Set
-only holds the frequencies: the human frequency in Temperate grassland is 3 · 10 = 30. A
-biome with the weight 0 is left out of the race's entry in the file.
+only holds the frequencies: the Midlander frequency in Temperate grassland is 3 · 5 = 15.
+A biome with the weight 0 is left out of the race's entry in the file.
 
 Columns: Ice & snow, Tundra, Cold steppe, Boreal forest, Cold desert, Temperate grassland,
 Woodland & shrubland, Temperate mixed forest, Temperate broadleaf forest, Temperate rain
 forest, Hot desert, Thorn scrub, Savanna, Tropical dry forest, Tropical rain forest,
 Mangrove.
 
-| Id | Name | On | Common | Ice | Tun | CSt | Bor | CDs | TGr | WSh | TMx | TBl | TRn | HDs | Thn | Sav | TDf | TRf | Mgv |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| `human` | Human | yes | 10 | 0 | 1 | 2 | 2 | 1 | 3 | 3 | 3 | 3 | 2 | 1 | 1 | 2 | 2 | 1 | 1 |
-| `elf` | Elf | yes | 2 | 0 | 0 | 0 | 2 | 0 | 1 | 1 | 3 | 3 | 3 | 0 | 0 | 0 | 1 | 2 | 0 |
-| `darkElf` | Dark elf | no | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
-| `dwarf` | Dwarf | yes | 2 | 1 | 2 | 1 | 2 | 1 | 1 | 1 | 2 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 0 |
-| `halfling` | Halfling | yes | 2 | 0 | 0 | 1 | 1 | 0 | 3 | 3 | 2 | 2 | 1 | 0 | 0 | 1 | 1 | 1 | 0 |
-| `gnome` | Gnome | no | 1 | 0 | 1 | 1 | 2 | 1 | 1 | 2 | 2 | 3 | 1 | 0 | 1 | 1 | 1 | 0 | 0 |
-| `orc` | Orc | yes | 2 | 0 | 1 | 3 | 1 | 2 | 2 | 2 | 1 | 1 | 1 | 2 | 2 | 2 | 1 | 0 | 0 |
-| `goblin` | Goblin | yes | 2 | 0 | 1 | 1 | 2 | 1 | 2 | 2 | 2 | 2 | 1 | 1 | 2 | 1 | 1 | 1 | 0 |
-| `hobgoblin` | Hobgoblin | no | 1 | 0 | 1 | 2 | 1 | 1 | 2 | 2 | 2 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 0 |
-| `kobold` | Kobold | no | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
-| `gnoll` | Gnoll | no | 1 | 0 | 0 | 2 | 1 | 1 | 2 | 2 | 1 | 1 | 0 | 2 | 3 | 3 | 1 | 0 | 0 |
-| `giantBlooded` | Giant-blooded | no | 0.5 | 1 | 2 | 2 | 2 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 1 | 1 | 1 | 0 | 0 |
-| `ogre` | Ogre | no | 0.5 | 1 | 2 | 2 | 2 | 1 | 1 | 2 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 0 | 0 |
-| `troll` | Troll | no | 0.5 | 2 | 2 | 1 | 2 | 1 | 1 | 1 | 2 | 2 | 2 | 2 | 2 | 1 | 2 | 2 | 2 |
-| `lizardfolk` | Lizardfolk | no | 1 | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 1 | 1 | 2 | 1 | 1 | 1 | 2 | 3 | 3 |
-| `catfolk` | Catfolk | no | 1 | 0 | 0 | 1 | 0 | 1 | 2 | 1 | 1 | 1 | 1 | 2 | 2 | 3 | 2 | 2 | 1 |
-| `ratfolk` | Ratfolk | no | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
-| `birdfolk` | Birdfolk | no | 1 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
-| `bullFolk` | Bull-folk | no | 1 | 0 | 1 | 2 | 1 | 1 | 3 | 2 | 1 | 1 | 1 | 1 | 1 | 3 | 1 | 0 | 0 |
-| `centaur` | Centaur | no | 1 | 0 | 0 | 3 | 1 | 1 | 3 | 2 | 2 | 2 | 1 | 1 | 1 | 3 | 1 | 0 | 0 |
-| `dragonkin` | Dragonkin | no | 0.5 | 0 | 0 | 1 | 1 | 2 | 1 | 1 | 1 | 1 | 1 | 2 | 2 | 2 | 1 | 1 | 1 |
-| `undead` | Undead | no | 0.5 | 1 | 2 | 1 | 1 | 2 | 1 | 1 | 1 | 1 | 1 | 2 | 1 | 1 | 1 | 1 | 1 |
-| `frostFolk` | Frost folk | no | 1 | 3 | 3 | 1 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| Id | Name | Common | Ice | Tun | CSt | Bor | CDs | TGr | WSh | TMx | TBl | TRn | HDs | Thn | Sav | TDf | TRf | Mgv |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| `northmen` | Northmen | 3 | 1 | 2 | 1 | 3 | 0 | 1 | 0 | 3 | 1 | 2 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `midlanders` | Midlanders | 5 | 0 | 0 | 1 | 1 | 0 | 3 | 2 | 2 | 3 | 2 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `saltroadFolk` | Saltroad folk | 3 | 0 | 0 | 0 | 0 | 2 | 1 | 2 | 0 | 0 | 0 | 3 | 3 | 2 | 1 | 0 | 0 |
+| `sunlanders` | Sunlanders | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 2 | 3 | 3 | 2 | 1 |
+| `grassRiders` | Grass riders | 3 | 0 | 1 | 3 | 1 | 2 | 3 | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 |
+| `rainkeepers` | Rainkeepers | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 1 | 2 | 3 | 2 | 2 |
+| `canalFolk` | Canal folk | 5 | 0 | 0 | 1 | 0 | 0 | 2 | 1 | 2 | 3 | 3 | 0 | 0 | 0 | 2 | 1 | 1 |
+| `elf` | Elves | 2 | 0 | 0 | 0 | 2 | 0 | 1 | 1 | 3 | 3 | 3 | 0 | 0 | 0 | 1 | 2 | 0 |
+| `dwarf` | Dwarves | 2 | 1 | 2 | 1 | 2 | 1 | 1 | 1 | 2 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `halfling` | Halflings | 2 | 0 | 0 | 1 | 1 | 0 | 3 | 3 | 2 | 2 | 1 | 0 | 0 | 1 | 1 | 1 | 0 |
+| `gnome` | Gnomes | 1 | 0 | 1 | 1 | 2 | 1 | 1 | 2 | 2 | 3 | 1 | 0 | 1 | 1 | 1 | 0 | 0 |
+| `orc` | Orcs | 2 | 0 | 1 | 3 | 1 | 2 | 2 | 2 | 1 | 1 | 1 | 2 | 2 | 2 | 1 | 0 | 0 |
+| `hoarkin` | Hoarkin | 1 | 3 | 2 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `hearthbloods` | Hearthbloods | 0.5 | 2 | 3 | 1 | 2 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `widegaze` | Widegaze | 1 | 0 | 0 | 3 | 0 | 1 | 3 | 0 | 0 | 0 | 0 | 0 | 1 | 2 | 0 | 0 | 0 |
+| `amberbloods` | Amberbloods | 1 | 0 | 0 | 0 | 3 | 0 | 0 | 0 | 3 | 2 | 2 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `brinefolk` | Brinefolk | 1 | 0 | 0 | 1 | 0 | 3 | 0 | 0 | 0 | 0 | 0 | 2 | 1 | 0 | 0 | 0 | 1 |
+| `duskreaders` | Duskreaders | 1 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 0 | 0 | 3 | 2 | 1 | 0 | 0 | 0 |
+| `noonfolk` | Noonfolk | 1 | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 0 | 0 | 0 | 2 | 3 | 3 | 1 | 0 | 0 |
+| `boughwalkers` | Boughwalkers | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 2 | 3 | 1 |
+| `shoalfolk` | Shoalfolk | 1 | 0 | 0 | 0 | 1 | 0 | 0 | 1 | 0 | 0 | 2 | 0 | 0 | 0 | 1 | 1 | 3 |
+| `swiftborn` | Swiftborn | 1 | 0 | 0 | 0 | 0 | 0 | 2 | 3 | 1 | 2 | 0 | 0 | 1 | 1 | 0 | 0 | 0 |
+| `flinchless` | Flinchless | 0.5 | 0 | 0 | 1 | 0 | 0 | 2 | 2 | 1 | 2 | 0 | 0 | 0 | 1 | 0 | 0 | 0 |
+| `lanternkin` | Lanternkin | 0.5 | 0 | 0 | 0 | 0 | 0 | 1 | 1 | 1 | 1 | 2 | 0 | 0 | 1 | 2 | 2 | 1 |
+| `stillfaces` | Stillfaces | 1 | 0 | 0 | 0 | 2 | 0 | 0 | 1 | 3 | 2 | 1 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `twofold` | Twofold | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 2 | 3 | 2 | 1 |
+| `bitterbloods` | Bitterbloods | 0.5 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 1 | 3 | 3 |
+| `catfolk` | Catfolk | 1 | 0 | 0 | 1 | 0 | 1 | 2 | 1 | 1 | 1 | 1 | 2 | 2 | 3 | 2 | 2 | 1 |
 
-**Height modifiers.** Dwarf: `(200, 0), (200, 1)`, only from 200 m and up. Elf:
-`(200, 1), (200, 0)`, only below 200 m. The other 21 races have none.
+**Height modifiers.** Control points `(height in m, factor)` (section 3.2).
 
-The six races that are on live in every biome between them: in Ice & snow only the
-dwarves do, in Mangrove only the humans. Ice & snow below 200 m holds nobody, since the
-dwarves do not live that low.
+| Race | Points | Meaning |
+|---|---|---|
+| Elves | `(200, 1), (200, 0)` | Only below 200 m |
+| Dwarves | `(200, 0), (200, 1)` | Only from 200 m and up |
+| Hearthbloods | `(100, 0.5), (400, 1)` | Half weight below 100 m, full weight from 400 m |
+| Widegaze | `(300, 1), (500, 0)` | Full weight below 300 m, none from 500 m |
+| Shoalfolk | `(20, 1), (80, 0)` | Full weight below 20 m, none from 80 m |
+
+The other 23 races have none.
+
+**How common.** `common` is 3 to 5 for the human races, 2 for Elves, Dwarves, Halflings
+and Orcs, 1 for Gnomes, and 1 or 0.5 for a new race: 1 when it has a homeland of its own,
+0.5 when it lives scattered among others or is rare by its nature.
+
+The seven human races live in every biome and at every height between them, so no land
+is without a race. In Ice & snow there are Northmen, Hoarkin and Hearthbloods, and
+dwarves from 200 m and up.
 
 ---
 
@@ -413,13 +529,13 @@ when it stands in sections 1 to 9.
 | Document | What it holds | Used by |
 |---|---|---|
 | [adding-a-race.md](adding-a-race.md) | The steps to add a race, to one world or to the default list | Section 2 |
-| [races-basis.md](races-basis.md) | A proposal for a reworked list of 32 races. Each entry has a description, a history, the biomes, the vocations and the factions of the race | Sections 2, 4, 8, 9 |
-| [races-basis-parameter-set.json](races-basis-parameter-set.json) | The 32 races of the proposal as a Parameter Set file, to try them on a map | Section 2 |
+| [races-basis.md](races-basis.md) | The 28 races of the default list. Each entry has a description, a history, the biomes, the vocations and the factions of the race. Also the measured shares per race | Sections 2, 3.3, 4, 8, 9, Appendix A |
 | [races-and-worldbuilding.md](races-and-worldbuilding.md) | The framework the new races of the proposal were built with | Section 2 |
 | [map-generation-research.md](map-generation-research.md) §10.7 | Why the race and potential population rules are as they are, and what was weighed against them | Sections 2, 3 |
-| [research/races.md](research/races.md) | 41 race archetypes from RPGs, fantasy settings and strategy games, and the habitat weights behind Appendix A | Section 2, Appendix A |
-| [research/human-races.md](research/human-races.md) | A candidate list in which every race looks like a regular human or nearly so | Section 2 |
+| [research/races.md](research/races.md) | 41 race archetypes from RPGs, fantasy settings and strategy games, and the habitat weights of the first default list of 23 races. The classic races and the Catfolk keep their weights from it. The races that were left out are still described there | Section 2, Appendix A |
+| [research/human-races.md](research/human-races.md) | An earlier candidate list in which every race looks like a regular human or nearly so. Not adopted | Section 2 |
 | [research/factions.md](research/factions.md) | Faction archetypes, their axes and relations, and a design note | Section 4 |
-| [research/portrait-components.md](research/portrait-components.md) | Lists of hairstyles, outfits, colours, race markers and accessories for portraits | Section 9 |
+| [research/vocations.md](research/vocations.md) | 51 vocations with their lore, resources, biomes, races and factions, the proposals for new resources, and a design note | Section 8 |
+| [research/portrait-components.md](research/portrait-components.md) | Lists of hairstyles, outfits, colours, race markers and accessories for portraits. Written for the 32 races of the first version of races-basis.md and extended for the Catfolk: it still covers the five that were left out | Section 9 |
 | [NameGenerator-Reuse.md](NameGenerator-Reuse.md) | The person-name generator, ported from an earlier project | Section 7 |
 | [RegionNameGenerator-Reuse.md](RegionNameGenerator-Reuse.md) | The region-name generator of the same project, not ported | Section 5 |

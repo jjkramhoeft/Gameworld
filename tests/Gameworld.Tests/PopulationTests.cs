@@ -8,7 +8,17 @@ namespace Gameworld.Tests;
 /// <summary>The races of the Parameter Set and the potential population of society-generation.md sections 2 and 3.</summary>
 public class PopulationTests
 {
-    private static readonly string[] ClassicSix = ["human", "elf", "dwarf", "halfling", "orc", "goblin"];
+    /// <summary>The ids of the default list, in its order: seven human races, five classic races and sixteen new ones.</summary>
+    private static readonly string[] DefaultRaces =
+    [
+        "northmen", "midlanders", "saltroadFolk", "sunlanders", "grassRiders", "rainkeepers", "canalFolk",
+        "elf", "dwarf", "halfling", "gnome", "orc",
+        "hoarkin", "hearthbloods", "widegaze", "amberbloods", "brinefolk", "duskreaders", "noonfolk", "boughwalkers",
+        "shoalfolk", "swiftborn", "flinchless", "lanternkin", "stillfaces", "twofold", "bitterbloods", "catfolk",
+    ];
+
+    /// <summary>The seven human races of the default list.</summary>
+    private static readonly string[] HumanRaces = DefaultRaces[..7];
 
     private static PerBiome<double> Everywhere(double f) =>
         new(f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f);
@@ -22,19 +32,21 @@ public class PopulationTests
 
     private static ParameterSet With(params RaceParameters[] races) => ParameterSet.Default with { Races = races };
 
-    private static ParameterSet AllRacesOn() =>
-        ParameterSet.Default with { Races = ParameterSet.Default.Races.Select(r => r with { Enabled = true }).ToArray() };
+    private static ParameterSet OnlyOn(params string[] ids) =>
+        ParameterSet.Default with { Races = ParameterSet.Default.Races.Select(r => r with { Enabled = ids.Contains(r.Id) }).ToArray() };
 
     private static RaceParameters Race(string id, IReadOnlyList<HeightFactorPoint>? heightModifier = null) =>
         new(id, id, true, Everywhere(1)) { HeightModifier = heightModifier };
 
     [Fact]
-    public void The_default_list_holds_every_race_once_and_the_classic_six_are_on()
+    public void The_default_list_holds_the_28_races_once_and_all_are_on()
     {
         var races = ParameterSet.Default.Races;
-        Assert.Equal(23, races.Count);
+        Assert.Equal(28, races.Count);
+        Assert.Equal(DefaultRaces, races.Select(r => r.Id));
         Assert.Equal(races.Count, races.Select(r => r.Id).Distinct().Count());
-        Assert.Equal(ClassicSix, races.Where(r => r.Enabled).Select(r => r.Id));
+        Assert.All(races, r => Assert.True(r.Enabled));
+        Assert.DoesNotContain(races, r => r.Id == "human"); // the human peoples are separate races
         Assert.All(races, r => Assert.False(string.IsNullOrWhiteSpace(r.Name)));
 
         // Every race has a frequency for every biome, and lives in at least one of them.
@@ -45,15 +57,22 @@ public class PopulationTests
             Assert.Contains(frequencies, f => f > 0);
         }
 
-        var human = races.Single(r => r.Id == "human");
-        Assert.Equal(0, human.BiomeFrequency[Biome.IceAndSnow]);
-        Assert.Equal(30, human.BiomeFrequency[Biome.TemperateGrassland]);
-        Assert.Equal(10, human.BiomeFrequency[Biome.Mangrove]);
+        // A frequency is the habitat weight times how common the race is: Midlanders 3 · 5 in Temperate grassland.
+        RaceParameters Of(string id) => races.Single(r => r.Id == id);
+        Assert.Equal(0, Of("midlanders").BiomeFrequency[Biome.IceAndSnow]);
+        Assert.Equal(15, Of("midlanders").BiomeFrequency[Biome.TemperateGrassland]);
+        Assert.Equal(5, Of("midlanders").BiomeFrequency[Biome.BorealForest]);
+        Assert.Equal(1.5, Of("bitterbloods").BiomeFrequency[Biome.Mangrove]);
 
-        // Dwarves only live from 200 m and up, elves only below 200 m; the height does not matter to the others.
-        Assert.Equal(RaceParameters.OnlyFrom(200), races.Single(r => r.Id == "dwarf").HeightModifier);
-        Assert.Equal(RaceParameters.OnlyBelow(200), races.Single(r => r.Id == "elf").HeightModifier);
-        Assert.All(races.Where(r => r.Id is not ("dwarf" or "elf")), r => Assert.Null(r.HeightModifier));
+        // Five races have a height modifier; the height does not matter to the others.
+        Assert.Equal(RaceParameters.OnlyFrom(200), Of("dwarf").HeightModifier);
+        Assert.Equal(RaceParameters.OnlyBelow(200), Of("elf").HeightModifier);
+        Assert.Equal([new HeightFactorPoint(100, 0.5), new HeightFactorPoint(400, 1)], Of("hearthbloods").HeightModifier);
+        Assert.Equal([new HeightFactorPoint(300, 1), new HeightFactorPoint(500, 0)], Of("widegaze").HeightModifier);
+        Assert.Equal([new HeightFactorPoint(20, 1), new HeightFactorPoint(80, 0)], Of("shoalfolk").HeightModifier);
+        Assert.All(
+            races.Where(r => r.Id is not ("dwarf" or "elf" or "hearthbloods" or "widegaze" or "shoalfolk")),
+            r => Assert.Null(r.HeightModifier));
     }
 
     [Fact]
@@ -63,13 +82,13 @@ public class PopulationTests
             """
             {
               "Races": [
-                { "Id": "human", "Name": "Human", "Enabled": true, "BiomeFrequency": { "Savanna": 3, "Tundra": 1 } },
+                { "Id": "midlanders", "Name": "Midlanders", "Enabled": true, "BiomeFrequency": { "Savanna": 3, "Tundra": 1 } },
                 { "Id": "moonfolk", "Name": "Moon folk", "Enabled": false, "BiomeFrequency": { "Savanna": 1 },
                   "HeightModifier": [ { "HeightM": 300, "Factor": 0 }, { "HeightM": 500, "Factor": 1 } ] }
               ]
             }
             """);
-        Assert.Equal(["human", "moonfolk"], p.Races.Select(r => r.Id));
+        Assert.Equal(["midlanders", "moonfolk"], p.Races.Select(r => r.Id));
         Assert.False(p.Races[1].Enabled);
         Assert.Equal(3, p.Races[0].BiomeFrequency[Biome.Savanna]);
         Assert.Equal(0, p.Races[0].BiomeFrequency[Biome.HotDesert]); // a biome that is left out is 0
@@ -77,12 +96,12 @@ public class PopulationTests
         Assert.Equal([new HeightFactorPoint(300, 0), new HeightFactorPoint(500, 1)], p.Races[1].HeightModifier);
 
         var rules = new PopulationRules(p);
-        Assert.Equal(["human"], rules.Races.Select(r => r.Id));
+        Assert.Equal(["midlanders"], rules.Races.Select(r => r.Id));
 
         var toggled = p with { Races = p.Races.Select(r => r with { Enabled = true }).ToArray() };
         Assert.Equal(toggled.ToJson(), ParameterSet.FromJson(toggled.ToJson()).ToJson());
         var both = new PopulationRules(toggled);
-        Assert.Equal(["human", "moonfolk"], both.Races.Select(r => r.Id));
+        Assert.Equal(["midlanders", "moonfolk"], both.Races.Select(r => r.Id));
         Assert.Equal(0.5, both.HeightFactor(1, 400), 12);
     }
 
@@ -91,7 +110,7 @@ public class PopulationTests
     {
         var json = JsonNode.Parse(ParameterSet.Default.ToJson())!;
         var races = json["Races"]!.AsArray();
-        Assert.Equal(23, races.Count);
+        Assert.Equal(28, races.Count);
         foreach (var race in races)
         {
             var frequencies = race!["BiomeFrequency"]!.AsObject();
@@ -106,7 +125,7 @@ public class PopulationTests
             Entry("elf")["BiomeFrequency"]!.AsObject().Select(f => f.Key));
 
         // A race without a height modifier does not carry one in the file.
-        Assert.False(Entry("human").ContainsKey("HeightModifier"));
+        Assert.False(Entry("midlanders").ContainsKey("HeightModifier"));
         Assert.Equal(
             """[{"HeightM":200,"Factor":0},{"HeightM":200,"Factor":1}]""",
             Entry("dwarf")["HeightModifier"]!.ToJsonString());
@@ -117,7 +136,7 @@ public class PopulationTests
         Assert.Equal(ParameterSet.Default.Races.Select(r => r.BiomeFrequency), back.Races.Select(r => r.BiomeFrequency));
         Assert.Equal(0, back.Races.Single(r => r.Id == "elf").BiomeFrequency[Biome.Tundra]);
         Assert.Equal(RaceParameters.OnlyBelow(200), back.Races.Single(r => r.Id == "elf").HeightModifier);
-        Assert.Null(back.Races.Single(r => r.Id == "human").HeightModifier);
+        Assert.Null(back.Races.Single(r => r.Id == "midlanders").HeightModifier);
 
         // The schema does not ask for the biomes that are left out, nor for a height modifier.
         var schema = ParameterSetSchema.Build()["properties"]!["Races"]!["items"]!;
@@ -132,14 +151,15 @@ public class PopulationTests
     public void The_races_that_are_on_share_a_patch_by_their_frequency_in_its_biome()
     {
         var rules = new PopulationRules(ParameterSet.Default);
-        Assert.Equal(ClassicSix, rules.Races.Select(r => r.Id));
+        Assert.Equal(DefaultRaces, rules.Races.Select(r => r.Id));
+        int At(string id) => Array.IndexOf(DefaultRaces, id);
 
         // Without height modifiers the shares are the frequencies over their sum, at any height.
         var plain = new PopulationRules(With(ParameterSet.Default.Races.Select(r => r with { HeightModifier = null }).ToArray()));
         foreach (var biome in Enum.GetValues<Biome>())
         {
             var shares = plain.Shares(biome, 100);
-            Assert.Equal(6, shares.Length);
+            Assert.Equal(28, shares.Length);
             Assert.Equal(1, shares.Sum(), 12);
             var sum = plain.Races.Sum(r => r.BiomeFrequency[biome]);
             for (var k = 0; k < shares.Length; k++)
@@ -147,20 +167,30 @@ public class PopulationTests
             Assert.Equal(shares, plain.Shares(biome, 900));
         }
 
-        // Temperate broadleaf forest: human 30, elf 6, dwarf 2, halfling 4, orc 2, goblin 4.
-        // Below 200 m there are no dwarves, from 200 m and up no elves.
+        // Temperate broadleaf forest: the frequencies sum to 62.5, of which Midlanders and Canal folk 15 each,
+        // elves 6 and dwarves 2. Below 200 m there are no dwarves, from 200 m and up no elves.
         var low = rules.Shares(Biome.TemperateBroadleafForest, 199);
-        Assert.Equal(30.0 / 46, low[0], 12);
-        Assert.Equal(6.0 / 46, low[1], 12);
-        Assert.Equal(0, low[2]);
+        Assert.Equal(15 / 60.5, low[At("midlanders")], 12);
+        Assert.Equal(15 / 60.5, low[At("canalFolk")], 12);
+        Assert.Equal(6 / 60.5, low[At("elf")], 12);
+        Assert.Equal(0, low[At("dwarf")]);
         var high = rules.Shares(Biome.TemperateBroadleafForest, 200);
-        Assert.Equal(30.0 / 42, high[0], 12);
-        Assert.Equal(0, high[1]);
-        Assert.Equal(2.0 / 42, high[2], 12);
+        Assert.Equal(15 / 56.5, high[At("midlanders")], 12);
+        Assert.Equal(0, high[At("elf")]);
+        Assert.Equal(2 / 56.5, high[At("dwarf")], 12);
 
-        // Ice & snow: of the six only dwarves live there, and only from 200 m and up.
-        Assert.Equal([0, 0, 1, 0, 0, 0], rules.Shares(Biome.IceAndSnow, 450));
-        Assert.Empty(rules.Shares(Biome.IceAndSnow, 50));
+        // Ice & snow: Northmen 3, Hoarkin 3, dwarves 2 from 200 m and up, and Hearthbloods 1,
+        // at half weight below 100 m and full weight from 400 m.
+        var ice = rules.Shares(Biome.IceAndSnow, 450);
+        Assert.Equal(4, ice.Count(x => x > 0));
+        Assert.Equal(3 / 9.0, ice[At("northmen")], 12);
+        Assert.Equal(3 / 9.0, ice[At("hoarkin")], 12);
+        Assert.Equal(2 / 9.0, ice[At("dwarf")], 12);
+        Assert.Equal(1 / 9.0, ice[At("hearthbloods")], 12);
+        var shore = rules.Shares(Biome.IceAndSnow, 50);
+        Assert.Equal(3 / 6.5, shore[At("hoarkin")], 12);
+        Assert.Equal(0, shore[At("dwarf")]);
+        Assert.Equal(0.5 / 6.5, shore[At("hearthbloods")], 12);
     }
 
     [Fact]
@@ -220,20 +250,20 @@ public class PopulationTests
     [Fact]
     public void A_race_that_is_off_gets_nothing_and_the_others_share_the_land_without_it()
     {
-        var human = new RaceParameters("human", "Human", true, Everywhere(3));
-        var elf = new RaceParameters("elf", "Elf", true, Everywhere(1));
+        var midlanders = new RaceParameters("midlanders", "Midlanders", true, Everywhere(3));
+        var elf = new RaceParameters("elf", "Elves", true, Everywhere(1));
         (Biome, double, double, PatchResources, double)[] land = [(Biome.Savanna, 120, 64, Resources(0.5), 0.5)];
 
-        var both = new PopulationRules(With(human, elf)).Region(land);
+        var both = new PopulationRules(With(midlanders, elf)).Region(land);
         Assert.Equal(192, both.Total); // 64 km² × 6 × 0.5
-        Assert.Equal(144, both.Of("human"));
+        Assert.Equal(144, both.Of("midlanders"));
         Assert.Equal(48, both.Of("elf"));
 
-        var humansOnly = new PopulationRules(With(human, elf with { Enabled = false })).Region(land);
-        Assert.Equal(["human"], humansOnly.Races.Select(r => r.Race));
-        Assert.Equal(192, humansOnly.Of("human"));
-        Assert.Equal(0, humansOnly.Of("elf"));
-        Assert.Equal(both.Total, humansOnly.Total);
+        var withoutElves = new PopulationRules(With(midlanders, elf with { Enabled = false })).Region(land);
+        Assert.Equal(["midlanders"], withoutElves.Races.Select(r => r.Race));
+        Assert.Equal(192, withoutElves.Of("midlanders"));
+        Assert.Equal(0, withoutElves.Of("elf"));
+        Assert.Equal(both.Total, withoutElves.Total);
     }
 
     [Fact]
@@ -289,10 +319,10 @@ public class PopulationTests
     [Fact]
     public void A_race_id_must_be_given_and_unique()
     {
-        var human = new RaceParameters("human", "Human", true, Everywhere(1));
-        Assert.Throws<ArgumentException>(() => new PopulationRules(With(human, human with { Name = "Other", Enabled = false })));
-        Assert.Throws<ArgumentException>(() => new PopulationRules(With(human with { Id = " " })));
-        Assert.Throws<ArgumentException>(() => World.Create("cellgen", With(human, human)));
+        var race = new RaceParameters("midlanders", "Midlanders", true, Everywhere(1));
+        Assert.Throws<ArgumentException>(() => new PopulationRules(With(race, race with { Name = "Other", Enabled = false })));
+        Assert.Throws<ArgumentException>(() => new PopulationRules(With(race with { Id = " " })));
+        Assert.Throws<ArgumentException>(() => World.Create("cellgen", With(race, race)));
     }
 
     [Fact]
@@ -305,14 +335,14 @@ public class PopulationTests
         foreach (var id in RegionStageRules.RegionsWithin(new RegionId(0, 0), 1))
         {
             var population = world.Advance(id, RegionStage.Planned).Plan!.Population;
-            Assert.Equal(ClassicSix, population.Races.Select(r => r.Race));
+            Assert.Equal(DefaultRaces, population.Races.Select(r => r.Race));
             Assert.All(population.Races, r => Assert.True(r.Persons >= 0));
             Assert.Same(population, world.PlanOf(id).Population);
 
             // The same sum from the Elevated data: the mean height of the land patches and their final biomes and resources.
             var land = world.ElevationOf(id).Patches;
             Assert.Equal(world.DetailOf(id).Patches.Count(x => !x.Shape.Ocean), land.Length);
-            var expected = new double[6];
+            var expected = new double[DefaultRaces.Length];
             foreach (var patch in land)
             {
                 if (patch.MeanHeightM is { } mean) Assert.Equal(Math.Max(0, mean), patch.HeightM);
@@ -320,7 +350,7 @@ public class PopulationTests
                 var shares = rules.Shares(patch.Biome.Biome, patch.HeightM);
                 for (var k = 0; k < shares.Length; k++) expected[k] += capacity * shares[k];
             }
-            for (var k = 0; k < 6; k++)
+            for (var k = 0; k < expected.Length; k++)
                 Assert.Equal((long)Math.Floor(expected[k] + 0.5), population.Races[k].Persons);
 
             // A region without land from 200 m and up has no dwarves; one without land below it no elves.
@@ -338,18 +368,21 @@ public class PopulationTests
     }
 
     [Fact]
-    public void Turning_more_races_on_shares_the_same_land_between_more_races()
+    public void Turning_races_off_shares_the_same_land_between_fewer_races()
     {
         var region = new RegionId(0, 0);
-        var six = World.Create("cellgen").Advance(region, RegionStage.Planned).Plan!;
-        var all = World.Create("cellgen", AllRacesOn()).Advance(region, RegionStage.Planned).Plan!;
+        var all = World.Create("cellgen").Advance(region, RegionStage.Planned).Plan!;
+        var humans = World.Create("cellgen", OnlyOn(HumanRaces)).Advance(region, RegionStage.Planned).Plan!;
 
-        Assert.Equal(23, all.Population.Races.Count);
-        // The races share the same land differently. The total only grows by land that none of the six
-        // lives on (Ice & snow below 200 m). Each race is rounded on its own.
-        Assert.InRange(all.Population.Total - six.Population.Total, -23, six.Population.Total / 50);
-        Assert.True(all.Population.Of("human") < six.Population.Of("human"));
+        Assert.Equal(28, all.Population.Races.Count);
+        Assert.Equal(HumanRaces, humans.Population.Races.Select(r => r.Race));
+        // The seven human races live in every biome and at every height between them, so the land feeds
+        // as many persons with them alone. Each race is rounded on its own.
+        Assert.InRange(all.Population.Total - humans.Population.Total, -28, 28);
+        foreach (var race in HumanRaces)
+            Assert.True(humans.Population.Of(race) >= all.Population.Of(race));
+        Assert.True(humans.Population.Of("midlanders") > all.Population.Of("midlanders"));
         // The races do not move the Prospects.
-        Assert.Equal(DomainJson.Serialize(six.Prospects), DomainJson.Serialize(all.Prospects));
+        Assert.Equal(DomainJson.Serialize(all.Prospects), DomainJson.Serialize(humans.Prospects));
     }
 }

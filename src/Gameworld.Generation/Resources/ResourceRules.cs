@@ -5,7 +5,7 @@ namespace Gameworld.Generation.Resources;
 
 /// <summary>
 /// The patch resource rules (map-generation.md section 14 and Appendices B–D): an amount in
-/// [0, 1] and a named variant for each of the 24 raw resources. A pure function of its input.
+/// [0, 1] and a named variant for each of the 27 raw resources. A pure function of its input.
 /// </summary>
 public static class ResourceRules
 {
@@ -16,7 +16,7 @@ public static class ResourceRules
     public static PatchResources Ocean(in OceanResourceInput input)
     {
         var boost = Boost(input.Prosperity);
-        var ledger = new ResourceLedger(input.Seed, input.Patch, boost);
+        var ledger = new ResourceLedger(input.Seed, input.Patch, boost, power: 0); // no arcane materials at sea
         var t0 = input.SeaLevelTemperatureC;
 
         if (input.OnShelf)
@@ -52,11 +52,13 @@ public static class ResourceRules
         Resource.Gold => 1,
         Resource.Tin => 0.9,
         Resource.SilverAndLead => 0.9,
+        Resource.ArcaneMaterials => 0.9,
         Resource.GemsAndPearls => 0.8,
         Resource.Salt => 0.7,
         Resource.Spices => 0.7,
         Resource.CopperOre => 0.6,
         Resource.IronOre => 0.5,
+        Resource.Reagents => 0.5,
         Resource.Crystal => 0.4,
         Resource.StimulantsAndSugar => 0.4,
         Resource.FursAndIvory => 0.35,
@@ -67,6 +69,9 @@ public static class ResourceRules
         _ => 0,
     };
 
+    /// <summary>The supernatural power (14.1): 0 up to a Supernatural of 60, a half at 75 and 1 from 90.</summary>
+    public static double Power(double supernatural) => Math.Clamp((supernatural - 60) / 30, 0, 1);
+
     /// <summary>The fur gate of an ocean patch (D.3): hashed on the patch, not the zone.</summary>
     private static bool OceanFurGate(in OceanResourceInput input, double boost) =>
         Hashing.Unit(input.Seed, 0x5e05, input.Patch.I, input.Patch.J) < 0.5 * boost;
@@ -76,7 +81,7 @@ public static class ResourceRules
 /// The amounts of one patch while the rules run: <c>put</c>, <c>pick</c> and the deposit roll
 /// of sections 14.1 and 14.4, and the two summaries of 14.5.
 /// </summary>
-internal sealed class ResourceLedger(uint seed, GridCoord patch, double boost)
+internal sealed class ResourceLedger(uint seed, GridCoord patch, double boost, double power)
 {
     private readonly ResourceAmount[] _amounts = new ResourceAmount[ResourceCatalog.Count];
 
@@ -102,12 +107,15 @@ internal sealed class ResourceLedger(uint seed, GridCoord patch, double boost)
 
     /// <summary>
     /// A deposit kind (14.4): present when the patch's hash of the kind is below the chance
-    /// (× boost for the valuables), with richness rich · (0.35 + 0.65 · hash).
+    /// (× boost for the valuables, × power for the arcane materials), with richness
+    /// rich · (0.35 + 0.65 · hash).
     /// </summary>
     public void Deposit(int kind, Resource resource, string variant, double chance, double rich = 1)
     {
         if (chance <= 0) return;
         if (IsBoosted(resource)) chance *= boost;
+        if (resource == Resource.ArcaneMaterials) chance *= power;
+        if (chance <= 0) return;
         if (!(Hashing.Unit(seed, 0x5e400u + (uint)kind, patch.I, patch.J) < chance)) return;
         var richness = rich * (0.35 + 0.65 * Hashing.Unit(seed, 0x5e800u + (uint)kind, patch.I, patch.J));
         Put(resource, richness, variant, ResourceOrigin.Deposit);
@@ -166,7 +174,7 @@ internal sealed class LandRules
     private readonly bool _lake, _harbour, _coastal, _riverPoor;
 
     // Derived values (14.1).
-    private readonly double _boost, _tg, _season, _irr;
+    private readonly double _prosperity, _boost, _tg, _season, _irr;
     private readonly bool _tropicalHighland, _floodplain;
 
     public LandRules(in LandResourceInput input)
@@ -176,8 +184,9 @@ internal sealed class LandRules
 
         _seed = input.Seed;
         _zone = input.Zone;
+        _prosperity = input.Prosperity;
         _boost = ResourceRules.Boost(input.Prosperity);
-        _out = new ResourceLedger(input.Seed, input.Patch, _boost);
+        _out = new ResourceLedger(input.Seed, input.Patch, _boost, ResourceRules.Power(input.Supernatural));
 
         var biome = input.Biome;
         _biome = biome.Biome;
@@ -255,6 +264,9 @@ internal sealed class LandRules
         Furs();
         Dyes();
         Horses();
+        Reagents();
+        Herbs();
+        ArcaneMaterials();
         return _out.Build();
     }
 
@@ -503,6 +515,9 @@ internal sealed class LandRules
         else return;
 
         _out.Deposit(1, r, variant, ByZone(0.04, 0.12, 0.75, 0.95) * factor, ByZone(0.35, 0.5, 0.85, 1));
+
+        // A kind of its own, not a name in the pick of the clastic basins, so kind 1 keeps its variants.
+        if (_clastic && !_mountains) _out.Deposit(52, r, "gypsum and alabaster", 0.04, 0.8);
     }
 
     private void Clay()
@@ -766,8 +781,21 @@ internal sealed class LandRules
     private void Horses()
     {
         var amount = _f.Mounts * ByZone(1, 1, 0.7, 0.4);
+        if (_biome == Biome.IceAndSnow && !_coastal) amount = 0;
         string variant;
-        if (_biome is Biome.HotDesert or Biome.ThornScrub)
+        if (_biome == Biome.IceAndSnow)
+        {
+            variant = "sled dogs";
+        }
+        else if (_biome == Biome.Tundra)
+        {
+            variant = _out.Pick(Resource.HorsesAndPackAnimals, "reindeer", "sled dogs");
+        }
+        else if (_biome == Biome.BorealForest)
+        {
+            variant = "reindeer";
+        }
+        else if (_biome is Biome.HotDesert or Biome.ThornScrub)
         {
             variant = _high ? "donkeys and mules" : "dromedary camel";
         }
@@ -785,10 +813,99 @@ internal sealed class LandRules
             variant = "donkeys and mules";
             amount = Math.Max(amount, 0.3 * _f.Pasture);
         }
+        else if (_biome is Biome.TropicalDryForest or Biome.TropicalRainForest)
+        {
+            variant = "elephants";
+        }
         else
         {
             variant = "horses";
         }
         if (amount > 0) _out.Put(Resource.HorsesAndPackAnimals, amount, variant);
+    }
+
+    // ---- The resources of 2026-11-15: reagents, herbs and arcane materials ------------------
+
+    private void Reagents()
+    {
+        const Resource r = Resource.Reagents;
+
+        if (_volcanic && _high)
+        {
+            _out.Deposit(53, r, "alum", 0.06);
+            _out.Deposit(55, r, "sulphur", 0.05);
+            _out.Deposit(56, r, "quicksilver", 0.015);
+        }
+
+        if (_clastic && (_hills || _lowland)) _out.Deposit(54, r, "alum shale and vitriol", 0.03, 0.7);
+
+        // "As 9": the zones of the playa salt, behind the same gate.
+        if (_riverPoor && _m < 0.5 && ZoneGate(0x5e02, 0.08))
+        {
+            _out.Deposit(57, r, "saltpetre", 0.1, 0.8);
+            _out.Deposit(59, r, "borax", 0.05, 0.8);
+        }
+
+        if (_carbonate && _hills) _out.Deposit(58, r, "cave saltpetre", 0.03, 0.6);
+    }
+
+    private void Herbs()
+    {
+        var amount = _f.Herb;
+        if (_high && _biome != Biome.IceAndSnow) amount += 0.15;
+        if (amount > 0) _out.Put(Resource.Herbs, amount, HerbVariant());
+    }
+
+    private string HerbVariant()
+    {
+        const Resource r = Resource.Herbs;
+        if (_mountains && _biome is not (Biome.IceAndSnow or Biome.Tundra or Biome.HotDesert or Biome.ColdDesert))
+            return _out.Pick(r, "gentian", "arnica");
+        return _biome switch
+        {
+            Biome.Tundra => _out.Pick(r, "roseroot", "Iceland moss"),
+            Biome.BorealForest => _out.Pick(r, "bog myrtle", "Labrador tea", "yarrow"),
+            Biome.ColdSteppe => _out.Pick(r, "wormwood", "liquorice", "ephedra"),
+            Biome.ColdDesert => "ephedra",
+            Biome.TemperateGrassland => _out.Pick(r, "yarrow", "chamomile", "wormwood"),
+            Biome.WoodlandAndShrubland => _out.Pick(r, "sage", "thyme and rosemary", "poppy"),
+            Biome.TemperateMixedForest => _out.Pick(r, "hops", "valerian", "St John's wort"),
+            Biome.TemperateBroadleafForest => _out.Pick(r, "hops", "foxglove", "comfrey"),
+            Biome.TemperateRainForest => _out.Pick(r, "valerian", "angelica"),
+            Biome.HotDesert or Biome.ThornScrub => _out.Pick(r, "aloe", "senna"),
+            Biome.Savanna => _out.Pick(r, "senna", "devil's claw"),
+            Biome.TropicalDryForest => _out.Pick(r, "neem", "holy basil"),
+            Biome.TropicalRainForest => _out.Pick(r, "fever bark", "ipecac", "arrow-poison vine"),
+            _ => "water hyssop", // mangrove
+        };
+    }
+
+    /// <summary>Arcane materials (kinds 60 to 73): the chance is the chance at full supernatural power.</summary>
+    private void ArcaneMaterials()
+    {
+        const Resource r = Resource.ArcaneMaterials;
+        var hotDesert = _biome == Biome.HotDesert;
+
+        if (hotDesert || _biome is Biome.ColdDesert or Biome.IceAndSnow) _out.Deposit(60, r, "star metal", 0.4);
+        if ((_granite || _foldBelt) && _mountains) _out.Deposit(61, r, "truesilver", 0.5);
+        if (_volcanic && _high && _humid) _out.Deposit(62, r, "mana crystal", 0.6);
+        if (_clastic && _hills && _m < 1) _out.Deposit(63, r, "dragonbone", 0.5);
+        if (_carbonate && !_flat && _humid) _out.Deposit(64, r, "glowcap fungi", 0.5, 0.7);
+        if (_coastal && _t0 >= 24) _out.Deposit(65, r, "moonpearls", 0.3);
+        if (_biome == Biome.Tundra && (_lake || _river >= 1)) _out.Deposit(66, r, "frost-lotus", 0.6);
+        if (_mountains && _belt is ThermalBelt.Polar or ThermalBelt.Subpolar) _out.Deposit(67, r, "windcrystal", 0.6);
+        if (hotDesert && _t >= 26) _out.Deposit(68, r, "sunstone", 0.4);
+
+        // Elderwood stands in forest that people have left alone: low prosperity.
+        var forest = _biome is Biome.BorealForest or Biome.TemperateMixedForest or Biome.TemperateBroadleafForest
+            or Biome.TemperateRainForest or Biome.TropicalRainForest;
+        if (forest && _prosperity < 0.4) _out.Deposit(69, r, "elderwood", 0.4);
+
+        if (_low && _biome is Biome.WoodlandAndShrubland or Biome.TemperateMixedForest or Biome.TemperateBroadleafForest)
+            _out.Deposit(70, r, "sap of Elanor", 0.4);
+        if (_tropicalHighland && _humid) _out.Deposit(71, r, "dreamleaf", 0.6);
+        if (_low && _humid && _t < 10 && _belt >= ThermalBelt.Boreal) _out.Deposit(72, r, "ghostlight peat", 0.4, 0.7);
+        if (_low && _biome is Biome.ColdSteppe or Biome.TemperateGrassland or Biome.ThornScrub or Biome.Savanna)
+            _out.Deposit(73, r, "stormglass", 0.3);
     }
 }

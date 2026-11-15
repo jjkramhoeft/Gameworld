@@ -219,7 +219,7 @@ Ice & snow, Tundra, Cold steppe, Boreal forest, Cold desert, Temperate grassland
 
 #### Resource
 
-What a patch holds for people to use. The generation gives every patch an amount for each of 24 raw resources, and a variant of each: rye is a variant of grain. A potential is what the land can yield. A deposit is a rare find that often needs to be mined.
+What a patch holds for people to use. The generation gives every patch an amount for each of 27 raw resources, and a variant of each: rye is a variant of grain. One of them, the arcane materials, lies only where the Supernatural Field is high. A potential is what the land can yield. A deposit is a rare find that often needs to be mined.
 
 Resources are split in groups to make trade and needs manageable: Food, Materials, Fuel, Luxuries, Metals and Animals are found in patches, and Building, Tools, Gear, Weapons and Clothing are only produced. A product is produced from resources and is not generated with the map. The groups and the catalogue of variants are in docs/map-generation.md Appendix G.
 
@@ -239,9 +239,9 @@ The peoples that live on the map. The Stub of every entity in this group is deri
 
 #### Race
 
-A people that can live in the world: humans, elves, dwarves and so on. Races are needed to generate factions, families and persons.
+A people that can live in the world: Northmen, Elves, Dwarves and so on. Races are needed to generate factions, families and persons. Race is the only level: a race has no sub-races, and each human people is a race of its own, so there is no plain human race.
 
-The races are a list in the Parameter Set, not a fixed set in the code. Each race has an id, a name, a toggle (on or off), a frequency for each biome and a height modifier. The default list holds 23 races, of which Human, Elf, Dwarf, Halfling, Orc and Goblin are on (docs/society-generation.md Appendix A). How a faction, a family or a person gets its race is not decided yet.
+The races are a list in the Parameter Set, not a fixed set in the code. Each race has an id, a name, a toggle (on or off), a frequency for each biome and a height modifier. The default list holds 28 races, all on: seven human races (Northmen, Midlanders, Saltroad folk, Sunlanders, Grass riders, Rainkeepers, Canal folk), five classic races (Elves, Dwarves, Halflings, Gnomes, Orcs) and sixteen new near-human races (docs/society-generation.md Appendix A). How a faction, a family or a person gets its race is not decided yet.
 
 #### Potential population
 
@@ -263,11 +263,11 @@ A family of NPCs, typically living together in a household. It can include serva
 
 #### Person
 
-An NPC in the game. The Stub of a person holds name, age, sex, role, family links, faction membership and home. The name is not authored: it comes from the name generator, so a person has a name already as a Stub. The textual description, the history and the portrait are authored.
+An NPC in the game. The Stub of a person holds name, age, sex, vocation, role, family links, faction membership and home. The name is not authored: it comes from the name generator, so a person has a name already as a Stub. The textual description, the history and the portrait are authored.
 
 #### Vocation
 
-The work a person does. Vocations are not specified yet, and how a vocation stands to the role of a person is not decided.
+The work a person does: farmer, smith, priest. A person has one vocation and can have a by-work, a second vocation beside it. The vocation is not the role: the role is the position of the person in the household, in the vocation or in a faction. The vocations will be a list in the Parameter Set, like the races. They are not specified yet.
 
 #### Looks
 
@@ -283,7 +283,7 @@ What a portrait of a person must show: the body and the face, the hair, the outf
 | [docs/default-parameter-set.json](docs/default-parameter-set.json) | The default Parameter Set |
 | [docs/parameter-set.schema.json](docs/parameter-set.schema.json) | The JSON Schema of a Parameter Set file. Generated, do not edit |
 | [docs/adding-a-race.md](docs/adding-a-race.md) | The steps to add a race |
-| [docs/races-basis.md](docs/races-basis.md) | A proposal for a reworked race list of 32 races |
+| [docs/races-basis.md](docs/races-basis.md) | The 28 default races: looks, history, way of life, vocations and factions |
 | [docs/NameGenerator-Reuse.md](docs/NameGenerator-Reuse.md) | The person-name generator |
 | [docs/research/](docs/research/) | The source notes behind the research document |
 | [docs/plans/](docs/plans/) | Plans for changes that are not implemented yet |

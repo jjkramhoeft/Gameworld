@@ -23,6 +23,8 @@ public sealed class PatchDetail
     public required double FieldPrecipitationMm { get; init; }
     /// <summary>The Prosperity field at the patch's site, rescaled to 0–1.</summary>
     public required double Prosperity { get; init; }
+    /// <summary>The Supernatural field at the patch's site, 0–100.</summary>
+    public required double Supernatural { get; init; }
     /// <summary>The estimated biome (typical height of the elevation type); null for an ocean patch.</summary>
     public BiomeRecord? Biome { get; init; }
     /// <summary>The biome computed without height cooling is hot or cold desert.</summary>
@@ -113,6 +115,7 @@ internal static class DetailBuilder
             var t0 = world.Fields.InitialTemperature(shape.Site);
             var p0 = world.Fields.Precipitation(shape.Site);
             var prosperity = world.Fields.Sample01(FieldKind.Prosperity, shape.Site);
+            var supernatural = world.Fields.Sample(FieldKind.Supernatural, shape.Site);
             if (shape.Ocean)
             {
                 patches[i] = new PatchDetail
@@ -124,6 +127,7 @@ internal static class DetailBuilder
                     SeaLevelTemperatureC = t0,
                     FieldPrecipitationMm = p0,
                     Prosperity = prosperity,
+                    Supernatural = supernatural,
                 };
                 continue;
             }
@@ -140,6 +144,7 @@ internal static class DetailBuilder
                 SeaLevelTemperatureC = t0,
                 FieldPrecipitationMm = p0,
                 Prosperity = prosperity,
+                Supernatural = supernatural,
                 Biome = biomes.Classify(t0, p0, BiomeRules.TypicalHeightM(type), type, shape.Coastal, riverPoor),
                 DesertAtSeaLevel = seaLevel.Biome is Biome.HotDesert or Biome.ColdDesert,
             };
@@ -173,7 +178,7 @@ internal static class DetailBuilder
                 seed, patch.Root, patch.Shape.Coastal, patch.SeaLevelTemperatureC, patch.Prosperity));
         return world.LandResources(new LandResourceInput(
             seed, patch.Root, patch.Shape.Zone, biome!, patch.ZoneType, patch.Bedrock,
-            patch.Shape.Coastal, patch.RiverPoor, patch.Water, patch.Prosperity));
+            patch.Shape.Coastal, patch.RiverPoor, patch.Water, patch.Prosperity, patch.Supernatural));
     }
 
     /// <summary>The water site of every land patch (section 14.1).</summary>

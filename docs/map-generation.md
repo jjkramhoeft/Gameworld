@@ -568,7 +568,7 @@ gives the plain fBm.
 Uses: initial temperature and precipitation feed the biomes; precipitation also thins the rivers
 of dry flat zones (next section); prosperity feeds resources, Prospect scores and the
 potential population ([society-generation.md](society-generation.md) section 3); the
-supernatural field feeds nothing yet.
+supernatural field feeds the arcane materials of the resources (14.1).
 
 ### 9.1 Distribution
 
@@ -1229,14 +1229,18 @@ is bound to warm low coasts.
 
 Stage: Detailed (estimated) and Elevated (final).
 
-Every patch gets an amount in [0, 1] for each of 24 raw
+Every patch gets an amount in [0, 1] for each of 27 raw
 resources, plus a named variant ("grain: rye", "timber: teak"). A resource is listed for
 a patch when its amount is at least 0.25. The layer is a pure function of the patch.
 
-The 24 resources: grain, produce, orchard, livestock, fish, wild food & game (food);
-timber, stone, clay, crystal, fibre (materials); fuel; salt; iron ore, copper ore, tin,
-silver & lead, gold (metals); gems & pearls, spices, stimulants & sugar, furs & ivory,
-dyes (luxuries); horses & pack animals.
+The 27 resources: grain, produce, orchard, livestock, fish, wild food & game (food);
+timber, stone, clay, crystal, fibre, reagents, herbs (materials); fuel; salt; iron ore,
+copper ore, tin, silver & lead, gold (metals); gems & pearls, spices, stimulants & sugar,
+furs & ivory, dyes, arcane materials (luxuries); horses & pack animals.
+
+Reagents, herbs and arcane materials were added on 2026-11-15, for the vocations of
+[society-generation.md](society-generation.md) section 8. They are last in the resource
+index (Appendix D), so the rules of the first 24 keep their hashes.
 
 ### 14.1 Inputs per patch
 
@@ -1275,6 +1279,11 @@ dyes (luxuries); horses & pack animals.
   boost `(2 · prosperity)²` (¼ in poor land, 1 in the middle, 4 at the top). The boost
   multiplies the chances of the valuable resources only: silver & lead, gold, gems,
   spices, stimulants, furs, dyes.
+- **Supernatural** at the site, 0–100 (section 9), and its power
+  `power = clamp((supernatural − 60) / 30, 0, 1)`. The power is 0 on the nine tenths of
+  the map below 60, a half at 75 and 1 from 90. It multiplies the chances of the arcane
+  materials only. A Parameter Set whose Supernatural field never passes 60 has no arcane
+  materials.
 
 Whenever a rule sets an amount, the amount is first clamped to [0, 1] and replaces the
 resource's current amount (and variant) only if it is strictly larger, so on a tie the
@@ -1337,10 +1346,11 @@ below is an overview; where its wording is looser than Appendix D, the appendix 
 | Fuel | 0.9 × timber; peat 0.6 on cool wet low ground; dung 0.35 × livestock; plus coal deposits |
 | Furs & ivory | `fur(biome)`, only in a hashed share of zones (half of the cold ones, three tenths of the hot ones, × boost) |
 | Honey (stimulants) | `honey(biome)`, 0–0.3 |
-| Horses | `mounts(biome) · zone factor (1, 1, 0.7, 0.4)`; camels in deserts, mules in hills |
+| Horses | `mounts(biome) · zone factor (1, 1, 0.7, 0.4)`; camels in deserts, mules in hills, reindeer and sled dogs in the cold, elephants in the tropical forests |
+| Herbs | `herb(biome)`, + 0.15 in hills and mountains |
 
 This table is a summary. The exact rules, including the variant names, are in Appendix D.1
-and the biome factors (pasture, game, wood, fur, mounts, honey, soil, tree ground) in
+and the biome factors (pasture, game, wood, fur, mounts, honey, herb, soil, tree ground) in
 Appendix C.
 
 ### 14.4 Deposits
@@ -1348,17 +1358,17 @@ Appendix C.
 Deposits are rare point resources. Each kind has a fixed purpose number; for a patch:
 
 ```
-present  = toUnit(hash4(seed, 0x5e400 + kind, patch i, patch j)) < chance (× boost for valuables)
+present  = toUnit(hash4(seed, 0x5e400 + kind, patch i, patch j)) < chance (× boost for valuables, × power for arcane materials)
 richness = rich · (0.35 + 0.65 · toUnit(hash4(seed, 0x5e800 + kind, patch i, patch j)))
 ```
 
 A resource keeps the largest amount any of its kinds gives. The chances depend on bedrock,
-elevation type, climate and water. In summary (all 51 kinds with their exact conditions,
+elevation type, climate and water. In summary (all 73 kinds with their exact conditions,
 chances and kind numbers are in Appendix D.2):
 
 | Resource | Where (chance per patch) |
 |---|---|
-| Stone | by elevation type: 0.04 flat, 0.12 lowland, 0.75 hills, 0.95 mountains; × 2.5 on carbonate, × 2 on basalt, × 1.6 on clastic, × 0.5 on cover |
+| Stone | by elevation type: 0.04 flat, 0.12 lowland, 0.75 hills, 0.95 mountains; × 2.5 on carbonate, × 2 on basalt, × 1.6 on clastic, × 0.5 on cover; gypsum and alabaster in clastic basins 0.04 |
 | Crystal | hills and mountains 0.03–0.05 (× 2 granite or fold belt, × 3 volcanic); glass sand on coasts and navigable rivers |
 | Coal, lignite, oil seeps | clastic basins: 0.04, 0.04, 0.01 |
 | Salt | solar salt on dry warm low coasts 0.25; playa salt in 8 % of arid river-poor flat zones 0.3; rock salt and brine in 5 % of clastic basins 0.12 / 0.08 |
@@ -1368,12 +1378,26 @@ chances and kind numbers are in Appendix D.2):
 | Silver & lead | fold-belt highlands 0.05; carbonate lowland and hills 0.025–0.06; volcanic mountains 0.03 |
 | Gold | lodes in fold-belt highlands, shield hills, volcanic mountains 0.03; placer gold `0.2 · goldLoad` on rivers below; beach gold at river mouths |
 | Gems | by bedrock in highlands (0.004 for diamond and emerald up to 0.04 for jade, agate, topaz); amber on cool clastic coasts; pearls on warm coasts 0.04 |
+| Reagents | alum 0.06, sulphur 0.05 and quicksilver 0.015 in volcanic highlands; alum shale and vitriol in clastic lowland and hills 0.03; saltpetre 0.1 and borax 0.05 in the zones of the playa salt; cave saltpetre in carbonate hills 0.03 |
+| Arcane materials | 14 kinds, each with a chance of 0.3–0.6 × power where its bedrock or biome fits: star metal in deserts and on ice, truesilver in granite and fold-belt mountains, mana crystal in wet volcanic highlands, elderwood in forest of low prosperity, and so on |
 
 Copper and tin come from different bedrock typees, so no zone has both: bronze needs
 trade.
 
+The reagents make the volcanic highlands the land of the dyer, the glassmaker and the
+alchemist: one patch in seven there has one. The arcane materials lie only where the
+supernatural field is high, which at the defaults is a tenth of the map.
+
+Measured over the 81 regions around the origin of the seed "cellgen", on the estimated
+resources of the Detailed stage: reagents are listed in 1.1 % of the land patches and in
+49 of the 81 regions. Arcane materials are listed in 1.0 % of the land patches: 1.8
+patches per region on average, with a median of 1, a maximum of 6 and none in 14 of the
+regions. Herbs are listed in 70 % of the land patches. Horses & pack animals are listed
+in 64 % of them, up from 44 % before the reindeer, the sled dogs and the elephants.
+
 **Ocean patches** have fish (0.9 next to land, 0.5 in open water) and, next to land,
 seaweed in cool water, seals in cold water, pearls or coral in warm water (Appendix D.3).
+They have no reagents, herbs or arcane materials.
 
 ### 14.5 Summaries
 
@@ -1382,8 +1406,9 @@ Two summary numbers per patch feed the Prospect scores:
 ```
 food   = clamp(0.75 · max(grain, 0.8 · produce) + 0.2 · livestock + 0.1 · orchard + 0.05 · wildFood, 0, 1)
 wealth = Σ tradeValue(r) · amount(r)   over resources with amount ≥ 0.25
-tradeValue: gold 1, tin 0.9, silver 0.9, gems 0.8, salt 0.7, spices 0.7, copper 0.6, iron 0.5,
-            crystal 0.4, stimulants 0.4, furs 0.35, dyes 0.3, horses 0.2, orchard 0.1, fibre 0.1, others 0
+tradeValue: gold 1, tin 0.9, silver 0.9, arcane materials 0.9, gems 0.8, salt 0.7, spices 0.7,
+            copper 0.6, iron 0.5, reagents 0.5, crystal 0.4, stimulants 0.4, furs 0.35, dyes 0.3,
+            horses 0.2, orchard 0.1, fibre 0.1, others 0
 ```
 
 ---
@@ -2037,29 +2062,29 @@ a fibre; the prosperity boost for spices, stimulants and dyes).
 
 ## Appendix C. Factors by biome
 
-Soil and tree ground are used by the crops (14.2); pasture, game, wood, fur, mounts and
-honey by the other potentials (Appendix D); "veg" is the travel slowdown of the
+Soil and tree ground are used by the crops (14.2); pasture, game, wood, fur, mounts, honey
+and herb by the other potentials (Appendix D); "veg" is the travel slowdown of the
 central-place graph (15.2); "road cost" is the biome factor of the travel grid (16.1).
 
-| Biome | Soil | Tree ground | Pasture | Game | Wood | Fur | Mounts | Honey | Veg | Road cost |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Ocean | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 1 |
-| Ice & snow | 0 | 0 | 0 | 0.05 | 0 | 0 | 0 | 0 | 1.5 | 5 |
-| Tundra | 0.3 | 0.2 | 0.25 | 0.3 | 0 | 0.5 | 0 | 0 | 1.1 | 1.6 |
-| Cold steppe | 1 | 1 | 0.7 | 0.3 | 0.08 | 0.15 | 0.9 | 0.1 | 1 | 1.1 |
-| Boreal forest | 0.55 | 1 | 0.25 | 0.7 | 1 | 0.85 | 0 | 0.2 | 1.3 | 1.4 |
-| Cold desert | 1 | 1 | 0.2 | 0.1 | 0 | 0 | 0.5 | 0 | 1 | 3.5 |
-| Temperate grassland | 1 | 1 | 1 | 0.4 | 0.1 | 0 | 0.9 | 0.2 | 1 | 1 |
-| Woodland & shrubland | 1 | 1 | 0.7 | 0.45 | 0.4 | 0 | 0.3 | 0.3 | 1.1 | 1.1 |
-| Temperate mixed forest | 1 | 1 | 0.6 | 0.8 | 1 | 0.3 | 0.15 | 0.2 | 1.3 | 1.3 |
-| Temperate broadleaf forest | 1 | 1 | 0.6 | 0.8 | 1 | 0.1 | 0.15 | 0.3 | 1.3 | 1.3 |
-| Temperate rain forest | 0.55 | 1 | 0.5 | 0.8 | 1 | 0.2 | 0 | 0.15 | 2 | 2 |
-| Hot desert | 1 | 1 | 0.15 | 0.05 | 0 | 0 | 0.5 | 0 | 1.1 | 4 |
-| Thorn scrub | 0.7 | 1 | 0.5 | 0.3 | 0.25 | 0.25 | 0.4 | 0.15 | 1.1 | 1.5 |
-| Savanna | 0.6 | 1 | 0.8 | 0.6 | 0.35 | 0.4 | 0.3 | 0.2 | 1 | 1.05 |
-| Tropical dry forest | 0.7 | 1 | 0.45 | 0.6 | 0.8 | 0.35 | 0.1 | 0.2 | 1.3 | 1.3 |
-| Tropical rain forest | 0.4 | 1 | 0.15 | 0.6 | 1 | 0.35 | 0 | 0.15 | 2 | 2.2 |
-| Mangrove | 0.3 | 0.4 | 0.1 | 0.4 | 0.5 | 0 | 0 | 0.1 | 2 | 3 |
+| Biome | Soil | Tree ground | Pasture | Game | Wood | Fur | Mounts | Honey | Herb | Veg | Road cost |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Ocean | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 1 |
+| Ice & snow | 0 | 0 | 0 | 0.05 | 0 | 0 | 0.25 | 0 | 0 | 1.5 | 5 |
+| Tundra | 0.3 | 0.2 | 0.25 | 0.3 | 0 | 0.5 | 0.3 | 0 | 0.15 | 1.1 | 1.6 |
+| Cold steppe | 1 | 1 | 0.7 | 0.3 | 0.08 | 0.15 | 0.9 | 0.1 | 0.3 | 1 | 1.1 |
+| Boreal forest | 0.55 | 1 | 0.25 | 0.7 | 1 | 0.85 | 0.25 | 0.2 | 0.4 | 1.3 | 1.4 |
+| Cold desert | 1 | 1 | 0.2 | 0.1 | 0 | 0 | 0.5 | 0 | 0.1 | 1 | 3.5 |
+| Temperate grassland | 1 | 1 | 1 | 0.4 | 0.1 | 0 | 0.9 | 0.2 | 0.4 | 1 | 1 |
+| Woodland & shrubland | 1 | 1 | 0.7 | 0.45 | 0.4 | 0 | 0.3 | 0.3 | 0.8 | 1.1 | 1.1 |
+| Temperate mixed forest | 1 | 1 | 0.6 | 0.8 | 1 | 0.3 | 0.15 | 0.2 | 0.6 | 1.3 | 1.3 |
+| Temperate broadleaf forest | 1 | 1 | 0.6 | 0.8 | 1 | 0.1 | 0.15 | 0.3 | 0.6 | 1.3 | 1.3 |
+| Temperate rain forest | 0.55 | 1 | 0.5 | 0.8 | 1 | 0.2 | 0 | 0.15 | 0.6 | 2 | 2 |
+| Hot desert | 1 | 1 | 0.15 | 0.05 | 0 | 0 | 0.5 | 0 | 0.1 | 1.1 | 4 |
+| Thorn scrub | 0.7 | 1 | 0.5 | 0.3 | 0.25 | 0.25 | 0.4 | 0.15 | 0.35 | 1.1 | 1.5 |
+| Savanna | 0.6 | 1 | 0.8 | 0.6 | 0.35 | 0.4 | 0.3 | 0.2 | 0.4 | 1 | 1.05 |
+| Tropical dry forest | 0.7 | 1 | 0.45 | 0.6 | 0.8 | 0.35 | 0.3 | 0.2 | 0.6 | 1.3 | 1.3 |
+| Tropical rain forest | 0.4 | 1 | 0.15 | 0.6 | 1 | 0.35 | 0.25 | 0.15 | 0.8 | 2 | 2.2 |
+| Mangrove | 0.3 | 0.4 | 0.1 | 0.4 | 0.5 | 0 | 0 | 0.1 | 0.3 | 2 | 3 |
 
 ---
 
@@ -2073,12 +2098,13 @@ larger amount. `pick[a, b, …]` chooses one name by
 `hash4(seed, 0x5e10 + resource index, patch i, patch j) mod count`, where the resource
 index is its position in this list (from 0): grain, produce, orchard, livestock, fish, wild
 food, timber, stone, clay, crystal, fibre, fuel, salt, iron ore, copper ore, tin,
-silver & lead, gold, gems, spices, stimulants, furs, dyes, horses.
+silver & lead, gold, gems, spices, stimulants, furs, dyes, horses, reagents, herbs, arcane
+materials.
 
 The rules run in this order, because fuel reads the timber and livestock amounts: grain,
 produce, orchard (crops) → livestock → fish → wild food → timber → stone → clay → crystal →
 fibre (crops) → fuel → salt → metals → gems → spices, stimulants (crops) → honey → furs →
-dyes → horses.
+dyes → horses → reagents → herbs → arcane materials.
 
 ### D.1 Potentials
 
@@ -2161,17 +2187,30 @@ ivory]. A biome with none of these on a coast with `T₀ < 3` gives seals at 0.3
 **Dyes.** The dye crops, plus lichen dyes at 0.15 on tundra and in temperate rain forest,
 plus the deposits murex and kermes below.
 
-**Horses & pack animals.** Amount = `mounts · (1, 1, 0.7, 0.4 by elevation type)`. Variant,
-first match: hot desert or thorn scrub → donkeys and mules (high) or dromedary camel; cold
-desert → Bactrian camel; tropical highland in mountains → llama and alpaca-like camelids,
-amount at least `0.5 · pasture`; high → donkeys and mules, amount at least `0.3 · pasture`;
-else horses.
+**Horses & pack animals.** Amount = `mounts · (1, 1, 0.7, 0.4 by elevation type)`; on ice
+it is 0 unless coastal. Variant, first match: ice → sled dogs; tundra → pick[reindeer, sled
+dogs]; boreal forest → reindeer; hot desert or thorn scrub → donkeys and mules (high) or
+dromedary camel; cold desert → Bactrian camel; tropical highland in mountains → llama and
+alpaca-like camelids, amount at least `0.5 · pasture`; high → donkeys and mules, amount at
+least `0.3 · pasture`; tropical dry forest or tropical rain forest → elephants; else
+horses.
+
+**Herbs.** Amount = `herb`, + 0.15 in hills and mountains outside ice. Variant by biome: tundra pick[roseroot, Iceland moss]; boreal forest pick[bog myrtle,
+Labrador tea, yarrow]; cold steppe pick[wormwood, liquorice, ephedra]; cold desert
+ephedra; grassland pick[yarrow, chamomile, wormwood]; shrubland pick[sage, thyme and
+rosemary, poppy]; mixed forest pick[hops, valerian, St John's wort]; broadleaf pick[hops,
+foxglove, comfrey]; temperate rain forest pick[valerian, angelica]; hot desert and thorn
+scrub pick[aloe, senna]; savanna pick[senna, devil's claw]; dry forest pick[neem, holy
+basil]; rain forest pick[fever bark, ipecac, arrow-poison vine]; mangrove water hyssop.
+Override: in mountains (not ice, tundra or a desert) pick[gentian, arnica]. The wild herbs of wild
+food stay as they are: they are the herbs of the kitchen, and these are the herbs of the
+healer, the brewer and the alchemist.
 
 ### D.2 Deposits
 
 `#` is the kind number of the hash purpose (14.4). The chance is multiplied by the
-prosperity boost for silver & lead, gold, gems, furs and dyes. "Rich" is the richness
-factor (1 when blank).
+prosperity boost for silver & lead, gold, gems, furs and dyes, and by the supernatural
+power for arcane materials (14.1). "Rich" is the richness factor (1 when blank).
 
 | # | Resource | Variant | Condition | Chance | Rich |
 |---|---|---|---|---|---|
@@ -2226,6 +2265,28 @@ factor (1 when blank).
 | 49 | Furs | musk deer | mountains; boreal belt | 0.03 | |
 | 50 | Gems | pearl oyster (ocean patch) | next to land; `T₀ ≥ 20` | 0.05 | |
 | 51 | Gems | precious red coral (ocean patch) | next to land; `11 ≤ T₀ < 20` | 0.03 | |
+| 52 | Stone | gypsum and alabaster | clastic; not mountains | 0.04 | 0.8 |
+| 53 | Reagents | alum | volcanic; high | 0.06 | |
+| 54 | Reagents | alum shale and vitriol | clastic; hills or lowland | 0.03 | 0.7 |
+| 55 | Reagents | sulphur | volcanic; high | 0.05 | |
+| 56 | Reagents | quicksilver | volcanic; high | 0.015 | |
+| 57 | Reagents | saltpetre | as 9 | 0.1 | 0.8 |
+| 58 | Reagents | cave saltpetre | carbonate; hills | 0.03 | 0.6 |
+| 59 | Reagents | borax | as 9 | 0.05 | 0.8 |
+| 60 | Arcane materials | star metal | hot desert, cold desert or ice | 0.4 | |
+| 61 | Arcane materials | truesilver | granite or fold belt; mountains | 0.5 | |
+| 62 | Arcane materials | mana crystal | volcanic; high; humid | 0.6 | |
+| 63 | Arcane materials | dragonbone | clastic; hills; `m < 1` | 0.5 | |
+| 64 | Arcane materials | glowcap fungi | carbonate; not flat; humid | 0.5 | 0.7 |
+| 65 | Arcane materials | moonpearls | coastal; `T₀ ≥ 24` | 0.3 | |
+| 66 | Arcane materials | frost-lotus | tundra; a lake or `river ≥ 1` | 0.6 | |
+| 67 | Arcane materials | windcrystal | mountains; polar or subpolar belt | 0.6 | |
+| 68 | Arcane materials | sunstone | hot desert; `T ≥ 26` | 0.4 | |
+| 69 | Arcane materials | elderwood | boreal forest, mixed forest, broadleaf, temperate rain forest or tropical rain forest; prosperity below 0.4 | 0.4 | |
+| 70 | Arcane materials | sap of Elanor | shrubland, mixed forest or broadleaf; low | 0.4 | |
+| 71 | Arcane materials | dreamleaf | tropical highland; humid | 0.6 | |
+| 72 | Arcane materials | ghostlight peat | low; humid; `T < 10`; boreal or warmer | 0.4 | 0.7 |
+| 73 | Arcane materials | stormglass | cold steppe, grassland, thorn scrub or savanna; low | 0.3 | |
 
 **Stone by bedrock** (bedrock factor on the chance, then the variant): shield and granite
 × 1, granite; fold belt × 1, pick[slate, slate, marble] in mountains, else pick[slate,
@@ -2234,6 +2295,15 @@ basalt × 2, pick[basalt, basalt, millstone and quern stone]; ophiolite × 1, so
 carbonate × 2.5, pick[chalk, limestone, flint and chert] on low ground, else
 pick[limestone, limestone, marble]; clastic × 1.6, pick[sandstone, sandstone, millstone
 and quern stone]; unconsolidated cover × 0.5, field stone and boulders.
+
+**Gypsum and alabaster** (kind 52) is a kind of its own and not a name in the pick of the
+clastic basins, so the stone of kind 1 keeps its variants. Where both are present the
+larger amount wins, as for every resource.
+
+**Arcane materials** (kinds 60 to 73). The chance in the table is the chance at full
+power: `present = hash < chance · power` (14.1). Prosperity in the condition of elderwood
+is the rescaled prosperity of 14.1: elderwood stands in forest that people have left
+alone. The prosperity boost does not apply to arcane materials.
 
 ### D.3 Ocean patches
 
@@ -2272,11 +2342,11 @@ The table is an example and not binding yet.
 | `shield`    | Crystalline shield   | flat, lowland, hills    | Granite, banded iron, lode gold (hills), diamonds, kaolin     |
 | `foldBelt`  | Fold belt            | hills, mountains        | Slate, marble, silver, lode gold, garnet, emerald             |
 | `granite`   | Granite intrusion    | hills, mountains        | Granite, tin lodes, skarn iron, topaz and beryl, kaolin       |
-| `volcanic`  | Volcanic arc         | mountains               | Basalt, obsidian, pumice, porphyry copper, gold, rock crystal |
+| `volcanic`  | Volcanic arc         | mountains               | Basalt, obsidian, pumice, porphyry copper, gold, rock crystal, alum, sulphur, quicksilver |
 | `basalt`    | Flood basalt         | flat, lowland, hills    | Basalt, native copper, agate, black sands                     |
 | `ophiolite` | Ophiolite            | hills, mountains        | Soapstone, massive-sulfide copper, jade                       |
-| `carbonate` | Carbonate platform   | lowland, hills          | Limestone, chalk, flint, lead and zinc, skarn iron            |
-| `clastic`   | Clastic basin        | flat, lowland           | Sandstone, coal, lignite, red-bed copper, rock salt, amber    |
+| `carbonate` | Carbonate platform   | lowland, hills          | Limestone, chalk, flint, lead and zinc, skarn iron, cave saltpetre |
+| `clastic`   | Clastic basin        | flat, lowland           | Sandstone, coal, lignite, red-bed copper, rock salt, amber, gypsum, alum shale |
 | `alluvium`  | Unconsolidated cover | flat, lowland           | Field stone only; clay                                        |
 
 ---
@@ -2311,17 +2381,18 @@ Resources are split in groups to make trade and the calculation of needs more ma
 - **Variant**: one of several kinds of the same resource, as rye is a variant of grain.
 - **Product**: something produced from resources. Products are not generated with the map.
 
-### G.3 The catalogue and the 24 generated resources
+### G.3 The catalogue and the 27 generated resources
 
-The generation gives every patch an amount for each of 24 raw resources, and a variant
-(section 14). The catalogue below is finer than these 24 in some rows:
+The generation gives every patch an amount for each of 27 raw resources, and a variant
+(section 14). The catalogue below is finer than these 27 in some rows:
 
 - Wild food and game are one generated resource. The same goes for solid and liquid fuel,
   silver ore and lead ore, gems and pearls, spices and incense, furs and ivory, and mounts
   and pack animals.
 - Salt is a generated resource of its own. In the catalogue it is a variant of Preserver.
-- Star metal and the sap from Elanor are fantasy resources. The generation has no rule for
-  them yet.
+- Reagents and herbs are generated resources of the group Materials. Arcane materials are
+  one generated resource of the group Luxuries, whatever the material is: star metal is a
+  metal and the sap of Elanor a preserver, and both are variants of it.
 
 The catalogue is an example and not sufficient yet. The variants the generation can
 actually pick are those of Appendices B and D.
@@ -2336,11 +2407,13 @@ actually pick are those of Appendices B and D.
 | Food | wild food | Bilberry, blueberry, cloudberry and crowberry, raspberry and bramble, sea buckthorn, elderberry, forest mushrooms, acorns, wild grass seed, lotus, water chestnut, cattail, arrowhead, maple sap, edible seaweed, kelp, wild herbs |
 | Food | game | deer, wild boar, caribou, bison and wild cattle, antelope and gazelle, wild sheep and ibex, waterfowl, upland game birds, hares and rabbits |
 | Materials | Timber | Oak, beech, ash, elm, linden, willow and osier, poplar, Scots pine, spruce, fir, larch, giant conifers, cedar, yew, cypress, Mediterranean pines, cork oak, teak, sal, mahogany, Spanish cedar, rosewood, ebony, African mahogany, iroko, balsa, eucalypt-type hardwood, thorn-scrub wood, juniper, mangrove timber, driftwood, bog oak |
-| Materials | Stone | granite, basalt, limestone, chalk, marble, sandstone, slate, flint and chert, obsidian, pumice and pozzolana, soapstone, millstone and quern stone, whetstone |
+| Materials | Stone | granite, basalt, limestone, chalk, marble, sandstone, slate, flint and chert, obsidian, pumice and pozzolana, soapstone, millstone and quern stone, whetstone, gypsum and alabaster |
 | Materials | Clay | Clay, kaolin |
 | Materials | Crystal | quartz, Rock crystal |
 | Materials | Fibre | Flax, hemp, cotton, wool, silk, wild silk, jute, ramie, kenaf, sisal and agave, abaca, New Zealand flax, esparto grass, kapok, nettle, lime-bast |
-| Materials | Preserver | Salt, Sap from the Elven flower Elanor |
+| Materials | Preserver | Salt |
+| Materials | Reagents | Alum, alum shale and vitriol, sulphur, quicksilver, saltpetre, cave saltpetre, borax |
+| Materials | Herbs | Roseroot, Iceland moss, bog myrtle, Labrador tea, yarrow, wormwood, liquorice, ephedra, chamomile, sage, thyme and rosemary, poppy, hops, valerian, St John's wort, foxglove, comfrey, angelica, aloe, senna, devil's claw, neem, holy basil, fever bark, ipecac, arrow-poison vine, water hyssop, gentian, arnica |
 | Fuel | Solid | Firewood, charcoal, peat, dung fuel, coal, lignite, turf and sod |
 | Fuel | Liquid | oil, naphtha seeps |
 | Metals | Iron ore | Bog iron, lateritic iron and ironstone, banded iron formation, magnetite skarn iron, black sands |
@@ -2349,7 +2422,6 @@ actually pick are those of Appendices B and D.
 | Metals | silver ore | Silver (argentiferous galena) |
 | Metals | lead ore | lead-zinc in carbonates, lead-zinc skarns and veins, calamine |
 | Metals | gold ore | gold ore |
-| Metals | star metal | star metal |
 | Luxuries | Gems | Diamond, Ruby, Sapphire, Emerald, Aquamarine, Amethyst, Garnet, Topaz, Tourmaline, Opal, Jade, Lapis, Turquoise, Spinel, Zircon |
 | Luxuries | Pearls | Pearls |
 | Luxuries | spices | Black pepper, clove, nutmeg and mace, cinnamon, cardamom, ginger, turmeric, vanilla, allspice, chili pepper, saffron, cumin, coriander, caraway, mustard |
@@ -2358,5 +2430,6 @@ actually pick are those of Appendices B and D.
 | Luxuries | furs | Sable and marten, beaver, fox and Arctic fox, ermine, squirrel, bear, big cats, seals, ostrich, exotic feathers, ambergris, eider down, musk deer |
 | Luxuries | ivory | walrus, narwhal tusk, elephant ivory, hippopotamus ivory |
 | Luxuries | dyes | Cochineal, kermes, lac, murex, woad, indigo, madder, weld, safflower, henna, annatto, red sanders and brazilwood, logwood, lichen dyes |
+| Luxuries | Arcane materials | Star metal, truesilver, mana crystal, dragonbone, glowcap fungi, moonpearls, frost-lotus, windcrystal, sunstone, elderwood, sap of the Elven flower Elanor, dreamleaf, ghostlight peat, stormglass |
 | Animals | Mounts | Horse |
-| Animals | Pack Animals | Horses, donkeys, mules, dromedary camel, Bactrian camel, llama, alpaca-like camelids |
+| Animals | Pack Animals | Horses, donkeys, mules, dromedary camel, Bactrian camel, llama, alpaca-like camelids, reindeer, sled dogs, elephants |
