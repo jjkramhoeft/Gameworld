@@ -15,7 +15,7 @@ Gameworld is a sandbox, prototype and research repo for a larger PC game. It exp
 * A fine balance between believability and wonder.
 
 * Variation, exploration and progression that foster continued play and replayability.
- 
+
 ## Lifecycle Phases
 
 1) World Generation Development
@@ -38,6 +38,7 @@ Gameworld is a sandbox, prototype and research repo for a larger PC game. It exp
 ### Some High Level Details - Decided in advance
 
 #### Foundation
+
 The foundation is the root of the game world. It has:
 
 * The seed for all the generation algorithms.
@@ -54,22 +55,26 @@ Many foundations can coexist in storage (e.g. to compare maps side by side in ph
 The world of a foundation is unbounded. Regions are not fixed up front, they come into existence lazily as play moves outward.
 
 #### Parameter Set
+
 The set of all map and world parameters. Referenced by a foundation, and immutable after phase 1 like the foundation. Can be json files or exported/loaded from json files.
 
 The Parameter Set also holds the lists that are expected to change: the bedrock types and the races (see Race). A change to a list after phase 1 is a new Parameter Set, and with it a new foundation. Foundations that exist are not touched.
 
 #### Derived and Authored data
+
 All generated data belongs to one of two classes:
 
 * Derived data is a pure function of the foundation (seed + parameter set + generator version). Regions, zones, patches, rivers, lakes, heights, biomes, resources, prospects, the potential population, the travel network and all Stubs are derived. The database is only a cache of derived data - it can be evicted and recomputed with an identical result.
 * Authored data comes from an LLM or a diffusion model. It costs to produce, so it is stored as the source of truth and is never regenerated or evicted.
 
 #### Randomness
+
 There is no shared random stream. Every generation step seeds itself from a hash of (foundation seed, entity identity, purpose). A region gets the same result whether it is generated first or thousandth, so generation is independent of the order the player explores in.
 
 Where a step needs a sequence of random numbers (e.g. pick 3 of the zone cells of a region), a small generator is seeded from the hash of that one cell and consumed in a fixed order.
 
 #### Identity
+
 All structural identities are deterministic. No database generated ids appear in the domain.
 
 * Region = coordinate in the region grid
@@ -90,12 +95,13 @@ Zones and patches are built from cells and take their identity from them:
 This lets player state and authored data point at derived data that may be evicted and recomputed, and it makes a Stub addressable before it is Realised.
 
 #### Region Generation Stages
+
 A region moves through the stages below, in the order of the table and one stage at a time. No stage is skipped: a region is Elevated before it is Planned. Stages only advance - a region never moves backwards. Evicting derived data from storage and recomputing it is not a stage change.
 
 Sited is not a state a region is in. It needs only the seed, so it is a pure function that can be calculated for any region at any time, and it is never persisted. Stored regions start at Outlined. The Sited row describes what the function yields.
 
 | Stage | Contains | Needs |
-|---|---|---|
+| --- | --- | --- |
 | Sited | Region, Zone and Patch cell location, Zone cells initial type and bedrock. Ocean seeds, Determined number of links, expansions and mergers | foundation only |
 | Outlined | Zones linked, expanded and merged. Sea access | All regions within the link range + 5 rings Sited (7 rings at the defaults) |
 | Detailed | Patch mergers, rivers, lakes. Estimated biomes and resources | All bordering regions Outlined |
@@ -110,6 +116,7 @@ Biomes and resources exist in two forms. The estimated form is calculated in the
 The policy for when a region advances (e.g. Detailed within some distance of the player) is not part of the domain model. The model only knows the stage and its preconditions.
 
 #### Entity Generation States
+
 Cities, factions, families and people each have their own generation state, independent of the region stage:
 
 Stub → Pending → Realised
@@ -123,6 +130,7 @@ The name of a person is not authored. It comes from the name generator (see [doc
 Text and portrait are tracked separately, so a person can be shown with a description and history before the picture arrives. A city can exist with a population count long before any individual in it is authored.
 
 #### Region
+
 The map is structured in large regions the size of Middle Ages European kingdoms (approximately 100-200km x 100-200km, 128 km by default). The regions are divided into zones (32 km by default). The zones are divided into patches (8 km by default).
 
 The cell sizes are the Parameter Set values - not the counts. With the default sizes a region owns about 16 zone cells and a zone cell owns about 16 patch cells, and the exact count varies with where the sites fall. After the mergers the resulting number of zones and patches is lower - that is an outcome to evaluate in phase 1, not a parameter.
@@ -139,20 +147,23 @@ A region can be Outlined when all regions within the link range + 5 rings are Si
 A Region is the top level of three levels of nested Voronoi cells. The levels are nested through the patch: a point belongs to a patch, the patch to a zone and the zone to a region. Zone borders, region borders and coastlines therefore all run along patch borders.
 
 #### Zone
+
 Zones have an elevation type: Ocean, Flat Land, Lowland, Hills or Mountains. And zones also have a bedrock type that drives mined resources in its patches
 
 The elevation type is the authoritative elevation class of the zone, and it is an input to river generation. The actual height is calculated in the Elevated stage from the rivers. The elevation type does not give a height band - it gives how steeply the land rises from rivers and coast, the gradient of the rivers and the roughness of the surface. Ocean zones are never touched by river-driven height, their depth follows the distance from the coast.
 
 The elevation type and the bedrock are drawn by configured weights per zone cell when the region is Sited. The bedrock weights depend on the elevation type.
 
-A zone is the middle level of three levels of nested Voronoi cells. 
+A zone is the middle level of three levels of nested Voronoi cells.
 
 #### Patch
+
 Patches have one biome associated with them. The biome drives the patch flora and fauna.
 
 A patch is the bottom level of three levels of nested Voronoi cells. The patch level of Voronoi cells has its borders warped - to give the map a more natural aesthetic. Because the levels are nested through the patch, the coastlines and the zone and region borders get the same warped shape.
 
 #### Zone and Patch transformation
+
 To give greater variation in zone and patch size and to give larger oceans - zones and patches undergo mergers.
 When a region is initialised a number of the zone cells it owns are determined to be of the ocean type - these initial ocean zone cells are marked as ocean seeds.
 
@@ -179,28 +190,31 @@ The patch merger is the first step of the Detailed stage. It runs when the zones
 See [docs/map-generation.md](docs/map-generation.md) for the details of the zone and patch transformation (sections 5 and 6), and for all the later generation steps. The reasons behind the algorithms are in [docs/map-generation-research.md](docs/map-generation-research.md).
 
 #### Sea
+
 A sea is a connected set of ocean zones. It can span several regions. An ocean seed that is not on any link gives a small enclosed sea of one zone.
 
 A region has sea access if an ocean zone touches its land when it is Outlined. The ocean zone can belong to a neighbouring region. A region without sea access is landlocked. Whether two coasts are on the same sea is not stored as a region fact, because the world is unbounded. It is answered by a search over Outlined regions when gameplay needs it.
 
 #### Bedrock
+
 Bedrock will eventually be a fixed set of predetermined bedrock types (approximately 10). The generation currently uses the nine below, with weights per elevation type (see docs/map-generation.md section 14.1).
 
 Example table (not binding yet)
-| Id          | Name                 | Mostly under            | Gives                                                    |
-| ----------- | -------------------- | ----------------------- | -------------------------------------------------------- |
-| `shield`    | Crystalline shield   | flat, lowland, hills    | Granite, banded iron, lode gold (hills), diamonds, kaolin |
-| `foldBelt`  | Fold belt            | hills, mountains        | Slate, marble, silver, lode gold, garnet, emerald        |
-| `granite`   | Granite intrusion    | hills, mountains        | Granite, tin lodes, skarn iron, topaz and beryl, kaolin  |
-| `volcanic`  | Volcanic arc         | mountains               | Basalt, obsidian, pumice, porphyry copper, gold, rock crystal |
-| `basalt`    | Flood basalt         | flat, lowland, hills    | Basalt, native copper, agate, black sands                |
-| `ophiolite` | Ophiolite            | hills, mountains        | Soapstone, massive-sulfide copper, jade                  |
-| `carbonate` | Carbonate platform   | lowland, hills          | Limestone, chalk, flint, lead and zinc, skarn iron       |
-| `clastic`   | Clastic basin        | flat, lowland           | Sandstone, coal, lignite, red-bed copper, rock salt, amber |
-| `alluvium`  | Unconsolidated cover | flat, lowland           | Field stone only; clay                                   |
 
+| Id          | Name                 | Mostly under            | Gives                                                         |
+| ----------- | -------------------- | ----------------------- | ------------------------------------------------------------- |
+| `shield`    | Crystalline shield   | flat, lowland, hills    | Granite, banded iron, lode gold (hills), diamonds, kaolin     |
+| `foldBelt`  | Fold belt            | hills, mountains        | Slate, marble, silver, lode gold, garnet, emerald             |
+| `granite`   | Granite intrusion    | hills, mountains        | Granite, tin lodes, skarn iron, topaz and beryl, kaolin       |
+| `volcanic`  | Volcanic arc         | mountains               | Basalt, obsidian, pumice, porphyry copper, gold, rock crystal |
+| `basalt`    | Flood basalt         | flat, lowland, hills    | Basalt, native copper, agate, black sands                     |
+| `ophiolite` | Ophiolite            | hills, mountains        | Soapstone, massive-sulfide copper, jade                       |
+| `carbonate` | Carbonate platform   | lowland, hills          | Limestone, chalk, flint, lead and zinc, skarn iron            |
+| `clastic`   | Clastic basin        | flat, lowland           | Sandstone, coal, lignite, red-bed copper, rock salt, amber    |
+| `alluvium`  | Unconsolidated cover | flat, lowland           | Field stone only; clay                                        |
 
 #### Biome
+
 Biomes will eventually be a fixed set of predetermined biomes (10-20). Geography and climate will drive biomes.
 
 The biome of a patch comes from its temperature and its aridity. The temperature is the Initial Temperature field cooled by the height of the patch. The aridity is the precipitation relative to what the temperature demands. Mangrove is an override on warm, wet and low coasts.
@@ -210,17 +224,21 @@ The current set (not binding yet) is 15 land biomes and Mangrove:
 Ice & snow, Tundra, Cold steppe, Boreal forest, Cold desert, Temperate grassland, Woodland & shrubland, Temperate mixed forest, Temperate broadleaf forest, Temperate rain forest, Hot desert, Thorn scrub, Savanna, Tropical dry forest, Tropical rain forest, Mangrove
 
 #### Rivers
+
 Rivers are calculated per region with a space-colonization algorithm, growing from the sea into the land. It is the rivers that drive the height of the landscape.
 
 A river never runs on the land of another region. Region borders are therefore watersheds, and the height map puts a ridge on them. The exception is a landlocked region: its rivers search up to 4 zones away for an ocean, and they cross the land of a neighbouring region to reach it.
 
 #### Lakes
+
 Lakes are placed per region after the rivers. A lake always sits on a river, so every lake has a river running in and out. There are no lakes in mountain zones, in deserts or in river-poor flat zones (dry flat zones that get few rivers).
 
 Lakes do not change the height map. They count as fresh water for resources and prospects.
 
 #### Fields
+
 Perlin Noise Maps that are used to drive climate, biomes and resources. They are Fields: stateless functions of foundation and coordinate that can be sampled anywhere at any time. Fields are never stored and have no generation stage - a stage only records the values it sampled. Precipitation and Initial Temperature are warped, so their highs and lows form winding belts instead of round spots. They also have a distribution in the Parameter Set: what share of the map lies below a value. It decides how the land is shared between the biomes.
+
 * Precipitation
 * Initial Temperature
 * Prosperity
@@ -236,10 +254,10 @@ This section focuses on resources found in patches, these are generated together
 
 Resources are split in groups to make trade and needs calculation more manageable.
 
-* Food 
+* Food
 * Materials
 * Fuel
-* Luxuries 
+* Luxuries
 * Metals
 * Animals
 * Building (Only produced)
@@ -249,15 +267,19 @@ Resources are split in groups to make trade and needs calculation more manageabl
 * Clothing (Only produced)
 
 ##### Potentials or Deposits
+
 Potentials are what the land can yield. Deposits are rare finds that often need to be mined.
 
 ##### Variants
+
 Variants of the same resource group
 
 ##### Product
+
 Products are produced from resources
 
 ##### Generated resources
+
 The generation gives every patch an amount for each of 24 raw resources, and a variant (see docs/map-generation.md section 14). The example table below is finer than these 24 in some rows:
 
 * Wild food and game are one generated resource. The same goes for solid and liquid fuel, silver ore and lead ore, gems and pearls, spices and incense, furs and ivory, and mounts and pack animals.
@@ -267,41 +289,42 @@ The generation gives every patch an amount for each of 24 raw resources, and a v
 Example table (not sufficient)
 
 | Group | Resources | Variant |
-|---|---|---|
+| --- | --- | --- |
 | Food | Grain | wheat, durum, spelt, barley, rye, oats, maize, sorghum, pearl millet, teff, buckwheat, quinoa, fonio, wild rice |
-| Food | Produce| Potato, cassava, yam, taro, banana, sago palm, breadfruit, faba bean, pea, lentil, chickpea, common bean, cowpea, pigeon pea, onion and alliums, cabbage and kale, carrot, beet, melons, tiger nut, bottle gourd |
+| Food | Produce | Potato, cassava, yam, taro, banana, sago palm, breadfruit, faba bean, pea, lentil, chickpea, common bean, cowpea, pigeon pea, onion and alliums, cabbage and kale, carrot, beet, melons, tiger nut, bottle gourd |
 | Food | Orchard | Olive, grape, date palm, fig, pomegranate, almond, pistachio, carob, apple, pear, peach and stone fruit, citrus, walnut, sweet chestnut, hazel, stone pine nuts, cedar-pine nuts, coconut, oil palm, mango, avocado, tamarind, baobab, shea, Brazil nut, cashew, palmyra palm, prickly pear, jujube, mesquite pods, pineapple, soybean, groundnut, sesame, rapeseed, sunflower |
 | Food | livestock | Cattle, sheep, goats, pigs, yak, herded reindeer, water buffalo, poultry, alfalfa, dairy products |
 | Food | fish | River fish, salmon runs, sturgeon, eels, lake fish, cod banks, herring/sardine/anchovy, tuna and large pelagics, oysters and mussels, clams, crabs, lobsters, shrimp, octopus |
-| Food | wild food | Bilberry, blueberry, cloudberry and crowberry, raspberry and bramble, sea buckthorn, elderberry, forest mushrooms, acorns, wild grass seed, lotus, water chestnut, cattail, arrowhead, maple sap, edible seaweed, kelp, wild herbs  |
-| Food | game | deer, wild boar, caribou, bison and wild cattle, antelope and gazelle, wild sheep and ibex, waterfowl, upland game birds, hares and rabbits  |
-| Materials | Timber | Oak, beech, ash, elm, linden, willow and osier, poplar, Scots pine, spruce, fir, larch, giant conifers, cedar, yew, cypress, Mediterranean pines, cork oak, teak, sal, mahogany, Spanish cedar, rosewood, ebony, African mahogany, iroko, balsa, eucalypt-type hardwood, thorn-scrub wood, juniper, mangrove timber, driftwood, bog oak  |
+| Food | wild food | Bilberry, blueberry, cloudberry and crowberry, raspberry and bramble, sea buckthorn, elderberry, forest mushrooms, acorns, wild grass seed, lotus, water chestnut, cattail, arrowhead, maple sap, edible seaweed, kelp, wild herbs |
+| Food | game | deer, wild boar, caribou, bison and wild cattle, antelope and gazelle, wild sheep and ibex, waterfowl, upland game birds, hares and rabbits |
+| Materials | Timber | Oak, beech, ash, elm, linden, willow and osier, poplar, Scots pine, spruce, fir, larch, giant conifers, cedar, yew, cypress, Mediterranean pines, cork oak, teak, sal, mahogany, Spanish cedar, rosewood, ebony, African mahogany, iroko, balsa, eucalypt-type hardwood, thorn-scrub wood, juniper, mangrove timber, driftwood, bog oak |
 | Materials | Stone | granite, basalt, limestone, chalk, marble, sandstone, slate, flint and chert, obsidian, pumice and pozzolana, soapstone, millstone and quern stone, whetstone |
-| Materials | Clay | Clay, kaolin  |
-| Materials | Crystal | quartz, Rock crystal   |
+| Materials | Clay | Clay, kaolin |
+| Materials | Crystal | quartz, Rock crystal |
 | Materials | Fibre | Flax, hemp, cotton, wool, silk, wild silk, jute, ramie, kenaf, sisal and agave, abaca, New Zealand flax, esparto grass, kapok, nettle, lime-bast |
-| Materials | Preserver | Salt, Sap from the Elven flower Elanor  |
+| Materials | Preserver | Salt, Sap from the Elven flower Elanor |
 | Fuel | Solid | Firewood, charcoal, peat, dung fuel, coal, lignite, turf and sod |
 | Fuel | Liquid | oil, naphtha seeps |
 | Metals | Iron ore | Bog iron, lateritic iron and ironstone, banded iron formation, magnetite skarn iron, black sands |
-| Metals | copper ore | Porphyry copper, red-bed copper, massive-sulfide copper, native copper, malachite, azurite  |
+| Metals | copper ore | Porphyry copper, red-bed copper, massive-sulfide copper, native copper, malachite, azurite |
 | Metals | tin ore | Tin lode, stream tin |
 | Metals | silver ore | Silver (argentiferous galena) |
 | Metals | lead ore | lead-zinc in carbonates, lead-zinc skarns and veins, calamine |
 | Metals | gold ore | gold ore |
 | Metals | star metal | star metal |
-| Luxuries | Gems| Diamond, Ruby, Sapphire, Emerald, Aquamarine, Amethyst, Garnet, Topaz, Tourmaline, Opal, Jade, Lapis, Turquoise, Spinel, Zircon |
+| Luxuries | Gems | Diamond, Ruby, Sapphire, Emerald, Aquamarine, Amethyst, Garnet, Topaz, Tourmaline, Opal, Jade, Lapis, Turquoise, Spinel, Zircon |
 | Luxuries | Pearls | Pearls |
-| Luxuries | spices| Black pepper, clove, nutmeg and mace, cinnamon, cardamom, ginger, turmeric, vanilla, allspice, chili pepper, saffron, cumin, coriander, caraway, mustard |
-| Luxuries | incense | frankincense, myrrh, gum arabic, sandalwood, agarwood, pine resin/tar/pitch, copal and dammar, camphor, lavender and rose oil, cinchona bark, mastic and balsams, rubber latex  |
+| Luxuries | spices | Black pepper, clove, nutmeg and mace, cinnamon, cardamom, ginger, turmeric, vanilla, allspice, chili pepper, saffron, cumin, coriander, caraway, mustard |
+| Luxuries | incense | frankincense, myrrh, gum arabic, sandalwood, agarwood, pine resin/tar/pitch, copal and dammar, camphor, lavender and rose oil, cinchona bark, mastic and balsams, rubber latex |
 | Luxuries | stimulants & sugar | Honey, sugar cane, palm sugar, tea, coffee, cacao, kola nut, betel nut, coca, tobacco |
 | Luxuries | furs | Sable and marten, beaver, fox and Arctic fox, ermine, squirrel, bear, big cats, seals, ostrich, exotic feathers, ambergris, eider down, musk deer |
 | Luxuries | ivory | walrus, narwhal tusk, elephant ivory, hippopotamus ivory |
 | Luxuries | dyes | Cochineal, kermes, lac, murex, woad, indigo, madder, weld, safflower, henna, annatto, red sanders and brazilwood, logwood, lichen dyes |
 | Animals | Mounts | Horse |
-| Animals | Pack Animals | Horses, donkeys, mules, dromedary camel, Bactrian camel, llama, alpaca-like camelids  |
-     
-#### Prospect 
+| Animals | Pack Animals | Horses, donkeys, mules, dromedary camel, Bactrian camel, llama, alpaca-like camelids |
+
+#### Prospect
+
 A potential location for a City or Town. Has information about resources, travel options etc.
 
 Every land patch of a region gets a score from five factors: resources, geography, trade, climate and prosperity. The best patches become the Prospects of the region (20 by default, of which up to 4 are for cities), with a minimum spacing between them. A Prospect never touches the land of another region, which keeps Prospects apart across region borders without reading the neighbour.
@@ -313,9 +336,11 @@ A Prospect is Rich, Average or Poor by its score. A map draws a Rich Prospect in
 Prospects only read the estimated biomes and resources (see Region Generation Stages).
 
 #### Travel network
+
 Roads, river routes and sea lanes that connect the Prospects on show. The network of a region is calculated from the Prospects of the region and its bordering regions. A link between Prospects in two regions is decided by exactly one region, so the network does not depend on the order the regions are generated in.
-    
+
 #### Race
+
 A people that can live in the world: humans, elves, dwarves and so on. Races are needed to generate factions, families and people.
 
 The races are a list in the Parameter Set, not a fixed set in the code. The list is expected to change late in phase 2, so a race is added or changed by editing the list. Each race has:
@@ -334,6 +359,7 @@ By default dwarves only live from 200 m and up and elves only below 200 m. The h
 How a faction, a family or a person gets its race is not decided yet.
 
 #### Potential population
+
 An estimate of how many persons the land of a region can feed, for each race that is on. It is not a count of people that exist: cities, families and persons come in the Settled stage.
 
 Every land patch has a capacity in persons. It comes from the area of the patch, its food resources and the Prosperity field. The races that are on share the capacity of a patch in proportion to their frequency in the biome of the patch, each multiplied by the height modifier of the race at the height of the patch. The potential population of a race in a region is the sum of its shares over the land patches of the region.
@@ -343,12 +369,15 @@ So the races compete for the same land. Toggling a race off does not lower the p
 The potential population is calculated in the Planned stage. It reads the height map: the height of a patch is its mean height, and the biomes and resources are the final ones (see Region Generation Stages). See [docs/map-generation.md](docs/map-generation.md) section 19 for the rule and Appendix E for the default list.
 
 #### Faction
+
 A group of people in one region. A political grouping. Could be a Kingdom, a thieves guild or a tribe of people.
 
 #### Family
+
 A family of NPCs. Typically living together in a household. Can include servants or slaves.
 
 #### Person
+
 An NPC in the game. A person. The name is generated and belongs to the Stub. The textual description, the history and the portrait are authored.
 
 ## Setup and run
@@ -356,7 +385,7 @@ An NPC in the game. A person. The name is generated and belongs to the Stub. The
 The code is one .NET solution, `Gameworld.slnx`. It needs the .NET 11 SDK and nothing else: no database and no external services. The NuGet packages of the test project are restored on the first build.
 
 | Project | What it is |
-|---|---|
+| --- | --- |
 | `src/Gameworld.Domain` | The domain model of this readme |
 | `src/Gameworld.Generation` | The generation algorithms of [docs/map-generation.md](docs/map-generation.md) and the map renderer |
 | `src/Gameworld.MapGenerator` | The map generation app (console) |
@@ -390,7 +419,7 @@ dotnet run --project src/Gameworld.MapGenerator -c Release -- --seed atlas --reg
 ```
 
 | Option | Meaning | Default |
-|---|---|---|
+| --- | --- | --- |
 | `--seed <text>` | The seed text of the foundation | `cellgen` |
 | `--parameters <file.json>` | The Parameter Set | the built-in defaults |
 | `--region <i,j>` | The centre region | `0,0` |
@@ -436,6 +465,6 @@ A map viewer in the browser, on top of the same generator.
 dotnet run --project src/Gameworld.Demo -c Release
 ```
 
-Then open http://localhost:5062. Drag to pan, scroll to zoom, and click the map to see the region, zone and patch at that point. The side panel switches the base map (elevation types, biomes, height, or none) and the layers, among them the four Fields, and it replaces the foundation: a new seed, or an edited Parameter Set under "Parameter Set (json)". Replacing the foundation discards all derived data.
+Then open <http://localhost:5062>. Drag to pan, scroll to zoom, and click the map to see the region, zone and patch at that point. The side panel switches the base map (elevation types, biomes, height, or none) and the layers, among them the four Fields, and it replaces the foundation: a new seed, or an edited Parameter Set under "Parameter Set (json)". Replacing the foundation discards all derived data.
 
 Regions are generated when they come into view, so the first view of an area takes longer than the next. The Prospects and travel layers take the regions through the Elevated stage first, which builds their height maps.
