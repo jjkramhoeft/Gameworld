@@ -88,6 +88,43 @@ public static class ResourceCatalog
         Resource.HorsesAndPackAnimals => ResourceGroup.Animals,
         _ => throw new ArgumentOutOfRangeException(nameof(resource)),
     };
+
+    /// <summary>
+    /// The abbreviation of a resource: three capital letters, different for every resource
+    /// (map-generation.md Appendix G.3). None of them is the id of a default race, so
+    /// orchard is OCH and not ORC.
+    /// </summary>
+    public static string AbbreviationOf(Resource resource) => resource switch
+    {
+        Resource.Grain => "GRN",
+        Resource.Produce => "PRD",
+        Resource.Orchard => "OCH",
+        Resource.Livestock => "LVS",
+        Resource.Fish => "FSH",
+        Resource.WildFoodAndGame => "WLD",
+        Resource.Timber => "TMB",
+        Resource.Stone => "STN",
+        Resource.Clay => "CLY",
+        Resource.Crystal => "XTL",
+        Resource.Fibre => "FBR",
+        Resource.Fuel => "FUL",
+        Resource.Salt => "SAL",
+        Resource.IronOre => "IRN",
+        Resource.CopperOre => "COP",
+        Resource.Tin => "TIN",
+        Resource.SilverAndLead => "SLV",
+        Resource.Gold => "GLD",
+        Resource.GemsAndPearls => "GEM",
+        Resource.Spices => "SPC",
+        Resource.StimulantsAndSugar => "STM",
+        Resource.FursAndIvory => "FUR",
+        Resource.Dyes => "DYE",
+        Resource.HorsesAndPackAnimals => "HOR",
+        Resource.Reagents => "RGT",
+        Resource.Herbs => "HRB",
+        Resource.ArcaneMaterials => "ARC",
+        _ => throw new ArgumentOutOfRangeException(nameof(resource)),
+    };
 }
 
 /// <summary>The amount of one resource in a patch, in [0, 1], with its variant ("grain: rye").</summary>

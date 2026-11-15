@@ -52,7 +52,7 @@ public enum ThermalBelt
     Tropical,
 }
 
-/// <summary>The current set of biomes (not binding yet): 15 land biomes and Mangrove.</summary>
+/// <summary>The current set of biomes: 15 land biomes and Mangrove.</summary>
 public enum Biome
 {
     IceAndSnow,

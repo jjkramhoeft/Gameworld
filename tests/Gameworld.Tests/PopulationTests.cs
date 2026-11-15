@@ -30,7 +30,17 @@ public class PopulationTests
         return new PatchResources(amounts, food, 0);
     }
 
-    private static ParameterSet With(params RaceParameters[] races) => ParameterSet.Default with { Races = races };
+    /// <summary>
+    /// The rules are tested at 6 persons per km², a hundred times the default, so that a patch cell of
+    /// 64 km² feeds whole persons: 384 at a food supply of 1. The minority minimum is 10 persons with it.
+    /// </summary>
+    private static readonly PopulationParameters Dense = new() { PersonsPerKm2 = 6, MinorityMinPersons = 10 };
+
+    private static ParameterSet With(params RaceParameters[] races) => ParameterSet.Default with
+    {
+        Races = races,
+        Planning = ParameterSet.Default.Planning with { Population = Dense },
+    };
 
     private static ParameterSet OnlyOn(params string[] ids) =>
         ParameterSet.Default with { Races = ParameterSet.Default.Races.Select(r => r with { Enabled = ids.Contains(r.Id) }).ToArray() };
@@ -294,13 +304,13 @@ public class PopulationTests
     public void The_capacity_of_a_patch_follows_its_area_food_and_prosperity()
     {
         var rules = new PopulationRules(ParameterSet.Default);
-        Assert.Equal(64 * 6 * 0.5, rules.Capacity(64, Resources(0.5), 0.5), 9);
+        Assert.Equal(64 * 0.06 * 0.5, rules.Capacity(64, Resources(0.5), 0.5), 9);
         Assert.Equal(2 * rules.Capacity(64, Resources(0.5), 0.5), rules.Capacity(128, Resources(0.5), 0.5), 9);
         Assert.Equal(0, rules.Capacity(64, Resources(0), 0.5));
 
         // Prosperity: from half at the lowest to one and a half at the highest.
-        Assert.Equal(64 * 6 * 0.5 * 0.5, rules.Capacity(64, Resources(0.5), 0), 9);
-        Assert.Equal(64 * 6 * 0.5 * 1.5, rules.Capacity(64, Resources(0.5), 1), 9);
+        Assert.Equal(64 * 0.06 * 0.5 * 0.5, rules.Capacity(64, Resources(0.5), 0), 9);
+        Assert.Equal(64 * 0.06 * 0.5 * 1.5, rules.Capacity(64, Resources(0.5), 1), 9);
 
         // Fish adds a fifth of its amount to the food supply, which never passes 1.
         Assert.Equal(0.5, PopulationRules.FoodSupply(Resources(0.5)), 12);
@@ -384,7 +394,7 @@ public class PopulationTests
     [Fact]
     public void A_region_holds_its_main_races_and_a_minority_race_by_turn_or_by_draw()
     {
-        var population = new PopulationParameters { RacesPerRegion = 4, MinorityRacesPerRegion = 1, MinorityMinPersons = 10, MinorityShare = 0.1 };
+        var population = Dense with { RacesPerRegion = 4, MinorityRacesPerRegion = 1, MinorityShare = 0.1 };
         var rules = new PopulationRules(EightRaces(population), 42);
         Assert.Equal(384, rules.Capacity(64, Resources(1), 0.5), 9);
 
@@ -458,13 +468,13 @@ public class PopulationTests
         Assert.Empty(empty.Population.MinorityRaces);
 
         // Enough places for every race, and none of them a minority place: the plain shares of every race.
-        var open = new PopulationRules(EightRaces(new PopulationParameters { RacesPerRegion = 8, MinorityRacesPerRegion = 0 }), 42)
+        var open = new PopulationRules(EightRaces(Dense with { RacesPerRegion = 8, MinorityRacesPerRegion = 0 }), 42)
             .Share(new GridCoord(5, 5), OnePatch);
         Assert.Equal(8, open.MainCount);
         for (var k = 0; k < 8; k++) Assert.Equal(open.Plain[k], open.Persons[k], 9);
 
         // No places at all: the region holds nobody.
-        var closed = new PopulationRules(EightRaces(new PopulationParameters { RacesPerRegion = 0 }), 42).Share(new GridCoord(5, 5), OnePatch);
+        var closed = new PopulationRules(EightRaces(Dense with { RacesPerRegion = 0 }), 42).Share(new GridCoord(5, 5), OnePatch);
         Assert.Empty(closed.Races);
         Assert.Equal(0, closed.Population.Total);
     }
@@ -474,7 +484,7 @@ public class PopulationTests
     {
         var warm = new RaceParameters("warm", "Warm folk", true, Everywhere(0) with { Savanna = 5 });
         var cold = new RaceParameters("cold", "Cold folk", true, Everywhere(0) with { IceAndSnow = 1 });
-        var p = ParameterSet.Default with { Races = [warm, cold] };
+        var p = With(warm, cold);
         PopulationPatch[] land =
         [
             (Biome.Savanna, 120, 128, Resources(0.5), 0.5), // 384 persons
@@ -489,7 +499,7 @@ public class PopulationTests
         // With one place the region holds the larger race only, and the ice is left empty.
         var one = new PopulationRules(p with
         {
-            Planning = p.Planning with { Population = new PopulationParameters { RacesPerRegion = 1, MinorityRacesPerRegion = 0 } },
+            Planning = p.Planning with { Population = Dense with { RacesPerRegion = 1, MinorityRacesPerRegion = 0 } },
         }).Share(new GridCoord(0, 0), land);
         Assert.Equal(["warm"], one.Population.RegionRaces);
         Assert.Equal(384, one.Population.Total);
@@ -603,13 +613,13 @@ public class PopulationTests
             // The main races are the four largest by the plain shares, the largest first.
             var largest = Enumerable.Range(0, plain.Length).OrderByDescending(k => plain[k]).ThenBy(k => k).Take(4).ToArray();
             Assert.Equal(largest, races.Races[..4]);
-            // A minority race is the one whose turn it is, or a drawn one, and the land would feed at least 10 of it.
+            // A minority race is the one whose turn it is, or a drawn one, and the land would feed at least a tenth of a person of it.
             for (var place = 0; place < 2; place++)
             {
                 var minority = races.Races[4 + place];
-                Assert.True(plain[minority] >= 10);
+                Assert.True(plain[minority] >= 0.1);
                 var turn = rules.TurnRace(id.Coord, place);
-                if (!largest.Contains(turn) && plain[turn] >= 10 && turn != races.Races[4]) Assert.Equal(turn, minority);
+                if (!largest.Contains(turn) && plain[turn] >= 0.1 && turn != races.Races[4]) Assert.Equal(turn, minority);
             }
 
             // The six races share the capacity of the land they live on: never more than all of it.
@@ -636,8 +646,8 @@ public class PopulationTests
 
             people += population.Total;
         }
-        // Nine regions of the default world: a few tens of thousands of persons each.
-        Assert.InRange(people / 9, 10_000, 100_000);
+        // Nine regions of the default world: a few hundred persons each.
+        Assert.InRange(people / 9, 100, 1_000);
     }
 
     [Fact]

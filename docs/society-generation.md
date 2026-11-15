@@ -163,11 +163,11 @@ the plain shares of section 3.2, and its **minority races**, which get their pla
 
 | Parameter | Default |
 |---|---|
-| Persons per km² at a food supply of 1 and a middling Prosperity | 6 |
+| Persons per km² at a food supply of 1 and a middling Prosperity | 0.06 |
 | Prosperity effect | 0.5 |
 | Races per region | 6 |
 | Minority races per region | 2 |
-| Persons a race needs in a region to take a minority place | 10 |
+| Persons a race needs in a region to take a minority place | 0.1 |
 | Share of the region a minority race is lifted towards | 0.05 |
 
 Races per region 28 with no minority races gives every race that is on its plain share.
@@ -262,7 +262,7 @@ main races:
     the (races per region − b) races with the largest plain(r) > 0; ties in the order of the Parameter Set
 
 minority place z = 0 … b−1 of region (i, j):
-    eligible = the races that are on, are not yet a race of the region, and have plain(r) > 0 and plain(r) ≥ 10
+    eligible = the races that are on, are not yet a race of the region, and have plain(r) > 0 and plain(r) ≥ 0.1
     turn     = order[(i + W·j + offset + z·⌊M / b⌋) mod M]
     if turn is eligible:     turn takes the place
     else if any is eligible: one is drawn, each with the weight plain(r)
@@ -272,8 +272,8 @@ minority place z = 0 … b−1 of region (i, j):
 - **The main races** follow the frequencies and the height modifiers alone: they are the
   races the land of the region suits best.
 - **The turn** is how an under-represented race is boosted: it takes the place by its
-  turn, not by its size. It only needs the land of the region to feed 10 of it by the
-  plain shares.
+  turn, not by its size. It only needs the land of the region to feed 0.1 of it by the
+  plain shares, so it takes no place where it has next to no land.
 - **The turn pattern.** The regions where one race has its turn form a lattice: the
   regions with the same `(i + W·j) mod M`. `W` is the number in 1 … M−1 for which the
   shortest step between two such regions is the longest, and the lowest such number. With
@@ -321,11 +321,12 @@ population(r)    = round(Σ capacity(patch) · share(r, patch))   over the regio
 The land patches of a region are the patches of its zones (map-generation.md section
 6.2), so every land patch counts in exactly one region.
 
-With the defaults the median region has a potential population of about 36,400 and the
-range is 700 to 118,800 (measured on 1,079 regions of four seeds). Every one of them holds
+With the defaults the median region has a potential population of about 364 and the
+range is 7 to 1,188 (measured on 1,079 regions of four seeds at the earlier density of 6
+persons per km², and divided by 100). Every one of them holds
 six races. The largest race of a region holds 27 % of it in the median region and 19 to
 43 % over all regions, so no race has a majority anywhere. A minority race holds 4.9 % of
-its region in the median case, and 2,000 persons. 0.9 % of the capacity lies on patches
+its region in the median case, and about 20 persons. 0.9 % of the capacity lies on patches
 that hold nobody.
 
 Of all persons 83.5 % are of the seven human races, 10.4 % of the five classic races and

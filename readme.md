@@ -221,7 +221,7 @@ Ice & snow, Tundra, Cold steppe, Boreal forest, Cold desert, Temperate grassland
 
 What a patch holds for people to use. The generation gives every patch an amount for each of 27 raw resources, and a variant of each: rye is a variant of grain. One of them, the arcane materials, lies only where the Supernatural Field is high. A potential is what the land can yield. A deposit is a rare find that often needs to be mined.
 
-Resources are split in groups to make trade and needs manageable: Food, Materials, Fuel, Luxuries, Metals and Animals are found in patches, and Building, Tools, Gear, Weapons and Clothing are only produced. A product is produced from resources and is not generated with the map. The groups and the catalogue of variants are in docs/map-generation.md Appendix G.
+Resources are split in groups to make trade and needs manageable: Food, Materials, Fuel, Luxuries, Metals and Animals are found in patches, and Building, Tools, Gear, Weapons and Clothing are only produced. A product is produced from resources and is not generated with the map. Every generated resource has an abbreviation of three capital letters that no other resource has: GRN is grain. The groups, the abbreviations and the catalogue of variants are in docs/map-generation.md Appendix G.
 
 #### Prospect
 

@@ -87,7 +87,16 @@ app.MapGet("/api/statistics", (double left, double top, double width, double hei
     return Results.Json(host.Statistics(left, top, width, height, final ?? false, plan ?? false), new JsonSerializerOptions());
 });
 
-app.MapGet("/api/regions/{i:int}/{j:int}", (int i, int j, string? stage, WorldHost host) =>
+// The listed resources of the patches of a rectangle of the world, which the browser sets to the current view at full zoom.
+app.MapGet("/api/resources", (double left, double top, double width, double height, WorldHost host) =>
+{
+    if (!(width > 0 && height > 0) || !double.IsFinite(left + top + width + height)) return Results.BadRequest();
+    return host.ResourceLabels(left, top, width, height) is { } labels
+        ? Results.Json(labels, new JsonSerializerOptions())
+        : Results.BadRequest();
+});
+
+app.MapGet("/api/regions/{i:int}/{j:int}",(int i, int j, string? stage, WorldHost host) =>
 {
     if (!Enum.TryParse<RegionStage>(stage ?? "Detailed", ignoreCase: true, out var target)) return Results.BadRequest();
     return Json(host.Region(new RegionId(i, j), target));
@@ -286,6 +295,49 @@ namespace Gameworld.Demo
                     .ToArray());
         }
 
+        /// <summary>
+        /// The listed resources of every patch with a patch cell in a rectangle of the world, the largest amount first,
+        /// for the labels the map shows at full zoom. A label stands at the mean of the sites of the patch's cells, so
+        /// it does not move when the view does. It takes the regions in the rectangle to Detailed. Null when the
+        /// rectangle holds too many patch cells: the labels are for a close view only.
+        /// </summary>
+        public PatchLabel[]? ResourceLabels(double left, double top, double width, double height)
+        {
+            const int MaxPatchCells = 4000;
+            lock (_gate)
+            {
+                var world = _world;
+                var cells = world.Cells;
+                var level = cells.Patches;
+                // One grid square more on every side: the site of a patch cell is jittered and its border warped.
+                int i0 = (int)Math.Floor(left / level.Size) - 1, i1 = (int)Math.Floor((left + width) / level.Size) + 1;
+                int j0 = (int)Math.Floor(top / level.Size) - 1, j1 = (int)Math.Floor((top + height) / level.Size) + 1;
+                if ((long)(i1 - i0 + 1) * (j1 - j0 + 1) > MaxPatchCells) return null;
+
+                var labels = new List<PatchLabel>();
+                var seen = new HashSet<long>();
+                for (var j = j0; j <= j1; j++)
+                    for (var i = i0; i <= i1; i++)
+                    {
+                        var info = cells.InfoOf(new GridCoord(i, j));
+                        if (!seen.Add(info.Patch.Key)) continue;
+                        var patch = world.DetailOf(new RegionId(info.Region)).Find(info.Patch);
+                        if (patch is null) continue;
+                        var listed = patch.Resources.Listed
+                            .OrderByDescending(r => r.Amount.Amount)
+                            .Select(r => new ResourceLabel(ResourceCatalog.AbbreviationOf(r.Resource), r.Resource.ToString(), r.Amount.Variant, r.Amount.Amount, r.Amount.Origin == ResourceOrigin.Deposit))
+                            .ToArray();
+                        if (listed.Length == 0) continue;
+                        var members = patch.Shape.Cells;
+                        labels.Add(new PatchLabel(
+                            members.Average(c => level.SiteX(c.I, c.J)),
+                            members.Average(c => level.SiteY(c.I, c.J)),
+                            listed));
+                    }
+                return labels.ToArray();
+            }
+        }
+
         /// <summary>The domain data behind a point: its region, zone and patch, and what the stages the region has reached say about the patch. Looking takes the region to Detailed, no further.</summary>
         public PointInfo Inspect(WorldPoint point)
         {
@@ -342,7 +394,7 @@ namespace Gameworld.Demo
                         patch.Water.Harbour,
                         patch.Resources.Listed
                             .OrderByDescending(r => r.Amount.Amount)
-                            .Select(r => new ResourceInfo(r.Resource, ResourceCatalog.GroupOf(r.Resource), r.Amount.Amount, r.Amount.Variant, r.Amount.Origin))
+                            .Select(r => new ResourceInfo(r.Resource, ResourceCatalog.AbbreviationOf(r.Resource), ResourceCatalog.GroupOf(r.Resource), r.Amount.Amount, r.Amount.Variant, r.Amount.Origin))
                             .ToArray(),
                         patch.Resources.Food,
                         patch.Resources.Wealth,
@@ -444,5 +496,11 @@ namespace Gameworld.Demo
         double? Score,
         ProspectFactors? Factors);
 
-    public sealed record ResourceInfo(Resource Resource, ResourceGroup Group, double Amount, string? Variant, ResourceOrigin Origin);
+    public sealed record ResourceInfo(Resource Resource, string Abbreviation, ResourceGroup Group, double Amount, string? Variant, ResourceOrigin Origin);
+
+    /// <summary>The label of a patch on the map: where it stands, and the listed resources of the patch, the largest amount first.</summary>
+    public sealed record PatchLabel(double X, double Y, ResourceLabel[] Resources);
+
+    /// <param name="Resource">The name of the resource, as the domain model spells it.</param>
+    public sealed record ResourceLabel(string Abbreviation, string Resource, string? Variant, double Amount, bool Deposit);
 }

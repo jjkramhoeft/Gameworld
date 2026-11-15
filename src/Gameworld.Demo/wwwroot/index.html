@@ -52,6 +52,8 @@
   .res li { display: grid; grid-template-columns: 1fr 44px; gap: 8px; padding: 2px 0; border-top: 1px solid var(--line); }
   .res small { color: var(--muted); }
   .res .amt { text-align: right; font-variant-numeric: tabular-nums; }
+  .abbr { font: 600 11px ui-monospace, Consolas, monospace; letter-spacing: .04em; }
+  .res .abbr { background: var(--muted); color: var(--panel); border-radius: 4px; padding: 1px 5px; margin-right: 4px; }
   .hist { list-style: none; margin: 8px 0 0; padding: 0; font-size: 13px; transition: opacity .15s; }
   .hist.stale { opacity: .55; }
   .hist li { display: grid; grid-template-columns: 160px 1fr 40px; gap: 8px; align-items: center; padding: 2px 0; }
@@ -70,6 +72,10 @@
   main.dragging { cursor: grabbing; }
   #tiles { position: absolute; inset: 0; }
   #tiles img { position: absolute; width: 256px; height: 256px; user-select: none; -webkit-user-drag: none; image-rendering: auto; }
+  #labels { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+  .toast { position: absolute; transform: translate(-50%, -50%); display: flex; flex-wrap: wrap; justify-content: center;
+           gap: 1px 7px; width: max-content; max-width: 124px; padding: 4px 8px; border-radius: 8px; background: #000b; color: #fff;
+           box-shadow: 0 1px 4px #0006; pointer-events: auto; }
   #pin { position: absolute; width: 14px; height: 14px; margin: -7px 0 0 -7px; border: 2px solid #fff; border-radius: 50%;
          box-shadow: 0 0 0 2px #000a; pointer-events: none; display: none; }
   #status { position: absolute; left: 10px; bottom: 10px; background: #000a; color: #fff; padding: 4px 9px; border-radius: 6px;
@@ -124,7 +130,9 @@
     <label><input type="checkbox" value="precipitation">Precipitation</label>
     <label><input type="checkbox" value="prosperity">Prosperity</label>
     <label><input type="checkbox" value="supernatural">Supernatural</label>
+    <label><input type="checkbox" id="show-resources" checked>Resources</label>
   </div>
+  <p class="note">Resources shows at full zoom: a label on every patch with the abbreviations of its listed resources, the largest amount first.</p>
 
   <h2>Under the pointer</h2>
   <div id="inspect"><p class="note">Click the map to see the region, zone and patch at that point.</p></div>
@@ -147,6 +155,7 @@
 
 <main id="map" aria-label="Map">
   <div id="tiles"></div>
+  <div id="labels"></div>
   <div id="pin"></div>
   <div id="legend"></div>
   <div id="zoom"><button id="zoom-in" type="button" aria-label="Zoom in">+</button><button id="zoom-out" type="button" aria-label="Zoom out">−</button></div>
@@ -162,7 +171,8 @@ const state = { version: 0, tile: 256, baseMpp: 2000, maxZoom: 6, regionSize: 12
 const tiles = new Map();
 
 const mpp = () => state.baseMpp / 2 ** state.zoom;
-const layers = () => [...document.querySelectorAll('#layers input:checked')].map(i => i.value).join(',');
+// The layers the tiles draw. The resource labels are not one of them: the browser draws those itself.
+const layers = () => [...document.querySelectorAll('#layers input[value]:checked')].map(i => i.value).join(',');
 
 function draw() {
   const w = map.clientWidth, h = map.clientHeight, m = mpp(), span = state.tile * m;
@@ -195,12 +205,67 @@ function draw() {
     pin.style.top = (state.pinned.y - top) / m + 'px';
   } else pin.style.display = 'none';
 
+  placeLabels();
+  labelsSoon();
+
   // A scale bar of a round number of kilometres, about 120 px wide.
   const km = [1, 2, 5, 10, 20, 50, 100, 200].find(k => k * 1000 / m >= 90) ?? 200;
   $('scale').firstElementChild.textContent = km + ' km';
   $('scale').lastElementChild.style.width = km * 1000 / m + 'px';
 
   statisticsSoon();
+}
+
+// Resource labels. At full zoom every patch in view shows the abbreviations of its listed resources.
+// They are asked for a moment after the view comes to rest, for the view rounded out to whole tiles,
+// so a small pan does not ask again.
+const labelsEl = $('labels');
+let labels = [], labelsKey = '', labelsTimer = 0, labelsRun = 0;
+function clearLabels() {
+  clearTimeout(labelsTimer);
+  labelsRun++; labelsKey = ''; labels = [];
+  labelsEl.replaceChildren();
+}
+function placeLabels() {
+  const m = mpp(), left = state.cx - map.clientWidth / 2 * m, top = state.cy - map.clientHeight / 2 * m;
+  for (const l of labels) {
+    l.el.style.left = (l.x - left) / m + 'px';
+    l.el.style.top = (l.y - top) / m + 'px';
+  }
+}
+function labelsSoon() {
+  clearTimeout(labelsTimer);
+  if (state.zoom !== state.maxZoom || !$('show-resources').checked) { if (labelsKey || labels.length) clearLabels(); return; }
+  labelsTimer = setTimeout(loadLabels, 150);
+}
+async function loadLabels() {
+  const w = map.clientWidth, h = map.clientHeight, m = mpp(), span = state.tile * m;
+  if (!w || !h || !state.version) return;
+  const left = Math.floor((state.cx - w / 2 * m) / span) * span, top = Math.floor((state.cy - h / 2 * m) / span) * span;
+  const right = Math.ceil((state.cx + w / 2 * m) / span) * span, bottom = Math.ceil((state.cy + h / 2 * m) / span) * span;
+  const query = `left=${left}&top=${top}&width=${right - left}&height=${bottom - top}`;
+  const key = state.version + '?' + query;
+  if (key === labelsKey) return;
+  labelsKey = key;
+  const run = ++labelsRun;
+  try {
+    const r = await fetch('/api/resources?' + query);
+    if (!r.ok) throw new Error(await r.text());
+    const patches = await r.json();
+    if (run !== labelsRun) return;
+    labels = patches.map(p => {
+      const el = document.createElement('div');
+      el.className = 'toast';
+      el.innerHTML = p.Resources.map(x =>
+        `<span class="abbr" title="${esc(words(x.Resource))}${x.Variant ? ': ' + esc(x.Variant) : ''} · ${num(x.Amount)}${x.Deposit ? ' · deposit' : ''}">${esc(x.Abbreviation)}</span>`).join('');
+      return { x: p.X, y: p.Y, el };
+    });
+    labelsEl.replaceChildren(...labels.map(l => l.el));
+    placeLabels();
+  } catch {
+    // The map works without the labels: the next move of the view asks again.
+    if (run === labelsRun) labelsKey = '';
+  }
 }
 
 // Statistics of the current view. They are counted only while the section is open, a moment after the view comes to rest.
@@ -401,7 +466,7 @@ async function inspect(p) {
       }
       if (patch.Resources.length)
         resources = '<ul class="res">' + patch.Resources.map(x =>
-          `<li><span>${esc(words(x.Resource))} <small>${esc(x.Variant ?? '')} · ${x.Group}${x.Origin === 'Deposit' ? ' · deposit' : ''}</small></span><span class="amt">${num(x.Amount)}</span></li>`).join('') + '</ul>';
+          `<li><span><span class="abbr">${esc(x.Abbreviation)}</span>${esc(words(x.Resource))} <small>${esc(x.Variant ?? '')} · ${x.Group}${x.Origin === 'Deposit' ? ' · deposit' : ''}</small></span><span class="amt">${num(x.Amount)}</span></li>`).join('') + '</ul>';
     }
     const f = d.Fields;
     row('Fields', `${num(f.InitialTemperatureC, 1)} °C · ${num(f.PrecipitationMm, 0)} mm · prosperity ${num(f.Prosperity, 0)} · supernatural ${num(f.Supernatural, 0)}`);
@@ -423,6 +488,7 @@ function show(f) {
   $('foundation').textContent = `Seed "${f.Seed}" (${f.SeedValue}) · generator version ${f.GeneratorVersion}`;
   for (const img of tiles.values()) { img.src = ''; img.remove(); }
   tiles.clear();
+  clearLabels();
   state.pinned = null;
   $('inspect').innerHTML = '<p class="note">Click the map to see the region, zone and patch at that point.</p>';
   draw();

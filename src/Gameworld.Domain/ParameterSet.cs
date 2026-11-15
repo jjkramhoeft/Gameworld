@@ -443,7 +443,7 @@ public sealed record PopulationParameters
 {
     [Description("Persons per km² on land with a food supply of 1 at a middling Prosperity. The potential population of a patch is its area × this × its food supply × its Prosperity factor (society §3.1).")]
     [Range(0, double.PositiveInfinity)]
-    public double PersonsPerKm2 { get; init; } = 6;
+    public double PersonsPerKm2 { get; init; } = 0.06;
 
     [Description("How much the Prosperity field moves the potential population of a patch: the factor runs from 1 − this at the lowest Prosperity to 1 + this at the highest. 0 turns the effect of Prosperity off (society §3.1).")]
     [Range(0, 1)]
@@ -467,7 +467,7 @@ public sealed record PopulationParameters
 
     [Description("How many persons of a race the land of a region must feed by the plain shares for the race to take a minority place there (society §3.3).")]
     [Range(0, double.PositiveInfinity)]
-    public double MinorityMinPersons { get; init; } = 10;
+    public double MinorityMinPersons { get; init; } = 0.1;
 
     [Description("The share of the potential population of a region that a minority race is lifted towards, 0 to 0.9. A minority race that already holds more keeps its share, and one that lives on a few patches only stays below it. 0 turns the lift off (society §3.4).")]
     [Range(0, 0.9)]

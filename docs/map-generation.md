@@ -1236,7 +1236,8 @@ a patch when its amount is at least 0.25. The layer is a pure function of the pa
 The 27 resources: grain, produce, orchard, livestock, fish, wild food & game (food);
 timber, stone, clay, crystal, fibre, reagents, herbs (materials); fuel; salt; iron ore,
 copper ore, tin, silver & lead, gold (metals); gems & pearls, spices, stimulants & sugar,
-furs & ivory, dyes, arcane materials (luxuries); horses & pack animals.
+furs & ivory, dyes, arcane materials (luxuries); horses & pack animals. Each has a
+three-letter abbreviation (Appendix G.3).
 
 Reagents, herbs and arcane materials were added on 2026-11-15, for the vocations of
 [society-generation.md](society-generation.md) section 8. They are last in the resource
@@ -2393,6 +2394,41 @@ The generation gives every patch an amount for each of 27 raw resources, and a v
 - Reagents and herbs are generated resources of the group Materials. Arcane materials are
   one generated resource of the group Luxuries, whatever the material is: star metal is a
   metal and the sap of Elanor a preserver, and both are variants of it.
+
+Every generated resource has an abbreviation of three capital letters, for places where
+the name is too long, as a label on a map or a column of a table. No two resources share
+one, and none is the id of a default race: orchard is OCH and not ORC. The number is the
+resource index of Appendix D.
+
+| # | Resource | Abbreviation | Group |
+|---|---|---|---|
+| 0 | Grain | GRN | Food |
+| 1 | Produce | PRD | Food |
+| 2 | Orchard | OCH | Food |
+| 3 | Livestock | LVS | Food |
+| 4 | Fish | FSH | Food |
+| 5 | Wild food & game | WLD | Food |
+| 6 | Timber | TMB | Materials |
+| 7 | Stone | STN | Materials |
+| 8 | Clay | CLY | Materials |
+| 9 | Crystal | XTL | Materials |
+| 10 | Fibre | FBR | Materials |
+| 11 | Fuel | FUL | Fuel |
+| 12 | Salt | SAL | Materials |
+| 13 | Iron ore | IRN | Metals |
+| 14 | Copper ore | COP | Metals |
+| 15 | Tin | TIN | Metals |
+| 16 | Silver & lead | SLV | Metals |
+| 17 | Gold | GLD | Metals |
+| 18 | Gems & pearls | GEM | Luxuries |
+| 19 | Spices | SPC | Luxuries |
+| 20 | Stimulants & sugar | STM | Luxuries |
+| 21 | Furs & ivory | FUR | Luxuries |
+| 22 | Dyes | DYE | Luxuries |
+| 23 | Horses & pack animals | HOR | Animals |
+| 24 | Reagents | RGT | Materials |
+| 25 | Herbs | HRB | Materials |
+| 26 | Arcane materials | ARC | Luxuries |
 
 The catalogue is an example and not sufficient yet. The variants the generation can
 actually pick are those of Appendices B and D.

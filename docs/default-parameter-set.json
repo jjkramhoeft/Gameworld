@@ -157,13 +157,13 @@
     "RichScore": 75,
     "PoorScore": 62,
     "Population": {
-      "PersonsPerKm2": 6,
+      "PersonsPerKm2": 0.06,
       "ProsperityEffect": 0.5,
       "RacesPerRegion": 6,
       "MinorityRacesPerRegion": 2,
       "RacesPerCity": 5,
       "RacesPerTown": 4,
-      "MinorityMinPersons": 10,
+      "MinorityMinPersons": 0.1,
       "MinorityShare": 0.05,
       "MinorityBoost": 5,
       "HinterlandShare": 0.02

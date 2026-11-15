@@ -222,6 +222,19 @@ public class DomainTests
     }
 
     [Fact]
+    public void Every_resource_has_an_abbreviation_of_three_capital_letters_that_no_other_has()
+    {
+        var abbreviations = ResourceCatalog.All.Select(ResourceCatalog.AbbreviationOf).ToList();
+        Assert.All(abbreviations, a => Assert.Matches("^[A-Z]{3}$", a));
+        Assert.Equal(ResourceCatalog.Count, abbreviations.Distinct().Count());
+        Assert.Equal("GRN", ResourceCatalog.AbbreviationOf(Resource.Grain));
+        Assert.Equal("ARC", ResourceCatalog.AbbreviationOf(Resource.ArcaneMaterials));
+        // No abbreviation is the id of a default race.
+        var raceIds = ParameterSet.Default.Races.Select(r => r.Id.ToUpperInvariant()).ToHashSet();
+        Assert.DoesNotContain(abbreviations, raceIds.Contains);
+    }
+
+    [Fact]
     public void Identities_and_points_have_a_compact_json_form()
     {
         Assert.Equal("[3,-4]", DomainJson.Serialize(new RegionId(3, -4)));

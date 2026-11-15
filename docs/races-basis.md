@@ -2284,7 +2284,11 @@ biomes. The other new races have a weight in 3 to 9 biomes.
 Measured on 1,079 regions: the 18 × 15 regions around region (0, 0) (i from −9 to 8, j
 from −7 to 7) of the seeds `cellgen`, `gameworld`, `atlas` and `ember`, taken to the
 Planned stage with the default Parameter Set. One of the 1,080 regions has no land. The
-regions hold 40,758,804 persons, 36,412 in a median region.
+regions hold about 407,600 persons, 364 in a median region.
+
+The measurement was made at 6 persons per km². The default is 0.06 since 2026-11-15, and
+the persons below are the measured numbers divided by 100. The races of a region and the
+shares are the same at both densities, apart from the rounding to whole persons.
 
 A region holds six races: four main races and two minority races
 ([society-generation.md](society-generation.md) section 3.3). The plain share is what a
@@ -2294,34 +2298,34 @@ races.
 
 | # | Race | Group | Plain share | Share of all persons | Regions that hold it | As a main race | Largest race in (of 1,079) | Persons in a median region that holds it |
 |---|---|---|---|---|---|---|---|---|
-| 1 | Northmen | Human | 5.44 % | 4.18 % | 33 % | 25.4 % | 29 | 4,711 |
-| 2 | Midlanders | Human | 11.16 % | 19.21 % | 80 % | 77.8 % | 352 | 8,813 |
-| 3 | Saltroad folk | Human | 9.10 % | 15.13 % | 64 % | 60.2 % | 244 | 8,290 |
-| 4 | Sunlanders | Human | 8.99 % | 13.55 % | 63 % | 58.9 % | 90 | 7,933 |
-| 5 | Grass riders | Human | 4.62 % | 1.94 % | 18 % | 9.5 % | 6 | 3,602 |
-| 6 | Rainkeepers | Human | 7.43 % | 7.54 % | 45 % | 39.1 % | 3 | 6,024 |
-| 7 | Canal folk | Human | 11.97 % | 21.93 % | 90 % | 88.8 % | 340 | 9,029 |
-| 8 | Elves | Classic | 3.04 % | 0.65 % | 10 % | 1.7 % | 0 | 2,214 |
-| 9 | Dwarves | Classic | 1.46 % | 0.36 % | 8 % | 0.2 % | 0 | 1,565 |
-| 10 | Halflings | Classic | 5.50 % | 2.44 % | 20 % | 10.9 % | 0 | 4,462 |
-| 11 | Gnomes | Classic | 3.04 % | 0.72 % | 9 % | 0.0 % | 0 | 2,763 |
-| 12 | Orcs | Classic | 7.14 % | 6.23 % | 35 % | 26.7 % | 15 | 6,279 |
-| 13 | Hoarkin | New | 0.47 % | 0.27 % | 8 % | 0.4 % | 0 | 1,136 |
-| 14 | Hearthbloods | New | 0.31 % | 0.24 % | 7 % | 0.1 % | 0 | 1,306 |
-| 15 | Widegaze | New | 1.17 % | 0.37 % | 8 % | 0.0 % | 0 | 1,631 |
-| 16 | Amberbloods | New | 1.65 % | 0.41 % | 8 % | 0.0 % | 0 | 1,895 |
-| 17 | Brinefolk | New | 1.35 % | 0.38 % | 9 % | 0.1 % | 0 | 1,490 |
-| 18 | Duskreaders | New | 1.71 % | 0.41 % | 8 % | 0.2 % | 0 | 1,740 |
-| 19 | Noonfolk | New | 2.38 % | 0.48 % | 8 % | 0.0 % | 0 | 2,020 |
-| 20 | Boughwalkers | New | 0.89 % | 0.31 % | 8 % | 0.0 % | 0 | 1,430 |
-| 21 | Shoalfolk | New | 0.20 % | 0.18 % | 6 % | 0.0 % | 0 | 1,129 |
-| 22 | Swiftborn | New | 2.08 % | 0.40 % | 8 % | 0.0 % | 0 | 1,854 |
-| 23 | Flinchless | New | 0.81 % | 0.38 % | 8 % | 0.0 % | 0 | 1,986 |
-| 24 | Lanternkin | New | 0.95 % | 0.35 % | 8 % | 0.0 % | 0 | 1,771 |
-| 25 | Stillfaces | New | 1.68 % | 0.44 % | 9 % | 0.0 % | 0 | 1,767 |
-| 26 | Twofold | New | 1.57 % | 0.34 % | 8 % | 0.1 % | 0 | 1,667 |
-| 27 | Bitterbloods | New | 0.43 % | 0.29 % | 7 % | 0.0 % | 0 | 1,573 |
-| 28 | Catfolk | New | 3.45 % | 0.89 % | 10 % | 0.0 % | 0 | 3,220 |
+| 1 | Northmen | Human | 5.44 % | 4.18 % | 33 % | 25.4 % | 29 | 47 |
+| 2 | Midlanders | Human | 11.16 % | 19.21 % | 80 % | 77.8 % | 352 | 88 |
+| 3 | Saltroad folk | Human | 9.10 % | 15.13 % | 64 % | 60.2 % | 244 | 83 |
+| 4 | Sunlanders | Human | 8.99 % | 13.55 % | 63 % | 58.9 % | 90 | 79 |
+| 5 | Grass riders | Human | 4.62 % | 1.94 % | 18 % | 9.5 % | 6 | 36 |
+| 6 | Rainkeepers | Human | 7.43 % | 7.54 % | 45 % | 39.1 % | 3 | 60 |
+| 7 | Canal folk | Human | 11.97 % | 21.93 % | 90 % | 88.8 % | 340 | 90 |
+| 8 | Elves | Classic | 3.04 % | 0.65 % | 10 % | 1.7 % | 0 | 22 |
+| 9 | Dwarves | Classic | 1.46 % | 0.36 % | 8 % | 0.2 % | 0 | 16 |
+| 10 | Halflings | Classic | 5.50 % | 2.44 % | 20 % | 10.9 % | 0 | 45 |
+| 11 | Gnomes | Classic | 3.04 % | 0.72 % | 9 % | 0.0 % | 0 | 28 |
+| 12 | Orcs | Classic | 7.14 % | 6.23 % | 35 % | 26.7 % | 15 | 63 |
+| 13 | Hoarkin | New | 0.47 % | 0.27 % | 8 % | 0.4 % | 0 | 11 |
+| 14 | Hearthbloods | New | 0.31 % | 0.24 % | 7 % | 0.1 % | 0 | 13 |
+| 15 | Widegaze | New | 1.17 % | 0.37 % | 8 % | 0.0 % | 0 | 16 |
+| 16 | Amberbloods | New | 1.65 % | 0.41 % | 8 % | 0.0 % | 0 | 19 |
+| 17 | Brinefolk | New | 1.35 % | 0.38 % | 9 % | 0.1 % | 0 | 15 |
+| 18 | Duskreaders | New | 1.71 % | 0.41 % | 8 % | 0.2 % | 0 | 17 |
+| 19 | Noonfolk | New | 2.38 % | 0.48 % | 8 % | 0.0 % | 0 | 20 |
+| 20 | Boughwalkers | New | 0.89 % | 0.31 % | 8 % | 0.0 % | 0 | 14 |
+| 21 | Shoalfolk | New | 0.20 % | 0.18 % | 6 % | 0.0 % | 0 | 11 |
+| 22 | Swiftborn | New | 2.08 % | 0.40 % | 8 % | 0.0 % | 0 | 19 |
+| 23 | Flinchless | New | 0.81 % | 0.38 % | 8 % | 0.0 % | 0 | 20 |
+| 24 | Lanternkin | New | 0.95 % | 0.35 % | 8 % | 0.0 % | 0 | 18 |
+| 25 | Stillfaces | New | 1.68 % | 0.44 % | 9 % | 0.0 % | 0 | 18 |
+| 26 | Twofold | New | 1.57 % | 0.34 % | 8 % | 0.1 % | 0 | 17 |
+| 27 | Bitterbloods | New | 0.43 % | 0.29 % | 7 % | 0.0 % | 0 | 16 |
+| 28 | Catfolk | New | 3.45 % | 0.89 % | 10 % | 0.0 % | 0 | 32 |
 
 | Group | Plain share | Share of all persons | Seed `cellgen` | Seed `gameworld` | Seed `atlas` | Seed `ember` |
 |---|---|---|---|---|---|---|
@@ -2335,7 +2339,7 @@ races.
 | Races with 1 % or more of the persons | 5 | 6 | 6 |
 | Share of the largest race | 19 % | 27 % | 43 % |
 | Share of a minority race | 0.4 % | 4.9 % | 25 % |
-| Persons | 680 | 36,412 | 118,787 |
+| Persons | 7 | 364 | 1,188 |
 
 What the numbers show:
 
@@ -2366,10 +2370,10 @@ What the numbers show:
   shares nearly every region has both elves and dwarves.
 - **Each new race is in 6 to 10 % of the regions**, always as a minority race or nearly so.
   Together the new races hold 6.1 % of the persons. Where a new race is present it
-  has 1,129 to 3,220 persons in the median region.
+  has 11 to 32 persons in the median region.
 - **The turns even out the rare races.** By the plain shares the Shoalfolk hold 0.20 %
   and the Catfolk 3.45 %, 17 times as much. As minority races they are in 6 % and 10 % of
-  the regions. The Shoalfolk miss a turn where no coast below 80 m feeds 10 of them.
+  the regions. The Shoalfolk miss a turn where no coast below 80 m feeds 0.1 of them.
 
 The numbers were read from the Planned regions of a `World` in a throwaway program. The
 map generation app writes the same data for a block of regions: the region files hold

@@ -77,15 +77,15 @@ default Parameter Set:
 
 | Height band | Share of the land patches | Share of the potential population | Persons per km² |
 |---|---|---|---|
-| 0 to 50 m | 15.0 % | 16.3 % | 3.1 |
-| 50 to 100 m | 17.6 % | 18.1 % | 2.9 |
-| 100 to 200 m | 29.2 % | 31.0 % | 2.9 |
-| 200 to 300 m | 17.7 % | 17.8 % | 2.8 |
-| 300 to 500 m | 12.8 % | 11.6 % | 2.5 |
-| 500 to 750 m | 4.5 % | 3.4 % | 2.1 |
-| 750 to 1,000 m | 1.9 % | 1.3 % | 2.0 |
-| 1,000 to 1,500 m | 1.2 % | 0.5 % | 1.2 |
-| 1,500 to 2,000 m | 0.2 % | 0.03 % | 0.5 |
+| 0 to 50 m | 15.0 % | 16.3 % | 0.031 |
+| 50 to 100 m | 17.6 % | 18.1 % | 0.029 |
+| 100 to 200 m | 29.2 % | 31.0 % | 0.029 |
+| 200 to 300 m | 17.7 % | 17.8 % | 0.028 |
+| 300 to 500 m | 12.8 % | 11.6 % | 0.025 |
+| 500 to 750 m | 4.5 % | 3.4 % | 0.021 |
+| 750 to 1,000 m | 1.9 % | 1.3 % | 0.020 |
+| 1,000 to 1,500 m | 1.2 % | 0.5 % | 0.012 |
+| 1,500 to 2,000 m | 0.2 % | 0.03 % | 0.005 |
 
 | A race that only lives from | gets this share of the land patches | which feed this share of all persons |
 |---|---|---|
@@ -138,7 +138,7 @@ race can add persons.
 **Where the new race shows up.** A region holds six races: its four main races and two
 minority races (society-generation.md section 3.3). The new race is a race of a region
 where it is among the four largest by the plain shares, or where it has its turn for a
-minority place and the land feeds at least 10 of it. A race that is never among the four
+minority place and the land feeds at least 0.1 of it. A race that is never among the four
 largest is in about one region in ten. Elsewhere it has 0 persons.
 
 **The turns move.** The order of the turns and the stride of the turn pattern follow from
@@ -191,7 +191,7 @@ minority place once in every 29 regions.
    with the standing of the race in the region: `Main`, `Minority` or `Absent`. A race has
    0 persons in a region it is not a race of, so look at more than the nine regions of
    the default block: `--rings 3` gives 49. A race that is on but is `Absent` everywhere
-   and never has 10 persons by the plain shares finds no land: check its biomes and its
+   and never has 0.1 persons by the plain shares finds no land: check its biomes and its
    height modifier against each other, with the tables of step 1. A race that only lives
    from 1,000 m and up has 1.4 % of the land, and no patch lies above 2,000 m.
 
