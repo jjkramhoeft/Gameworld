@@ -81,14 +81,25 @@ public sealed record PotentialPopulation(IReadOnlyList<RacePopulation> Races)
 
 /// <summary>
 /// What the Planned stage adds: the Prospects for cities and towns, the potential population
-/// per race, and the races a city or a town on each Prospect holds.
+/// per race, the races a city or a town on each Prospect holds, and the factions of the region.
 /// </summary>
 /// <param name="ProspectRaces">For each Prospect, in the order of <paramref name="Prospects"/>: the ids of the races of a city or a town on it, the largest first and the drawn one last. They are races of the region.</param>
-/// <remarks>Factions belong to this stage too. The readme does not yet say what a faction holds, so they are not modelled.</remarks>
+/// <param name="Factions">The factions of the region, by slot: the ruling faction, the opposition when there is one, then the lesser factions. Empty in a region without persons.</param>
 public sealed record RegionPlan(
     IReadOnlyList<Prospect> Prospects,
     PotentialPopulation Population,
-    IReadOnlyList<IReadOnlyList<string>> ProspectRaces);
+    IReadOnlyList<IReadOnlyList<string>> ProspectRaces,
+    IReadOnlyList<Faction> Factions)
+{
+    /// <summary>The ruling faction; null in a region without persons.</summary>
+    public Faction? Ruling => Factions.FirstOrDefault(f => f.Role == FactionRole.Ruling);
+
+    /// <summary>The opposition; null when the region has none.</summary>
+    public Faction? Opposition => Factions.FirstOrDefault(f => f.Role == FactionRole.Opposition);
+
+    /// <summary>The lesser factions, by slot.</summary>
+    public IEnumerable<Faction> Lesser => Factions.Where(f => f.Role == FactionRole.Lesser);
+}
 
 /// <summary>What the Settled stage adds: the travel network.</summary>
 /// <remarks>Actual cities and towns, families and important persons belong to this stage too and are not modelled yet.</remarks>

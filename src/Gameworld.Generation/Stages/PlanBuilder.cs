@@ -1,5 +1,6 @@
 using Gameworld.Domain;
 using Gameworld.Generation.Basics;
+using Gameworld.Generation.Factions;
 using Gameworld.Generation.Races;
 using Gameworld.Generation.Resources;
 
@@ -41,15 +42,19 @@ public sealed class PlanWork
     /// <summary>For each Prospect, in the order of <see cref="Prospects"/>: the ids of the races of a city or a town on it.</summary>
     public required string[][] ProspectRaces { get; init; }
 
-    public RegionPlan ToDomain() => new(Prospects, Population, ProspectRaces);
+    /// <summary>The factions of the region and how the region was read for them.</summary>
+    public required FactionWork Factions { get; init; }
+
+    public RegionPlan ToDomain() => new(Prospects, Population, ProspectRaces, Factions.Factions);
 }
 
 /// <summary>
 /// Prospects for cities and towns (map-generation.md section 15), the potential population
-/// (society-generation.md section 3) and the races of a city or a town on each Prospect
-/// (society-generation.md section 5.1). The Prospects only read the estimated biomes and resources, so they never
-/// depend on the height map. The potential population reads the final form: the mean height
-/// of each patch and the biomes and resources calculated with it.
+/// (society-generation.md section 3), the races of a city or a town on each Prospect
+/// (society-generation.md section 5.1) and the factions of the region (society-generation.md
+/// section 4). The Prospects only read the estimated biomes and resources, so they never
+/// depend on the height map. The potential population and the factions read the final form:
+/// the mean height of each patch and the biomes and resources calculated with it.
 /// </summary>
 internal static class PlanBuilder
 {
@@ -262,17 +267,28 @@ internal static class PlanBuilder
         var final = new Dictionary<long, int>();
         for (var i = 0; i < elevation.Patches.Length; i++) final[elevation.Patches[i].Patch.Root.Key] = i;
         var prospects = Select(world, scores);
-        var prospectRaces = prospects.Select(prospect =>
+        var seats = prospects.Select(prospect =>
         {
             var root = prospect.Patch.Coord;
             var around = new List<int>();
             if (final.TryGetValue(root.Key, out var own)) around.Add(own);
             foreach (var k in landNeighbours[index[root.Key]])
                 if (final.TryGetValue(land[k].Root.Key, out var neighbour)) around.Add(neighbour);
-            return rules.SettlementRaces(races, around, prospect.ForCity, root)
-                .Select(k => rules.Races[k].Id)
-                .ToArray();
+            var local = new double[races.Races.Length];
+            foreach (var patch in around)
+                for (var r = 0; r < local.Length; r++) local[r] += races.PatchPersons[patch][r];
+            return new FactionProspect(prospect, rules.SettlementRaces(races, around, prospect.ForCity, root), around.ToArray(), local);
         }).ToArray();
+        var prospectRaces = seats.Select(seat => seat.Races.Select(k => rules.Races[k].Id).ToArray()).ToArray();
+
+        // society-generation.md 4 The factions of the region: from its land in its final form,
+        // its races and its Prospects. Nothing is read from another region.
+        var factions = world.FactionRules.Build(
+            region,
+            elevation.Patches.Select(x => new FactionPatch(
+                x.Patch.Shape.Cells.Length * patchKm * patchKm, x.Biome.Biome, x.Patch.ZoneType, x.Resources, x.Patch.Supernatural)).ToArray(),
+            races,
+            seats);
 
         return new PlanWork
         {
@@ -281,6 +297,7 @@ internal static class PlanBuilder
             Prospects = prospects,
             Races = races,
             ProspectRaces = prospectRaces,
+            Factions = factions,
         };
     }
 

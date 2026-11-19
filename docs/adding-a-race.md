@@ -8,8 +8,8 @@ ways to add one, and they differ a lot in work:
 - **To the default list**: change the built-in defaults, so every world without its own
   Parameter Set file has the race. This touches code, tests and five docs.
 
-The rules behind both are in [society-generation.md](society-generation.md) sections 2
-and 3, and the default list is its Appendix A. The term Race is defined in the
+The rules behind both are in [society-generation.md](society-generation.md) sections 2,
+3 and 4, and the default list is its Appendix A. The term Race is defined in the
 [readme](../readme.md).
 
 A change to the list is a new Parameter Set, and with it a new foundation. Foundations
@@ -17,7 +17,7 @@ that exist are not touched.
 
 ## 1. Decide what the race is
 
-A race is five things:
+A race is six things:
 
 | Field | What to decide |
 |---|---|
@@ -26,6 +26,7 @@ A race is five things:
 | `Enabled` | Whether the race lives in the world. A race that is off gets no population. |
 | `BiomeFrequency` | How frequent the race is in each of the 16 biomes, relative to the other races. |
 | `HeightModifier` | Optional. How the height of the land changes the frequency. Leave it out when the height does not matter to the race. |
+| `FactionLeaning` | Optional. How much the race leans to each of the six types of faction, 0 to 3. Leave it out and the race leans to every type alike, with 1. |
 
 **The frequencies.** By the plain shares, the races that are on share a patch in proportion
 to their frequency in its biome. Only the proportions between the races within one biome
@@ -128,6 +129,13 @@ The biome and the height are not independent: cold biomes lie higher, deserts lo
 So a hot desert race that only lives from 200 m and up has about a fifth of the hot
 desert, and a tundra race with the same limit keeps more than half of the tundra.
 
+**The leaning.** One number from 0 to 3 for each type of faction: `Family`, `Race`,
+`Vocation`, `Belief`, `Magic` and `Place`. 3 is the kind of group the race forms first, 2
+one that fits it, 1 one it seldom forms and 0 one it never forms. The leaning weighs the
+race when the type and the lead race of a faction are drawn
+(society-generation.md section 4.4). A race that leans 3 to Race and 0 to Place is a people
+under its chiefs wherever it leads, and never a free town.
+
 **What a new race does to the world.** Adding a race, or toggling one on, does not change
 how many persons the land could feed. It changes how the land is shared: the new race takes
 its share from the races already there. The one exception is land where nobody lived before.
@@ -170,7 +178,8 @@ minority place once in every 29 regions.
      "HeightModifier": [
        { "HeightM": 100, "Factor": 0 },
        { "HeightM": 300, "Factor": 1 }
-     ]
+     ],
+     "FactionLeaning": { "Family": 1, "Race": 3, "Vocation": 1, "Belief": 2, "Magic": 2, "Place": 1 }
    }
    ```
 
@@ -188,7 +197,8 @@ minority place once in every 29 regions.
    a main race or a minority race of the region.
 
 4. Check the result. The region files in `out/` hold the potential population per race,
-   with the standing of the race in the region: `Main`, `Minority` or `Absent`. A race has
+   with the standing of the race in the region: `Main`, `Minority` or `Absent`, and the
+   factions of the region with their lead race. A race has
    0 persons in a region it is not a race of, so look at more than the nine regions of
    the default block: `--rings 3` gives 49. A race that is on but is `Absent` everywhere
    and never has 0.1 persons by the plain shares finds no land: check its biomes and its
@@ -204,10 +214,10 @@ Do step 2 first and look at the numbers. Then change these together:
 
 | Where | What |
 |---|---|
-| [src/Gameworld.Domain/ParameterSet.cs](../src/Gameworld.Domain/ParameterSet.cs) | Add a `Make(...)` line to `RaceParameters.Defaults`: id, name, `common`, then the 16 habitat weights in the order of the column header. Every race of the default list is on. Add `with { HeightModifier = ... }` for a height modifier; `OnlyFrom` and `OnlyBelow` make the two steps. |
+| [src/Gameworld.Domain/ParameterSet.cs](../src/Gameworld.Domain/ParameterSet.cs) | Add a `Make(...)` line to `RaceParameters.Defaults`: id, name, `common`, then the 16 habitat weights in the order of the column header. Every race of the default list is on. Add `with { HeightModifier = ... }` for a height modifier; `OnlyFrom` and `OnlyBelow` make the two steps. Add the race to `DefaultLeanings` in the same record: its leaning to the six types of faction. A default race without an entry there fails when the list is built. |
 | [default-parameter-set.json](default-parameter-set.json) | Add the same entry to `Races`, at the same place in the list, with the frequencies multiplied out. A test checks that this file equals `ParameterSet.Default`. |
 | [society-generation.md](society-generation.md) section 2 | Update the count in the parameter table ("28, all on") and the list of names below it. |
-| [society-generation.md](society-generation.md) Appendix A | Add the row to the table. Update the height modifier table and the note below it ("The other 23 races have none"). |
+| [society-generation.md](society-generation.md) Appendix A | Add the row to the table. Update the height modifier table and the note below it ("The other 23 races have none"). Add the row to the table of leanings. |
 | [races-basis.md](races-basis.md) | Add the entry of the race, its row in the list and in the habitat table, and the counts at the top. |
 | [readme.md](../readme.md), Race | Update the count ("The default list holds 28 races") and the groups. |
 | [map-generation-research.md](map-generation-research.md) section 10.7 | Update the count of 28 and say where the weights of the new race come from. |
@@ -238,7 +248,8 @@ dotnet test -c Release
 
 - **Names.** The name generator has three styles (GB, elven and dark elven) and nothing
   maps a race to a style. See [NameGenerator-Reuse.md](NameGenerator-Reuse.md).
-- **Factions, families and persons.** How they get their race is not decided.
+- **Families and persons.** How they get their race is not decided. A faction has a lead
+  race (society-generation.md section 4).
 - **Its own density.** A race changes its share of the land, not the capacity of the land.
 - **Other habitat rules.** Bedrock, water, the Supernatural field and clustering per race
   are open. See the open topics of map-generation-research.md section 10.7.

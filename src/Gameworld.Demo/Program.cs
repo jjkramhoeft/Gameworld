@@ -5,6 +5,7 @@ using Gameworld.Demo;
 using Gameworld.Domain;
 using Gameworld.Generation;
 using Gameworld.Generation.Cells;
+using Gameworld.Generation.Factions;
 using Gameworld.Generation.Rendering;
 using Gameworld.Generation.Stages;
 
@@ -355,6 +356,11 @@ namespace Gameworld.Demo
                 var prospectAt = plan is null ? -1 : Array.FindIndex(plan.Prospects, p => p.Patch.Coord == info.Patch);
                 var prospect = prospectAt < 0 ? null : plan!.Prospects[prospectAt];
                 string NameOf(string race) => world.Parameters.Races.FirstOrDefault(x => x.Id == race)?.Name ?? race;
+                string VocationNameOf(string id) => world.Parameters.Vocations.FirstOrDefault(x => x.Id == id)?.Name ?? id;
+                FactionInfo InfoOf(Faction f) => new(
+                    f.Slot, f.Role, f.Type, f.Form, NameOf(f.LeadRace),
+                    f.Kind is null ? null : FactionRules.KindName(f.Kind),
+                    f.Vocations.Select(VocationNameOf).ToArray(), f.Ground, f.Grip, f.Seat);
                 string FloraNameOf(string id) => world.Parameters.Flora.FirstOrDefault(x => x.Id == id)?.Name ?? id;
                 string FaunaNameOf(string id) => world.Parameters.Fauna.FirstOrDefault(x => x.Id == id)?.Name ?? id;
                 var elevation = world.FindElevation(regionId);
@@ -374,6 +380,7 @@ namespace Gameworld.Demo
                     plan?.Population.Races
                         .Select(r => new RacePopulationInfo(r.Race, NameOf(r.Race), r.Persons, r.Standing))
                         .ToArray(),
+                    plan?.Factions.Factions.Select(InfoOf).ToArray(),
                     info.Ocean,
                     new ZoneInfo(
                         new ZoneId(new ZoneCellId(info.Zone)),
@@ -461,6 +468,7 @@ namespace Gameworld.Demo
     /// <param name="RegionScoreSum">The sum of the scores of the region's Prospects, which decides how many are on show. Null until the region is Planned.</param>
     /// <param name="RegionPopulation">The potential population of the region per race that is on, in the order of the Parameter Set. Null until the region is Planned.</param>
     /// <param name="ProspectRaces">The names of the races of a city or a town on the Prospect of the patch, the largest first and the drawn one last. Null when the patch has no Prospect.</param>
+    /// <param name="RegionFactions">The factions of the region, by slot: the ruling faction, the opposition when there is one, then the lesser factions. Null until the region is Planned.</param>
     public sealed record PointInfo(
         WorldPoint Point,
         RegionId Region,
@@ -469,6 +477,7 @@ namespace Gameworld.Demo
         ProspectCount? RegionProspects,
         double? RegionScoreSum,
         RacePopulationInfo[]? RegionPopulation,
+        FactionInfo[]? RegionFactions,
         bool Ocean,
         ZoneInfo Zone,
         PatchInfo? Patch,
@@ -476,6 +485,13 @@ namespace Gameworld.Demo
         string[]? ProspectRaces,
         double? HeightM,
         FieldValues Fields);
+
+    /// <summary>A faction of a region, with the names of its lead race, its kind and its vocations.</summary>
+    /// <param name="Kind">The name of the kind of a lesser faction, and of the trade of a guild in opposition.</param>
+    /// <param name="Seat">The patch of the Prospect the faction sits on.</param>
+    public sealed record FactionInfo(
+        int Slot, FactionRole Role, FactionType Type, FactionForm Form, string LeadRace, string? Kind,
+        string[] Vocations, OppositionGround? Ground, double Grip, PatchId? Seat);
 
     /// <summary>The four Fields sampled at the point itself, not at the site of its patch.</summary>
     public sealed record FieldValues(double InitialTemperatureC, double PrecipitationMm, double Prosperity, double Supernatural);

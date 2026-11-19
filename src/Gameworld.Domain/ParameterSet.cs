@@ -29,7 +29,7 @@ public sealed record ParameterSet
     [Description("Elevated stage: the height map and the biomes (§12, §13).")]
     public ElevationParameters Elevation { get; init; } = new();
 
-    [Description("Planned stage: Prospects for cities and towns, which of them are on show (§15), and the potential population (society §3). The Settled stage has no parameters of its own: the travel network connects the Prospects on show (§16).")]
+    [Description("Planned stage: Prospects for cities and towns, which of them are on show (§15), the potential population (society §3) and the factions (society §4). The Settled stage has no parameters of its own: the travel network connects the Prospects on show (§16).")]
     public PlanningParameters Planning { get; init; } = new();
 
     [Description("The four Fields: noise maps that drive climate, biomes and resources. They have no stage (§9).")]
@@ -452,6 +452,9 @@ public sealed record PlanningParameters
 
     [Description("The potential population of a region: how many persons its land can feed. The races that are on share it (society §3).")]
     public PopulationParameters Population { get; init; } = new();
+
+    [Description("The factions of a region: its ruling faction, its opposition and its lesser factions, from the races, the biomes, the resources and the wealth of the region (society §4).")]
+    public FactionParameters Factions { get; init; } = new();
 }
 
 public sealed record PopulationParameters
@@ -495,6 +498,176 @@ public sealed record PopulationParameters
     [Description("How much of the potential population of the whole region a city or a town draws on, beside the patch of its Prospect and the land patches around it, 0 to 1. It lets a race of the region that does not live nearby into the city or town (society §5.1).")]
     [Range(0, 1)]
     public double HinterlandShare { get; init; } = 0.02;
+}
+
+/// <summary>Parameters of the factions of a region (society-generation.md section 4).</summary>
+public sealed record FactionParameters
+{
+    [Description("How much the size of a race counts when the lead race of the ruling faction is drawn: the share of the race in the persons of the region is raised to this power. With the default the largest race leads in about 6 regions in 10 and a minority race in 1 in 100. A higher number makes the largest race lead more often (society §4.4).")]
+    [Range(0, double.PositiveInfinity)]
+    public double RacePower { get; init; } = 5;
+
+    [Description("How much the land decides the type of the ruling faction: the fit of each type is raised to this power. 1 lets the leaning of the races decide more; a high number makes the type with the best fit rule nearly always (society §4.4).")]
+    [Range(0, double.PositiveInfinity)]
+    public double Sharpness { get; init; } = 2;
+
+    [Description("The fit of each type as the ruler in a land that says nothing for it, 0 to 1. The land moves the fit from here up to 1. A higher base makes the type rule more regions (society §4.4).")]
+    public PerFactionType<double> BaseFit { get; init; } = new(0.35, 0.12, 0.05, 0.05, 0, 0.10);
+
+    [Description("The weights of the five terms of the tension of a region. The tension runs from 0 to their sum, 1 with the defaults (society §4.5).")]
+    public TensionWeights Tension { get; init; } = new();
+
+    [Description("The tension from which a region has an opposition. With the default about 4 regions in 10 have an opposition; 0.4 gives 6 in 10 and 0.6 gives 2 in 10 (society §4.5).")]
+    [Range(0, double.PositiveInfinity)]
+    public double OppositionTension { get; init; } = 0.5;
+
+    [Description("The width of the random part of the tension: a number from minus half this to plus half this is added, drawn per region. 0 makes the tension alone decide (society §4.5).")]
+    [Range(0, double.PositiveInfinity)]
+    public double TensionJitter { get; init; } = 0.2;
+
+    [Description("The persons a region needs to hold an opposition (society §4.5).")]
+    [Range(0, double.PositiveInfinity)]
+    public double OppositionMinPersons { get; init; } = 80;
+
+    [Description("Which type opposes which ruler: for each type of the ruling faction, the weight of each type as its opposition. A crown is opposed by a rival house first, a people by another people, a guild by a rival guild, a faith by a sect or by the mages, a free town by a lord who wants it (society §4.6).")]
+    public PerFactionType<PerFactionType<double>> Cleavage { get; init; } = new(
+        Family: new(3, 2, 2, 2, 1, 2),
+        Race: new(2, 3, 1, 1, 1, 1),
+        Vocation: new(2, 1, 3, 1, 1, 2),
+        Belief: new(2, 1, 1, 3, 3, 1),
+        Magic: new(2, 1, 1, 3, 2, 2),
+        Place: new(3, 2, 2, 1, 1, 1));
+
+    [Description("Which type of opposition each term of the tension feeds, 0 to 2. The contest has no entry: it feeds every type by its fit (society §4.6).")]
+    public TensionFavour Favour { get; init; } = new();
+
+    [Description("The persons a region needs for each lesser faction: a region holds at most its persons divided by this, rounded down (society §4.7).")]
+    [Range(1, double.PositiveInfinity)]
+    public double PersonsPerLesserFaction { get; init; } = 150;
+
+    [Description("The most lesser factions a region holds (society §4.7).")]
+    [Range(0, int.MaxValue)]
+    public int MaxLesserFactions { get; init; } = 4;
+
+    [Description("The lowest fit, 0 to 1, with which a kind of lesser faction is taken. A lower number gives more lesser factions (society §4.7).")]
+    [Range(0, 1)]
+    public double LesserFit { get; init; } = 0.75;
+
+    [Description("The width of the random part of the fit of a kind of lesser faction: a number from minus half this to plus half this is added, drawn per region and kind (society §4.7).")]
+    [Range(0, double.PositiveInfinity)]
+    public double LesserJitter { get; init; } = 0.1;
+
+    [Description("The ranges the indices of a region are read through: each index runs from 0 at Low to 1 at High. The defaults are about the 10th and the 90th percentile of generated regions, so a change to the map parameters can call for new ranges (society §4.3).")]
+    public FactionIndexRanges Indices { get; init; } = new();
+}
+
+[Description("A range an index is read through: 0 at Low and below, 1 at High and above, a straight line between.")]
+public sealed record IndexRange(
+    [property: Description("The value at and below which the index is 0.")] double Low,
+    [property: Description("The value at and above which the index is 1.")] double High);
+
+public sealed record TensionWeights
+{
+    [Description("Weight of the contest: the land and the races would as well carry another kind of ruler (society §4.5).")]
+    [Range(0, double.PositiveInfinity)]
+    public double Contest { get; init; } = 0.25;
+
+    [Description("Weight of rough land: hills and mountains shelter those who do not obey (society §4.5).")]
+    [Range(0, double.PositiveInfinity)]
+    public double RoughLand { get; init; } = 0.20;
+
+    [Description("Weight of a rival seat: a second Prospect on show nearly as good as the best, and far from it (society §4.5).")]
+    [Range(0, double.PositiveInfinity)]
+    public double RivalSeat { get; init; } = 0.20;
+
+    [Description("Weight of precious finds: silver and lead, gold, gems and pearls (society §4.5).")]
+    [Range(0, double.PositiveInfinity)]
+    public double PreciousFinds { get; init; } = 0.15;
+
+    [Description("Weight of poor land: Poor Prospects, and rich and poor Prospects side by side (society §4.5).")]
+    [Range(0, double.PositiveInfinity)]
+    public double PoorLand { get; init; } = 0.20;
+}
+
+public sealed record TensionFavour
+{
+    [Description("Rough land feeds a people and a commune first, then a hill lord and a faith (society §4.6).")]
+    public PerFactionType<double> RoughLand { get; init; } = new(1, 2, 0, 1, 0, 2);
+
+    [Description("A rival seat feeds a rival house, the guilds of the second city and its council (society §4.6).")]
+    public PerFactionType<double> RivalSeat { get; init; } = new(2, 0, 2, 0, 0, 2);
+
+    [Description("Precious finds feed a rival house and a guild (society §4.6).")]
+    public PerFactionType<double> PreciousFinds { get; init; } = new(2, 0, 2, 0, 0, 0);
+
+    [Description("Poor land feeds a sect and a commune first, then a subject people (society §4.6).")]
+    public PerFactionType<double> PoorLand { get; init; } = new(0, 1, 0, 2, 0, 2);
+}
+
+public sealed record FactionIndexRanges
+{
+    [Description("Grain: the mean amount of grain on the land of the region (society §4.3).")]
+    public IndexRange Grain { get; init; } = new(0.17, 0.45);
+
+    [Description("Half of the index herd: the mean amount of livestock (society §4.3).")]
+    public IndexRange Livestock { get; init; } = new(0.33, 0.53);
+
+    [Description("Half of the index herd: the mean amount of horses and pack animals (society §4.3).")]
+    public IndexRange Horses { get; init; } = new(0.22, 0.40);
+
+    [Description("Open: the share of the land in Cold steppe, Temperate grassland, Savanna, Cold desert, Hot desert, Thorn scrub and Tundra (society §4.3).")]
+    public IndexRange OpenLand { get; init; } = new(0.25, 0.66);
+
+    [Description("Forest: the share of the land in the six forest biomes, Mangrove and Woodland & shrubland (society §4.3).")]
+    public IndexRange Forest { get; init; } = new(0.29, 0.69);
+
+    [Description("Cold: the share of the land in Ice & snow, Tundra and Boreal forest (society §4.3).")]
+    public IndexRange ColdLand { get; init; } = new(0.1, 0.6);
+
+    [Description("Dry: the share of the land in Hot desert, Cold desert, Cold steppe and Thorn scrub (society §4.3).")]
+    public IndexRange DryLand { get; init; } = new(0.1, 0.6);
+
+    [Description("Rough: the share of the land in Hills zones plus 1.5 times the share in Mountains zones (society §4.3).")]
+    public IndexRange RoughLand { get; init; } = new(0, 0.45);
+
+    [Description("Half of the index trade: the best Trade factor of a Prospect on show (society §4.3).")]
+    public IndexRange TradeFactor { get; init; } = new(0.5, 1);
+
+    [Description("Half of the index trade: the number of Prospects on show with a harbour or a navigable river mouth (society §4.3).")]
+    public IndexRange Harbours { get; init; } = new(0, 4);
+
+    [Description("Half of the index wealth: the mean Prosperity factor of the Prospects of the region (society §4.3).")]
+    public IndexRange Prosperity { get; init; } = new(0.33, 0.69);
+
+    [Description("Half of the index wealth: the number of Rich Prospects on show (society §4.3).")]
+    public IndexRange RichProspects { get; init; } = new(0, 9);
+
+    [Description("Urban: the number of Prospects on show (society §4.3).")]
+    public IndexRange ProspectsOnShow { get; init; } = new(6, 19);
+
+    [Description("Ore: the shares of the land with a listed amount of iron ore, copper ore, tin, silver and lead, gold, gems and pearls and salt, added (society §4.3).")]
+    public IndexRange Ore { get; init; } = new(0.03, 0.18);
+
+    [Description("Precious: the shares of the land with a listed amount of silver and lead, gold and gems and pearls, added (society §4.3).")]
+    public IndexRange Precious { get; init; } = new(0, 0.06);
+
+    [Description("Arcane: the mean over the land of how far the Supernatural field lies above 60, from 0 at 60 to 1 at 100 (society §4.3).")]
+    public IndexRange Supernatural { get; init; } = new(0.014, 0.032);
+
+    [Description("People: the persons of the region (society §4.3).")]
+    public IndexRange Persons { get; init; } = new(160, 600);
+
+    [Description("Small: the persons of the region, read the other way round: the index is 1 at Low and below and 0 at High and above (society §4.3).")]
+    public IndexRange SmallRegion { get; init; } = new(60, 260);
+
+    [Description("Mixed: the share of the largest race in the persons of the region, read the other way round: the index is 1 at Low and below and 0 at High and above (society §4.3).")]
+    public IndexRange LargestRace { get; init; } = new(0.24, 0.32);
+
+    [Description("Poor: the share of the Prospects on show that are Poor (society §4.3).")]
+    public IndexRange PoorProspects { get; init; } = new(0, 0.5);
+
+    [Description("Uneven: the highest Prosperity factor of a Prospect on show minus the lowest (society §4.3).")]
+    public IndexRange UnevenProsperity { get; init; } = new(0.1, 0.5);
 }
 
 public sealed record ProspectWeights
@@ -609,6 +782,46 @@ public sealed record RaceParameters(
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public IReadOnlyList<HeightFactorPoint>? HeightModifier { get; init; }
 
+    [Description("How much the race leans to each type of faction, 0 to 3: 3 for the kind of group it forms first, 0 for a kind it never forms. It weighs the race in the draws for the type and the lead race of a faction. Left out, the race leans to every type alike (society §4.4).")]
+    public PerFactionType<double> FactionLeaning { get; init; } = new(1, 1, 1, 1, 1, 1);
+
+    /// <summary>
+    /// The leaning of each default race to each type of faction (society-generation.md
+    /// Appendix A), from the "Factions" line of its entry in races-basis.md.
+    /// </summary>
+    private static readonly Dictionary<string, PerFactionType<double>> DefaultLeanings = new()
+    {
+        //                     Family Race Vocation Belief Magic Place
+        ["northmen"] = new(2, 1, 2, 1, 1, 3),
+        ["midlanders"] = new(3, 1, 2, 2, 1, 2),
+        ["saltroadFolk"] = new(2, 2, 3, 2, 1, 1),
+        ["sunlanders"] = new(3, 2, 2, 2, 1, 2),
+        ["grassRiders"] = new(2, 3, 1, 1, 1, 0),
+        ["rainkeepers"] = new(2, 1, 2, 3, 1, 2),
+        ["canalFolk"] = new(2, 1, 3, 1, 1, 1),
+        ["elf"] = new(2, 3, 1, 1, 2, 1),
+        ["dwarf"] = new(1, 3, 3, 1, 1, 1),
+        ["halfling"] = new(2, 1, 1, 1, 0, 3),
+        ["gnome"] = new(1, 1, 3, 1, 2, 2),
+        ["orc"] = new(1, 3, 2, 1, 1, 0),
+        ["hoarkin"] = new(1, 2, 2, 1, 1, 3),
+        ["hearthbloods"] = new(2, 2, 1, 1, 1, 2),
+        ["widegaze"] = new(1, 2, 2, 1, 2, 2),
+        ["amberbloods"] = new(1, 2, 2, 2, 1, 2),
+        ["brinefolk"] = new(1, 1, 3, 2, 1, 2),
+        ["duskreaders"] = new(2, 1, 2, 1, 2, 2),
+        ["noonfolk"] = new(0, 1, 2, 2, 1, 3),
+        ["boughwalkers"] = new(2, 2, 2, 1, 1, 2),
+        ["shoalfolk"] = new(1, 1, 2, 1, 1, 3),
+        ["swiftborn"] = new(0, 1, 2, 1, 1, 3),
+        ["flinchless"] = new(1, 1, 3, 1, 1, 1),
+        ["lanternkin"] = new(1, 1, 3, 1, 2, 1),
+        ["stillfaces"] = new(1, 2, 2, 1, 2, 1),
+        ["twofold"] = new(3, 1, 1, 2, 1, 1),
+        ["bitterbloods"] = new(1, 2, 3, 1, 2, 2),
+        ["catfolk"] = new(1, 2, 2, 2, 1, 1),
+    };
+
     /// <summary>The height modifier of a race that only lives from a height and up.</summary>
     public static IReadOnlyList<HeightFactorPoint> OnlyFrom(double heightM) => [new(heightM, 0), new(heightM, 1)];
 
@@ -662,7 +875,10 @@ public sealed record RaceParameters(
             common * habitat[0], common * habitat[1], common * habitat[2], common * habitat[3],
             common * habitat[4], common * habitat[5], common * habitat[6], common * habitat[7],
             common * habitat[8], common * habitat[9], common * habitat[10], common * habitat[11],
-            common * habitat[12], common * habitat[13], common * habitat[14], common * habitat[15]));
+            common * habitat[12], common * habitat[13], common * habitat[14], common * habitat[15]))
+            {
+                FactionLeaning = DefaultLeanings[id],
+            };
 }
 
 /// <summary>The ids of the nine bedrock types the generation currently uses.</summary>

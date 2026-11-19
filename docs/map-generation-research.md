@@ -51,11 +51,13 @@ The names in this document follow the [readme](../readme.md). The notes themselv
 | TRADE | [game-resources-and-trade.md](research/game-resources-and-trade.md) | 2026-11-10 | How games choose, place and trade resources; trade theory; a 39-resource set; price and flow models | §9, §11 |
 | SITES | [settlement-siting.md](research/settlement-siting.md) | 2026-11-10 | Where settlements form; suitability methods; how generators and games place cities; a siting design | §10, §11 |
 
-One later note is used in §10.7 only. It is not part of the compilation above, and it follows the names of the readme:
+Three later notes are used in §10.7 and §10.8 only. They are not part of the compilation above, and they follow the names of the readme:
 
 | Key | Note | Date | Covers | Used in |
 |---|---|---|---|---|
 | RACES | [races.md](research/races.md) | 2026-11-14 | The peoples that RPGs, fantasy settings and strategy games use again and again, as 41 race archetypes; a race × biome and race × terrain matrix; what a generator needs per race | §10.7 |
+| FACTIONS | [factions.md](research/factions.md) | 2026-11-14 | 48 faction archetypes from RPGs, strategy games, tabletop settings and history; the axes that tell them apart; their rivalries and alliances | §10.8 |
+| FACGEN | [faction-generation.md](research/faction-generation.md) | 2026-11-19 | How generators and games compute the kind of ruler of a land; the scholarship on what decides a ruler, an opposition and guilds | §10.8 |
 
 ---
 
@@ -929,9 +931,47 @@ This section rests on a later note, RACES (see §1). It was added on 2026-11-14 
 | At most six races per region, five per city and four per town, with the minority races by turn | Adopted (2026-11-15). The test is in [plans/race-caps.md](plans/race-caps.md) |
 | A presence field per race, so that a race clusters in some regions and is absent from others (RACES §5.4) | Open. A race is absent from most regions now, but the turns spread a minority race evenly: it does not cluster |
 | Variants of a race picked by the biome (RACES §5.3) | Rejected: a race has no sub-races (2026-11-15) |
-| The race of a faction, a family and a person; mixed families (RACES §5.4, §5.5) | Open |
+| The race of a faction (RACES §5.4) | Adopted (2026-11-19): a faction has a lead race, and a faction of the type Race holds that race only (§10.8) |
+| The race of a family and a person; mixed families (RACES §5.4, §5.5) | Open |
 | Size, lifespan and fertility per race, and a density that follows from them (RACES §5.1) | Open |
 | Underground and sea peoples (RACES §5.6) | Open |
+
+### 10.8 Factions
+
+This section rests on two later notes, FACTIONS and FACGEN (see §1). It was added on 2026-11-19 with the rule that is [society-generation.md](society-generation.md) section 4. The test of the rule, with every number, is in [plans/region-factions.md](plans/region-factions.md).
+
+**What the notes found.** Nearly every fantasy faction is a medieval institution with one twist, and factions split cleanly by what binds their members (FACTIONS §1, §2.1). The one generator that publishes its weights draws a monarchy for 89 % of its inland states and a republic more often on the coast, and gives rule by a faith a roll of 10 %; resources, wealth and the peoples do not enter, and it has no opposition and no guilds (FACGEN §2.1). Dwarf Fortress lets the people decide how a polity is built (FACGEN §2.2). In the scholarship hierarchy follows grain, which can be seized, not fertile land as such (FACGEN §3.1); rough and marginal land is where states did not reach (§3.2); merchant republics are small and mercantile (§3.5); a mine gave its miners a charter, not the rule (§3.6); civil war follows rough terrain, poverty and numbers, and not diversity (§4.1); wealth that can be taken feeds a rising (§4.3); the lasting rivals are few (§4.4, §4.5); and guilds follow towns, with the merchants first and primary production rarely guilded (§5). The notes give directions, not sizes: every weight of the rule is this project's own judgement.
+
+**Design** (proposed and adopted with the user, 2026-11-19):
+
+| Question | Adopted | Weighed against it |
+|---|---|---|
+| The types | Six, by what binds the members: Family, Race, Vocation, Belief, Magic and Place. The first five were asked for by the user. Each rests on a fact of a person | The nine bases of FACTIONS §2.1: arms and crime are bound by work, and a cause is a role. The five types of FACGEN §6.2: they leave out the free town and the commune, which six races form first. The 48 archetypes drawn directly: 48 weights against 18 indices cannot be tuned by eye |
+| The roles | Ruling (exactly one in a region with persons), opposition (none or one) and lesser (up to four). Every type can hold every role | A ruling faction for each race of a region: six rulers of 60 persons each, in a region the size of one kingdom. The five stances of FACTIONS §2.3: outlawed and independent factions away from the Prospects are left open |
+| What decides the ruler | The fit of the land for each type, from 18 indices of the region, times the leaning of each race, times its share of the persons. The lead race and the type are drawn together | The best fit always: a house in 60 % of the regions and a merchant republic in 3 of 1,154, since a region spans many biomes and its averages are flat. Grain against roots (FACGEN §3.1): the share of Grain in Grain and Produce is 0.43 to 0.48 in four regions in five. Sea access: 94 % of the regions have it |
+| Who leads | The lead race is drawn with its share to the power 5: the largest race in 54 % of the regions, a minority race in 1 % | Only the largest race: a foreign ruler is a story worth having. The power 2: a minority race rules 5 % of the regions, and rulers of small races are everywhere |
+| Whether there is an opposition | A tension from five terms: contest (another type fits nearly as well), rough land, a rival seat, precious finds and poor land. An opposition from a tension of 0.5, with a random part: 42 % of the regions | How divided the region is by race (FACGEN §4.2): measured, the polarization is 0.61 to 0.68 in four regions in five, since every region holds six races of about the same size. The races decide who opposes, not whether |
+| Who opposes | A draw by the share and the leaning of each race, a cleavage table from the type of the ruler and what each term of the tension favours | The runner-up of the ruling draw alone: the opposition would not follow the land that causes it |
+| Ore | A miners' guild under the ruler, and tension from precious finds | A mining league as a ruler: the first version had miners ruling 5 % of the regions, and the sources know chartered miners under a lord (FACGEN §3.6) |
+| The lesser factions | Twenty kinds, fifteen of them guilds of one trade, taken by their fit to the resources of the region, as many as its persons carry. The merchants have a floor and primary production a factor of 0.9 | Guilds from the vocations of each city: the better rule, but no vocation is drawn yet. The kinds as a list in the Parameter Set: their fits are formulas, so they are a table in the code for now |
+| The rare races | The lead race of a lesser faction is drawn with the minority races weighted up 5 times, and an enclave is a people other than that of the ruler. A minority race leads 45 % of the lesser factions | No boost: 23 %. The Elves, the Dwarves and the new races rule next to no region, so without the lesser factions they would lead nothing |
+| The Supernatural | The mean over the land of how far the field lies above 60, read from the 25th percentile to about the 95th | The amount of Arcane materials, which the test of the plan used: with its range the real field gave a faith to 19 % of the regions and the mages to 14 %, until the range was set from the measured values. The field has features of 10 km, so every region holds some and regions differ little |
+| The neighbours | Nothing is read from another region: a region is Planned from itself | Leagues, shared churches and relations across borders: the Planned stage would need the neighbours Planned, and the result would depend on the order of generation. They belong to the Settled stage |
+| The capital | The seat of the ruling faction: the best Prospect on show that holds its lead race. It is the best Prospect of the region in 94 % of the regions | County towns as faction capitals (SITES §6.14): the zones play no part in the rule |
+
+| Topic | Status |
+|---|---|
+| Six types and three roles of faction | Adopted (2026-11-19) |
+| A ruling faction for every region with persons, from the land and the races | Adopted |
+| An opposition from the tension of the region | Adopted |
+| Lesser factions from the resources and the persons of the region | Adopted, with the kinds in the code |
+| A leaning to each type per race, in the Parameter Set | Adopted, as starting values read from races-basis.md |
+| The archetypes of FACTIONS §3 as the forms of a faction | Partly: 17 race-neutral forms. The archetype and the race-specific name are left to the authoring |
+| Wilderness factions away from the Prospects (FACTIONS §5.3) | Open |
+| Factions that span regions, and relations across borders (FACTIONS §5.5) | Open |
+| The kind of opposition from where the wealth lies (FACGEN §4.3) | Open: the rule reads how much precious ore a region has, not where |
+| Belief as a concept: which faith a faction of the type Belief holds | Open |
+| Guilds from the vocations of the cities and towns | Open, until the vocations are drawn |
 
 ---
 
@@ -1053,11 +1093,17 @@ Collected from the notes; questions that have since been settled are left out.
 
 **Settlements**
 - Should passes feed the travel graph as cheap land edges (SITES §6.14)?
-- Should county towns seed faction capitals? Zones are "also meant for factions" (SITES §6.14).
+- Should county towns seed the seats of the lesser factions? The capital is the seat of the ruling faction (§10.8). Zones are "also meant for factions" (SITES §6.14).
 - Which Christaller distance series is right, the 4 km or the 7 km one? The translation that would settle it was not reachable (SITES §2.5).
 
 **Races**
-- Is race a Stub fact of a person and a family, a fact of a faction, or a "people" layer under the factions (RACES §5.6)?
+- Is race a Stub fact of a person and a family, or a "people" layer under the factions (RACES §5.6)? A faction has a lead race (§10.8).
+- Should a rare race rule a region now and then? Today the large human races lead nearly every ruling faction (§10.8).
+
+**Factions**
+- Should the rule read the land around each Prospect instead of the whole region, which is flat (§10.8)?
+- Should a faction span regions, as a church, a merchant league and a horde do in every source (FACTIONS §5.5)?
+- What does a faction of the type Belief believe in?
 - Should a race have one number for how common it is, apart from its frequency per biome? Today the default frequencies carry both (§10.7).
 - A dwarven region scores low on food. Should a race change the capacity of the land, or only its share of it (RACES §5.6)?
 

@@ -7,9 +7,9 @@ their looks. It is the specification of the society generation, as
 the concepts and holds the names, and the names in this document follow the readme.
 
 Only the first steps are specified and implemented: the races (section 2), the races of a
-region with their potential population (section 3) and the races of a city or a town
-(section 5.1). The rest of sections 4 to 9 holds what is decided and what is still open.
-Detailing it is a later task.
+region with their potential population (section 3), the factions of a region (section 4)
+and the races of a city or a town (section 5.1). The rest of sections 5 to 9 holds what is
+decided and what is still open. Detailing it is a later task.
 
 Sections 2 and 3 and Appendix A were section 19 and Appendix E of map-generation.md until
 2026-11-15. The research notes cite them under those numbers.
@@ -41,7 +41,7 @@ and the travel network are its inputs.
 |---|---|---|
 | Races | none: a list in the Parameter Set | Specified and implemented (section 2) |
 | The races of a region and its potential population | Planned | Specified and implemented (section 3) |
-| Factions | Planned | Not specified (section 4) |
+| Factions | Planned | Specified and implemented (section 4): a ruling faction, an opposition and lesser factions per region |
 | Cities and towns | Settled; their races Planned | The races of a city or a town are specified and implemented (section 5.1), the rest is not specified |
 | Families | Settled | Not specified (section 6) |
 | Persons | Settled for the important persons, later for the rest | The names are implemented, the rest is not specified (section 7) |
@@ -61,7 +61,8 @@ These rules come from the readme and are decided.
   truth and are never regenerated or evicted. Authored data must not contradict the Stub.
 - **Identity is deterministic.** A city, a faction, a family or a person is its parent
   plus a slot index. So a Stub is addressable before it is Realised, and player state and
-  authored data can point at it. What the parent of each kind is has not been decided.
+  authored data can point at it. The parent of a faction is its region (section 4.2). The
+  parent of a city, a family and a person has not been decided.
 - **Only a small and relevant set is precalculated.** The game supports a very large
   number of persons, cities and towns. Only a small and relevant set of them is generated
   at game start, and more are generated as play progresses.
@@ -105,6 +106,10 @@ expected to change late in phase 2, so a race is added or changed by editing the
 - A **height modifier**: a factor on the frequencies of the race that depends on the
   height of the land. It can cut a race off at a height or fade it in and out. A race
   without a height modifier lives at every height.
+- A **leaning to each of the six types of faction**, from 0 to 3: 3 for the kind of group
+  the race forms first, 0 for a kind it never forms. It weighs the race in the draws for
+  the type and the lead race of a faction (section 4.4). A race without a leaning leans to
+  every type alike, with 1.
 
 In a Parameter Set file a race lists only the biomes it lives in. A biome that is left out
 has the frequency 0, and a frequency of 0 is not written to the file. A race without a
@@ -114,6 +119,7 @@ height modifier does not carry one in the file.
 |---|---|
 | Races | 28, all on (Appendix A) |
 | Height modifiers | Elves, Dwarves, Hearthbloods, Widegaze and Shoalfolk (Appendix A) |
+| Leanings to the types of faction | One row per race (Appendix A) |
 
 The default list was decided on 2026-11-15. It holds:
 
@@ -137,7 +143,8 @@ own in the list.
 
 Open:
 
-- How a faction, a family or a person gets its race, and whether a family can be mixed.
+- How a family or a person gets its race, and whether a family can be mixed. A faction
+  has a lead race (section 4.2).
 - What a race can ask for beyond the biome and the height: coast, river, elevation type,
   bedrock, the Supernatural and Prosperity fields, a town, another race to live among
   (collected in races-basis.md, "What the entries ask for that a race cannot say yet").
@@ -345,22 +352,396 @@ it is about a quarter, whether the region holds five or six races. The shares pe
 
 ## 4. Factions
 
-Stage: Planned. Not specified yet.
+Stage: Planned. The factions need the region itself only: its land in its final form, its
+races (section 3) and its Prospects with their races (section 5.1). Nothing is read from
+another region.
 
-A faction is a group of people in one region: a political grouping. It could be a
-kingdom, a thieves' guild or a tribe.
+A faction is a group of people in one region: a political grouping. Every region with
+persons has one **ruling faction**. Some have an **opposition**, and some have **lesser
+factions**: guilds mostly. The rule was adopted on 2026-11-19 as proposed in
+[plans/region-factions.md](plans/region-factions.md), which holds the test behind it and
+what was weighed. Its fits, weights and tables are starting values for phase 1.
+
+| Parameter | Default |
+|---|---|
+| Race power | 5 |
+| Sharpness | 2 |
+| Base fit: Family, Race, Vocation, Belief, Magic, Place | 0.35, 0.12, 0.05, 0.05, 0, 0.10 |
+| Tension weights: contest, rough land, rival seat, precious finds, poor land | 0.25, 0.20, 0.20, 0.15, 0.20 |
+| Tension an opposition needs | 0.50 |
+| Tension jitter | 0.2 |
+| Persons an opposition needs | 80 |
+| Persons per lesser faction | 150 |
+| Most lesser factions | 4 |
+| Lowest fit of a lesser faction | 0.75 |
+| Lesser jitter | 0.1 |
+| Cleavage and favour | the tables of section 4.6 |
+| Index ranges | the table of section 4.3 |
+| Leaning of each race to each type | Appendix A |
+
+The parameters are `Planning.Factions` in the Parameter Set. The leaning is
+`FactionLeaning` on each race. The draws use the hash purposes 0x4b01 to 0x4b05.
+
+### 4.1 The types
+
+The type of a faction is what binds its members. Each type rests on a fact of a person.
+
+| Type | Bound by | The fact of a person it rests on |
+|---|---|---|
+| **Family** | blood and marriage: a house and its household | family links |
+| **Race** | a people: one race, its clans and its customs | race |
+| **Vocation** | work: a trade, its masters and its monopoly | vocation |
+| **Belief** | a faith: a temple, an order, a sect | belief (not a concept of the readme yet) |
+| **Magic** | the arcane: a college, a circle, a cabal | the supernatural vocations |
+| **Place** | a home: a town or a valley that rules itself | home |
+
+Arms and crime are not types: a free company and a thieves' guild are bound by work. A
+cause is not a type: it is a role, the opposition.
+
+### 4.2 The roles, the forms and the Stub
+
+| Role | Per region | Meaning |
+|---|---|---|
+| **Ruling** | exactly 1; none in a region without persons | It governs the region |
+| **Opposition** | 0 or 1 | It wants the rule, or wants out of it |
+| **Lesser** | 0 to 4 | It lives under the ruler: a guild, an order, a circle, a great house, a chartered town, an enclave |
+
+The **form** is the name of a type in a role. It is a label for the authoring and no rule
+reads it. It is race-neutral: a crown of the Northmen is a jarldom.
+
+| Type | Ruling | Opposition | Lesser |
+|---|---|---|---|
+| Family | Crown | House | House |
+| Race | Horde, Clan or Hold | Horde, Clan or Hold | Enclave |
+| Vocation | Merchant republic | Guild | Guild |
+| Belief | Temple state | Sect or Order | Order |
+| Magic | Magocracy | Cabal | Circle |
+| Place | Free city or Commune | Free city or Commune | Chartered town |
+
+- A Race ruler or opposition is a Horde when `herd · open ≥ max(0.6 · rough, 0.35)`, a
+  Hold when `rough ≥ 0.5` and `ore ≥ 0.4`, else a Clan.
+- A Place ruler or opposition is a Free city when `urban · trade ≥ 0.35`, else a Commune.
+- A Belief opposition is a Sect when `poor > 0.4`, else an Order.
+
+The Stub of a faction holds:
+
+| Fact | Meaning |
+|---|---|
+| Slot | Its identity is the region and the slot: 0 the ruling faction, 1 the opposition, 2 to 5 the lesser factions. Slot 1 is empty in a region without an opposition |
+| Role, type, form | As above |
+| Lead race | The race of its leaders. A faction of the type Race holds that race only. Any other faction is open to the races of its seat |
+| Seat | A Prospect on show of the region. None in a region without a Prospect on show |
+| Kind | The kind of a lesser faction (section 4.7), and the trade of a guild in opposition |
+| Vocations | The vocations a guild, an order and a circle gather |
+| Ground | What an opposition stands on (section 4.6) |
+| Grip | 0 to 1. The ruling faction: 1 − the tension. The opposition: the tension. A lesser faction: its fit |
+
+The seat of the ruling faction is the capital of the region.
+
+### 4.3 The indices of a region
+
+The rule reads the region through indices from 0 to 1.
+
+```
+ramp(x, low, high) = clamp((x − low) / (high − low), 0, 1)
+mean(k)   = the area-weighted mean amount of resource k over the land patches, in their final form
+listed(k) = the share of the land area where the amount of resource k is 0.25 or more
+persons   = the potential population of the region, not rounded (section 3.4)
+share(r)  = the persons of race r / persons
+```
+
+The area of a patch is that of section 3.1. The Prospects are all Prospects of the region
+where the row says so, else the ones on show. A harbour is a Prospect on show with a
+harbour, or with a river mouth of 8 or more.
+
+| Index | Value | Low | High |
+|---|---|---|---|
+| grain | ramp of mean(Grain) | 0.17 | 0.45 |
+| herd | 0.5 · ramp of mean(Livestock) | 0.33 | 0.53 |
+| | + 0.5 · ramp of mean(Horses & pack animals) | 0.22 | 0.40 |
+| open | ramp of the share of the land in Cold steppe, Temperate grassland, Savanna, Cold desert, Hot desert, Thorn scrub and Tundra | 0.25 | 0.66 |
+| forest | ramp of the share in Boreal forest, the three temperate forests, the two tropical forests, Mangrove and Woodland & shrubland | 0.29 | 0.69 |
+| cold | ramp of the share in Ice & snow, Tundra and Boreal forest | 0.1 | 0.6 |
+| dry | ramp of the share in Hot desert, Cold desert, Cold steppe and Thorn scrub | 0.1 | 0.6 |
+| rough | ramp of the share in Hills zones + 1.5 · the share in Mountains zones | 0 | 0.45 |
+| trade | 0.5 · ramp of the best Trade factor of a Prospect on show | 0.5 | 1 |
+| | + 0.5 · ramp of the number of harbours | 0 | 4 |
+| wealth | 0.5 · ramp of the mean Prosperity factor of all Prospects of the region | 0.33 | 0.69 |
+| | + 0.5 · ramp of the number of Rich Prospects on show | 0 | 9 |
+| urban | ramp of the number of Prospects on show | 6 | 19 |
+| ore | ramp of listed(Iron ore) + listed(Copper ore) + listed(Tin) + listed(Silver & lead) + listed(Gold) + listed(Gems & pearls) + listed(Salt) | 0.03 | 0.18 |
+| precious | ramp of listed(Silver & lead) + listed(Gold) + listed(Gems & pearls) | 0 | 0.06 |
+| arcane | ramp of the area-weighted mean of clamp((Supernatural − 60) / 40, 0, 1) over the land patches, with the Supernatural field at the site of each patch | 0.014 | 0.032 |
+| people | ramp of persons | 160 | 600 |
+| small | 1 − ramp of persons | 60 | 260 |
+| mixed | 1 − ramp of the largest share(r) | 0.24 | 0.32 |
+| poor | ramp of the Poor Prospects on show / the Prospects on show; 0 without one on show | 0 | 0.5 |
+| uneven | ramp of the highest − the lowest Prosperity factor of the Prospects on show; 0 with fewer than two | 0.1 | 0.5 |
+
+- The lows and highs are parameters. They are about the 10th and the 90th percentile of
+  generated regions, so a change to the map parameters can call for new ones. The range of
+  `arcane` is the 25th percentile and about the 95th: the Supernatural field is fine
+  grained, so every region has some, and only the upper half counts.
+- `city` is 1 when a Prospect for a city is on show, else 0.4. The fits of section 4.7 use
+  it.
+
+### 4.4 The ruling faction
+
+The fit of the land for each type as the ruler:
+
+```
+fit(t) = base(t) + (1 − base(t)) · land(t)
+
+land(Family)   = 0.5·grain + 0.3·people + 0.2·(1 − rough)
+land(Race)     = max(herd·open, 0.6·rough + 0.4·forest·(1 − grain), 0.8·small)
+land(Vocation) = trade · (0.4 + 0.6·wealth) · (0.5 + 0.5·urban)
+land(Belief)   = 0.5·arcane + 0.15·mixed + 0.3·poor·(1 − trade)
+land(Magic)    = 0.8 · arcane³
+land(Place)    = max(urban·trade, 0.8·small, 0.7·rough·(1 − people), 0.6·cold)
+```
+
+Grain land with many persons gets a house. Open herding land, rough land, forest without
+grain and very small regions get a people. Trading towns with wealth get the guilds.
+Supernatural land, and poor land off the trade routes, get a faith. Only the most
+supernatural land gets the mages. Land with many trading towns, very small regions,
+thinly peopled rough land and the cold north get self-rule.
+
+The lead race and the type are drawn together:
+
+```
+lean(r, t)   = the leaning of race r to type t / 3                 # Appendix A; a negative leaning counts as 0
+weight(r, t) = share(r)^race power · lean(r, t) · fit(t)^sharpness   over the races r of the region and the six types t
+(lead race, type) = one draw by weight, with u = toUnit(hash4(seed, 0x4b01, i, j))
+```
+
+- The weights are walked race by race in the order of the Parameter Set, and for each race
+  type by type in the order Family, Race, Vocation, Belief, Magic, Place. The first whose
+  running sum passes `u · the sum of the weights` is drawn.
+- The powers go through the deterministic exponential and logarithm. A power of 0 gives 1.
+- If every weight is 0, the lead race is the largest race of the region and the type the
+  one with the best fit.
+- The race power makes the largest race lead in most regions without making it certain.
+  The sharpness is how much the land decides: with 1 the leanings decide more, with a high
+  number the best fit always wins.
+
+The seat is the Prospect on show with the highest score among those that hold the lead
+race (section 5.1). When none holds it, the Prospect on show with the highest score. Ties
+go to the first in the order of the Prospects.
+
+### 4.5 The tension
+
+```
+typeWeight(t) = Σ weight(r, t) over the races
+contest   = ramp(1 − typeWeight(ruling type) / Σ typeWeight, 0.4, 0.9)
+rivalSeat = the highest ramp(score(p) / score(best), 0.8, 1) · ramp(km from p to best, 40, 100)
+            over the Prospects p on show other than best, the one with the highest score
+poorLand  = 0.5·poor + 0.5·uneven
+
+tension = w(contest)·contest + w(rough land)·rough + w(rival seat)·rivalSeat
+        + w(precious finds)·precious + w(poor land)·poorLand
+
+there is an opposition when persons ≥ the persons an opposition needs
+    and tension + jitter · (u − 0.5) ≥ the tension an opposition needs,   u = toUnit(hash4(seed, 0x4b02, i, j))
+```
+
+| Term | What it says |
+|---|---|
+| contest | The land and the races would as well carry another kind of ruler. A merchant republic in grain land is contested, a crown there is not |
+| rough land | Hills and mountains shelter those who do not obey |
+| rival seat | A second Prospect nearly as good as the best, and far from it. The distance is between the two Spots |
+| precious finds | Silver, gold and gems pay for a rising and are worth one |
+| poor land | Poor Prospects, and rich and poor Prospects side by side |
+
+How divided a region is by race is not a term: every region holds six races of about the
+same size, so it is nearly the same everywhere. The races decide who opposes, not whether.
+
+### 4.6 The opposition
+
+```
+ground(t)    = w(contest)·contest·fit(t)
+             + (w(rough land)·rough·favour(rough land, t) + w(rival seat)·rivalSeat·favour(rival seat, t)
+              + w(precious finds)·precious·favour(precious finds, t) + w(poor land)·poorLand·favour(poor land, t)) / 2
+weight(r, t) = share(r) · lean(r, t) · cleavage(ruling type, t) · ground(t)
+(lead race, type) = one draw by weight, with u = toUnit(hash4(seed, 0x4b03, i, j)), walked as in section 4.4
+```
+
+- A faction of the type Race is never of the lead race of the ruler: a people does not
+  oppose its own ruler as a people. A Magic opposition needs `arcane ≥ 0.3`.
+- If every weight is 0 the region has no opposition.
+- `cleavage` says which type opposes which ruler:
+
+  | Ruler ↓, opposition → | Family | Race | Vocation | Belief | Magic | Place |
+  |---|---|---|---|---|---|---|
+  | Family | 3 | 2 | 2 | 2 | 1 | 2 |
+  | Race | 2 | 3 | 1 | 1 | 1 | 1 |
+  | Vocation | 2 | 1 | 3 | 1 | 1 | 2 |
+  | Belief | 2 | 1 | 1 | 3 | 3 | 1 |
+  | Magic | 2 | 1 | 1 | 3 | 2 | 2 |
+  | Place | 3 | 2 | 2 | 1 | 1 | 1 |
+
+  A crown is opposed by a rival house first, a people by another people, a guild by a
+  rival guild, a faith by a sect or by the mages, and a free town by a lord who wants it.
+- `favour` says which type each term feeds:
+
+  | Term | Family | Race | Vocation | Belief | Magic | Place |
+  |---|---|---|---|---|---|---|
+  | rough land | 1 | 2 | 0 | 1 | 0 | 2 |
+  | rival seat | 2 | 0 | 2 | 0 | 0 | 2 |
+  | precious finds | 2 | 0 | 2 | 0 | 0 | 0 |
+  | poor land | 0 | 1 | 0 | 2 | 0 | 2 |
+
+- **The ground** of the opposition is the term with the largest weighted value in the
+  tension: contest, rough land, rival seat, precious finds or poor land, the first of them
+  in a tie. It is kept so that the authoring knows why the opposition is there.
+- **A guild in opposition** has a trade: the kind of the type Vocation with the highest fit
+  (section 4.7, without the random part). That kind is then not also a lesser faction.
+- **The seat** is the Prospect on show, other than the seat of the ruler, with the highest
+  `score · (0.5 + 0.5 · ramp(km from the seat of the ruler, 20, 80))` among those that hold
+  the lead race of the opposition. When none holds it, among all the others. In a region
+  with one Prospect on show it shares the seat of the ruler.
+
+### 4.7 The lesser factions
+
+```
+slots = min(the most lesser factions, ⌊persons / the persons per lesser faction⌋)
+for every kind of the table, in its order: value = fit + lesser jitter · (u − 0.5)
+the kinds are taken by value, highest first, while value ≥ the lowest fit and a slot is free
+```
+
+- `u` comes from one sfc32 generator per region, seeded with `hash4(seed, 0x4b04, i, j)`. It
+  gives one number per kind in the order of the table, also for a kind that is not taken.
+- A kind is passed over, and the next is tried, when:
+  - a lesser faction of its type is taken already, for every type but Vocation;
+  - it is the chartered town under a Place ruler, or the circle under a Magic ruler: the
+    ruler is that council or that circle already;
+  - it is the trade of the guild in opposition;
+  - none of the vocations it gathers is on;
+  - it is the enclave and the region has no other race than the lead race of the ruler.
+- The kinds are a table in the code. The fits read the resources of the land. They should
+  read the vocations of the cities and towns once those are drawn (section 8).
+
+| Kind | Type | Vocations it gathers | Fit | Seat resources |
+|---|---|---|---|---|
+| Merchants' guild | Vocation | Merchant, Shopkeeper, Carter | (0.4 + 0.6·(0.65·trade + 0.35·wealth)) · city | |
+| Miners' guild | Vocation | Miner, Quarryman, Smelter | 0.9 · ore | Iron ore, Copper ore, Tin, Silver & lead, Gold, Gems & pearls |
+| Smiths' guild | Vocation | Smith, Artificer | ramp(listed(Iron ore), 0.02, 0.08) · (0.5 + 0.5·ramp(mean(Fuel), 0.33, 0.6)) · city | Iron ore |
+| Mariners' guild | Vocation | Sailor, Fisher, Shipwright | ramp(harbours, 0, 3) · (0.5 + 0.5·ramp(mean(Fish), 0.28, 0.41)) | Fish; on water |
+| Clothiers' guild | Vocation | Weaver, Tailor, Tanner, Leatherworker | (0.5·ramp(mean(Fibre), 0.2, 0.47) + 0.3·ramp(mean(Dyes), 0.03, 0.17) + 0.2·ramp(mean(Livestock), 0.33, 0.53)) · city | Fibre, Dyes |
+| Builders' guild | Vocation | Mason, Carpenter | (0.6·ramp(mean(Stone), 0.04, 0.22) + 0.4·ramp(mean(Timber), 0.3, 0.65)) · city · (0.5 + 0.5·urban) | Stone, Timber |
+| Salters' guild | Vocation | Salter | 0.9 · ramp(listed(Salt), 0, 0.04) | Salt |
+| Caravan company | Vocation | Carter, Merchant, Innkeeper | dry · ramp(mean(Horses & pack animals), 0.22, 0.4) · (0.5 + 0.5·ramp(best Trade factor, 0.5, 1)) | Horses & pack animals |
+| Foresters' guild | Vocation | Forester, Hunter, Charcoal burner | 0.9 · (0.5·ramp(mean(Timber), 0.3, 0.65) + 0.5·ramp(mean(Furs & ivory), 0.02, 0.21)) | Timber, Furs & ivory |
+| Drovers' guild | Vocation | Herder, Butcher | 0.9 · herd · open | Livestock, Horses & pack animals |
+| Apothecaries' guild | Vocation | Healer, Alchemist | 0.4·ramp(mean(Herbs), 0.3, 0.52) + 0.3·ramp(mean(Reagents), 0, 0.015) + 0.3·ramp(mean(Spices), 0, 0.12) | Herbs, Reagents, Spices |
+| Victuallers' guild | Vocation | Miller, Baker, Brewer, Innkeeper | (0.5·grain + 0.5·ramp(mean(Orchard), 0.22, 0.56)) · urban · city | Grain, Orchard |
+| Goldsmiths' guild | Vocation | Jeweller | precious · (0.5 + 0.5·wealth) · city | Gold, Silver & lead, Gems & pearls |
+| Free company | Vocation | Soldier, Guard | 0.5·rough + 0.5·poor | |
+| Thieves' guild | Vocation | Thief, Beggar | wealth · urban · (0.5 + 0.5·uneven) · city | |
+| Order | Belief | Priest, Scribe, Healer | 0.35 + 0.65 · max(arcane, 0.6·poor) | |
+| Circle | Magic | Mage, Alchemist, Seer | arcane | Arcane materials |
+| Great house | Family | Noble | 0.8 · (0.6·grain + 0.4·people) | |
+| Chartered town | Place | | urban · (0.4 + 0.6·trade) | |
+| Enclave | Race | | 0.85 · the highest lean(r, Race) · (1 for a minority race, 0.6 for a main race) over the races of the region other than the lead race of the ruler | |
+
+The merchants have a floor in a region with a city, and the four trades of primary
+production (miners, salters, foresters, drovers) a factor of 0.9: merchant guilds came
+first and primary production was rarely guilded
+([research/faction-generation.md](research/faction-generation.md) section 5). A vocation
+that is off is left out of what a kind gathers.
+
+**The lead race** of a lesser faction is drawn among the races of the region, walked in the
+order of the Parameter Set, each with the weight
+
+```
+share(r) · lean(r, type) · (the minority boost of section 5.1 for a minority race, else 1)
+```
+
+- The draws use one sfc32 generator per region, seeded with `hash4(seed, 0x4b05, i, j)`. It
+  gives one number per lesser faction, in the order they are taken, and none for an
+  enclave.
+- If every weight is 0 the lead race is the largest race of the region.
+- An enclave is of the race that gave its fit, the first such race in the order of the
+  Parameter Set.
+- The boost is where the rare races get their factions: a minority race leads nearly half
+  of the lesser factions.
+
+**The seat** of a lesser faction is the Prospect on show with the highest pull among those
+that hold its lead race, and among all on show when none does:
+
+```
+local(p) = the highest amount of a seat resource of the kind on the patch of p and its neighbouring land patches of the region; 0 for a kind without
+pull(p)  = score(p) · (1 + local(p)) · (0.25 if the kind is on water and p has no harbour and no river of 8 or more, else 1)
+```
+
+An enclave sits on the Prospect on show, other than the seat of the ruler, where its race
+has the most persons on the patch of the Prospect and its neighbouring land patches
+(`local(r)` of section 5.1). It only takes the seat of the ruler when no other Prospect on
+show holds its race.
+
+### 4.8 Measured
+
+The generator on 1,154 regions with land (the 17 × 17 regions around (0, 0) of the seeds
+`cellgen`, `gameworld`, `atlas` and `ember`), with the default Parameter Set. Every one of
+them has persons and a ruling faction.
+
+| Ruling faction | Regions |
+|---|---|
+| Family: Crown | 42.8 % |
+| Race: Horde 8.1 %, Clan 6.3 %, Hold 4.1 % | 18.5 % |
+| Place: Commune 10.5 %, Free city 6.1 % | 16.6 % |
+| Vocation: Merchant republic | 10.6 % |
+| Belief: Temple state | 10.0 % |
+| Magic: Magocracy | 1.6 % |
+
+- The type with the best fit rules 43 % of the regions. In the others the leaning of the
+  races or the draw decided.
+- The lead race is the largest race of the region in 54 % of the regions and a minority
+  race in 1 %. Midlanders lead 32 % of the ruling factions, Canal folk 25 %, Saltroad folk
+  17 %, Sunlanders 14 %, Northmen 4 %, Rainkeepers 3 %, Orcs 3 % and Grass riders 1 %. All
+  other races together lead 10 regions.
+- The seat holds the lead race in 99.6 % of the regions. It is the best Prospect of the
+  region in 94 % and a Prospect for a city in 80 %.
+- 41.7 % of the regions have an opposition: 22 % of those under a Crown, 50 to 67 % of
+  those under another ruler. It is a House in 35 % of the cases, a Guild in 19 %, a Sect in
+  10 %, a Commune in 9 %, a Free city in 8 %, an Order in 5 %, a Clan in 5 %, a Hold in
+  5 %, a Horde in 4 % and a Cabal in 1 %. Its ground is contest in 64 %, rough land in
+  20 %, a rival seat in 7 %, poor land in 6 % and precious finds in 3 %. It sits 86 km from
+  the seat of the ruler in the median case.
+- Lesser factions: none in 24 % of the regions, one in 34 %, two in 24 %, three in 13 % and
+  four in 6 %. 60 % of the regions have a guild. Regions with each kind: merchants 21 %,
+  enclave 18 %, clothiers 15 %, order 12 %, mariners 10 %, victuallers 10 %, salters 9 %,
+  free company 7 %, smiths 6 %, chartered town 5 %, goldsmiths 5 %, thieves 5 %, foresters
+  4 %, circle 4 %, miners 3 %, builders 2 %, apothecaries 2 %, great house 2 %, caravan
+  company 2 %, drovers 1 %.
+- A minority race leads 45 % of the lesser factions, and half of the regions have a
+  faction led by a minority race. All 28 races lead a lesser faction somewhere. The human
+  races lead 64 % of them, the classic races 19 % and the new races 17 %.
+- 53 % of the lesser factions sit on the seat of the ruler: three merchants' guilds in
+  four, two mariners' guilds in five, one salters' guild in three and no enclave.
+- A region has 1 to 6 factions and 2.8 in the mean: one in 17 % of the regions, two in
+  26 %, three in 28 %, four in 18 %, five in 9 % and six in 2 %.
 
 Open:
 
-- What a faction holds, and what the parent of its identity is.
-- How many factions a region has, and how they follow from the potential population and
-  the Prospects.
-- The race of a faction.
-- How factions stand to each other, inside a region and across region borders.
+- A Belief faction has no faith to believe in: belief is not a concept of the readme.
+- Factions that cross regions (a church, a merchant league, a horde), and how factions
+  stand to each other across region borders. Both need the bordering regions, so they
+  belong to the Settled stage.
+- Whether the rule should read the land around each Prospect instead of the whole region,
+  which is flat: a region spans many biomes.
+- Where the wealth lies: the sources tie the kind of opposition to precious finds near the
+  seat or far from it. The rule reads how much a region has, not where.
+- Outlaws away from the Prospects: bandits, pirates and cults.
+- The kinds of lesser faction as a list in the Parameter Set, and their fits from the
+  vocations of the cities and towns (section 8).
+- How a person gets its faction membership (section 7).
 
-Material: [research/factions.md](research/factions.md) holds the faction archetypes, the
-axes that tell them apart, their relations and a design note for the generator. Every
-entry of [races-basis.md](races-basis.md) lists the kinds of group the race forms.
+Material: [research/factions.md](research/factions.md) holds 48 faction archetypes, the
+axes that tell them apart and their relations.
+[research/faction-generation.md](research/faction-generation.md) holds how generators and
+games compute the kind of ruler of a land, and what decides a ruler, an opposition and
+guilds in the scholarship. Every entry of [races-basis.md](races-basis.md) lists the kinds
+of group the race forms.
 
 ---
 
@@ -569,7 +950,8 @@ Open:
 - The age at which a person gets a vocation, and what a child and an old person hold.
 - The factors per race, which races keep slaves, and which races other than the Twofold
   switch the division by sex off.
-- What makes a city the capital.
+- The capital of a region is the seat of its ruling faction (section 4.4). What a vocation
+  of the tier capital needs beyond that.
 
 Material: [research/vocations.md](research/vocations.md) describes each of the 51
 vocations (what it covers, its lore, its resources, where it is found, how frequent it is,
@@ -668,6 +1050,41 @@ Mangrove.
 
 The other 23 races have none.
 
+**Leanings to the types of faction.** 0 never, 1 seldom, 2 fits, 3 the kind of group the
+race forms first (section 4.4). They are read from the "Factions" line of each entry of
+races-basis.md, and they are starting values.
+
+| Race | Family | Race | Vocation | Belief | Magic | Place | Read from |
+|---|---|---|---|---|---|---|---|
+| Northmen | 2 | 1 | 2 | 1 | 1 | 3 | A Thing district of free farmers, a jarldom, a ship fellowship |
+| Midlanders | 3 | 1 | 2 | 2 | 1 | 2 | A kingdom, a barony, a free town, a craft guild, a monastery |
+| Saltroad folk | 2 | 2 | 3 | 2 | 1 | 1 | A caravan company, a merchant house, an emirate, a confederation of clans |
+| Sunlanders | 3 | 2 | 2 | 2 | 1 | 2 | A grassland empire, a cattle clan, a walled city-state, a caste of smiths |
+| Grass riders | 2 | 3 | 1 | 1 | 1 | 0 | A clan and its herds, a horde under a khan |
+| Rainkeepers | 2 | 1 | 2 | 3 | 1 | 2 | A temple town and its lands, a king's court, a merchant guild |
+| Canal folk | 2 | 1 | 3 | 1 | 1 | 1 | A governor's court, an academy, a merchant house, a state monopoly |
+| Elves | 2 | 3 | 1 | 1 | 2 | 1 | A forest realm, a house, an Open house that teaches |
+| Dwarves | 1 | 3 | 3 | 1 | 1 | 1 | A hold under its king, a clan, a craft guild inside a hold |
+| Halflings | 2 | 1 | 1 | 1 | 0 | 3 | A Hundred under its elected reeve, a moot, a great family |
+| Gnomes | 1 | 1 | 3 | 1 | 2 | 2 | A warren under its masters, a family workshop, a college of makers' marks |
+| Orcs | 1 | 3 | 2 | 1 | 1 | 0 | A warband under a chief, a horde, a company for hire |
+| Hoarkin | 1 | 2 | 2 | 1 | 1 | 3 | A winter lodge, the summer moot, a hunting company |
+| Hearthbloods | 2 | 2 | 1 | 1 | 1 | 2 | A hall under its larder-lord, a league of halls |
+| Widegaze | 1 | 2 | 2 | 1 | 2 | 2 | A mound village, the Watch, a herding kindred, a circle of star watchers |
+| Amberbloods | 1 | 2 | 2 | 2 | 1 | 2 | A grove village, a wardenship, a timber court |
+| Brinefolk | 1 | 1 | 3 | 2 | 1 | 2 | A pan town under its pan masters, a salt league, the Keepers of the Bed |
+| Duskreaders | 2 | 1 | 2 | 1 | 2 | 2 | A canyon town under the elders of its houses, a night caravan company |
+| Noonfolk | 0 | 1 | 2 | 2 | 1 | 3 | A free commune under a noon council, a grain cooperative, the Vigil |
+| Boughwalkers | 2 | 2 | 2 | 1 | 1 | 2 | A canopy village, a tree lineage, a dye house |
+| Shoalfolk | 1 | 1 | 2 | 1 | 1 | 3 | A stilt village under a tide council, a pilots' guild |
+| Swiftborn | 0 | 1 | 2 | 1 | 1 | 3 | A town and its Long Work, a harvest gang, a year-class |
+| Flinchless | 1 | 1 | 3 | 1 | 1 | 1 | A legion village under a captain, a free company, a surgeons' hall |
+| Lanternkin | 1 | 1 | 3 | 1 | 2 | 1 | A guild of notaries, a ring of insurers, a lamp court |
+| Stillfaces | 1 | 2 | 2 | 1 | 2 | 1 | A village kindred, a lodge of trackers, a circle of diagnosticians |
+| Twofold | 3 | 1 | 1 | 2 | 1 | 1 | A house and its chain, a temple of the Pair |
+| Bitterbloods | 1 | 2 | 3 | 1 | 2 | 2 | A swamp village, an apothecaries' house, a school of poisoners |
+| Catfolk | 1 | 2 | 2 | 2 | 1 | 1 | A granary ward, a hunting band, a temple of the Small Huntress |
+
 **How common.** `common` is 3 to 5 for the human races, 2 for Elves, Dwarves, Halflings
 and Orcs, 1 for Gnomes, and 1 or 0.5 for a new race: 1 when it has a homeland of its own,
 0.5 when it lives scattered among others or is rare by its nature.
@@ -693,6 +1110,8 @@ when it stands in sections 1 to 9.
 | [research/races.md](research/races.md) | 41 race archetypes from RPGs, fantasy settings and strategy games, and the habitat weights of the first default list of 23 races. The classic races and the Catfolk keep their weights from it. The races that were left out are still described there | Section 2, Appendix A |
 | [research/human-races.md](research/human-races.md) | An earlier candidate list in which every race looks like a regular human or nearly so. Not adopted | Section 2 |
 | [research/factions.md](research/factions.md) | Faction archetypes, their axes and relations, and a design note | Section 4 |
+| [research/faction-generation.md](research/faction-generation.md) | How generators and games compute the kind of ruler of a land, and the scholarship on what decides a ruler, an opposition and guilds | Section 4 |
+| [plans/region-factions.md](plans/region-factions.md) | The plan behind the factions of a region: the proposal, its test on 1,154 regions, what was weighed and what changed when it was implemented | Section 4 |
 | [research/vocations.md](research/vocations.md) | 51 vocations with their lore, resources, biomes, races and factions, the proposals for new resources, and a design note | Section 8 |
 | [tools-basis.md](tools-basis.md) | 146 real tools for the 51 vocations, each with a sourced description, lore and the fitting vocations. Material: no rule reads it | Sections 8, 9 |
 | [research/portrait-components.md](research/portrait-components.md) | Lists of hairstyles, outfits, colours, race markers and accessories for portraits. Written for the 32 races of the first version of races-basis.md and extended for the Catfolk: it still covers the five that were left out | Section 9 |

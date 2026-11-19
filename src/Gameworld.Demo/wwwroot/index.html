@@ -414,6 +414,18 @@ const words = s => String(s).replace(/([a-z])([A-Z])/g, '$1 $2').replace(/ And /
 const num = (v, d = 2) => v == null ? '–' : Number(v).toFixed(d);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
+// One faction of a region: its role, what it is, its lead race and what the rule says about it.
+function factionLine(f, patch) {
+  const what = f.Kind ?? words(f.Form);
+  const notes = [words(f.Type).toLowerCase()];
+  if (f.Ground) notes.push('ground: ' + words(f.Ground).toLowerCase());
+  notes.push('grip ' + num(f.Grip));
+  if (f.Vocations.length) notes.push(f.Vocations.map(esc).join(', '));
+  const here = patch && f.Seat && f.Seat[0] === patch.Id[0] && f.Seat[1] === patch.Id[1];
+  const seat = f.Seat ? ` · seat (${f.Seat[0]}, ${f.Seat[1]})${here ? ' <b>here</b>' : ''}` : '';
+  return `${f.Role}: ${esc(what)} of the ${esc(f.LeadRace)} <span class="muted">(${notes.join(' · ')})</span>${seat}`;
+}
+
 async function inspect(p) {
   state.pinned = p;
   draw();
@@ -433,6 +445,10 @@ async function inspect(p) {
       const races = d.RegionPopulation.filter(r => r.Standing !== 'Absent').sort((a, b) => b.Persons - a.Persons)
         .map(r => `${esc(r.Name)} ${people(r.Persons)}${r.Standing === 'Minority' ? ' <span class="muted">(minority)</span>' : ''}`).join(' · ');
       row('', `Potential population: ${people(total)}${races ? ' (' + races + ')' : ''}`);
+    }
+    if (d.RegionFactions) {
+      if (!d.RegionFactions.length) row('Factions', '<span class="muted">none: the region holds nobody</span>');
+      d.RegionFactions.forEach((f, n) => row(n ? '' : 'Factions', factionLine(f, d.Patch)));
     }
     row('Zone', `(${d.Zone.Id[0]}, ${d.Zone.Id[1]}) · ${words(d.Zone.ElevationType)} · ${d.Zone.Cells} cell${d.Zone.Cells > 1 ? 's' : ''}`);
     if (d.Zone.Prospects) row('', 'Prospects: ' + prospectCount(d.Zone.Prospects));

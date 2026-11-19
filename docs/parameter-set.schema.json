@@ -601,7 +601,7 @@
       "additionalProperties": false
     },
     "Planning": {
-      "description": "Planned stage: Prospects for cities and towns, which of them are on show (§15), and the potential population (society §3). The Settled stage has no parameters of its own: the travel network connects the Prospects on show (§16).",
+      "description": "Planned stage: Prospects for cities and towns, which of them are on show (§15), the potential population (society §3) and the factions (society §4). The Settled stage has no parameters of its own: the travel network connects the Prospects on show (§16).",
       "type": "object",
       "properties": {
         "ProspectsPerRegion": {
@@ -745,6 +745,1088 @@
               "minimum": 0,
               "maximum": 1,
               "default": 0.02
+            }
+          },
+          "additionalProperties": false
+        },
+        "Factions": {
+          "description": "The factions of a region: its ruling faction, its opposition and its lesser factions, from the races, the biomes, the resources and the wealth of the region (society §4).",
+          "type": "object",
+          "properties": {
+            "RacePower": {
+              "description": "How much the size of a race counts when the lead race of the ruling faction is drawn: the share of the race in the persons of the region is raised to this power. With the default the largest race leads in about 6 regions in 10 and a minority race in 1 in 100. A higher number makes the largest race lead more often (society §4.4).",
+              "type": "number",
+              "minimum": 0,
+              "default": 5
+            },
+            "Sharpness": {
+              "description": "How much the land decides the type of the ruling faction: the fit of each type is raised to this power. 1 lets the leaning of the races decide more; a high number makes the type with the best fit rule nearly always (society §4.4).",
+              "type": "number",
+              "minimum": 0,
+              "default": 2
+            },
+            "BaseFit": {
+              "description": "The fit of each type as the ruler in a land that says nothing for it, 0 to 1. The land moves the fit from here up to 1. A higher base makes the type rule more regions (society §4.4).",
+              "type": "object",
+              "properties": {
+                "Family": {
+                  "description": "Value for the type Family: a house and its household.",
+                  "type": "number",
+                  "default": 0.35
+                },
+                "Race": {
+                  "description": "Value for the type Race: a people.",
+                  "type": "number",
+                  "default": 0.12
+                },
+                "Vocation": {
+                  "description": "Value for the type Vocation: a trade.",
+                  "type": "number",
+                  "default": 0.05
+                },
+                "Belief": {
+                  "description": "Value for the type Belief: a faith.",
+                  "type": "number",
+                  "default": 0.05
+                },
+                "Magic": {
+                  "description": "Value for the type Magic: the arcane.",
+                  "type": "number",
+                  "default": 0
+                },
+                "Place": {
+                  "description": "Value for the type Place: a town or a valley that rules itself.",
+                  "type": "number",
+                  "default": 0.1
+                }
+              },
+              "required": [
+                "Family",
+                "Race",
+                "Vocation",
+                "Belief",
+                "Magic",
+                "Place"
+              ],
+              "additionalProperties": false
+            },
+            "Tension": {
+              "description": "The weights of the five terms of the tension of a region. The tension runs from 0 to their sum, 1 with the defaults (society §4.5).",
+              "type": "object",
+              "properties": {
+                "Contest": {
+                  "description": "Weight of the contest: the land and the races would as well carry another kind of ruler (society §4.5).",
+                  "type": "number",
+                  "minimum": 0,
+                  "default": 0.25
+                },
+                "RoughLand": {
+                  "description": "Weight of rough land: hills and mountains shelter those who do not obey (society §4.5).",
+                  "type": "number",
+                  "minimum": 0,
+                  "default": 0.2
+                },
+                "RivalSeat": {
+                  "description": "Weight of a rival seat: a second Prospect on show nearly as good as the best, and far from it (society §4.5).",
+                  "type": "number",
+                  "minimum": 0,
+                  "default": 0.2
+                },
+                "PreciousFinds": {
+                  "description": "Weight of precious finds: silver and lead, gold, gems and pearls (society §4.5).",
+                  "type": "number",
+                  "minimum": 0,
+                  "default": 0.15
+                },
+                "PoorLand": {
+                  "description": "Weight of poor land: Poor Prospects, and rich and poor Prospects side by side (society §4.5).",
+                  "type": "number",
+                  "minimum": 0,
+                  "default": 0.2
+                }
+              },
+              "additionalProperties": false
+            },
+            "OppositionTension": {
+              "description": "The tension from which a region has an opposition. With the default about 4 regions in 10 have an opposition; 0.4 gives 6 in 10 and 0.6 gives 2 in 10 (society §4.5).",
+              "type": "number",
+              "minimum": 0,
+              "default": 0.5
+            },
+            "TensionJitter": {
+              "description": "The width of the random part of the tension: a number from minus half this to plus half this is added, drawn per region. 0 makes the tension alone decide (society §4.5).",
+              "type": "number",
+              "minimum": 0,
+              "default": 0.2
+            },
+            "OppositionMinPersons": {
+              "description": "The persons a region needs to hold an opposition (society §4.5).",
+              "type": "number",
+              "minimum": 0,
+              "default": 80
+            },
+            "Cleavage": {
+              "description": "Which type opposes which ruler: for each type of the ruling faction, the weight of each type as its opposition. A crown is opposed by a rival house first, a people by another people, a guild by a rival guild, a faith by a sect or by the mages, a free town by a lord who wants it (society §4.6).",
+              "type": "object",
+              "properties": {
+                "Family": {
+                  "description": "Value for the type Family: a house and its household.",
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "properties": {
+                    "Family": {
+                      "description": "Value for the type Family: a house and its household.",
+                      "type": "number",
+                      "default": 3
+                    },
+                    "Race": {
+                      "description": "Value for the type Race: a people.",
+                      "type": "number",
+                      "default": 2
+                    },
+                    "Vocation": {
+                      "description": "Value for the type Vocation: a trade.",
+                      "type": "number",
+                      "default": 2
+                    },
+                    "Belief": {
+                      "description": "Value for the type Belief: a faith.",
+                      "type": "number",
+                      "default": 2
+                    },
+                    "Magic": {
+                      "description": "Value for the type Magic: the arcane.",
+                      "type": "number",
+                      "default": 1
+                    },
+                    "Place": {
+                      "description": "Value for the type Place: a town or a valley that rules itself.",
+                      "type": "number",
+                      "default": 2
+                    }
+                  },
+                  "required": [
+                    "Family",
+                    "Race",
+                    "Vocation",
+                    "Belief",
+                    "Magic",
+                    "Place"
+                  ],
+                  "additionalProperties": false
+                },
+                "Race": {
+                  "description": "Value for the type Race: a people.",
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "properties": {
+                    "Family": {
+                      "description": "Value for the type Family: a house and its household.",
+                      "type": "number",
+                      "default": 2
+                    },
+                    "Race": {
+                      "description": "Value for the type Race: a people.",
+                      "type": "number",
+                      "default": 3
+                    },
+                    "Vocation": {
+                      "description": "Value for the type Vocation: a trade.",
+                      "type": "number",
+                      "default": 1
+                    },
+                    "Belief": {
+                      "description": "Value for the type Belief: a faith.",
+                      "type": "number",
+                      "default": 1
+                    },
+                    "Magic": {
+                      "description": "Value for the type Magic: the arcane.",
+                      "type": "number",
+                      "default": 1
+                    },
+                    "Place": {
+                      "description": "Value for the type Place: a town or a valley that rules itself.",
+                      "type": "number",
+                      "default": 1
+                    }
+                  },
+                  "required": [
+                    "Family",
+                    "Race",
+                    "Vocation",
+                    "Belief",
+                    "Magic",
+                    "Place"
+                  ],
+                  "additionalProperties": false
+                },
+                "Vocation": {
+                  "description": "Value for the type Vocation: a trade.",
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "properties": {
+                    "Family": {
+                      "description": "Value for the type Family: a house and its household.",
+                      "type": "number",
+                      "default": 2
+                    },
+                    "Race": {
+                      "description": "Value for the type Race: a people.",
+                      "type": "number",
+                      "default": 1
+                    },
+                    "Vocation": {
+                      "description": "Value for the type Vocation: a trade.",
+                      "type": "number",
+                      "default": 3
+                    },
+                    "Belief": {
+                      "description": "Value for the type Belief: a faith.",
+                      "type": "number",
+                      "default": 1
+                    },
+                    "Magic": {
+                      "description": "Value for the type Magic: the arcane.",
+                      "type": "number",
+                      "default": 1
+                    },
+                    "Place": {
+                      "description": "Value for the type Place: a town or a valley that rules itself.",
+                      "type": "number",
+                      "default": 2
+                    }
+                  },
+                  "required": [
+                    "Family",
+                    "Race",
+                    "Vocation",
+                    "Belief",
+                    "Magic",
+                    "Place"
+                  ],
+                  "additionalProperties": false
+                },
+                "Belief": {
+                  "description": "Value for the type Belief: a faith.",
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "properties": {
+                    "Family": {
+                      "description": "Value for the type Family: a house and its household.",
+                      "type": "number",
+                      "default": 2
+                    },
+                    "Race": {
+                      "description": "Value for the type Race: a people.",
+                      "type": "number",
+                      "default": 1
+                    },
+                    "Vocation": {
+                      "description": "Value for the type Vocation: a trade.",
+                      "type": "number",
+                      "default": 1
+                    },
+                    "Belief": {
+                      "description": "Value for the type Belief: a faith.",
+                      "type": "number",
+                      "default": 3
+                    },
+                    "Magic": {
+                      "description": "Value for the type Magic: the arcane.",
+                      "type": "number",
+                      "default": 3
+                    },
+                    "Place": {
+                      "description": "Value for the type Place: a town or a valley that rules itself.",
+                      "type": "number",
+                      "default": 1
+                    }
+                  },
+                  "required": [
+                    "Family",
+                    "Race",
+                    "Vocation",
+                    "Belief",
+                    "Magic",
+                    "Place"
+                  ],
+                  "additionalProperties": false
+                },
+                "Magic": {
+                  "description": "Value for the type Magic: the arcane.",
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "properties": {
+                    "Family": {
+                      "description": "Value for the type Family: a house and its household.",
+                      "type": "number",
+                      "default": 2
+                    },
+                    "Race": {
+                      "description": "Value for the type Race: a people.",
+                      "type": "number",
+                      "default": 1
+                    },
+                    "Vocation": {
+                      "description": "Value for the type Vocation: a trade.",
+                      "type": "number",
+                      "default": 1
+                    },
+                    "Belief": {
+                      "description": "Value for the type Belief: a faith.",
+                      "type": "number",
+                      "default": 3
+                    },
+                    "Magic": {
+                      "description": "Value for the type Magic: the arcane.",
+                      "type": "number",
+                      "default": 2
+                    },
+                    "Place": {
+                      "description": "Value for the type Place: a town or a valley that rules itself.",
+                      "type": "number",
+                      "default": 2
+                    }
+                  },
+                  "required": [
+                    "Family",
+                    "Race",
+                    "Vocation",
+                    "Belief",
+                    "Magic",
+                    "Place"
+                  ],
+                  "additionalProperties": false
+                },
+                "Place": {
+                  "description": "Value for the type Place: a town or a valley that rules itself.",
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "properties": {
+                    "Family": {
+                      "description": "Value for the type Family: a house and its household.",
+                      "type": "number",
+                      "default": 3
+                    },
+                    "Race": {
+                      "description": "Value for the type Race: a people.",
+                      "type": "number",
+                      "default": 2
+                    },
+                    "Vocation": {
+                      "description": "Value for the type Vocation: a trade.",
+                      "type": "number",
+                      "default": 2
+                    },
+                    "Belief": {
+                      "description": "Value for the type Belief: a faith.",
+                      "type": "number",
+                      "default": 1
+                    },
+                    "Magic": {
+                      "description": "Value for the type Magic: the arcane.",
+                      "type": "number",
+                      "default": 1
+                    },
+                    "Place": {
+                      "description": "Value for the type Place: a town or a valley that rules itself.",
+                      "type": "number",
+                      "default": 1
+                    }
+                  },
+                  "required": [
+                    "Family",
+                    "Race",
+                    "Vocation",
+                    "Belief",
+                    "Magic",
+                    "Place"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "Family",
+                "Race",
+                "Vocation",
+                "Belief",
+                "Magic",
+                "Place"
+              ],
+              "additionalProperties": false
+            },
+            "Favour": {
+              "description": "Which type of opposition each term of the tension feeds, 0 to 2. The contest has no entry: it feeds every type by its fit (society §4.6).",
+              "type": "object",
+              "properties": {
+                "RoughLand": {
+                  "description": "Rough land feeds a people and a commune first, then a hill lord and a faith (society §4.6).",
+                  "type": "object",
+                  "properties": {
+                    "Family": {
+                      "description": "Value for the type Family: a house and its household.",
+                      "type": "number",
+                      "default": 1
+                    },
+                    "Race": {
+                      "description": "Value for the type Race: a people.",
+                      "type": "number",
+                      "default": 2
+                    },
+                    "Vocation": {
+                      "description": "Value for the type Vocation: a trade.",
+                      "type": "number",
+                      "default": 0
+                    },
+                    "Belief": {
+                      "description": "Value for the type Belief: a faith.",
+                      "type": "number",
+                      "default": 1
+                    },
+                    "Magic": {
+                      "description": "Value for the type Magic: the arcane.",
+                      "type": "number",
+                      "default": 0
+                    },
+                    "Place": {
+                      "description": "Value for the type Place: a town or a valley that rules itself.",
+                      "type": "number",
+                      "default": 2
+                    }
+                  },
+                  "required": [
+                    "Family",
+                    "Race",
+                    "Vocation",
+                    "Belief",
+                    "Magic",
+                    "Place"
+                  ],
+                  "additionalProperties": false
+                },
+                "RivalSeat": {
+                  "description": "A rival seat feeds a rival house, the guilds of the second city and its council (society §4.6).",
+                  "type": "object",
+                  "properties": {
+                    "Family": {
+                      "description": "Value for the type Family: a house and its household.",
+                      "type": "number",
+                      "default": 2
+                    },
+                    "Race": {
+                      "description": "Value for the type Race: a people.",
+                      "type": "number",
+                      "default": 0
+                    },
+                    "Vocation": {
+                      "description": "Value for the type Vocation: a trade.",
+                      "type": "number",
+                      "default": 2
+                    },
+                    "Belief": {
+                      "description": "Value for the type Belief: a faith.",
+                      "type": "number",
+                      "default": 0
+                    },
+                    "Magic": {
+                      "description": "Value for the type Magic: the arcane.",
+                      "type": "number",
+                      "default": 0
+                    },
+                    "Place": {
+                      "description": "Value for the type Place: a town or a valley that rules itself.",
+                      "type": "number",
+                      "default": 2
+                    }
+                  },
+                  "required": [
+                    "Family",
+                    "Race",
+                    "Vocation",
+                    "Belief",
+                    "Magic",
+                    "Place"
+                  ],
+                  "additionalProperties": false
+                },
+                "PreciousFinds": {
+                  "description": "Precious finds feed a rival house and a guild (society §4.6).",
+                  "type": "object",
+                  "properties": {
+                    "Family": {
+                      "description": "Value for the type Family: a house and its household.",
+                      "type": "number",
+                      "default": 2
+                    },
+                    "Race": {
+                      "description": "Value for the type Race: a people.",
+                      "type": "number",
+                      "default": 0
+                    },
+                    "Vocation": {
+                      "description": "Value for the type Vocation: a trade.",
+                      "type": "number",
+                      "default": 2
+                    },
+                    "Belief": {
+                      "description": "Value for the type Belief: a faith.",
+                      "type": "number",
+                      "default": 0
+                    },
+                    "Magic": {
+                      "description": "Value for the type Magic: the arcane.",
+                      "type": "number",
+                      "default": 0
+                    },
+                    "Place": {
+                      "description": "Value for the type Place: a town or a valley that rules itself.",
+                      "type": "number",
+                      "default": 0
+                    }
+                  },
+                  "required": [
+                    "Family",
+                    "Race",
+                    "Vocation",
+                    "Belief",
+                    "Magic",
+                    "Place"
+                  ],
+                  "additionalProperties": false
+                },
+                "PoorLand": {
+                  "description": "Poor land feeds a sect and a commune first, then a subject people (society §4.6).",
+                  "type": "object",
+                  "properties": {
+                    "Family": {
+                      "description": "Value for the type Family: a house and its household.",
+                      "type": "number",
+                      "default": 0
+                    },
+                    "Race": {
+                      "description": "Value for the type Race: a people.",
+                      "type": "number",
+                      "default": 1
+                    },
+                    "Vocation": {
+                      "description": "Value for the type Vocation: a trade.",
+                      "type": "number",
+                      "default": 0
+                    },
+                    "Belief": {
+                      "description": "Value for the type Belief: a faith.",
+                      "type": "number",
+                      "default": 2
+                    },
+                    "Magic": {
+                      "description": "Value for the type Magic: the arcane.",
+                      "type": "number",
+                      "default": 0
+                    },
+                    "Place": {
+                      "description": "Value for the type Place: a town or a valley that rules itself.",
+                      "type": "number",
+                      "default": 2
+                    }
+                  },
+                  "required": [
+                    "Family",
+                    "Race",
+                    "Vocation",
+                    "Belief",
+                    "Magic",
+                    "Place"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            },
+            "PersonsPerLesserFaction": {
+              "description": "The persons a region needs for each lesser faction: a region holds at most its persons divided by this, rounded down (society §4.7).",
+              "type": "number",
+              "minimum": 1,
+              "default": 150
+            },
+            "MaxLesserFactions": {
+              "description": "The most lesser factions a region holds (society §4.7).",
+              "type": "integer",
+              "minimum": 0,
+              "default": 4
+            },
+            "LesserFit": {
+              "description": "The lowest fit, 0 to 1, with which a kind of lesser faction is taken. A lower number gives more lesser factions (society §4.7).",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.75
+            },
+            "LesserJitter": {
+              "description": "The width of the random part of the fit of a kind of lesser faction: a number from minus half this to plus half this is added, drawn per region and kind (society §4.7).",
+              "type": "number",
+              "minimum": 0,
+              "default": 0.1
+            },
+            "Indices": {
+              "description": "The ranges the indices of a region are read through: each index runs from 0 at Low to 1 at High. The defaults are about the 10th and the 90th percentile of generated regions, so a change to the map parameters can call for new ranges (society §4.3).",
+              "type": "object",
+              "properties": {
+                "Grain": {
+                  "description": "Grain: the mean amount of grain on the land of the region (society §4.3).",
+                  "type": "object",
+                  "properties": {
+                    "Low": {
+                      "description": "The value at and below which the index is 0.",
+                      "type": "number",
+                      "default": 0.17
+                    },
+                    "High": {
+                      "description": "The value at and above which the index is 1.",
+                      "type": "number",
+                      "default": 0.45
+                    }
+                  },
+                  "required": [
+                    "Low",
+                    "High"
+                  ],
+                  "additionalProperties": false
+                },
+                "Livestock": {
+                  "description": "Half of the index herd: the mean amount of livestock (society §4.3).",
+                  "type": "object",
+                  "properties": {
+                    "Low": {
+                      "description": "The value at and below which the index is 0.",
+                      "type": "number",
+                      "default": 0.33
+                    },
+                    "High": {
+                      "description": "The value at and above which the index is 1.",
+                      "type": "number",
+                      "default": 0.53
+                    }
+                  },
+                  "required": [
+                    "Low",
+                    "High"
+                  ],
+                  "additionalProperties": false
+                },
+                "Horses": {
+                  "description": "Half of the index herd: the mean amount of horses and pack animals (society §4.3).",
+                  "type": "object",
+                  "properties": {
+                    "Low": {
+                      "description": "The value at and below which the index is 0.",
+                      "type": "number",
+                      "default": 0.22
+                    },
+                    "High": {
+                      "description": "The value at and above which the index is 1.",
+                      "type": "number",
+                      "default": 0.4
+                    }
+                  },
+                  "required": [
+                    "Low",
+                    "High"
+                  ],
+                  "additionalProperties": false
+                },
+                "OpenLand": {
+                  "description": "Open: the share of the land in Cold steppe, Temperate grassland, Savanna, Cold desert, Hot desert, Thorn scrub and Tundra (society §4.3).",
+                  "type": "object",
+                  "properties": {
+                    "Low": {
+                      "description": "The value at and below which the index is 0.",
+                      "type": "number",
+                      "default": 0.25
+                    },
+                    "High": {
+                      "description": "The value at and above which the index is 1.",
+                      "type": "number",
+                      "default": 0.66
+                    }
+                  },
+                  "required": [
+                    "Low",
+                    "High"
+                  ],
+                  "additionalProperties": false
+                },
+                "Forest": {
+                  "description": "Forest: the share of the land in the six forest biomes, Mangrove and Woodland & shrubland (society §4.3).",
+                  "type": "object",
+                  "properties": {
+                    "Low": {
+                      "description": "The value at and below which the index is 0.",
+                      "type": "number",
+                      "default": 0.29
+                    },
+                    "High": {
+                      "description": "The value at and above which the index is 1.",
+                      "type": "number",
+                      "default": 0.69
+                    }
+                  },
+                  "required": [
+                    "Low",
+                    "High"
+                  ],
+                  "additionalProperties": false
+                },
+                "ColdLand": {
+                  "description": "Cold: the share of the land in Ice & snow, Tundra and Boreal forest (society §4.3).",
+                  "type": "object",
+                  "properties": {
+                    "Low": {
+                      "description": "The value at and below which the index is 0.",
+                      "type": "number",
+                      "default": 0.1
+                    },
+                    "High": {
+                      "description": "The value at and above which the index is 1.",
+                      "type": "number",
+                      "default": 0.6
+                    }
+                  },
+                  "required": [
+                    "Low",
+                    "High"
+                  ],
+                  "additionalProperties": false
+                },
+                "DryLand": {
+                  "description": "Dry: the share of the land in Hot desert, Cold desert, Cold steppe and Thorn scrub (society §4.3).",
+                  "type": "object",
+                  "properties": {
+                    "Low": {
+                      "description": "The value at and below which the index is 0.",
+                      "type": "number",
+                      "default": 0.1
+                    },
+                    "High": {
+                      "description": "The value at and above which the index is 1.",
+                      "type": "number",
+                      "default": 0.6
+                    }
+                  },
+                  "required": [
+                    "Low",
+                    "High"
+                  ],
+                  "additionalProperties": false
+                },
+                "RoughLand": {
+                  "description": "Rough: the share of the land in Hills zones plus 1.5 times the share in Mountains zones (society §4.3).",
+                  "type": "object",
+                  "properties": {
+                    "Low": {
+                      "description": "The value at and below which the index is 0.",
+                      "type": "number",
+                      "default": 0
+                    },
+                    "High": {
+                      "description": "The value at and above which the index is 1.",
+                      "type": "number",
+                      "default": 0.45
+                    }
+                  },
+                  "required": [
+                    "Low",
+                    "High"
+                  ],
+                  "additionalProperties": false
+                },
+                "TradeFactor": {
+                  "description": "Half of the index trade: the best Trade factor of a Prospect on show (society §4.3).",
+                  "type": "object",
+                  "properties": {
+                    "Low": {
+                      "description": "The value at and below which the index is 0.",
+                      "type": "number",
+                      "default": 0.5
+                    },
+                    "High": {
+                      "description": "The value at and above which the index is 1.",
+                      "type": "number",
+                      "default": 1
+                    }
+                  },
+                  "required": [
+                    "Low",
+                    "High"
+                  ],
+                  "additionalProperties": false
+                },
+                "Harbours": {
+                  "description": "Half of the index trade: the number of Prospects on show with a harbour or a navigable river mouth (society §4.3).",
+                  "type": "object",
+                  "properties": {
+                    "Low": {
+                      "description": "The value at and below which the index is 0.",
+                      "type": "number",
+                      "default": 0
+                    },
+                    "High": {
+                      "description": "The value at and above which the index is 1.",
+                      "type": "number",
+                      "default": 4
+                    }
+                  },
+                  "required": [
+                    "Low",
+                    "High"
+                  ],
+                  "additionalProperties": false
+                },
+                "Prosperity": {
+                  "description": "Half of the index wealth: the mean Prosperity factor of the Prospects of the region (society §4.3).",
+                  "type": "object",
+                  "properties": {
+                    "Low": {
+                      "description": "The value at and below which the index is 0.",
+                      "type": "number",
+                      "default": 0.33
+                    },
+                    "High": {
+                      "description": "The value at and above which the index is 1.",
+                      "type": "number",
+                      "default": 0.69
+                    }
+                  },
+                  "required": [
+                    "Low",
+                    "High"
+                  ],
+                  "additionalProperties": false
+                },
+                "RichProspects": {
+                  "description": "Half of the index wealth: the number of Rich Prospects on show (society §4.3).",
+                  "type": "object",
+                  "properties": {
+                    "Low": {
+                      "description": "The value at and below which the index is 0.",
+                      "type": "number",
+                      "default": 0
+                    },
+                    "High": {
+                      "description": "The value at and above which the index is 1.",
+                      "type": "number",
+                      "default": 9
+                    }
+                  },
+                  "required": [
+                    "Low",
+                    "High"
+                  ],
+                  "additionalProperties": false
+                },
+                "ProspectsOnShow": {
+                  "description": "Urban: the number of Prospects on show (society §4.3).",
+                  "type": "object",
+                  "properties": {
+                    "Low": {
+                      "description": "The value at and below which the index is 0.",
+                      "type": "number",
+                      "default": 6
+                    },
+                    "High": {
+                      "description": "The value at and above which the index is 1.",
+                      "type": "number",
+                      "default": 19
+                    }
+                  },
+                  "required": [
+                    "Low",
+                    "High"
+                  ],
+                  "additionalProperties": false
+                },
+                "Ore": {
+                  "description": "Ore: the shares of the land with a listed amount of iron ore, copper ore, tin, silver and lead, gold, gems and pearls and salt, added (society §4.3).",
+                  "type": "object",
+                  "properties": {
+                    "Low": {
+                      "description": "The value at and below which the index is 0.",
+                      "type": "number",
+                      "default": 0.03
+                    },
+                    "High": {
+                      "description": "The value at and above which the index is 1.",
+                      "type": "number",
+                      "default": 0.18
+                    }
+                  },
+                  "required": [
+                    "Low",
+                    "High"
+                  ],
+                  "additionalProperties": false
+                },
+                "Precious": {
+                  "description": "Precious: the shares of the land with a listed amount of silver and lead, gold and gems and pearls, added (society §4.3).",
+                  "type": "object",
+                  "properties": {
+                    "Low": {
+                      "description": "The value at and below which the index is 0.",
+                      "type": "number",
+                      "default": 0
+                    },
+                    "High": {
+                      "description": "The value at and above which the index is 1.",
+                      "type": "number",
+                      "default": 0.06
+                    }
+                  },
+                  "required": [
+                    "Low",
+                    "High"
+                  ],
+                  "additionalProperties": false
+                },
+                "Supernatural": {
+                  "description": "Arcane: the mean over the land of how far the Supernatural field lies above 60, from 0 at 60 to 1 at 100 (society §4.3).",
+                  "type": "object",
+                  "properties": {
+                    "Low": {
+                      "description": "The value at and below which the index is 0.",
+                      "type": "number",
+                      "default": 0.014
+                    },
+                    "High": {
+                      "description": "The value at and above which the index is 1.",
+                      "type": "number",
+                      "default": 0.032
+                    }
+                  },
+                  "required": [
+                    "Low",
+                    "High"
+                  ],
+                  "additionalProperties": false
+                },
+                "Persons": {
+                  "description": "People: the persons of the region (society §4.3).",
+                  "type": "object",
+                  "properties": {
+                    "Low": {
+                      "description": "The value at and below which the index is 0.",
+                      "type": "number",
+                      "default": 160
+                    },
+                    "High": {
+                      "description": "The value at and above which the index is 1.",
+                      "type": "number",
+                      "default": 600
+                    }
+                  },
+                  "required": [
+                    "Low",
+                    "High"
+                  ],
+                  "additionalProperties": false
+                },
+                "SmallRegion": {
+                  "description": "Small: the persons of the region, read the other way round: the index is 1 at Low and below and 0 at High and above (society §4.3).",
+                  "type": "object",
+                  "properties": {
+                    "Low": {
+                      "description": "The value at and below which the index is 0.",
+                      "type": "number",
+                      "default": 60
+                    },
+                    "High": {
+                      "description": "The value at and above which the index is 1.",
+                      "type": "number",
+                      "default": 260
+                    }
+                  },
+                  "required": [
+                    "Low",
+                    "High"
+                  ],
+                  "additionalProperties": false
+                },
+                "LargestRace": {
+                  "description": "Mixed: the share of the largest race in the persons of the region, read the other way round: the index is 1 at Low and below and 0 at High and above (society §4.3).",
+                  "type": "object",
+                  "properties": {
+                    "Low": {
+                      "description": "The value at and below which the index is 0.",
+                      "type": "number",
+                      "default": 0.24
+                    },
+                    "High": {
+                      "description": "The value at and above which the index is 1.",
+                      "type": "number",
+                      "default": 0.32
+                    }
+                  },
+                  "required": [
+                    "Low",
+                    "High"
+                  ],
+                  "additionalProperties": false
+                },
+                "PoorProspects": {
+                  "description": "Poor: the share of the Prospects on show that are Poor (society §4.3).",
+                  "type": "object",
+                  "properties": {
+                    "Low": {
+                      "description": "The value at and below which the index is 0.",
+                      "type": "number",
+                      "default": 0
+                    },
+                    "High": {
+                      "description": "The value at and above which the index is 1.",
+                      "type": "number",
+                      "default": 0.5
+                    }
+                  },
+                  "required": [
+                    "Low",
+                    "High"
+                  ],
+                  "additionalProperties": false
+                },
+                "UnevenProsperity": {
+                  "description": "Uneven: the highest Prosperity factor of a Prospect on show minus the lowest (society §4.3).",
+                  "type": "object",
+                  "properties": {
+                    "Low": {
+                      "description": "The value at and below which the index is 0.",
+                      "type": "number",
+                      "default": 0.1
+                    },
+                    "High": {
+                      "description": "The value at and above which the index is 1.",
+                      "type": "number",
+                      "default": 0.5
+                    }
+                  },
+                  "required": [
+                    "Low",
+                    "High"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
             }
           },
           "additionalProperties": false
@@ -1248,6 +2330,45 @@
               ],
               "additionalProperties": false
             }
+          },
+          "FactionLeaning": {
+            "description": "How much the race leans to each type of faction, 0 to 3: 3 for the kind of group it forms first, 0 for a kind it never forms. It weighs the race in the draws for the type and the lead race of a faction. Left out, the race leans to every type alike (society §4.4).",
+            "type": "object",
+            "properties": {
+              "Family": {
+                "description": "Value for the type Family: a house and its household.",
+                "type": "number"
+              },
+              "Race": {
+                "description": "Value for the type Race: a people.",
+                "type": "number"
+              },
+              "Vocation": {
+                "description": "Value for the type Vocation: a trade.",
+                "type": "number"
+              },
+              "Belief": {
+                "description": "Value for the type Belief: a faith.",
+                "type": "number"
+              },
+              "Magic": {
+                "description": "Value for the type Magic: the arcane.",
+                "type": "number"
+              },
+              "Place": {
+                "description": "Value for the type Place: a town or a valley that rules itself.",
+                "type": "number"
+              }
+            },
+            "required": [
+              "Family",
+              "Race",
+              "Vocation",
+              "Belief",
+              "Magic",
+              "Place"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [

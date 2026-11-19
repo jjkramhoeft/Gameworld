@@ -175,6 +175,202 @@
       "MinorityShare": 0.05,
       "MinorityBoost": 5,
       "HinterlandShare": 0.02
+    },
+    "Factions": {
+      "RacePower": 5,
+      "Sharpness": 2,
+      "BaseFit": {
+        "Family": 0.35,
+        "Race": 0.12,
+        "Vocation": 0.05,
+        "Belief": 0.05,
+        "Magic": 0,
+        "Place": 0.1
+      },
+      "Tension": {
+        "Contest": 0.25,
+        "RoughLand": 0.2,
+        "RivalSeat": 0.2,
+        "PreciousFinds": 0.15,
+        "PoorLand": 0.2
+      },
+      "OppositionTension": 0.5,
+      "TensionJitter": 0.2,
+      "OppositionMinPersons": 80,
+      "Cleavage": {
+        "Family": {
+          "Family": 3,
+          "Race": 2,
+          "Vocation": 2,
+          "Belief": 2,
+          "Magic": 1,
+          "Place": 2
+        },
+        "Race": {
+          "Family": 2,
+          "Race": 3,
+          "Vocation": 1,
+          "Belief": 1,
+          "Magic": 1,
+          "Place": 1
+        },
+        "Vocation": {
+          "Family": 2,
+          "Race": 1,
+          "Vocation": 3,
+          "Belief": 1,
+          "Magic": 1,
+          "Place": 2
+        },
+        "Belief": {
+          "Family": 2,
+          "Race": 1,
+          "Vocation": 1,
+          "Belief": 3,
+          "Magic": 3,
+          "Place": 1
+        },
+        "Magic": {
+          "Family": 2,
+          "Race": 1,
+          "Vocation": 1,
+          "Belief": 3,
+          "Magic": 2,
+          "Place": 2
+        },
+        "Place": {
+          "Family": 3,
+          "Race": 2,
+          "Vocation": 2,
+          "Belief": 1,
+          "Magic": 1,
+          "Place": 1
+        }
+      },
+      "Favour": {
+        "RoughLand": {
+          "Family": 1,
+          "Race": 2,
+          "Vocation": 0,
+          "Belief": 1,
+          "Magic": 0,
+          "Place": 2
+        },
+        "RivalSeat": {
+          "Family": 2,
+          "Race": 0,
+          "Vocation": 2,
+          "Belief": 0,
+          "Magic": 0,
+          "Place": 2
+        },
+        "PreciousFinds": {
+          "Family": 2,
+          "Race": 0,
+          "Vocation": 2,
+          "Belief": 0,
+          "Magic": 0,
+          "Place": 0
+        },
+        "PoorLand": {
+          "Family": 0,
+          "Race": 1,
+          "Vocation": 0,
+          "Belief": 2,
+          "Magic": 0,
+          "Place": 2
+        }
+      },
+      "PersonsPerLesserFaction": 150,
+      "MaxLesserFactions": 4,
+      "LesserFit": 0.75,
+      "LesserJitter": 0.1,
+      "Indices": {
+        "Grain": {
+          "Low": 0.17,
+          "High": 0.45
+        },
+        "Livestock": {
+          "Low": 0.33,
+          "High": 0.53
+        },
+        "Horses": {
+          "Low": 0.22,
+          "High": 0.4
+        },
+        "OpenLand": {
+          "Low": 0.25,
+          "High": 0.66
+        },
+        "Forest": {
+          "Low": 0.29,
+          "High": 0.69
+        },
+        "ColdLand": {
+          "Low": 0.1,
+          "High": 0.6
+        },
+        "DryLand": {
+          "Low": 0.1,
+          "High": 0.6
+        },
+        "RoughLand": {
+          "Low": 0,
+          "High": 0.45
+        },
+        "TradeFactor": {
+          "Low": 0.5,
+          "High": 1
+        },
+        "Harbours": {
+          "Low": 0,
+          "High": 4
+        },
+        "Prosperity": {
+          "Low": 0.33,
+          "High": 0.69
+        },
+        "RichProspects": {
+          "Low": 0,
+          "High": 9
+        },
+        "ProspectsOnShow": {
+          "Low": 6,
+          "High": 19
+        },
+        "Ore": {
+          "Low": 0.03,
+          "High": 0.18
+        },
+        "Precious": {
+          "Low": 0,
+          "High": 0.06
+        },
+        "Supernatural": {
+          "Low": 0.014,
+          "High": 0.032
+        },
+        "Persons": {
+          "Low": 160,
+          "High": 600
+        },
+        "SmallRegion": {
+          "Low": 60,
+          "High": 260
+        },
+        "LargestRace": {
+          "Low": 0.24,
+          "High": 0.32
+        },
+        "PoorProspects": {
+          "Low": 0,
+          "High": 0.5
+        },
+        "UnevenProsperity": {
+          "Low": 0.1,
+          "High": 0.5
+        }
+      }
     }
   },
   "Fields": {
@@ -384,6 +580,14 @@
         "TemperateMixedForest": 9,
         "TemperateBroadleafForest": 3,
         "TemperateRainForest": 6
+      },
+      "FactionLeaning": {
+        "Family": 2,
+        "Race": 1,
+        "Vocation": 2,
+        "Belief": 1,
+        "Magic": 1,
+        "Place": 3
       }
     },
     {
@@ -398,6 +602,14 @@
         "TemperateMixedForest": 10,
         "TemperateBroadleafForest": 15,
         "TemperateRainForest": 10
+      },
+      "FactionLeaning": {
+        "Family": 3,
+        "Race": 1,
+        "Vocation": 2,
+        "Belief": 2,
+        "Magic": 1,
+        "Place": 2
       }
     },
     {
@@ -412,6 +624,14 @@
         "ThornScrub": 9,
         "Savanna": 6,
         "TropicalDryForest": 3
+      },
+      "FactionLeaning": {
+        "Family": 2,
+        "Race": 2,
+        "Vocation": 3,
+        "Belief": 2,
+        "Magic": 1,
+        "Place": 1
       }
     },
     {
@@ -425,6 +645,14 @@
         "TropicalDryForest": 12,
         "TropicalRainForest": 8,
         "Mangrove": 4
+      },
+      "FactionLeaning": {
+        "Family": 3,
+        "Race": 2,
+        "Vocation": 2,
+        "Belief": 2,
+        "Magic": 1,
+        "Place": 2
       }
     },
     {
@@ -439,6 +667,14 @@
         "TemperateGrassland": 9,
         "WoodlandAndShrubland": 3,
         "HotDesert": 3
+      },
+      "FactionLeaning": {
+        "Family": 2,
+        "Race": 3,
+        "Vocation": 1,
+        "Belief": 1,
+        "Magic": 1,
+        "Place": 0
       }
     },
     {
@@ -452,6 +688,14 @@
         "TropicalDryForest": 12,
         "TropicalRainForest": 8,
         "Mangrove": 8
+      },
+      "FactionLeaning": {
+        "Family": 2,
+        "Race": 1,
+        "Vocation": 2,
+        "Belief": 3,
+        "Magic": 1,
+        "Place": 2
       }
     },
     {
@@ -468,6 +712,14 @@
         "TropicalDryForest": 10,
         "TropicalRainForest": 5,
         "Mangrove": 5
+      },
+      "FactionLeaning": {
+        "Family": 2,
+        "Race": 1,
+        "Vocation": 3,
+        "Belief": 1,
+        "Magic": 1,
+        "Place": 1
       }
     },
     {
@@ -493,7 +745,15 @@
           "HeightM": 200,
           "Factor": 0
         }
-      ]
+      ],
+      "FactionLeaning": {
+        "Family": 2,
+        "Race": 3,
+        "Vocation": 1,
+        "Belief": 1,
+        "Magic": 2,
+        "Place": 1
+      }
     },
     {
       "Id": "dwarf",
@@ -520,7 +780,15 @@
           "HeightM": 200,
           "Factor": 1
         }
-      ]
+      ],
+      "FactionLeaning": {
+        "Family": 1,
+        "Race": 3,
+        "Vocation": 3,
+        "Belief": 1,
+        "Magic": 1,
+        "Place": 1
+      }
     },
     {
       "Id": "halfling",
@@ -537,6 +805,14 @@
         "Savanna": 2,
         "TropicalDryForest": 2,
         "TropicalRainForest": 2
+      },
+      "FactionLeaning": {
+        "Family": 2,
+        "Race": 1,
+        "Vocation": 1,
+        "Belief": 1,
+        "Magic": 0,
+        "Place": 3
       }
     },
     {
@@ -556,6 +832,14 @@
         "ThornScrub": 1,
         "Savanna": 1,
         "TropicalDryForest": 1
+      },
+      "FactionLeaning": {
+        "Family": 1,
+        "Race": 1,
+        "Vocation": 3,
+        "Belief": 1,
+        "Magic": 2,
+        "Place": 2
       }
     },
     {
@@ -576,6 +860,14 @@
         "ThornScrub": 4,
         "Savanna": 4,
         "TropicalDryForest": 2
+      },
+      "FactionLeaning": {
+        "Family": 1,
+        "Race": 3,
+        "Vocation": 2,
+        "Belief": 1,
+        "Magic": 1,
+        "Place": 0
       }
     },
     {
@@ -586,6 +878,14 @@
         "IceAndSnow": 3,
         "Tundra": 2,
         "BorealForest": 1
+      },
+      "FactionLeaning": {
+        "Family": 1,
+        "Race": 2,
+        "Vocation": 2,
+        "Belief": 1,
+        "Magic": 1,
+        "Place": 3
       }
     },
     {
@@ -608,7 +908,15 @@
           "HeightM": 400,
           "Factor": 1
         }
-      ]
+      ],
+      "FactionLeaning": {
+        "Family": 2,
+        "Race": 2,
+        "Vocation": 1,
+        "Belief": 1,
+        "Magic": 1,
+        "Place": 2
+      }
     },
     {
       "Id": "widegaze",
@@ -630,7 +938,15 @@
           "HeightM": 500,
           "Factor": 0
         }
-      ]
+      ],
+      "FactionLeaning": {
+        "Family": 1,
+        "Race": 2,
+        "Vocation": 2,
+        "Belief": 1,
+        "Magic": 2,
+        "Place": 2
+      }
     },
     {
       "Id": "amberbloods",
@@ -641,6 +957,14 @@
         "TemperateMixedForest": 3,
         "TemperateBroadleafForest": 2,
         "TemperateRainForest": 2
+      },
+      "FactionLeaning": {
+        "Family": 1,
+        "Race": 2,
+        "Vocation": 2,
+        "Belief": 2,
+        "Magic": 1,
+        "Place": 2
       }
     },
     {
@@ -653,6 +977,14 @@
         "HotDesert": 2,
         "ThornScrub": 1,
         "Mangrove": 1
+      },
+      "FactionLeaning": {
+        "Family": 1,
+        "Race": 1,
+        "Vocation": 3,
+        "Belief": 2,
+        "Magic": 1,
+        "Place": 2
       }
     },
     {
@@ -664,6 +996,14 @@
         "HotDesert": 3,
         "ThornScrub": 2,
         "Savanna": 1
+      },
+      "FactionLeaning": {
+        "Family": 2,
+        "Race": 1,
+        "Vocation": 2,
+        "Belief": 1,
+        "Magic": 2,
+        "Place": 2
       }
     },
     {
@@ -677,6 +1017,14 @@
         "ThornScrub": 3,
         "Savanna": 3,
         "TropicalDryForest": 1
+      },
+      "FactionLeaning": {
+        "Family": 0,
+        "Race": 1,
+        "Vocation": 2,
+        "Belief": 2,
+        "Magic": 1,
+        "Place": 3
       }
     },
     {
@@ -688,6 +1036,14 @@
         "TropicalDryForest": 2,
         "TropicalRainForest": 3,
         "Mangrove": 1
+      },
+      "FactionLeaning": {
+        "Family": 2,
+        "Race": 2,
+        "Vocation": 2,
+        "Belief": 1,
+        "Magic": 1,
+        "Place": 2
       }
     },
     {
@@ -711,7 +1067,15 @@
           "HeightM": 80,
           "Factor": 0
         }
-      ]
+      ],
+      "FactionLeaning": {
+        "Family": 1,
+        "Race": 1,
+        "Vocation": 2,
+        "Belief": 1,
+        "Magic": 1,
+        "Place": 3
+      }
     },
     {
       "Id": "swiftborn",
@@ -724,6 +1088,14 @@
         "TemperateBroadleafForest": 2,
         "ThornScrub": 1,
         "Savanna": 1
+      },
+      "FactionLeaning": {
+        "Family": 0,
+        "Race": 1,
+        "Vocation": 2,
+        "Belief": 1,
+        "Magic": 1,
+        "Place": 3
       }
     },
     {
@@ -737,6 +1109,14 @@
         "TemperateMixedForest": 0.5,
         "TemperateBroadleafForest": 1,
         "Savanna": 0.5
+      },
+      "FactionLeaning": {
+        "Family": 1,
+        "Race": 1,
+        "Vocation": 3,
+        "Belief": 1,
+        "Magic": 1,
+        "Place": 1
       }
     },
     {
@@ -753,6 +1133,14 @@
         "TropicalDryForest": 1,
         "TropicalRainForest": 1,
         "Mangrove": 0.5
+      },
+      "FactionLeaning": {
+        "Family": 1,
+        "Race": 1,
+        "Vocation": 3,
+        "Belief": 1,
+        "Magic": 2,
+        "Place": 1
       }
     },
     {
@@ -765,6 +1153,14 @@
         "TemperateMixedForest": 3,
         "TemperateBroadleafForest": 2,
         "TemperateRainForest": 1
+      },
+      "FactionLeaning": {
+        "Family": 1,
+        "Race": 2,
+        "Vocation": 2,
+        "Belief": 1,
+        "Magic": 2,
+        "Place": 1
       }
     },
     {
@@ -777,6 +1173,14 @@
         "TropicalDryForest": 3,
         "TropicalRainForest": 2,
         "Mangrove": 1
+      },
+      "FactionLeaning": {
+        "Family": 3,
+        "Race": 1,
+        "Vocation": 1,
+        "Belief": 2,
+        "Magic": 1,
+        "Place": 1
       }
     },
     {
@@ -788,6 +1192,14 @@
         "TropicalDryForest": 0.5,
         "TropicalRainForest": 1.5,
         "Mangrove": 1.5
+      },
+      "FactionLeaning": {
+        "Family": 1,
+        "Race": 2,
+        "Vocation": 3,
+        "Belief": 1,
+        "Magic": 2,
+        "Place": 2
       }
     },
     {
@@ -808,6 +1220,14 @@
         "TropicalDryForest": 2,
         "TropicalRainForest": 2,
         "Mangrove": 1
+      },
+      "FactionLeaning": {
+        "Family": 1,
+        "Race": 2,
+        "Vocation": 2,
+        "Belief": 2,
+        "Magic": 1,
+        "Place": 1
       }
     }
   ],

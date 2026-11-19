@@ -44,7 +44,7 @@ The project is in phase 1.
 
 ### Status
 
-The map is generated through all its stages, from the cells to the travel network, with the flora and fauna of every patch. Of the society, the races of each region, their potential population, the races of a city or a town on each Prospect and the person names are generated. The vocations are a list in the Parameter Set and are not drawn yet. Factions, cities and towns, families and persons are defined below but not generated yet, and neither is there a database: the apps compute everything in memory.
+The map is generated through all its stages, from the cells to the travel network, with the flora and fauna of every patch. Of the society, the races of each region, their potential population, the factions of each region, the races of a city or a town on each Prospect and the person names are generated. The vocations are a list in the Parameter Set and are not drawn yet. Cities and towns, families and persons are defined below but not generated yet, and neither is there a database: the apps compute everything in memory.
 
 ## Concepts
 
@@ -61,7 +61,8 @@ Foundation = seed + generator version + Parameter Set
    │  └─ Fields                         precipitation, initial temperature, prosperity, supernatural
    └─ Society                           docs/society-generation.md
       ├─ Race                           six of them share the potential population of a region
-      └─ Faction, City and Town, Family, Person with a vocation and looks
+      ├─ Faction                        a ruling faction per region, an opposition, lesser factions
+      └─ City and Town, Family, Person with a vocation and looks
 ```
 
 ### The world
@@ -101,7 +102,7 @@ All structural identities are deterministic. No database generated ids appear in
 
 * Region, zone cell and patch cell = coordinate in the grid of its level
 * Zone and patch = the identity of its root cell (see Zone)
-* City, faction, family and person = parent + slot index
+* City, faction, family and person = parent + slot index. The parent of a faction is its region
 
 This lets player state and authored data point at derived data that may be evicted and recomputed, and it makes a Stub addressable before it is Realised.
 
@@ -243,13 +244,13 @@ Roads, river routes and sea lanes that connect the Prospects on show. The networ
 
 ### The society
 
-The peoples that live on the map. The Stub of every entity in this group is derived data, and its presentation is authored. The rules are in [docs/society-generation.md](docs/society-generation.md). Only the races and the potential population are specified there so far. Detailing the rest is a later task.
+The peoples that live on the map. The Stub of every entity in this group is derived data, and its presentation is authored. The rules are in [docs/society-generation.md](docs/society-generation.md). Only the races, the potential population and the factions are specified there so far. Detailing the rest is a later task.
 
 #### Race
 
 A people that can live in the world: Northmen, Elves, Dwarves and so on. Races are needed to generate factions, families and persons. Race is the only level: a race has no sub-races, and each human people is a race of its own, so there is no plain human race.
 
-The races are a list in the Parameter Set, not a fixed set in the code. Each race has an id, a name, a toggle (on or off), a frequency for each biome and a height modifier. The default list holds 28 races, all on: seven human races (Northmen, Midlanders, Saltroad folk, Sunlanders, Grass riders, Rainkeepers, Canal folk), five classic races (Elves, Dwarves, Halflings, Gnomes, Orcs) and sixteen new near-human races (docs/society-generation.md Appendix A). How a faction, a family or a person gets its race is not decided yet.
+The races are a list in the Parameter Set, not a fixed set in the code. Each race has an id, a name, a toggle (on or off), a frequency for each biome, a height modifier and a leaning to each type of faction. The default list holds 28 races, all on: seven human races (Northmen, Midlanders, Saltroad folk, Sunlanders, Grass riders, Rainkeepers, Canal folk), five classic races (Elves, Dwarves, Halflings, Gnomes, Orcs) and sixteen new near-human races (docs/society-generation.md Appendix A). A faction has a lead race. How a family or a person gets its race is not decided yet.
 
 #### Main race and minority race
 
@@ -263,7 +264,17 @@ Every land patch has a capacity that comes from its area, its food resources and
 
 #### Faction
 
-A group of people in one region: a political grouping. It could be a kingdom, a thieves' guild or a tribe. Factions belong to the Planned stage.
+A group of people in one region: a political grouping. It could be a kingdom, a thieves' guild or a tribe. Factions belong to the Planned stage, and the identity of a faction is its region and a slot.
+
+The type of a faction is what binds its members. There are six: Family (a house and its household), Race (a people), Vocation (a trade), Belief (a faith), Magic (the arcane) and Place (a town or a valley that rules itself). The form is the name of a type in a role: a Family that rules is a Crown, a Vocation under the ruler is a Guild. It is a label for the authoring, and it is race-neutral: a crown of the Northmen is a jarldom.
+
+A faction has a lead race, the race of its leaders. A faction of the type Race holds that race only. Any other faction is open to the races of its seat. The seat is the Prospect the faction sits on, and the seat of the ruling faction is the capital of the region.
+
+#### Ruling faction, opposition and lesser faction
+
+The role of a faction is how it stands in its region. Every region with persons has exactly one ruling faction, which governs it. A region can have one opposition, which wants the rule or wants out of it, and up to four lesser factions, which live under the ruler: a guild, an order, a circle, a great house, a chartered town or an enclave.
+
+The type and the lead race of the ruling faction are drawn from how well the land suits each type and how much each race of the region leans to it: grain land with many persons gets a house, open herding land a people, trading towns the guilds, supernatural land a faith. A region has an opposition when its tension is high: another kind of ruler would fit it as well, its land is rough, it has a second city, precious finds or poor land. The ground of an opposition is the largest of these. The lesser factions follow the resources of the region and its persons. The grip of a faction says how firmly it stands: the ruling faction has what the tension leaves, the opposition the tension.
 
 #### City and town
 
