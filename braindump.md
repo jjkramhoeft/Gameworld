@@ -50,21 +50,8 @@ Graphic short stories are brief, self-contained narratives told through sequenti
 Protytype app that can generate Decorative & Vintage Vector Borders as png files.
 The input is a size (widt and heigt in pixels) and a style and seed. The output is a png file in the input size - the middle/bacground of the png is empty and transparent, the border/frame is generate in black and white (so that it later can be tinted) and the border fram is in the input style.
 
-The input styles are:
-* Art Deco Line Borders
-* Botanical Floral Frames
-* Art Nouveau Whiplash Borders
-* Art Nouveau Borders
-* Victorian Flourishes
-* Geometric Line Borders
-* Engraved Floral Frames
-* Organic Borders
-* Calligraphic Flourishes
 
-## Våbenskjold - 
-
-Resaerch
-Coat of arms (Heraldy - Achivement of arms) generation
+## Resaerch Coat of arms (Heraldy - Achivement of arms) generation
 What parts is it made up of - what are its components
 Where does its symbols come from
 How Could it be generated in the Worldgame for fractions (Guild, Kingdoms, families) What could contribute and how (Race, Biome - animals and plants, Landscape, City, Vocation)

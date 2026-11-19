@@ -221,7 +221,7 @@ Ice & snow, Tundra, Cold steppe, Boreal forest, Cold desert, Temperate grassland
 
 What a patch holds for people to use. The generation gives every patch an amount for each of 27 raw resources, and a variant of each: rye is a variant of grain. One of them, the arcane materials, lies only where the Supernatural Field is high. A potential is what the land can yield. A deposit is a rare find that often needs to be mined.
 
-Resources are split in groups to make trade and needs manageable: Food, Materials, Fuel, Luxuries, Metals and Animals are found in patches, and Building, Tools, Gear, Weapons and Clothing are only produced. A product is produced from resources and is not generated with the map. Every generated resource has an abbreviation of three capital letters that no other resource has: GRN is grain. The groups, the abbreviations and the catalogue of variants are in docs/map-generation.md Appendix G.
+Resources are split in groups to make trade and needs manageable: Food, Materials, Fuel, Luxuries, Metals and Animals are found in patches, and Building, Tools, Gear, Weapons and Clothing are only produced. A product is produced from resources and is not generated with the map. Every generated resource has an abbreviation of three letters that no other resource has, with a capital at the start of each word: Grn is grain and IrO iron ore. The groups, the abbreviations and the catalogue of variants are in docs/map-generation.md Appendix G.
 
 #### Prospect
 
@@ -290,9 +290,12 @@ What a portrait of a person must show: the body and the face, the hair, the outf
 | [docs/parameter-set.schema.json](docs/parameter-set.schema.json) | The JSON Schema of a Parameter Set file. Generated, do not edit |
 | [docs/adding-a-race.md](docs/adding-a-race.md) | The steps to add a race |
 | [docs/races-basis.md](docs/races-basis.md) | The 28 default races: looks, history, way of life, vocations and factions |
+| [docs/races-and-worldbuilding.md](docs/races-and-worldbuilding.md) | A framework for building a near-human race: origin, anchor traits, culture and the relation to humans |
 | [docs/NameGenerator-Reuse.md](docs/NameGenerator-Reuse.md) | The person-name generator |
-| [docs/research/](docs/research/) | The source notes behind the research document |
+| [docs/RegionNameGenerator-Reuse.md](docs/RegionNameGenerator-Reuse.md) | The region-name generator of an earlier project. It is not ported yet |
+| [docs/research/](docs/research/) | The source notes behind the research document, and research for what is not specified yet: factions, flora and fauna, heraldry, and sequential art for graphic short stories |
 | [docs/plans/](docs/plans/) | Plans for changes, each with its status |
+| [braindump.md](braindump.md) | Notes and ideas in progress, not decided |
 
 ## Build and run
 

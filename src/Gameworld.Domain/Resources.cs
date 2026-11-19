@@ -90,9 +90,10 @@ public static class ResourceCatalog
     };
 
     /// <summary>
-    /// The abbreviation of a resource: three capital letters, different for every resource
+    /// The abbreviation of a resource: three letters, a capital at the start of each word
+    /// of the name, different for every resource even when case is ignored
     /// (map-generation.md Appendix G.3). None of them is the id of a default race, so
-    /// orchard is OCH and not ORC.
+    /// orchard is Och and not Orc.
     /// </summary>
     public static string AbbreviationOf(Resource resource) => resource switch
     {

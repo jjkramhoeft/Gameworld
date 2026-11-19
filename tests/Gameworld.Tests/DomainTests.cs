@@ -222,16 +222,17 @@ public class DomainTests
     }
 
     [Fact]
-    public void Every_resource_has_an_abbreviation_of_three_capital_letters_that_no_other_has()
+    public void Every_resource_has_an_abbreviation_of_three_letters_that_no_other_has()
     {
         var abbreviations = ResourceCatalog.All.Select(ResourceCatalog.AbbreviationOf).ToList();
-        Assert.All(abbreviations, a => Assert.Matches("^[A-Z]{3}$", a));
-        Assert.Equal(ResourceCatalog.Count, abbreviations.Distinct().Count());
-        Assert.Equal("GRN", ResourceCatalog.AbbreviationOf(Resource.Grain));
-        Assert.Equal("ARC", ResourceCatalog.AbbreviationOf(Resource.ArcaneMaterials));
-        // No abbreviation is the id of a default race.
+        Assert.All(abbreviations, a => Assert.Matches("^[A-Z][A-Za-z]{2}$", a));
+        Assert.Equal(ResourceCatalog.Count, abbreviations.Select(a => a.ToUpperInvariant()).Distinct().Count());
+        Assert.Equal("Grn", ResourceCatalog.AbbreviationOf(Resource.Grain));
+        Assert.Equal("IrO", ResourceCatalog.AbbreviationOf(Resource.IronOre));
+        Assert.Equal("ArM", ResourceCatalog.AbbreviationOf(Resource.ArcaneMaterials));
+        // No abbreviation is the id of a default race, even when case is ignored.
         var raceIds = ParameterSet.Default.Races.Select(r => r.Id.ToUpperInvariant()).ToHashSet();
-        Assert.DoesNotContain(abbreviations, raceIds.Contains);
+        Assert.DoesNotContain(abbreviations, a => raceIds.Contains(a.ToUpperInvariant()));
     }
 
     [Fact]

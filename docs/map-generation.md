@@ -2395,40 +2395,42 @@ The generation gives every patch an amount for each of 27 raw resources, and a v
   one generated resource of the group Luxuries, whatever the material is: star metal is a
   metal and the sap of Elanor a preserver, and both are variants of it.
 
-Every generated resource has an abbreviation of three capital letters, for places where
-the name is too long, as a label on a map or a column of a table. No two resources share
-one, and none is the id of a default race: orchard is OCH and not ORC. The number is the
-resource index of Appendix D.
+Every generated resource has an abbreviation of three letters, for places where the name
+is too long, as a label on a map or a column of a table. The first letter is a capital,
+and a further capital starts the next word of the name: Grn is grain, IrO iron ore and WFG
+wild food & game. No two resources share one, even when case is ignored, and none is the
+id of a default race: orchard is Och and not Orc. The number is the resource index of
+Appendix D.
 
 | # | Resource | Abbreviation | Group |
 |---|---|---|---|
-| 0 | Grain | GRN | Food |
-| 1 | Produce | PRD | Food |
-| 2 | Orchard | OCH | Food |
-| 3 | Livestock | LVS | Food |
-| 4 | Fish | FSH | Food |
-| 5 | Wild food & game | WLD | Food |
-| 6 | Timber | TMB | Materials |
-| 7 | Stone | STN | Materials |
-| 8 | Clay | CLY | Materials |
-| 9 | Crystal | XTL | Materials |
-| 10 | Fibre | FBR | Materials |
-| 11 | Fuel | FUL | Fuel |
-| 12 | Salt | SAL | Materials |
-| 13 | Iron ore | IRN | Metals |
-| 14 | Copper ore | COP | Metals |
-| 15 | Tin | TIN | Metals |
-| 16 | Silver & lead | SLV | Metals |
-| 17 | Gold | GLD | Metals |
-| 18 | Gems & pearls | GEM | Luxuries |
-| 19 | Spices | SPC | Luxuries |
-| 20 | Stimulants & sugar | STM | Luxuries |
-| 21 | Furs & ivory | FUR | Luxuries |
-| 22 | Dyes | DYE | Luxuries |
-| 23 | Horses & pack animals | HOR | Animals |
-| 24 | Reagents | RGT | Materials |
-| 25 | Herbs | HRB | Materials |
-| 26 | Arcane materials | ARC | Luxuries |
+| 0 | Grain | Grn | Food |
+| 1 | Produce | Prd | Food |
+| 2 | Orchard | Och | Food |
+| 3 | Livestock | LvS | Food |
+| 4 | Fish | Fsh | Food |
+| 5 | Wild food & game | WFG | Food |
+| 6 | Timber | Tmb | Materials |
+| 7 | Stone | Stn | Materials |
+| 8 | Clay | Cly | Materials |
+| 9 | Crystal | Crl | Materials |
+| 10 | Fibre | Fbr | Materials |
+| 11 | Fuel | Ful | Fuel |
+| 12 | Salt | Sal | Materials |
+| 13 | Iron ore | IrO | Metals |
+| 14 | Copper ore | CpO | Metals |
+| 15 | Tin | Tin | Metals |
+| 16 | Silver & lead | SiL | Metals |
+| 17 | Gold | Gld | Metals |
+| 18 | Gems & pearls | GmP | Luxuries |
+| 19 | Spices | Spc | Luxuries |
+| 20 | Stimulants & sugar | StS | Luxuries |
+| 21 | Furs & ivory | FrI | Luxuries |
+| 22 | Dyes | Dye | Luxuries |
+| 23 | Horses & pack animals | HrP | Animals |
+| 24 | Reagents | Rgt | Materials |
+| 25 | Herbs | Hrb | Materials |
+| 26 | Arcane materials | ArM | Luxuries |
 
 The catalogue is an example and not sufficient yet. The variants the generation can
 actually pick are those of Appendices B and D.
