@@ -34,6 +34,7 @@ public sealed partial class World
         Fields = new Fields(foundation);
         BiomeRules = new BiomeRules(foundation.Parameters.Elevation.Biomes);
         PopulationRules = new PopulationRules(foundation.Parameters, foundation.Seed.Value);
+        FloraFaunaRules = new FloraFaunaRules(foundation.Parameters);
     }
 
     /// <summary>A world for a seed text and a Parameter Set, at the current generator version.</summary>
@@ -46,6 +47,7 @@ public sealed partial class World
     public Fields Fields { get; }
     public BiomeRules BiomeRules { get; }
     public PopulationRules PopulationRules { get; }
+    public FloraFaunaRules FloraFaunaRules { get; }
 
     /// <summary>
     /// A river-poor flat zone: a flat zone whose site (the site of its root cell) gets less

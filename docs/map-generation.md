@@ -1,8 +1,8 @@
 # How the map is generated
 
 This document describes every step that turns a foundation seed into the map: the cell
-hierarchy, oceans, elevation types, fields, rivers, lakes, the height map, biomes,
-resources, Prospects for cities and towns and the travel network. It is the specification
+hierarchy, oceans, elevation types, fields, rivers, lakes, the height map, biomes, flora
+and fauna, resources, Prospects for cities and towns and the travel network. It is the specification
 of the map generation algorithms. The [readme](../readme.md) defines the concepts around
 them (foundation, Parameter Set, identity, region generation stages), and the names in
 this document follow the readme. Default parameter values are given in parentheses or in
@@ -78,6 +78,7 @@ seed ──► fields (initial temperature, precipitation, prosperity, supernatu
           ├─► lakes       per region: on rivers
           ├─► height map  per region (raster): fitted to the rivers and the coast
           ├─► biomes      per patch: fields + height
+          ├─► flora, fauna per patch: biome + supernatural
           ├─► resources   per patch: biome, water, elevation type, bedrock, prosperity
           ├─► Prospects   per region: scored patches → Prospects for cities and towns
           └─► travel      roads, river routes, sea lanes between Prospects
@@ -1147,6 +1148,7 @@ Stage: Detailed (estimated biome) and Elevated (final biome).
 Every land patch gets one biome, from the fields at
 the patch's site and the patch's height. The estimated biome uses the typical height of
 the elevation type, and the final biome uses the height from the height map (13.1).
+With its biome a patch gets a few kinds of flora and fauna (13.4).
 
 ### 13.1 Inputs
 
@@ -1222,6 +1224,71 @@ is bound to warm low coasts.
 | Temperate grassland | 184, 222, 84 | Tropical rain forest | 0, 92, 36 |
 | Woodland & shrubland | 150, 104, 70 | Mangrove | 168, 70, 150 |
 | Temperate mixed forest | 76, 148, 84 | | |
+
+### 13.4 Flora and fauna
+
+Stage: Detailed (of the estimated biome) and Elevated (of the final biome).
+
+Every patch gets a few kinds of flora and a few kinds of fauna that fit it. They are drawn
+when the biome of the patch is chosen, so they exist in the same two forms as the biome.
+An ocean patch has no biome and gets kinds of the sea.
+
+**The lists.** The flora and the fauna are two lists in the Parameter Set, `Flora` and
+`Fauna`. The code knows no kind by name. A kind holds:
+
+| Value | Meaning |
+|---|---|
+| `Id` | What the generated data knows the kind by. Unique in its list |
+| `Name` | The name shown |
+| `Type` | Flora: Tree, Shrub, Flower, Herb, Fruit, Grass, Vine, Fungus, Moss, Aquatic or Arcane. Fauna: Critter, Animal, Beast or Monster |
+| `Enabled` | A kind that is off is never drawn |
+| `Biomes` | The biomes the kind lives in |
+| `Sea` | Whether the kind lives in the sea. Left out means no |
+| `Frequency` | How frequent the kind is relative to the others (1). 0 or below means never |
+| `MinSupernatural` | The Supernatural (0 to 100) a patch needs for the kind. Left out means 0 |
+
+The default lists hold 207 kinds of flora and 167 kinds of fauna: the entries of
+[research/flora-and-fauna.md](research/flora-and-fauna.md) sections 4 and 5, with the
+biomes the note gives each entry. The frequency is 1, except 0.5 for a beast and 0.25 for
+a monster and for an arcane plant. A monster and an arcane plant need a Supernatural of
+60, 75 or 90, by the tiers S1, S2 and S3 of the note. No other kind needs the field. So
+a monster is found on about a tenth of the map at the most (9, 14.1).
+
+**Fit.** A kind fits a patch when all of these hold:
+
+- the kind is on and its frequency is above 0,
+- a land patch: the kind lists the biome of the patch. An ocean patch: the kind is of the sea,
+- the Supernatural field at the site of the patch is at least `MinSupernatural`.
+
+**Draw.** With `(i, j)` the root cell of the patch and `k` the index of the kind in its
+list (kinds that are off count too):
+
+```
+n      = between(FloraPerPatch.Min, FloraPerPatch.Max, toUnit(hash4(seed, 0xf10a, i, j)))
+key(k) = −ln(1 − toUnit(hash4(seed, 0xf10000 + k, i, j))) / Frequency(k)
+```
+
+The flora of the patch are the `n` kinds that fit with the smallest keys, listed in the
+order of the Parameter Set. Two equal keys go to the lower `k`. A patch with fewer than
+`n` kinds that fit gets them all. The fauna use `FaunaPerPatch` and the purposes `0xfa0a`
+and `0xfa0000 + k`. Both counts are 3 to 6 by default, and `ln` is the exact one of
+Appendix A.
+
+The key makes a kind twice as likely to be drawn when its frequency is twice as high. The
+key of a kind depends on the patch and the kind only, not on the biome and not on the
+other kinds. Two things follow:
+
+- A patch whose estimated and final biome are the same has the same flora and fauna in
+  both forms.
+- Switching a kind off, or adding one at the end of its list, leaves the keys of the
+  other kinds as they were.
+
+**Not used yet.** The note gives some entries a condition beyond the biome: a lake or a
+river, mountains, a coast, a tropical highland. It also names the resource variant an
+entry stands behind and the vocations it matters to. The draw reads none of these. So a
+kind that the note places on a tropical highland, such as the llama, is drawn in its
+temperate biomes anywhere. The flora and fauna of a patch change no resource, no score
+and no population.
 
 ---
 

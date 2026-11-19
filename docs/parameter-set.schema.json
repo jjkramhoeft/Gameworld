@@ -510,7 +510,7 @@
           "additionalProperties": false
         },
         "Biomes": {
-          "description": "Biomes: one per land patch, from temperature and aridity (§13).",
+          "description": "Biomes: one per land patch, from temperature and aridity, and the flora and fauna of a patch (§13).",
           "type": "object",
           "properties": {
             "Cooling": {
@@ -551,6 +551,48 @@
               "description": "The smallest aridity (precipitation ÷ the dryness threshold of the temperature) at which a warm low coast becomes Mangrove. Below 0.5 is desert, 0.5 to 1 steppe, above 1 humid (§13.2).",
               "type": "number",
               "default": 0.5
+            },
+            "FloraPerPatch": {
+              "description": "How many kinds of flora a patch gets: a count drawn evenly from Min to Max. A patch gets fewer when fewer kinds fit it (§13.4).",
+              "type": "object",
+              "properties": {
+                "Min": {
+                  "description": "Smallest count, inclusive.",
+                  "type": "integer",
+                  "default": 3
+                },
+                "Max": {
+                  "description": "Largest count, inclusive.",
+                  "type": "integer",
+                  "default": 6
+                }
+              },
+              "required": [
+                "Min",
+                "Max"
+              ],
+              "additionalProperties": false
+            },
+            "FaunaPerPatch": {
+              "description": "How many kinds of fauna a patch gets: a count drawn evenly from Min to Max. A patch gets fewer when fewer kinds fit it (§13.4).",
+              "type": "object",
+              "properties": {
+                "Min": {
+                  "description": "Smallest count, inclusive.",
+                  "type": "integer",
+                  "default": 3
+                },
+                "Max": {
+                  "description": "Largest count, inclusive.",
+                  "type": "integer",
+                  "default": 6
+                }
+              },
+              "required": [
+                "Min",
+                "Max"
+              ],
+              "additionalProperties": false
             }
           },
           "additionalProperties": false
@@ -1213,6 +1255,237 @@
           "Name",
           "Enabled",
           "BiomeFrequency"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "Vocations": {
+      "description": "The vocations: the work a person does, in nine sectors. Add a vocation by adding an entry, and switch one on or off with Enabled. The vocations are not drawn for places or persons yet (society §8). A file that gives this list replaces the whole default list.",
+      "type": "array",
+      "items": {
+        "description": "A vocation: the work a person does. The vocations are not drawn for places or persons yet (society §8).",
+        "type": "object",
+        "properties": {
+          "Id": {
+            "description": "The id the generated data knows the vocation by. Unique in the list; keep it when the name changes.",
+            "type": "string"
+          },
+          "Name": {
+            "description": "The name shown for the vocation.",
+            "type": "string"
+          },
+          "Enabled": {
+            "description": "Whether the vocation exists in the world.",
+            "type": "boolean"
+          },
+          "Sector": {
+            "description": "The sector of the vocation: one of nine (society §8).",
+            "enum": [
+              "LandAndWater",
+              "Processing",
+              "Craft",
+              "TradeAndTransport",
+              "Service",
+              "GovernanceAndWar",
+              "FaithAndLearning",
+              "Supernatural",
+              "Margins"
+            ]
+          },
+          "LowestTier": {
+            "description": "The lowest tier of place in which the vocation is found: Countryside, Town, City or Capital (society §8).",
+            "enum": [
+              "Countryside",
+              "Town",
+              "City",
+              "Capital"
+            ]
+          },
+          "SharePercent": {
+            "description": "The starting share of the labour force of a whole region that holds the vocation, in per cent. The shares of the defaults sum to 100. They are starting values, not tuned (society §8).",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "OnWater": {
+            "description": "Whether the vocation is only found in a place on water: the shipwright and the sailor (society §8).",
+            "type": "boolean"
+          },
+          "Variants": {
+            "description": "The names of the variants of the vocation: the smaller trades it covers, such as the shepherd of the herder and the armourer of the smith (society §8).",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "Id",
+          "Name",
+          "Enabled",
+          "Sector",
+          "LowestTier"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "Flora": {
+      "description": "The flora: the plants that can grow in the world. Every patch gets a few of the kinds that fit its biome (§13.4). A file that gives this list replaces the whole default list.",
+      "type": "array",
+      "items": {
+        "description": "A kind of flora: a plant that can grow in the world, and the biomes it grows in.",
+        "type": "object",
+        "properties": {
+          "Id": {
+            "description": "The id the generated data knows the kind by. Unique in the list; keep it when the name changes.",
+            "type": "string"
+          },
+          "Name": {
+            "description": "The name shown for the kind.",
+            "type": "string"
+          },
+          "Type": {
+            "description": "The type of the kind: Tree, Shrub, Flower, Herb, Fruit, Grass, Vine, Fungus, Moss, Aquatic or Arcane.",
+            "enum": [
+              "Tree",
+              "Shrub",
+              "Flower",
+              "Herb",
+              "Fruit",
+              "Grass",
+              "Vine",
+              "Fungus",
+              "Moss",
+              "Aquatic",
+              "Arcane"
+            ]
+          },
+          "Enabled": {
+            "description": "Whether the kind grows in the world. A kind that is off is never drawn for a patch.",
+            "type": "boolean"
+          },
+          "Biomes": {
+            "description": "The biomes the kind grows in. A land patch can only get a kind that lists its biome (§13.4).",
+            "type": "array",
+            "items": {
+              "enum": [
+                "IceAndSnow",
+                "Tundra",
+                "ColdSteppe",
+                "BorealForest",
+                "ColdDesert",
+                "TemperateGrassland",
+                "WoodlandAndShrubland",
+                "TemperateMixedForest",
+                "TemperateBroadleafForest",
+                "TemperateRainForest",
+                "HotDesert",
+                "ThornScrub",
+                "Savanna",
+                "TropicalDryForest",
+                "TropicalRainForest",
+                "Mangrove"
+              ]
+            }
+          },
+          "Sea": {
+            "description": "Whether the kind grows in the sea: an ocean patch can only get a kind that is of the sea (§13.4).",
+            "type": "boolean"
+          },
+          "Frequency": {
+            "description": "How frequent the kind is, relative to the other kinds that fit a patch. A kind with twice the frequency is drawn about twice as often. 0 or below means never (§13.4).",
+            "type": "number"
+          },
+          "MinSupernatural": {
+            "description": "The Supernatural (0 to 100) a patch needs for the kind to grow there. 0 means anywhere. The arcane plants of the defaults need 60, 75 or 90 (§13.4).",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          }
+        },
+        "required": [
+          "Id",
+          "Name",
+          "Type",
+          "Enabled",
+          "Biomes"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "Fauna": {
+      "description": "The fauna: the creatures that can live in the world. Every patch gets a few of the kinds that fit its biome (§13.4). A file that gives this list replaces the whole default list.",
+      "type": "array",
+      "items": {
+        "description": "A kind of fauna: a creature that can live in the world, and the biomes it lives in.",
+        "type": "object",
+        "properties": {
+          "Id": {
+            "description": "The id the generated data knows the kind by. Unique in the list; keep it when the name changes.",
+            "type": "string"
+          },
+          "Name": {
+            "description": "The name shown for the kind.",
+            "type": "string"
+          },
+          "Type": {
+            "description": "The type of the kind: Critter (small), Animal (ordinary wildlife and livestock), Beast (large or dangerous) or Monster (supernatural or legendary).",
+            "enum": [
+              "Critter",
+              "Animal",
+              "Beast",
+              "Monster"
+            ]
+          },
+          "Enabled": {
+            "description": "Whether the kind lives in the world. A kind that is off is never drawn for a patch.",
+            "type": "boolean"
+          },
+          "Biomes": {
+            "description": "The biomes the kind lives in. A land patch can only get a kind that lists its biome (§13.4).",
+            "type": "array",
+            "items": {
+              "enum": [
+                "IceAndSnow",
+                "Tundra",
+                "ColdSteppe",
+                "BorealForest",
+                "ColdDesert",
+                "TemperateGrassland",
+                "WoodlandAndShrubland",
+                "TemperateMixedForest",
+                "TemperateBroadleafForest",
+                "TemperateRainForest",
+                "HotDesert",
+                "ThornScrub",
+                "Savanna",
+                "TropicalDryForest",
+                "TropicalRainForest",
+                "Mangrove"
+              ]
+            }
+          },
+          "Sea": {
+            "description": "Whether the kind lives in the sea: an ocean patch can only get a kind that is of the sea (§13.4).",
+            "type": "boolean"
+          },
+          "Frequency": {
+            "description": "How frequent the kind is, relative to the other kinds that fit a patch. A kind with twice the frequency is drawn about twice as often. 0 or below means never (§13.4).",
+            "type": "number"
+          },
+          "MinSupernatural": {
+            "description": "The Supernatural (0 to 100) a patch needs for the kind to live there. 0 means anywhere. The monsters of the defaults need 60, 75 or 90 (§13.4).",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          }
+        },
+        "required": [
+          "Id",
+          "Name",
+          "Type",
+          "Enabled",
+          "Biomes"
         ],
         "additionalProperties": false
       }

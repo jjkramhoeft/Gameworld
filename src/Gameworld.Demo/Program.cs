@@ -355,6 +355,8 @@ namespace Gameworld.Demo
                 var prospectAt = plan is null ? -1 : Array.FindIndex(plan.Prospects, p => p.Patch.Coord == info.Patch);
                 var prospect = prospectAt < 0 ? null : plan!.Prospects[prospectAt];
                 string NameOf(string race) => world.Parameters.Races.FirstOrDefault(x => x.Id == race)?.Name ?? race;
+                string FloraNameOf(string id) => world.Parameters.Flora.FirstOrDefault(x => x.Id == id)?.Name ?? id;
+                string FaunaNameOf(string id) => world.Parameters.Fauna.FirstOrDefault(x => x.Id == id)?.Name ?? id;
                 var elevation = world.FindElevation(regionId);
                 var zoneCells = world.Advance(regionId, RegionStage.Outlined).Outline.Zones
                     .FirstOrDefault(z => z.Id.Coord == info.Zone)?.Cells.Count ?? 1;
@@ -398,6 +400,8 @@ namespace Gameworld.Demo
                             .ToArray(),
                         patch.Resources.Food,
                         patch.Resources.Wealth,
+                        (elevation?.Find(info.Patch)?.Flora ?? patch.Flora).Select(FloraNameOf).ToArray(),
+                        (elevation?.Find(info.Patch)?.Fauna ?? patch.Fauna).Select(FaunaNameOf).ToArray(),
                         score?.Score,
                         score?.Factors),
                     prospect,
@@ -479,6 +483,8 @@ namespace Gameworld.Demo
     /// <param name="Prospects">The Prospects in the zone. Null for an ocean zone and until the region is Planned.</param>
     public sealed record ZoneInfo(ZoneId Id, ElevationType ElevationType, string? Bedrock, string? BedrockName, int Cells, bool RiverPoor, ProspectCount? Prospects);
 
+    /// <param name="Flora">The names of the kinds of flora of the patch: of the final biome when the region is Elevated, else of the estimated biome.</param>
+    /// <param name="Fauna">The names of the kinds of fauna of the patch, as for the flora.</param>
     public sealed record PatchInfo(
         PatchId Id,
         int Cells,
@@ -493,6 +499,8 @@ namespace Gameworld.Demo
         ResourceInfo[] Resources,
         double Food,
         double Wealth,
+        string[] Flora,
+        string[] Fauna,
         double? Score,
         ProspectFactors? Factors);
 

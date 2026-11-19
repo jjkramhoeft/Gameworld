@@ -41,6 +41,15 @@ public sealed record ParameterSet
     [Description("The races: the peoples that can live in the world. Add a race by adding an entry, and switch a race on or off with Enabled. The potential population of a region is shared between the races that are on, by their frequency in the biome of each patch and their height modifier at its height (society §2 and §3.2). A file that gives this list replaces the whole default list.")]
     public IReadOnlyList<RaceParameters> Races { get; init; } = RaceParameters.Defaults;
 
+    [Description("The vocations: the work a person does, in nine sectors. Add a vocation by adding an entry, and switch one on or off with Enabled. The vocations are not drawn for places or persons yet (society §8). A file that gives this list replaces the whole default list.")]
+    public IReadOnlyList<VocationParameters> Vocations { get; init; } = VocationParameters.Defaults;
+
+    [Description("The flora: the plants that can grow in the world. Every patch gets a few of the kinds that fit its biome (§13.4). A file that gives this list replaces the whole default list.")]
+    public IReadOnlyList<FloraParameters> Flora { get; init; } = FloraParameters.Defaults;
+
+    [Description("The fauna: the creatures that can live in the world. Every patch gets a few of the kinds that fit its biome (§13.4). A file that gives this list replaces the whole default list.")]
+    public IReadOnlyList<FaunaParameters> Fauna { get; init; } = FaunaParameters.Defaults;
+
     public static ParameterSet Default => new();
 
     internal static readonly JsonSerializerOptions JsonOptions = new()
@@ -305,7 +314,7 @@ public sealed record ElevationParameters
     [Description("The height map: a raster per region, fitted to the rivers and the coast (§12).")]
     public HeightMapParameters HeightMap { get; init; } = new();
 
-    [Description("Biomes: one per land patch, from temperature and aridity (§13).")]
+    [Description("Biomes: one per land patch, from temperature and aridity, and the flora and fauna of a patch (§13).")]
     public BiomeParameters Biomes { get; init; } = new();
 }
 
@@ -400,6 +409,12 @@ public sealed record BiomeParameters
 
     [Description("The smallest aridity (precipitation ÷ the dryness threshold of the temperature) at which a warm low coast becomes Mangrove. Below 0.5 is desert, 0.5 to 1 steppe, above 1 humid (§13.2).")]
     public double MangroveMinAridity { get; init; } = 0.5;
+
+    [Description("How many kinds of flora a patch gets: a count drawn evenly from Min to Max. A patch gets fewer when fewer kinds fit it (§13.4).")]
+    public IntRange FloraPerPatch { get; init; } = new(3, 6);
+
+    [Description("How many kinds of fauna a patch gets: a count drawn evenly from Min to Max. A patch gets fewer when fewer kinds fit it (§13.4).")]
+    public IntRange FaunaPerPatch { get; init; } = new(3, 6);
 }
 
 /// <summary>Parameters of the Planned stage (section 15).</summary>

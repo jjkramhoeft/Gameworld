@@ -45,7 +45,7 @@ and the travel network are its inputs.
 | Cities and towns | Settled; their races Planned | The races of a city or a town are specified and implemented (section 5.1), the rest is not specified |
 | Families | Settled | Not specified (section 6) |
 | Persons | Settled for the important persons, later for the rest | The names are implemented, the rest is not specified (section 7) |
-| Vocations | Planned for the countryside, Settled for the cities and towns | Decided in part, not specified (section 8) |
+| Vocations | Planned for the countryside, Settled for the cities and towns | The list is in the Parameter Set. The rules are decided in part and not specified (section 8) |
 | Looks | not decided | Not specified (section 9) |
 
 ### 1.1 What holds for every step
@@ -472,8 +472,9 @@ Stage: Planned for the countryside, Settled for the cities and towns. Not specif
 
 A vocation is the work a person does: farmer, smith, priest, guard and so on.
 
-The rules below were decided on 2026-11-15. None of them is specified in detail or
-implemented.
+The rules below were decided on 2026-11-15. The list of vocations is in the Parameter Set
+since 2026-11-19 (see "In the Parameter Set" below). No other rule is specified in detail
+or implemented, and no vocation is drawn for a place or a person.
 
 **Vocation and role are two facts.** The vocation is the work, one of the list, with a
 variant (a herder who is a shepherd). The role is the position of the person: in the
@@ -502,6 +503,25 @@ vocation by name. The default list has 51 vocations in nine sectors:
 
 A smaller trade is a variant of one of them: the monk of Priest, the armourer of Smith,
 the guide of Hunter, the dyer of Weaver, the boatman of Sailor and the banker of Merchant.
+
+**In the Parameter Set.** The list is `Vocations`. A vocation holds:
+
+| Value | Meaning |
+|---|---|
+| `Id` | What the generated data knows the vocation by. Unique in the list |
+| `Name` | The name shown |
+| `Enabled` | Whether the vocation exists in the world |
+| `Sector` | One of the nine sectors |
+| `LowestTier` | Countryside, Town, City or Capital |
+| `SharePercent` | The starting share of the labour force of a whole region, in per cent |
+| `OnWater` | The vocation is only found in a place on water: the shipwright and the sailor. Left out means no |
+| `Variants` | The names of the smaller trades the vocation covers |
+
+The defaults of `LowestTier`, `SharePercent`, `OnWater` and `Variants` are those of
+[research/vocations.md](research/vocations.md) section 3: the index table and the
+"Covers" line of each vocation. The shares sum to 100. They are starting values and are
+not tuned against generated regions. A vocation does not yet hold its inputs and outputs,
+its by-works or its share by sex.
 
 **Products are names only.** A vocation lists what it consumes and what it produces by id.
 The ids are the resources of the map and the products made from them: iron, cloth, flour,
@@ -540,8 +560,9 @@ are implemented.
 
 Open:
 
-- What a vocation holds in the Parameter Set, and the default values: the shares, the
-  inputs and outputs, the lowest tier, the by-works and the shares by sex.
+- What more a vocation holds in the Parameter Set: the inputs and outputs, the by-works,
+  the shares by sex and the condition of each variant. Whether the starting shares and
+  lowest tiers of the research note stand.
 - The rule that gives the vocations of a place from its resources, its size, its races and
   the fields, and the purpose numbers of its draws.
 - The list of roles, and which roles fit which vocations.

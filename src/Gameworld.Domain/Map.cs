@@ -170,6 +170,8 @@ public sealed record Zone(
 /// <param name="IsCoastal">One of its patch cells has a neighbour on the other side of the coast.</param>
 /// <param name="Biome">The biome of a land patch; null for an ocean patch.</param>
 /// <param name="Resources">The resources of the patch. An ocean patch only carries sea resources.</param>
+/// <param name="Flora">The ids of the kinds of flora of the patch, in the order of the Parameter Set. They fit its biome; an ocean patch holds flora of the sea.</param>
+/// <param name="Fauna">The ids of the kinds of fauna of the patch, in the order of the Parameter Set. They fit its biome; an ocean patch holds fauna of the sea.</param>
 public sealed record Patch(
     PatchId Id,
     ZoneId Zone,
@@ -178,7 +180,9 @@ public sealed record Patch(
     bool IsOcean,
     bool IsCoastal,
     BiomeRecord? Biome,
-    PatchResources Resources);
+    PatchResources Resources,
+    IReadOnlyList<string> Flora,
+    IReadOnlyList<string> Fauna);
 
 /// <summary>
 /// A node of a river tree. Rivers grow from the sea into the land, so the root of a tree sits

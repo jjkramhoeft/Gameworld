@@ -458,6 +458,8 @@ async function inspect(p) {
         row('Water', water.length ? water.join(' · ') : 'none');
         row('Food · wealth', `${num(patch.Food)} · ${num(patch.Wealth)}`);
       }
+      if (patch.Flora.length) row('Flora', patch.Flora.map(esc).join(' · '));
+      if (patch.Fauna.length) row('Fauna', patch.Fauna.map(esc).join(' · '));
       if (patch.Score != null) {
         const f = patch.Factors;
         row('Score', `${num(patch.Score, 1)}${d.Prospect ? ` · ${d.Prospect.Class} Prospect for a ${d.Prospect.ForCity ? 'city' : 'town'}${d.Prospect.OnShow ? ' · on show' : ' · not on show'}` : ''}`);

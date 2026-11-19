@@ -16,14 +16,22 @@ public sealed record RegionOutline(IReadOnlyList<Zone> Zones, bool HasSeaAccess)
 /// resources. The estimated form is calculated with a typical height per elevation type
 /// instead of the real height.
 /// </summary>
-/// <param name="Patches">The patches of the region's zones, with their estimated biome and resources. Sorted by key.</param>
+/// <param name="Patches">The patches of the region's zones, with their estimated biome and resources and the flora and fauna of the estimated biome. Sorted by key.</param>
 public sealed record RegionDetail(IReadOnlyList<Patch> Patches, Rivers Rivers, IReadOnlyList<Lake> Lakes);
 
 /// <summary>The final form of a land patch, calculated with the height from the height map.</summary>
 /// <param name="MeanHeightM">The mean height of the patch's land; null when no raster cell centre lies in it.</param>
-public sealed record PatchElevation(PatchId Patch, double? MeanHeightM, BiomeRecord Biome, PatchResources Resources);
+/// <param name="Flora">The ids of the kinds of flora of the final biome.</param>
+/// <param name="Fauna">The ids of the kinds of fauna of the final biome.</param>
+public sealed record PatchElevation(
+    PatchId Patch,
+    double? MeanHeightM,
+    BiomeRecord Biome,
+    PatchResources Resources,
+    IReadOnlyList<string> Flora,
+    IReadOnlyList<string> Fauna);
 
-/// <summary>What the Elevated stage adds: the height map and the final biomes and resources.</summary>
+/// <summary>What the Elevated stage adds: the height map and the final biomes, resources, flora and fauna.</summary>
 public sealed record RegionElevation(HeightMap HeightMap, IReadOnlyList<PatchElevation> Patches);
 
 /// <summary>How a race stands in a region.</summary>

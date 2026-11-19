@@ -34,6 +34,10 @@ public sealed class PatchDetail
     public List<int> RiverNodes { get; } = new();
     /// <summary>The estimated resources.</summary>
     public PatchResources Resources { get; set; } = PatchResources.None;
+    /// <summary>The ids of the kinds of flora of the estimated biome; of the sea for an ocean patch.</summary>
+    public IReadOnlyList<string> Flora { get; set; } = [];
+    /// <summary>The ids of the kinds of fauna of the estimated biome; of the sea for an ocean patch.</summary>
+    public IReadOnlyList<string> Fauna { get; set; } = [];
 
     /// <summary>A patch may not hold a lake if it is ocean, lies in a mountains zone, is a desert at sea level or lies in a river-poor flat zone.</summary>
     public bool MayHoldLake =>
@@ -88,14 +92,17 @@ public sealed class DetailWork
             p.Shape.Ocean,
             p.Shape.Coastal,
             p.Biome,
-            p.Resources)).ToArray(),
+            p.Resources,
+            p.Flora,
+            p.Fauna)).ToArray(),
         Rivers.Rivers,
         Lakes.Select(l => l.ToDomain()).ToArray());
 }
 
 /// <summary>
-/// The Detailed stage: patch mergers, rivers, lakes and the estimated biomes and resources
-/// (map-generation.md sections 6.3, 10, 11, 13 and 14).
+/// The Detailed stage: patch mergers, rivers, lakes and the estimated biomes and resources,
+/// with the flora and fauna of the estimated biomes (map-generation.md sections 6.3, 10, 11,
+/// 13 and 14).
 /// </summary>
 internal static class DetailBuilder
 {
@@ -163,9 +170,13 @@ internal static class DetailBuilder
         var work = new DetailWork(region, patches, rivers, nodeInfo, lakes);
         WaterSites(world, work);
 
-        // Estimated resources.
+        // Estimated resources, and the flora and fauna of the estimated biome.
         foreach (var patch in patches)
+        {
             patch.Resources = ResourcesOf(world, patch, patch.Biome);
+            patch.Flora = world.FloraFaunaRules.Flora(seed, patch.Root, patch.Biome?.Biome, patch.Supernatural);
+            patch.Fauna = world.FloraFaunaRules.Fauna(seed, patch.Root, patch.Biome?.Biome, patch.Supernatural);
+        }
         return work;
     }
 

@@ -138,7 +138,15 @@
       ],
       "RiverPoorPrecipitationFactor": 0.2,
       "MangroveMinTemperatureC": 20,
-      "MangroveMinAridity": 0.5
+      "MangroveMinAridity": 0.5,
+      "FloraPerPatch": {
+        "Min": 3,
+        "Max": 6
+      },
+      "FaunaPerPatch": {
+        "Min": 3,
+        "Max": 6
+      }
     }
   },
   "Planning": {
@@ -801,6 +809,5412 @@
         "TropicalRainForest": 2,
         "Mangrove": 1
       }
+    }
+  ],
+  "Vocations": [
+    {
+      "Id": "farmer",
+      "Name": "Farmer",
+      "Enabled": true,
+      "Sector": "LandAndWater",
+      "LowestTier": "Countryside",
+      "SharePercent": 35,
+      "Variants": [
+        "ploughman",
+        "peasant",
+        "free farmer",
+        "tenant",
+        "share-cropper",
+        "paddy farmer",
+        "rice farmer",
+        "millet farmer",
+        "yam farmer"
+      ]
+    },
+    {
+      "Id": "gardener",
+      "Name": "Gardener",
+      "Enabled": true,
+      "Sector": "LandAndWater",
+      "LowestTier": "Countryside",
+      "SharePercent": 3,
+      "Variants": [
+        "orchard keeper",
+        "vine dresser",
+        "olive grower",
+        "date gardener",
+        "spice grower",
+        "tea grower",
+        "coffee grower",
+        "tobacco grower",
+        "dye-plant grower",
+        "silk grower",
+        "beekeeper",
+        "mushroom grower",
+        "seedsman",
+        "grafter"
+      ]
+    },
+    {
+      "Id": "herder",
+      "Name": "Herder",
+      "Enabled": true,
+      "Sector": "LandAndWater",
+      "LowestTier": "Countryside",
+      "SharePercent": 8,
+      "Variants": [
+        "shepherd",
+        "cowherd",
+        "swineherd",
+        "goatherd",
+        "reindeer herder",
+        "yak herder",
+        "nomad herder",
+        "dairymaid",
+        "cheesemaker",
+        "horse breeder",
+        "horse breaker",
+        "camel breeder"
+      ]
+    },
+    {
+      "Id": "fisher",
+      "Name": "Fisher",
+      "Enabled": true,
+      "Sector": "LandAndWater",
+      "LowestTier": "Countryside",
+      "SharePercent": 2,
+      "Variants": [
+        "sea fisher",
+        "river fisher",
+        "eel trapper",
+        "shellfish gatherer",
+        "crab catcher",
+        "shrimp catcher",
+        "whaler",
+        "sealer",
+        "pearl diver",
+        "sponge diver",
+        "coral diver",
+        "fish drier"
+      ]
+    },
+    {
+      "Id": "hunter",
+      "Name": "Hunter",
+      "Enabled": true,
+      "Sector": "LandAndWater",
+      "LowestTier": "Countryside",
+      "SharePercent": 1,
+      "Variants": [
+        "hunter",
+        "trapper",
+        "fowler",
+        "falconer",
+        "forager",
+        "honey hunter",
+        "tracker",
+        "guide",
+        "scout",
+        "ratcatcher",
+        "monster hunter"
+      ]
+    },
+    {
+      "Id": "forester",
+      "Name": "Forester",
+      "Enabled": true,
+      "Sector": "LandAndWater",
+      "LowestTier": "Countryside",
+      "SharePercent": 1.5,
+      "Variants": [
+        "woodcutter",
+        "lumberjack",
+        "sawyer",
+        "forest warden",
+        "grove warden",
+        "resin tapper",
+        "tree shaper",
+        "firewood seller"
+      ]
+    },
+    {
+      "Id": "miner",
+      "Name": "Miner",
+      "Enabled": true,
+      "Sector": "LandAndWater",
+      "LowestTier": "Countryside",
+      "SharePercent": 0.7,
+      "Variants": [
+        "ore miner",
+        "prospector",
+        "gold washer",
+        "tin streamer",
+        "coal miner",
+        "gem miner",
+        "crystal miner"
+      ]
+    },
+    {
+      "Id": "quarryman",
+      "Name": "Quarryman",
+      "Enabled": true,
+      "Sector": "LandAndWater",
+      "LowestTier": "Countryside",
+      "SharePercent": 0.4,
+      "Variants": [
+        "quarrier",
+        "stonecutter",
+        "slate splitter",
+        "millstone cutter",
+        "sand digger",
+        "gravel digger",
+        "clay digger"
+      ]
+    },
+    {
+      "Id": "salter",
+      "Name": "Salter",
+      "Enabled": true,
+      "Sector": "LandAndWater",
+      "LowestTier": "Countryside",
+      "SharePercent": 0.2,
+      "Variants": [
+        "salt boiler",
+        "pan master",
+        "salt raker",
+        "rock-salt miner",
+        "brine worker",
+        "soda burner"
+      ]
+    },
+    {
+      "Id": "miller",
+      "Name": "Miller",
+      "Enabled": true,
+      "Sector": "Processing",
+      "LowestTier": "Countryside",
+      "SharePercent": 1,
+      "Variants": [
+        "water miller",
+        "windmill keeper",
+        "horse-mill keeper",
+        "oil presser",
+        "fuller",
+        "sawyer"
+      ]
+    },
+    {
+      "Id": "baker",
+      "Name": "Baker",
+      "Enabled": true,
+      "Sector": "Processing",
+      "LowestTier": "Town",
+      "SharePercent": 0.6,
+      "Variants": [
+        "baker",
+        "keeper of the common oven",
+        "pastry cook",
+        "pie maker",
+        "cook",
+        "cookshop keeper"
+      ]
+    },
+    {
+      "Id": "brewer",
+      "Name": "Brewer",
+      "Enabled": true,
+      "Sector": "Processing",
+      "LowestTier": "Countryside",
+      "SharePercent": 1.2,
+      "Variants": [
+        "brewer",
+        "alewife",
+        "maltster",
+        "wine maker",
+        "cider maker",
+        "mead maker",
+        "distiller"
+      ]
+    },
+    {
+      "Id": "butcher",
+      "Name": "Butcher",
+      "Enabled": true,
+      "Sector": "Processing",
+      "LowestTier": "Town",
+      "SharePercent": 0.5,
+      "Variants": [
+        "butcher",
+        "slaughterer",
+        "poulterer",
+        "tripe seller",
+        "fishmonger",
+        "fish salter",
+        "pickler",
+        "renderer",
+        "tallow chandler",
+        "soap boiler"
+      ]
+    },
+    {
+      "Id": "charcoalBurner",
+      "Name": "Charcoal burner",
+      "Enabled": true,
+      "Sector": "Processing",
+      "LowestTier": "Countryside",
+      "SharePercent": 0.3,
+      "Variants": [
+        "collier",
+        "tar burner",
+        "pitch boiler",
+        "ash burner",
+        "varnish maker",
+        "lime burner"
+      ]
+    },
+    {
+      "Id": "smelter",
+      "Name": "Smelter",
+      "Enabled": true,
+      "Sector": "Processing",
+      "LowestTier": "Countryside",
+      "SharePercent": 0.2,
+      "Variants": [
+        "bloomery man",
+        "iron smelter",
+        "furnace master",
+        "copper smelter",
+        "silver refiner",
+        "steel maker",
+        "bronze founder"
+      ]
+    },
+    {
+      "Id": "tanner",
+      "Name": "Tanner",
+      "Enabled": true,
+      "Sector": "Processing",
+      "LowestTier": "Town",
+      "SharePercent": 0.4,
+      "Variants": [
+        "tanner",
+        "tawyer",
+        "currier",
+        "skinner",
+        "furrier",
+        "parchment maker"
+      ]
+    },
+    {
+      "Id": "weaver",
+      "Name": "Weaver",
+      "Enabled": true,
+      "Sector": "Processing",
+      "LowestTier": "Countryside",
+      "SharePercent": 3.5,
+      "Variants": [
+        "spinner",
+        "weaver",
+        "linen weaver",
+        "silk weaver",
+        "fuller",
+        "dyer",
+        "shearman",
+        "felt maker",
+        "carpet weaver",
+        "rope maker",
+        "net maker"
+      ]
+    },
+    {
+      "Id": "smith",
+      "Name": "Smith",
+      "Enabled": true,
+      "Sector": "Craft",
+      "LowestTier": "Countryside",
+      "SharePercent": 1,
+      "Variants": [
+        "blacksmith",
+        "farrier",
+        "toolsmith",
+        "nailer",
+        "cutler",
+        "locksmith",
+        "weaponsmith",
+        "armourer",
+        "sword polisher",
+        "bronze founder",
+        "bell caster",
+        "forge hand"
+      ]
+    },
+    {
+      "Id": "carpenter",
+      "Name": "Carpenter",
+      "Enabled": true,
+      "Sector": "Craft",
+      "LowestTier": "Countryside",
+      "SharePercent": 1.5,
+      "Variants": [
+        "carpenter",
+        "joiner",
+        "wheelwright",
+        "cartwright",
+        "cooper",
+        "turner",
+        "chest maker",
+        "bowyer",
+        "fletcher",
+        "sled maker",
+        "woodcarver"
+      ]
+    },
+    {
+      "Id": "shipwright",
+      "Name": "Shipwright",
+      "Enabled": true,
+      "Sector": "Craft",
+      "LowestTier": "Town",
+      "SharePercent": 0.2,
+      "OnWater": true,
+      "Variants": [
+        "shipwright",
+        "boatbuilder",
+        "caulker",
+        "hull mender",
+        "sail maker",
+        "barge builder"
+      ]
+    },
+    {
+      "Id": "mason",
+      "Name": "Mason",
+      "Enabled": true,
+      "Sector": "Craft",
+      "LowestTier": "Town",
+      "SharePercent": 1,
+      "Variants": [
+        "stonemason",
+        "bricklayer",
+        "builder",
+        "plasterer",
+        "tiler",
+        "roofer",
+        "thatcher",
+        "steeplejack",
+        "well digger",
+        "bridge builder",
+        "engineer"
+      ]
+    },
+    {
+      "Id": "potter",
+      "Name": "Potter",
+      "Enabled": true,
+      "Sector": "Craft",
+      "LowestTier": "Town",
+      "SharePercent": 0.4,
+      "Variants": [
+        "potter",
+        "brickmaker",
+        "tile maker",
+        "kiln master",
+        "maker of fine ware"
+      ]
+    },
+    {
+      "Id": "glassmaker",
+      "Name": "Glassmaker",
+      "Enabled": true,
+      "Sector": "Craft",
+      "LowestTier": "City",
+      "SharePercent": 0.05,
+      "Variants": [
+        "glassblower",
+        "glazier",
+        "bead maker",
+        "mirror maker",
+        "lens grinder",
+        "vial blower"
+      ]
+    },
+    {
+      "Id": "leatherworker",
+      "Name": "Leatherworker",
+      "Enabled": true,
+      "Sector": "Craft",
+      "LowestTier": "Town",
+      "SharePercent": 1.2,
+      "Variants": [
+        "shoemaker",
+        "cobbler",
+        "saddler",
+        "harness maker",
+        "girdler",
+        "glover",
+        "purse maker",
+        "scabbard maker",
+        "bookbinder"
+      ]
+    },
+    {
+      "Id": "tailor",
+      "Name": "Tailor",
+      "Enabled": true,
+      "Sector": "Craft",
+      "LowestTier": "Town",
+      "SharePercent": 1.2,
+      "Variants": [
+        "tailor",
+        "seamstress",
+        "robe maker",
+        "hosier",
+        "hatter",
+        "embroiderer",
+        "garment furrier",
+        "old-clothes dealer"
+      ]
+    },
+    {
+      "Id": "jeweller",
+      "Name": "Jeweller",
+      "Enabled": true,
+      "Sector": "Craft",
+      "LowestTier": "City",
+      "SharePercent": 0.15,
+      "Variants": [
+        "goldsmith",
+        "silversmith",
+        "gem cutter",
+        "lapidary",
+        "engraver",
+        "enameller",
+        "moneyer",
+        "assayer",
+        "ivory carver",
+        "coral carver",
+        "amber worker"
+      ]
+    },
+    {
+      "Id": "artist",
+      "Name": "Artist",
+      "Enabled": true,
+      "Sector": "Craft",
+      "LowestTier": "City",
+      "SharePercent": 0.1,
+      "Variants": [
+        "painter",
+        "sculptor",
+        "image carver",
+        "illuminator",
+        "glass painter",
+        "temple sculptor",
+        "mosaic maker",
+        "map engraver",
+        "instrument maker"
+      ]
+    },
+    {
+      "Id": "artificer",
+      "Name": "Artificer",
+      "Enabled": true,
+      "Sector": "Craft",
+      "LowestTier": "Capital",
+      "SharePercent": 0.02,
+      "Variants": [
+        "clockmaker",
+        "fine locksmith",
+        "instrument maker",
+        "lens grinder",
+        "tinker",
+        "automaton maker",
+        "siege engineer",
+        "object enchanter"
+      ]
+    },
+    {
+      "Id": "merchant",
+      "Name": "Merchant",
+      "Enabled": true,
+      "Sector": "TradeAndTransport",
+      "LowestTier": "City",
+      "SharePercent": 0.5,
+      "Variants": [
+        "long-distance merchant",
+        "wholesaler",
+        "draper",
+        "mercer",
+        "spicer",
+        "grain factor",
+        "broker",
+        "moneychanger",
+        "banker",
+        "moneylender",
+        "insurer"
+      ]
+    },
+    {
+      "Id": "shopkeeper",
+      "Name": "Shopkeeper",
+      "Enabled": true,
+      "Sector": "TradeAndTransport",
+      "LowestTier": "Town",
+      "SharePercent": 1.5,
+      "Variants": [
+        "retailer",
+        "stallholder",
+        "huckster",
+        "pedlar",
+        "chapman",
+        "market trader"
+      ]
+    },
+    {
+      "Id": "carter",
+      "Name": "Carter",
+      "Enabled": true,
+      "Sector": "TradeAndTransport",
+      "LowestTier": "Town",
+      "SharePercent": 1.2,
+      "Variants": [
+        "carter",
+        "teamster",
+        "muleteer",
+        "caravan driver",
+        "caravan master",
+        "drover",
+        "porter",
+        "water carrier",
+        "courier",
+        "post rider",
+        "elephant driver"
+      ]
+    },
+    {
+      "Id": "sailor",
+      "Name": "Sailor",
+      "Enabled": true,
+      "Sector": "TradeAndTransport",
+      "LowestTier": "Town",
+      "SharePercent": 1.2,
+      "OnWater": true,
+      "Variants": [
+        "seaman",
+        "ship\u0027s master",
+        "pilot",
+        "rigger",
+        "bargeman",
+        "boatman",
+        "ferryman",
+        "raftsman",
+        "ship\u0027s lookout"
+      ]
+    },
+    {
+      "Id": "innkeeper",
+      "Name": "Innkeeper",
+      "Enabled": true,
+      "Sector": "TradeAndTransport",
+      "LowestTier": "Town",
+      "SharePercent": 0.8,
+      "Variants": [
+        "innkeeper",
+        "taverner",
+        "hosteller",
+        "alehouse keeper",
+        "cookshop keeper",
+        "bathhouse keeper",
+        "stable keeper"
+      ]
+    },
+    {
+      "Id": "healer",
+      "Name": "Healer",
+      "Enabled": true,
+      "Sector": "Service",
+      "LowestTier": "Countryside",
+      "SharePercent": 0.5,
+      "Variants": [
+        "physician",
+        "surgeon",
+        "barber-surgeon",
+        "barber",
+        "bonesetter",
+        "tooth puller",
+        "midwife",
+        "nurse",
+        "herbalist"
+      ]
+    },
+    {
+      "Id": "servant",
+      "Name": "Servant",
+      "Enabled": true,
+      "Sector": "Service",
+      "LowestTier": "Countryside",
+      "SharePercent": 7.9,
+      "Variants": [
+        "maid",
+        "manservant",
+        "cook",
+        "groom",
+        "nurse",
+        "wet nurse",
+        "laundress",
+        "valet",
+        "page",
+        "taster",
+        "household steward"
+      ]
+    },
+    {
+      "Id": "entertainer",
+      "Name": "Entertainer",
+      "Enabled": true,
+      "Sector": "Service",
+      "LowestTier": "Town",
+      "SharePercent": 0.2,
+      "Variants": [
+        "minstrel",
+        "bard",
+        "harper",
+        "singer",
+        "drummer",
+        "praise-singer",
+        "storyteller",
+        "poet",
+        "actor",
+        "acrobat",
+        "rope dancer",
+        "dancer",
+        "jester",
+        "wrestler"
+      ]
+    },
+    {
+      "Id": "courtesan",
+      "Name": "Courtesan",
+      "Enabled": true,
+      "Sector": "Service",
+      "LowestTier": "Town",
+      "SharePercent": 0.1,
+      "Variants": [
+        "courtesan",
+        "companion",
+        "kept mistress",
+        "prostitute",
+        "bathhouse attendant",
+        "brothel keeper"
+      ]
+    },
+    {
+      "Id": "noble",
+      "Name": "Noble",
+      "Enabled": true,
+      "Sector": "GovernanceAndWar",
+      "LowestTier": "Countryside",
+      "SharePercent": 1,
+      "Variants": [
+        "lord",
+        "lady",
+        "knight",
+        "squire",
+        "landholder",
+        "chief",
+        "jarl",
+        "khan",
+        "title-holder",
+        "head of a great house"
+      ]
+    },
+    {
+      "Id": "official",
+      "Name": "Official",
+      "Enabled": true,
+      "Sector": "GovernanceAndWar",
+      "LowestTier": "Countryside",
+      "SharePercent": 0.8,
+      "Variants": [
+        "steward",
+        "bailiff",
+        "reeve",
+        "hayward",
+        "magistrate",
+        "judge",
+        "tax collector",
+        "toll keeper",
+        "customs searcher",
+        "weigh-master",
+        "sworn measurer",
+        "surveyor",
+        "mayor",
+        "herald",
+        "town crier",
+        "envoy",
+        "treasurer",
+        "gaoler"
+      ]
+    },
+    {
+      "Id": "soldier",
+      "Name": "Soldier",
+      "Enabled": true,
+      "Sector": "GovernanceAndWar",
+      "LowestTier": "Town",
+      "SharePercent": 1,
+      "Variants": [
+        "man-at-arms",
+        "archer",
+        "crossbowman",
+        "spearman",
+        "mounted archer",
+        "cavalryman",
+        "sergeant",
+        "captain",
+        "mercenary",
+        "drill master",
+        "marine",
+        "champion"
+      ]
+    },
+    {
+      "Id": "guard",
+      "Name": "Guard",
+      "Enabled": true,
+      "Sector": "GovernanceAndWar",
+      "LowestTier": "Town",
+      "SharePercent": 0.6,
+      "Variants": [
+        "watchman",
+        "town guard",
+        "gate guard",
+        "night watch",
+        "bodyguard",
+        "caravan guard",
+        "road warden",
+        "pass warden",
+        "lookout",
+        "beacon keeper",
+        "granary warden",
+        "vault keeper",
+        "firefighter"
+      ]
+    },
+    {
+      "Id": "priest",
+      "Name": "Priest",
+      "Enabled": true,
+      "Sector": "FaithAndLearning",
+      "LowestTier": "Countryside",
+      "SharePercent": 2.5,
+      "Variants": [
+        "village priest",
+        "temple priest",
+        "chaplain",
+        "shaman",
+        "monk",
+        "nun",
+        "friar",
+        "hermit",
+        "ascetic",
+        "sexton"
+      ]
+    },
+    {
+      "Id": "scribe",
+      "Name": "Scribe",
+      "Enabled": true,
+      "Sector": "FaithAndLearning",
+      "LowestTier": "Town",
+      "SharePercent": 0.4,
+      "Variants": [
+        "clerk",
+        "copyist",
+        "notary",
+        "bookkeeper",
+        "secretary",
+        "advocate",
+        "records clerk",
+        "printer",
+        "bookbinder",
+        "bookseller",
+        "witness for hire"
+      ]
+    },
+    {
+      "Id": "scholar",
+      "Name": "Scholar",
+      "Enabled": true,
+      "Sector": "FaithAndLearning",
+      "LowestTier": "City",
+      "SharePercent": 0.15,
+      "Variants": [
+        "teacher",
+        "schoolmaster",
+        "tutor",
+        "professor",
+        "sage",
+        "astronomer",
+        "mathematician",
+        "lore keeper",
+        "chronicler",
+        "librarian",
+        "keeper of genealogies"
+      ]
+    },
+    {
+      "Id": "mage",
+      "Name": "Mage",
+      "Enabled": true,
+      "Sector": "Supernatural",
+      "LowestTier": "Capital",
+      "SharePercent": 0.03,
+      "Variants": [
+        "wizard",
+        "sorcerer",
+        "enchanter",
+        "court mage",
+        "battle mage",
+        "hedge wizard",
+        "rune carver"
+      ]
+    },
+    {
+      "Id": "alchemist",
+      "Name": "Alchemist",
+      "Enabled": true,
+      "Sector": "Supernatural",
+      "LowestTier": "City",
+      "SharePercent": 0.05,
+      "Variants": [
+        "apothecary",
+        "alchemist",
+        "potion maker",
+        "antidote maker",
+        "poisoner",
+        "perfumer",
+        "embalmer",
+        "maker of insect smoke"
+      ]
+    },
+    {
+      "Id": "seer",
+      "Name": "Seer",
+      "Enabled": true,
+      "Sector": "Supernatural",
+      "LowestTier": "Countryside",
+      "SharePercent": 0.2,
+      "Variants": [
+        "diviner",
+        "astrologer",
+        "geomancer",
+        "soothsayer",
+        "oracle",
+        "medium",
+        "dowser",
+        "well-finder",
+        "weather watcher",
+        "wise woman",
+        "hedge witch",
+        "cunning man"
+      ]
+    },
+    {
+      "Id": "labourer",
+      "Name": "Labourer",
+      "Enabled": true,
+      "Sector": "Margins",
+      "LowestTier": "Countryside",
+      "SharePercent": 11,
+      "Variants": [
+        "day labourer",
+        "field hand",
+        "harvest hand",
+        "builder\u0027s labourer",
+        "digger",
+        "ditcher",
+        "dock hand",
+        "quarry hand",
+        "peat cutter",
+        "ice cutter",
+        "gravedigger"
+      ]
+    },
+    {
+      "Id": "beggar",
+      "Name": "Beggar",
+      "Enabled": true,
+      "Sector": "Margins",
+      "LowestTier": "Town",
+      "SharePercent": 1.5,
+      "Variants": [
+        "beggar",
+        "pauper",
+        "vagrant",
+        "almsman",
+        "cripple",
+        "pilgrim",
+        "refugee",
+        "street orphan"
+      ]
+    },
+    {
+      "Id": "thief",
+      "Name": "Thief",
+      "Enabled": true,
+      "Sector": "Margins",
+      "LowestTier": "Town",
+      "SharePercent": 0.3,
+      "Variants": [
+        "cutpurse",
+        "pickpocket",
+        "burglar",
+        "fence",
+        "smuggler",
+        "forger",
+        "swindler",
+        "blackmailer",
+        "enforcer",
+        "poisoner",
+        "hired killer"
+      ]
+    },
+    {
+      "Id": "bandit",
+      "Name": "Bandit",
+      "Enabled": true,
+      "Sector": "Margins",
+      "LowestTier": "Countryside",
+      "SharePercent": 0.25,
+      "Variants": [
+        "highwayman",
+        "robber",
+        "raider",
+        "rustler",
+        "poacher",
+        "outlaw",
+        "pirate",
+        "wrecker",
+        "rebel"
+      ]
+    }
+  ],
+  "Flora": [
+    {
+      "Id": "spruce",
+      "Name": "Spruce",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "TemperateMixedForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "scotsPine",
+      "Name": "Scots pine",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "WoodlandAndShrubland",
+        "TemperateMixedForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "larch",
+      "Name": "Larch",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "birch",
+      "Name": "Birch",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "Tundra",
+        "BorealForest",
+        "TemperateMixedForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "poplarAndAspen",
+      "Name": "Poplar and aspen",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "BorealForest",
+        "ColdDesert",
+        "TemperateGrassland",
+        "TemperateMixedForest",
+        "HotDesert"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "rowan",
+      "Name": "Rowan",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "TemperateMixedForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "alder",
+      "Name": "Alder",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "juniper",
+      "Name": "Juniper",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "BorealForest",
+        "ColdDesert",
+        "TemperateGrassland",
+        "WoodlandAndShrubland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "willow",
+      "Name": "Willow",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "TemperateGrassland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "oak",
+      "Name": "Oak",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "beech",
+      "Name": "Beech",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "ash",
+      "Name": "Ash",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "elm",
+      "Name": "Elm",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "lime",
+      "Name": "Lime",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "fir",
+      "Name": "Fir",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateMixedForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "sugarMaple",
+      "Name": "Sugar maple",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "yew",
+      "Name": "Yew",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "mulberry",
+      "Name": "Mulberry",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland",
+        "TemperateBroadleafForest",
+        "TropicalDryForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "cedar",
+      "Name": "Cedar",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "giantConifers",
+      "Name": "Giant conifers",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "hemlockTree",
+      "Name": "Hemlock tree",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateMixedForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "lacquerTree",
+      "Name": "Lacquer tree",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "corkOak",
+      "Name": "Cork oak",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "kermesOak",
+      "Name": "Kermes oak",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "cypress",
+      "Name": "Cypress",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "stonePine",
+      "Name": "Stone pine",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "saxaul",
+      "Name": "Saxaul",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "ColdDesert"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "acacia",
+      "Name": "Acacia",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert",
+        "ThornScrub",
+        "Savanna"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "frankincenseTree",
+      "Name": "Frankincense tree",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert",
+        "ThornScrub"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "myrrhTree",
+      "Name": "Myrrh tree",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert",
+        "ThornScrub"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "dragonsBloodTree",
+      "Name": "Dragon\u0027s blood tree",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert",
+        "ThornScrub"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "baobab",
+      "Name": "Baobab",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "ThornScrub",
+        "Savanna"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "mesquite",
+      "Name": "Mesquite",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert",
+        "ThornScrub"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "teak",
+      "Name": "Teak",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "sal",
+      "Name": "Sal",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "sandalwood",
+      "Name": "Sandalwood",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "banyanAndSacredFig",
+      "Name": "Banyan and sacred fig",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "neem",
+      "Name": "Neem",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "kapok",
+      "Name": "Kapok",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "mahogany",
+      "Name": "Mahogany",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "ebonyAndRosewood",
+      "Name": "Ebony and rosewood",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "rubberTree",
+      "Name": "Rubber tree",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "cinnamon",
+      "Name": "Cinnamon",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "cloveAndNutmeg",
+      "Name": "Clove and nutmeg",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "agarwood",
+      "Name": "Agarwood",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "feverBarkTree",
+      "Name": "Fever-bark tree",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "logwood",
+      "Name": "Logwood",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest",
+        "Mangrove"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "flameOfTheForest",
+      "Name": "Flame of the forest",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "Savanna",
+        "TropicalDryForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "quebracho",
+      "Name": "Quebracho",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "ThornScrub",
+        "TropicalDryForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "mangrove",
+      "Name": "Mangrove",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "Mangrove"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "nipaPalm",
+      "Name": "Nipa palm",
+      "Type": "Tree",
+      "Enabled": true,
+      "Biomes": [
+        "Mangrove"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "dwarfWillow",
+      "Name": "Dwarf willow",
+      "Type": "Shrub",
+      "Enabled": true,
+      "Biomes": [
+        "Tundra"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "labradorTea",
+      "Name": "Labrador tea",
+      "Type": "Shrub",
+      "Enabled": true,
+      "Biomes": [
+        "Tundra",
+        "BorealForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "bogMyrtle",
+      "Name": "Bog myrtle",
+      "Type": "Shrub",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "TemperateMixedForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "hawthorn",
+      "Name": "Hawthorn",
+      "Type": "Shrub",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateGrassland",
+        "WoodlandAndShrubland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "elder",
+      "Name": "Elder",
+      "Type": "Shrub",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateGrassland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "heather",
+      "Name": "Heather",
+      "Type": "Shrub",
+      "Enabled": true,
+      "Biomes": [
+        "Tundra",
+        "BorealForest",
+        "TemperateMixedForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "sagebrush",
+      "Name": "Sagebrush",
+      "Type": "Shrub",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "ColdDesert"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "ephedra",
+      "Name": "Ephedra",
+      "Type": "Shrub",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "ColdDesert"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "saltbush",
+      "Name": "Saltbush",
+      "Type": "Shrub",
+      "Enabled": true,
+      "Biomes": [
+        "ColdDesert",
+        "HotDesert"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "camelThorn",
+      "Name": "Camel thorn",
+      "Type": "Shrub",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "ColdDesert",
+        "HotDesert"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "creosoteBush",
+      "Name": "Creosote bush",
+      "Type": "Shrub",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "saguaro",
+      "Name": "Saguaro",
+      "Type": "Shrub",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "sisalAndAgave",
+      "Name": "Sisal and agave",
+      "Type": "Shrub",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert",
+        "ThornScrub"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "mastic",
+      "Name": "Mastic",
+      "Type": "Shrub",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "oleander",
+      "Name": "Oleander",
+      "Type": "Shrub",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland",
+        "HotDesert"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "henna",
+      "Name": "Henna",
+      "Type": "Shrub",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert",
+        "ThornScrub",
+        "TropicalDryForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "tea",
+      "Name": "Tea",
+      "Type": "Shrub",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateBroadleafForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "coffee",
+      "Name": "Coffee",
+      "Type": "Shrub",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "indigo",
+      "Name": "Indigo",
+      "Type": "Shrub",
+      "Enabled": true,
+      "Biomes": [
+        "ThornScrub",
+        "Savanna",
+        "TropicalDryForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "cotton",
+      "Name": "Cotton",
+      "Type": "Shrub",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert",
+        "ThornScrub",
+        "Savanna",
+        "TropicalDryForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "mistletoe",
+      "Name": "Mistletoe",
+      "Type": "Shrub",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "arcticPoppy",
+      "Name": "Arctic poppy",
+      "Type": "Flower",
+      "Enabled": true,
+      "Biomes": [
+        "IceAndSnow",
+        "Tundra"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "fireweed",
+      "Name": "Fireweed",
+      "Type": "Flower",
+      "Enabled": true,
+      "Biomes": [
+        "Tundra",
+        "BorealForest",
+        "TemperateMixedForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "tulip",
+      "Name": "Tulip",
+      "Type": "Flower",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "ColdDesert",
+        "TemperateGrassland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "sunflower",
+      "Name": "Sunflower",
+      "Type": "Flower",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateGrassland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "coneflower",
+      "Name": "Coneflower",
+      "Type": "Flower",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateGrassland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "peony",
+      "Name": "Peony",
+      "Type": "Flower",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "asphodel",
+      "Name": "Asphodel",
+      "Type": "Flower",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "saffronCrocus",
+      "Name": "Saffron crocus",
+      "Type": "Flower",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "WoodlandAndShrubland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "dogRose",
+      "Name": "Dog rose",
+      "Type": "Flower",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateGrassland",
+        "WoodlandAndShrubland",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "lavender",
+      "Name": "Lavender",
+      "Type": "Flower",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "roseOfJericho",
+      "Name": "Rose of Jericho",
+      "Type": "Flower",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "rafflesia",
+      "Name": "Rafflesia",
+      "Type": "Flower",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "roseroot",
+      "Name": "Roseroot",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "Tundra",
+        "BorealForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "yarrow",
+      "Name": "Yarrow",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "TemperateGrassland",
+        "TemperateMixedForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "wormwood",
+      "Name": "Wormwood",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "TemperateGrassland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "liquorice",
+      "Name": "Liquorice",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "WoodlandAndShrubland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "chamomile",
+      "Name": "Chamomile",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "TemperateGrassland",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "sage",
+      "Name": "Sage",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "thymeAndRosemary",
+      "Name": "Thyme and rosemary",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "opiumPoppy",
+      "Name": "Opium poppy",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateGrassland",
+        "WoodlandAndShrubland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "valerian",
+      "Name": "Valerian",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "stJohnsWort",
+      "Name": "St John\u0027s wort",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateGrassland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "foxglove",
+      "Name": "Foxglove",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateBroadleafForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "comfrey",
+      "Name": "Comfrey",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "angelica",
+      "Name": "Angelica",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "TemperateMixedForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "gentianAndArnica",
+      "Name": "Gentian and arnica",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "TemperateGrassland",
+        "TemperateMixedForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "nettle",
+      "Name": "Nettle",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateGrassland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "woad",
+      "Name": "Woad",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateGrassland",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "madder",
+      "Name": "Madder",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateGrassland",
+        "WoodlandAndShrubland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "flax",
+      "Name": "Flax",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateGrassland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "hemp",
+      "Name": "Hemp",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "TemperateGrassland",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "ginseng",
+      "Name": "Ginseng",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateMixedForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "monkshood",
+      "Name": "Monkshood",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "TemperateMixedForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "deadlyNightshade",
+      "Name": "Deadly nightshade",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "hemlock",
+      "Name": "Hemlock",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateGrassland",
+        "WoodlandAndShrubland",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "rhubarb",
+      "Name": "Rhubarb",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "ColdDesert"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "glasswort",
+      "Name": "Glasswort",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "ColdDesert",
+        "Mangrove"
+      ],
+      "Sea": true,
+      "Frequency": 1
+    },
+    {
+      "Id": "cloverAndLucerne",
+      "Name": "Clover and lucerne",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateGrassland",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "silphium",
+      "Name": "Silphium",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland",
+        "HotDesert"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "dittany",
+      "Name": "Dittany",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "aloe",
+      "Name": "Aloe",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert",
+        "ThornScrub"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "senna",
+      "Name": "Senna",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert",
+        "ThornScrub",
+        "Savanna"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "devilsClaw",
+      "Name": "Devil\u0027s claw",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "ThornScrub",
+        "Savanna"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "holyBasil",
+      "Name": "Holy basil",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "ipecac",
+      "Name": "Ipecac",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "gingerAndTurmeric",
+      "Name": "Ginger and turmeric",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "thornApple",
+      "Name": "Thorn apple",
+      "Type": "Herb",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert",
+        "ThornScrub",
+        "TropicalDryForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "cloudberryAndCrowberry",
+      "Name": "Cloudberry and crowberry",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "Tundra",
+        "BorealForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "bilberry",
+      "Name": "Bilberry",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "Tundra",
+        "BorealForest",
+        "TemperateMixedForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "raspberryAndBramble",
+      "Name": "Raspberry and bramble",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "salmonberry",
+      "Name": "Salmonberry",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "seaBuckthorn",
+      "Name": "Sea buckthorn",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "ColdDesert"
+      ],
+      "Sea": true,
+      "Frequency": 1
+    },
+    {
+      "Id": "hazel",
+      "Name": "Hazel",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "apple",
+      "Name": "Apple",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "sweetChestnut",
+      "Name": "Sweet chestnut",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "walnut",
+      "Name": "Walnut",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "WoodlandAndShrubland",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "olive",
+      "Name": "Olive",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "fig",
+      "Name": "Fig",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland",
+        "HotDesert"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "pomegranate",
+      "Name": "Pomegranate",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland",
+        "HotDesert",
+        "ThornScrub"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "almond",
+      "Name": "Almond",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "WoodlandAndShrubland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "carob",
+      "Name": "Carob",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "citron",
+      "Name": "Citron",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland",
+        "TemperateBroadleafForest",
+        "TropicalDryForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "datePalm",
+      "Name": "Date palm",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "pricklyPear",
+      "Name": "Prickly pear",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland",
+        "HotDesert",
+        "ThornScrub"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "jujube",
+      "Name": "Jujube",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "HotDesert",
+        "ThornScrub"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "watermelon",
+      "Name": "Watermelon",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert",
+        "ThornScrub",
+        "Savanna"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "shea",
+      "Name": "Shea",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "Savanna"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "tamarind",
+      "Name": "Tamarind",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "Savanna",
+        "TropicalDryForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "mango",
+      "Name": "Mango",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "bananaAndPlantain",
+      "Name": "Banana and plantain",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "coconut",
+      "Name": "Coconut",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest",
+        "Mangrove"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "cacao",
+      "Name": "Cacao",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "kolaNut",
+      "Name": "Kola nut",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "oilPalm",
+      "Name": "Oil palm",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "brazilNut",
+      "Name": "Brazil nut",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "arecaPalm",
+      "Name": "Areca palm",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "sagoPalm",
+      "Name": "Sago palm",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalRainForest",
+        "Mangrove"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "palmyraPalm",
+      "Name": "Palmyra palm",
+      "Type": "Fruit",
+      "Enabled": true,
+      "Biomes": [
+        "Savanna",
+        "TropicalDryForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "cottongrass",
+      "Name": "Cottongrass",
+      "Type": "Grass",
+      "Enabled": true,
+      "Biomes": [
+        "Tundra",
+        "BorealForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "featherGrass",
+      "Name": "Feather grass",
+      "Type": "Grass",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "TemperateGrassland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "tallgrass",
+      "Name": "Tallgrass",
+      "Type": "Grass",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateGrassland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "wildBarley",
+      "Name": "Wild barley",
+      "Type": "Grass",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "TemperateGrassland",
+        "WoodlandAndShrubland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "esparto",
+      "Name": "Esparto",
+      "Type": "Grass",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland",
+        "HotDesert"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "reedAndCattail",
+      "Name": "Reed and cattail",
+      "Type": "Grass",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "TemperateGrassland",
+        "WoodlandAndShrubland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "TemperateRainForest",
+        "Mangrove"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "papyrus",
+      "Name": "Papyrus",
+      "Type": "Grass",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert",
+        "Savanna",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "bamboo",
+      "Name": "Bamboo",
+      "Type": "Grass",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateBroadleafForest",
+        "TemperateRainForest",
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "elephantGrass",
+      "Name": "Elephant grass",
+      "Type": "Grass",
+      "Enabled": true,
+      "Biomes": [
+        "Savanna",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "sorghum",
+      "Name": "Sorghum",
+      "Type": "Grass",
+      "Enabled": true,
+      "Biomes": [
+        "ThornScrub",
+        "Savanna"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "sugarCane",
+      "Name": "Sugar cane",
+      "Type": "Grass",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "wildRice",
+      "Name": "Wild rice",
+      "Type": "Grass",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest",
+        "Mangrove"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "hops",
+      "Name": "Hops",
+      "Type": "Vine",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "grapeVine",
+      "Name": "Grape vine",
+      "Type": "Vine",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "blackPepper",
+      "Name": "Black pepper",
+      "Type": "Vine",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "vanilla",
+      "Name": "Vanilla",
+      "Type": "Vine",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "rattan",
+      "Name": "Rattan",
+      "Type": "Vine",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "curareVine",
+      "Name": "Curare vine",
+      "Type": "Vine",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "yam",
+      "Name": "Yam",
+      "Type": "Vine",
+      "Enabled": true,
+      "Biomes": [
+        "Savanna",
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "bottleGourd",
+      "Name": "Bottle gourd",
+      "Type": "Vine",
+      "Enabled": true,
+      "Biomes": [
+        "ThornScrub",
+        "Savanna",
+        "TropicalDryForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "colocynth",
+      "Name": "Colocynth",
+      "Type": "Vine",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert",
+        "ThornScrub"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "flyAgaric",
+      "Name": "Fly agaric",
+      "Type": "Fungus",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "cep",
+      "Name": "Cep",
+      "Type": "Fungus",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "truffle",
+      "Name": "Truffle",
+      "Type": "Fungus",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "deathCap",
+      "Name": "Death cap",
+      "Type": "Fungus",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "fairyRing",
+      "Name": "Fairy ring",
+      "Type": "Fungus",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateGrassland",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "ergot",
+      "Name": "Ergot",
+      "Type": "Fungus",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "TemperateGrassland",
+        "TemperateMixedForest",
+        "Savanna"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "foxfire",
+      "Name": "Foxfire",
+      "Type": "Fungus",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "TemperateRainForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "snowAlgae",
+      "Name": "Snow algae",
+      "Type": "Moss",
+      "Enabled": true,
+      "Biomes": [
+        "IceAndSnow",
+        "Tundra"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "iceEdgeLichensAndMosses",
+      "Name": "Ice-edge lichens and mosses",
+      "Type": "Moss",
+      "Enabled": true,
+      "Biomes": [
+        "IceAndSnow",
+        "Tundra"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "reindeerLichen",
+      "Name": "Reindeer lichen",
+      "Type": "Moss",
+      "Enabled": true,
+      "Biomes": [
+        "Tundra",
+        "BorealForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "icelandMoss",
+      "Name": "Iceland moss",
+      "Type": "Moss",
+      "Enabled": true,
+      "Biomes": [
+        "Tundra",
+        "BorealForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "beardLichen",
+      "Name": "Beard lichen",
+      "Type": "Moss",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "TemperateMixedForest",
+        "TemperateRainForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "dyeLichen",
+      "Name": "Dye lichen",
+      "Type": "Moss",
+      "Enabled": true,
+      "Biomes": [
+        "Tundra",
+        "WoodlandAndShrubland",
+        "TemperateRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "peatMoss",
+      "Name": "Peat moss",
+      "Type": "Moss",
+      "Enabled": true,
+      "Biomes": [
+        "Tundra",
+        "BorealForest",
+        "TemperateMixedForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "bracken",
+      "Name": "Bracken",
+      "Type": "Moss",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateGrassland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "kelp",
+      "Name": "Kelp",
+      "Type": "Aquatic",
+      "Enabled": true,
+      "Biomes": [],
+      "Sea": true,
+      "Frequency": 1
+    },
+    {
+      "Id": "eelgrass",
+      "Name": "Eelgrass",
+      "Type": "Aquatic",
+      "Enabled": true,
+      "Biomes": [
+        "Mangrove"
+      ],
+      "Sea": true,
+      "Frequency": 1
+    },
+    {
+      "Id": "lotus",
+      "Name": "Lotus",
+      "Type": "Aquatic",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateBroadleafForest",
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "waterChestnut",
+      "Name": "Water chestnut",
+      "Type": "Aquatic",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "TropicalDryForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "waterHyssop",
+      "Name": "Water hyssop",
+      "Type": "Aquatic",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "Mangrove"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "taro",
+      "Name": "Taro",
+      "Type": "Aquatic",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "frostLotus",
+      "Name": "Frost-lotus",
+      "Type": "Arcane",
+      "Enabled": true,
+      "Biomes": [
+        "Tundra"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "glowcap",
+      "Name": "Glowcap",
+      "Type": "Arcane",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "TemperateRainForest",
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "elderwood",
+      "Name": "Elderwood",
+      "Type": "Arcane",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "TemperateRainForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "elvenSapflower",
+      "Name": "Elven sapflower",
+      "Type": "Arcane",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "dreamleaf",
+      "Name": "Dreamleaf",
+      "Type": "Arcane",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "mandrake",
+      "Name": "Mandrake",
+      "Type": "Arcane",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "moly",
+      "Name": "Moly",
+      "Type": "Arcane",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 90
+    },
+    {
+      "Id": "fernSeed",
+      "Name": "Fern seed",
+      "Type": "Arcane",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 75
+    },
+    {
+      "Id": "perindensTree",
+      "Name": "Perindens tree",
+      "Type": "Arcane",
+      "Enabled": true,
+      "Biomes": [
+        "Savanna",
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 75
+    },
+    {
+      "Id": "vegetableLamb",
+      "Name": "Vegetable lamb",
+      "Type": "Arcane",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "ColdDesert",
+        "TemperateGrassland"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 75
+    },
+    {
+      "Id": "singingMoss",
+      "Name": "Singing moss",
+      "Type": "Arcane",
+      "Enabled": true,
+      "Biomes": [
+        "IceAndSnow",
+        "Tundra"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "mirageLily",
+      "Name": "Mirage lily",
+      "Type": "Arcane",
+      "Enabled": true,
+      "Biomes": [
+        "ColdDesert",
+        "HotDesert"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "stormthorn",
+      "Name": "Stormthorn",
+      "Type": "Arcane",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "TemperateGrassland",
+        "ThornScrub",
+        "Savanna"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "lanternMangrove",
+      "Name": "Lantern mangrove",
+      "Type": "Arcane",
+      "Enabled": true,
+      "Biomes": [
+        "Mangrove"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "snareVine",
+      "Name": "Snare vine",
+      "Type": "Arcane",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    }
+  ],
+  "Fauna": [
+    {
+      "Id": "lemming",
+      "Name": "Lemming",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "Tundra"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "arcticHare",
+      "Name": "Arctic hare",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "IceAndSnow",
+        "Tundra"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "ptarmigan",
+      "Name": "Ptarmigan",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "IceAndSnow",
+        "Tundra",
+        "BorealForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "snowBunting",
+      "Name": "Snow bunting",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "IceAndSnow",
+        "Tundra"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "bitingSwarm",
+      "Name": "Biting swarm",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "Tundra",
+        "BorealForest",
+        "TemperateRainForest",
+        "TropicalDryForest",
+        "TropicalRainForest",
+        "Mangrove"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "redSquirrel",
+      "Name": "Red squirrel",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "stoat",
+      "Name": "Stoat (ermine)",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "Tundra",
+        "BorealForest",
+        "TemperateGrassland",
+        "TemperateMixedForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "pika",
+      "Name": "Pika",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "ColdDesert",
+        "TemperateGrassland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "bobakMarmot",
+      "Name": "Bobak marmot",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "TemperateGrassland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "jerboa",
+      "Name": "Jerboa",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "ColdDesert",
+        "HotDesert"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "hareAndRabbit",
+      "Name": "Hare and rabbit",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "ColdDesert",
+        "TemperateGrassland",
+        "WoodlandAndShrubland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "groundSquirrel",
+      "Name": "Ground squirrel (souslik)",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "TemperateGrassland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "locust",
+      "Name": "Locust",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateGrassland",
+        "HotDesert",
+        "ThornScrub",
+        "Savanna"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "honeybee",
+      "Name": "Honeybee",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateGrassland",
+        "WoodlandAndShrubland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "ThornScrub",
+        "Savanna",
+        "TropicalDryForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "hedgehog",
+      "Name": "Hedgehog",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateGrassland",
+        "WoodlandAndShrubland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "edibleDormouse",
+      "Name": "Edible dormouse",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "woodpecker",
+      "Name": "Woodpecker",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "rat",
+      "Name": "Rat",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateGrassland",
+        "WoodlandAndShrubland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "TemperateRainForest",
+        "HotDesert",
+        "ThornScrub",
+        "Savanna",
+        "TropicalDryForest",
+        "TropicalRainForest",
+        "Mangrove"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "bananaSlug",
+      "Name": "Banana slug",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "roughSkinnedNewt",
+      "Name": "Rough-skinned newt",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateMixedForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "leech",
+      "Name": "Leech",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateGrassland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "silkworm",
+      "Name": "Silkworm",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland",
+        "TemperateBroadleafForest",
+        "TropicalDryForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "kermesScale",
+      "Name": "Kermes scale",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "cochinealInsect",
+      "Name": "Cochineal insect",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert",
+        "ThornScrub"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "lacInsect",
+      "Name": "Lac insect",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "cicada",
+      "Name": "Cicada",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland",
+        "ThornScrub",
+        "Savanna",
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "tortoise",
+      "Name": "Tortoise",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "scorpion",
+      "Name": "Scorpion",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "ColdDesert",
+        "HotDesert",
+        "ThornScrub"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "scarab",
+      "Name": "Scarab",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland",
+        "HotDesert",
+        "ThornScrub",
+        "Savanna"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "termite",
+      "Name": "Termite",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "ThornScrub",
+        "Savanna",
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "tsetseFly",
+      "Name": "Tsetse fly",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "Savanna",
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "honeyguide",
+      "Name": "Honeyguide",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "ThornScrub",
+        "Savanna",
+        "TropicalDryForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "quelea",
+      "Name": "Quelea (weaver bird)",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "ThornScrub",
+        "Savanna"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "mongoose",
+      "Name": "Mongoose",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert",
+        "ThornScrub",
+        "Savanna",
+        "TropicalDryForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "poisonFrog",
+      "Name": "Poison frog",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "leafcutterAnt",
+      "Name": "Leafcutter ant",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "firefly",
+      "Name": "Firefly",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "Savanna",
+        "TropicalDryForest",
+        "TropicalRainForest",
+        "Mangrove"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "fiddlerCrab",
+      "Name": "Fiddler crab",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "Mangrove"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "mudskipper",
+      "Name": "Mudskipper",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "Mangrove"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "mudCrab",
+      "Name": "Mud crab",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "Mangrove"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "junglefowl",
+      "Name": "Junglefowl",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "flyingFox",
+      "Name": "Flying fox",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest",
+        "Mangrove"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "murex",
+      "Name": "Murex",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland"
+      ],
+      "Sea": true,
+      "Frequency": 1
+    },
+    {
+      "Id": "pearlOyster",
+      "Name": "Pearl oyster",
+      "Type": "Critter",
+      "Enabled": true,
+      "Biomes": [
+        "Mangrove"
+      ],
+      "Sea": true,
+      "Frequency": 1
+    },
+    {
+      "Id": "ringedSeal",
+      "Name": "Ringed seal",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "IceAndSnow",
+        "Tundra"
+      ],
+      "Sea": true,
+      "Frequency": 1
+    },
+    {
+      "Id": "penguin",
+      "Name": "Penguin",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "IceAndSnow"
+      ],
+      "Sea": true,
+      "Frequency": 1
+    },
+    {
+      "Id": "arcticFox",
+      "Name": "Arctic fox",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "IceAndSnow",
+        "Tundra"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "snowyOwl",
+      "Name": "Snowy owl",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "IceAndSnow",
+        "Tundra"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "sledDog",
+      "Name": "Sled dog",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "IceAndSnow",
+        "Tundra",
+        "BorealForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "reindeer",
+      "Name": "Reindeer",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "IceAndSnow",
+        "Tundra",
+        "BorealForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "eider",
+      "Name": "Eider",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "IceAndSnow",
+        "Tundra"
+      ],
+      "Sea": true,
+      "Frequency": 1
+    },
+    {
+      "Id": "wolverine",
+      "Name": "Wolverine",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "Tundra",
+        "BorealForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "moose",
+      "Name": "Moose",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "TemperateMixedForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "beaver",
+      "Name": "Beaver",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "sableAndMarten",
+      "Name": "Sable and marten",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "TemperateMixedForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "lynx",
+      "Name": "Lynx",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "WoodlandAndShrubland",
+        "TemperateMixedForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "capercaillie",
+      "Name": "Capercaillie",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "TemperateMixedForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "muskDeer",
+      "Name": "Musk deer",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "saiga",
+      "Name": "Saiga",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "ColdDesert",
+        "TemperateGrassland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "horse",
+      "Name": "Horse",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "TemperateGrassland",
+        "WoodlandAndShrubland",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "sheep",
+      "Name": "Sheep",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "ColdDesert",
+        "TemperateGrassland",
+        "WoodlandAndShrubland",
+        "TemperateMixedForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "wildSheepAndIbex",
+      "Name": "Wild sheep and ibex",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "BorealForest",
+        "ColdDesert",
+        "WoodlandAndShrubland",
+        "TemperateMixedForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "yak",
+      "Name": "Yak",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "Tundra",
+        "ColdSteppe",
+        "ColdDesert"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "bactrianCamel",
+      "Name": "Bactrian camel",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "ColdDesert"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "onager",
+      "Name": "Onager",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "ColdDesert",
+        "HotDesert"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "goldenEagle",
+      "Name": "Golden eagle",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "Tundra",
+        "ColdSteppe",
+        "BorealForest",
+        "ColdDesert",
+        "WoodlandAndShrubland"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "falcon",
+      "Name": "Falcon",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "ColdDesert",
+        "TemperateGrassland",
+        "HotDesert"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "cattle",
+      "Name": "Cattle",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateGrassland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "TemperateRainForest",
+        "Savanna",
+        "TropicalDryForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "redFox",
+      "Name": "Red fox",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "BorealForest",
+        "TemperateGrassland",
+        "WoodlandAndShrubland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "redDeer",
+      "Name": "Red deer",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "WoodlandAndShrubland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "wildBoarAndPig",
+      "Name": "Wild boar and pig",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "TropicalDryForest",
+        "TropicalRainForest",
+        "Mangrove"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "goat",
+      "Name": "Goat",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "ColdDesert",
+        "WoodlandAndShrubland",
+        "HotDesert",
+        "ThornScrub",
+        "Savanna"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "donkeyAndMule",
+      "Name": "Donkey and mule",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "WoodlandAndShrubland",
+        "HotDesert",
+        "ThornScrub",
+        "Savanna"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "raven",
+      "Name": "Raven",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "Tundra",
+        "ColdSteppe",
+        "BorealForest",
+        "ColdDesert",
+        "WoodlandAndShrubland",
+        "TemperateMixedForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "crane",
+      "Name": "Crane",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "BorealForest",
+        "TemperateGrassland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "otter",
+      "Name": "Otter",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "TemperateRainForest",
+        "Mangrove"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "waterfowl",
+      "Name": "Waterfowl",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "Tundra",
+        "BorealForest",
+        "TemperateGrassland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "TemperateRainForest",
+        "Mangrove"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "dromedary",
+      "Name": "Dromedary",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert",
+        "ThornScrub"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "gazelleAndOryx",
+      "Name": "Gazelle and oryx",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert",
+        "ThornScrub",
+        "Savanna"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "fennec",
+      "Name": "Fennec",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "ostrich",
+      "Name": "Ostrich",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert",
+        "ThornScrub",
+        "Savanna"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "hornedViper",
+      "Name": "Horned viper",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert",
+        "ThornScrub"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "cobra",
+      "Name": "Cobra",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "ThornScrub",
+        "Savanna",
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "wildebeestAndZebra",
+      "Name": "Wildebeest and zebra",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "Savanna"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "giraffe",
+      "Name": "Giraffe",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "ThornScrub",
+        "Savanna"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "vulture",
+      "Name": "Vulture",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "WoodlandAndShrubland",
+        "HotDesert",
+        "ThornScrub",
+        "Savanna"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "waterBuffalo",
+      "Name": "Water buffalo",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest",
+        "Mangrove"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "peafowl",
+      "Name": "Peafowl",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "monkeys",
+      "Name": "Monkeys",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "Savanna",
+        "TropicalDryForest",
+        "TropicalRainForest",
+        "Mangrove"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "tropicalDeer",
+      "Name": "Tropical deer",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "Savanna",
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "parrotAndMacaw",
+      "Name": "Parrot and macaw",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "sloth",
+      "Name": "Sloth",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "tapir",
+      "Name": "Tapir",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "dugong",
+      "Name": "Dugong",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "Mangrove"
+      ],
+      "Sea": true,
+      "Frequency": 1
+    },
+    {
+      "Id": "monitorLizard",
+      "Name": "Monitor lizard",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest",
+        "Mangrove"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "llama",
+      "Name": "Llama",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateGrassland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 1
+    },
+    {
+      "Id": "salmon",
+      "Name": "Salmon",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "TemperateMixedForest",
+        "TemperateRainForest"
+      ],
+      "Sea": true,
+      "Frequency": 1
+    },
+    {
+      "Id": "codAndHerring",
+      "Name": "Cod and herring",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [],
+      "Sea": true,
+      "Frequency": 1
+    },
+    {
+      "Id": "sturgeonAndEel",
+      "Name": "Sturgeon and eel",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "TemperateGrassland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Sea": true,
+      "Frequency": 1
+    },
+    {
+      "Id": "tuna",
+      "Name": "Tuna",
+      "Type": "Animal",
+      "Enabled": true,
+      "Biomes": [],
+      "Sea": true,
+      "Frequency": 1
+    },
+    {
+      "Id": "polarBear",
+      "Name": "Polar bear",
+      "Type": "Beast",
+      "Enabled": true,
+      "Biomes": [
+        "IceAndSnow",
+        "Tundra"
+      ],
+      "Sea": true,
+      "Frequency": 0.5
+    },
+    {
+      "Id": "walrus",
+      "Name": "Walrus",
+      "Type": "Beast",
+      "Enabled": true,
+      "Biomes": [
+        "IceAndSnow",
+        "Tundra"
+      ],
+      "Sea": true,
+      "Frequency": 0.5
+    },
+    {
+      "Id": "narwhal",
+      "Name": "Narwhal",
+      "Type": "Beast",
+      "Enabled": true,
+      "Biomes": [
+        "IceAndSnow"
+      ],
+      "Sea": true,
+      "Frequency": 0.5
+    },
+    {
+      "Id": "whale",
+      "Name": "Whale",
+      "Type": "Beast",
+      "Enabled": true,
+      "Biomes": [],
+      "Sea": true,
+      "Frequency": 0.5
+    },
+    {
+      "Id": "muskOx",
+      "Name": "Musk ox",
+      "Type": "Beast",
+      "Enabled": true,
+      "Biomes": [
+        "Tundra"
+      ],
+      "Frequency": 0.5
+    },
+    {
+      "Id": "woollyMammoth",
+      "Name": "Woolly mammoth",
+      "Type": "Beast",
+      "Enabled": true,
+      "Biomes": [
+        "IceAndSnow",
+        "Tundra",
+        "ColdSteppe"
+      ],
+      "Frequency": 0.5
+    },
+    {
+      "Id": "greyWolf",
+      "Name": "Grey wolf",
+      "Type": "Beast",
+      "Enabled": true,
+      "Biomes": [
+        "Tundra",
+        "ColdSteppe",
+        "BorealForest",
+        "ColdDesert",
+        "TemperateGrassland",
+        "WoodlandAndShrubland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 0.5
+    },
+    {
+      "Id": "brownBear",
+      "Name": "Brown bear",
+      "Type": "Beast",
+      "Enabled": true,
+      "Biomes": [
+        "Tundra",
+        "ColdSteppe",
+        "BorealForest",
+        "WoodlandAndShrubland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 0.5
+    },
+    {
+      "Id": "tiger",
+      "Name": "Tiger",
+      "Type": "Beast",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "TemperateMixedForest",
+        "TropicalDryForest",
+        "TropicalRainForest",
+        "Mangrove"
+      ],
+      "Frequency": 0.5
+    },
+    {
+      "Id": "snowLeopard",
+      "Name": "Snow leopard",
+      "Type": "Beast",
+      "Enabled": true,
+      "Biomes": [
+        "Tundra",
+        "ColdSteppe",
+        "ColdDesert"
+      ],
+      "Frequency": 0.5
+    },
+    {
+      "Id": "bison",
+      "Name": "Bison",
+      "Type": "Beast",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "TemperateGrassland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 0.5
+    },
+    {
+      "Id": "aurochs",
+      "Name": "Aurochs",
+      "Type": "Beast",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateGrassland",
+        "WoodlandAndShrubland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 0.5
+    },
+    {
+      "Id": "cougar",
+      "Name": "Cougar",
+      "Type": "Beast",
+      "Enabled": true,
+      "Biomes": [
+        "ColdDesert",
+        "WoodlandAndShrubland",
+        "TemperateMixedForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 0.5
+    },
+    {
+      "Id": "lion",
+      "Name": "Lion",
+      "Type": "Beast",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland",
+        "HotDesert",
+        "ThornScrub",
+        "Savanna"
+      ],
+      "Frequency": 0.5
+    },
+    {
+      "Id": "leopard",
+      "Name": "Leopard",
+      "Type": "Beast",
+      "Enabled": true,
+      "Biomes": [
+        "WoodlandAndShrubland",
+        "ThornScrub",
+        "Savanna",
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 0.5
+    },
+    {
+      "Id": "cheetah",
+      "Name": "Cheetah",
+      "Type": "Beast",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert",
+        "ThornScrub",
+        "Savanna"
+      ],
+      "Frequency": 0.5
+    },
+    {
+      "Id": "hyena",
+      "Name": "Hyena",
+      "Type": "Beast",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert",
+        "ThornScrub",
+        "Savanna"
+      ],
+      "Frequency": 0.5
+    },
+    {
+      "Id": "africanElephant",
+      "Name": "African elephant",
+      "Type": "Beast",
+      "Enabled": true,
+      "Biomes": [
+        "ThornScrub",
+        "Savanna",
+        "TropicalRainForest"
+      ],
+      "Frequency": 0.5
+    },
+    {
+      "Id": "asianElephant",
+      "Name": "Asian elephant",
+      "Type": "Beast",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 0.5
+    },
+    {
+      "Id": "rhinoceros",
+      "Name": "Rhinoceros",
+      "Type": "Beast",
+      "Enabled": true,
+      "Biomes": [
+        "ThornScrub",
+        "Savanna",
+        "TropicalDryForest"
+      ],
+      "Frequency": 0.5
+    },
+    {
+      "Id": "hippopotamus",
+      "Name": "Hippopotamus",
+      "Type": "Beast",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert",
+        "Savanna",
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 0.5
+    },
+    {
+      "Id": "wildBuffalo",
+      "Name": "Wild buffalo",
+      "Type": "Beast",
+      "Enabled": true,
+      "Biomes": [
+        "Savanna",
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 0.5
+    },
+    {
+      "Id": "crocodile",
+      "Name": "Crocodile",
+      "Type": "Beast",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert",
+        "Savanna",
+        "TropicalDryForest",
+        "TropicalRainForest",
+        "Mangrove"
+      ],
+      "Frequency": 0.5
+    },
+    {
+      "Id": "python",
+      "Name": "Python",
+      "Type": "Beast",
+      "Enabled": true,
+      "Biomes": [
+        "Savanna",
+        "TropicalDryForest",
+        "TropicalRainForest",
+        "Mangrove"
+      ],
+      "Frequency": 0.5
+    },
+    {
+      "Id": "jaguar",
+      "Name": "Jaguar",
+      "Type": "Beast",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest",
+        "Mangrove"
+      ],
+      "Frequency": 0.5
+    },
+    {
+      "Id": "bullShark",
+      "Name": "Bull shark",
+      "Type": "Beast",
+      "Enabled": true,
+      "Biomes": [
+        "Mangrove"
+      ],
+      "Sea": true,
+      "Frequency": 0.5
+    },
+    {
+      "Id": "komodoDragon",
+      "Name": "Komodo dragon",
+      "Type": "Beast",
+      "Enabled": true,
+      "Biomes": [
+        "Savanna",
+        "TropicalDryForest"
+      ],
+      "Frequency": 0.5
+    },
+    {
+      "Id": "amarok",
+      "Name": "Amarok",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "IceAndSnow",
+        "Tundra",
+        "BorealForest"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 75
+    },
+    {
+      "Id": "snowWasset",
+      "Name": "Snow wasset",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "IceAndSnow",
+        "Tundra",
+        "BorealForest"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "rimeDrake",
+      "Name": "Rime drake",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "IceAndSnow",
+        "Tundra"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 75
+    },
+    {
+      "Id": "griffin",
+      "Name": "Griffin",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "BorealForest",
+        "ColdDesert"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 75
+    },
+    {
+      "Id": "goldDiggingAnt",
+      "Name": "Gold-digging ant",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "ColdDesert",
+        "HotDesert"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "steppePegasus",
+      "Name": "Steppe pegasus",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "TemperateGrassland"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 75
+    },
+    {
+      "Id": "bonnacon",
+      "Name": "Bonnacon",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "TemperateGrassland",
+        "WoodlandAndShrubland"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "ryeWolf",
+      "Name": "Rye wolf",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateGrassland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "unicorn",
+      "Name": "Unicorn",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "Savanna",
+        "TropicalDryForest"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 90
+    },
+    {
+      "Id": "hercynianStag",
+      "Name": "Hercynian stag",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 75
+    },
+    {
+      "Id": "werewolf",
+      "Name": "Werewolf",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "WoodlandAndShrubland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 75
+    },
+    {
+      "Id": "willOTheWisp",
+      "Name": "Will-o\u0027-the-wisp",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "Tundra",
+        "BorealForest",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "waterHorse",
+      "Name": "Water horse",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "Tundra",
+        "BorealForest",
+        "TemperateMixedForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "hercinia",
+      "Name": "Hercinia",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "squonk",
+      "Name": "Squonk",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateMixedForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "wapaloosie",
+      "Name": "Wapaloosie",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateRainForest"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "salamander",
+      "Name": "Salamander",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "TemperateRainForest"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "caladrius",
+      "Name": "Caladrius",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "TemperateGrassland",
+        "WoodlandAndShrubland",
+        "TemperateBroadleafForest"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 75
+    },
+    {
+      "Id": "basilisk",
+      "Name": "Basilisk",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "ColdDesert",
+        "WoodlandAndShrubland",
+        "HotDesert",
+        "ThornScrub"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 75
+    },
+    {
+      "Id": "amphisbaena",
+      "Name": "Amphisbaena",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert",
+        "ThornScrub",
+        "Savanna"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "phoenix",
+      "Name": "Phoenix",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert",
+        "ThornScrub"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 90
+    },
+    {
+      "Id": "wingedSerpent",
+      "Name": "Winged serpent",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert",
+        "ThornScrub"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "cactusCat",
+      "Name": "Cactus cat",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "HotDesert",
+        "ThornScrub"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "roperite",
+      "Name": "Roperite",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "ColdDesert",
+        "WoodlandAndShrubland"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "hillDrake",
+      "Name": "Hill drake",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "ColdDesert",
+        "WoodlandAndShrubland",
+        "HotDesert",
+        "ThornScrub"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 75
+    },
+    {
+      "Id": "catoblepas",
+      "Name": "Catoblepas",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "ThornScrub",
+        "Savanna"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 75
+    },
+    {
+      "Id": "manticore",
+      "Name": "Manticore",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "ThornScrub",
+        "Savanna",
+        "TropicalDryForest"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 90
+    },
+    {
+      "Id": "leucrocuta",
+      "Name": "Leucrocuta",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "ThornScrub",
+        "Savanna"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 75
+    },
+    {
+      "Id": "yale",
+      "Name": "Yale",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "ThornScrub",
+        "Savanna",
+        "TropicalDryForest"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "dragon",
+      "Name": "Dragon",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "Savanna",
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 90
+    },
+    {
+      "Id": "roc",
+      "Name": "Roc",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "Savanna",
+        "TropicalDryForest",
+        "TropicalRainForest",
+        "Mangrove"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 90
+    },
+    {
+      "Id": "cinnamonBird",
+      "Name": "Cinnamon bird",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "scitalis",
+      "Name": "Scitalis",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "javelinSnake",
+      "Name": "Javelin snake",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "Savanna",
+        "TropicalDryForest",
+        "TropicalRainForest",
+        "Mangrove"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "hydrus",
+      "Name": "Hydrus",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "Savanna",
+        "TropicalDryForest",
+        "Mangrove"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "stormCrane",
+      "Name": "Storm crane",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "ColdSteppe",
+        "TemperateGrassland",
+        "ThornScrub",
+        "Savanna"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "canopySpinner",
+      "Name": "Canopy spinner",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "moonOyster",
+      "Name": "Moon oyster",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "Mangrove"
+      ],
+      "Sea": true,
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "serra",
+      "Name": "Serra",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [],
+      "Sea": true,
+      "Frequency": 0.25,
+      "MinSupernatural": 60
+    },
+    {
+      "Id": "stayShip",
+      "Name": "Stay-ship",
+      "Type": "Monster",
+      "Enabled": true,
+      "Biomes": [
+        "Mangrove"
+      ],
+      "Sea": true,
+      "Frequency": 0.25,
+      "MinSupernatural": 60
     }
   ]
 }

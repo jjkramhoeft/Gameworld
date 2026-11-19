@@ -44,7 +44,7 @@ The project is in phase 1.
 
 ### Status
 
-The map is generated through all its stages, from the cells to the travel network. Of the society, the races of each region, their potential population, the races of a city or a town on each Prospect and the person names are generated. Factions, cities and towns, families and persons are defined below but not generated yet, and neither is there a database: the apps compute everything in memory.
+The map is generated through all its stages, from the cells to the travel network, with the flora and fauna of every patch. Of the society, the races of each region, their potential population, the races of a city or a town on each Prospect and the person names are generated. The vocations are a list in the Parameter Set and are not drawn yet. Factions, cities and towns, families and persons are defined below but not generated yet, and neither is there a database: the apps compute everything in memory.
 
 ## Concepts
 
@@ -56,7 +56,7 @@ Foundation = seed + generator version + Parameter Set
    ├─ Map                               docs/map-generation.md
    │  ├─ Region ▸ Zone ▸ Patch          three nested levels, each built from Cells
    │  ├─ Zone                           elevation type, bedrock; ocean zones form Seas
-   │  ├─ Patch                          biome, resources
+   │  ├─ Patch                          biome, flora and fauna, resources
    │  ├─ Region                         rivers, lakes, height map, Prospects, travel network
    │  └─ Fields                         precipitation, initial temperature, prosperity, supernatural
    └─ Society                           docs/society-generation.md
@@ -80,13 +80,13 @@ Many foundations can coexist in storage, for one to compare maps side by side in
 
 The set of all map and world parameters. It is referenced by a foundation and is immutable after phase 1, like the foundation. It is a json file, or is exported to and loaded from one.
 
-The Parameter Set also holds the lists that are expected to change: the bedrock types and the races. A change to a list after phase 1 is a new Parameter Set, and with it a new foundation. Foundations that exist are not touched.
+The Parameter Set also holds the lists that are expected to change: the bedrock types, the races, the vocations, the flora and the fauna. A change to a list after phase 1 is a new Parameter Set, and with it a new foundation. Foundations that exist are not touched.
 
 #### Derived and authored data
 
 All generated data belongs to one of two classes:
 
-* **Derived data** is a pure function of the foundation (seed + Parameter Set + generator version). Regions, zones, patches, rivers, lakes, heights, biomes, resources, Prospects, the potential population, the travel network and all Stubs are derived. The database is only a cache of derived data: it can be evicted and recomputed with an identical result.
+* **Derived data** is a pure function of the foundation (seed + Parameter Set + generator version). Regions, zones, patches, rivers, lakes, heights, biomes, flora and fauna, resources, Prospects, the potential population, the travel network and all Stubs are derived. The database is only a cache of derived data: it can be evicted and recomputed with an identical result.
 * **Authored data** comes from an LLM or a diffusion model. It costs to produce, so it is stored as the source of truth and is never regenerated or evicted.
 
 #### Randomness
@@ -120,7 +120,7 @@ A region moves through the stages below, in the order of the table and one stage
 
 Sited is not a state a region is in. It needs only the seed, so it is a pure function that can be calculated for any region at any time, and it is never persisted. Stored regions start at Outlined. The Sited row describes what the function yields.
 
-Biomes and resources exist in two forms. The estimated form is calculated in the Detailed stage with a typical height per elevation type, and the final form in the Elevated stage with the height from the height map. Lakes, Prospects and the travel network only read the estimated form, so they never depend on the height map. The potential population reads the final form. The region is still Elevated before it is Planned.
+Biomes and resources exist in two forms. The estimated form is calculated in the Detailed stage with a typical height per elevation type, and the final form in the Elevated stage with the height from the height map. The flora and fauna of a patch follow its biome, so they exist in the same two forms. Lakes, Prospects and the travel network only read the estimated form, so they never depend on the height map. The potential population reads the final form. The region is still Elevated before it is Planned.
 
 The policy for when a region advances (Detailed within some distance of the player, say) is not part of the domain model. The model only knows the stage and its preconditions.
 
@@ -148,7 +148,7 @@ A zone has the identity of its root cell, the cell the others have merged into, 
 
 #### Patch
 
-The bottom level of the map (8 km by default): one or more patch cells of the same zone that have merged. A patch has the identity of its root cell and belongs to the zone of that cell, and like a merged zone it is considered to be one large cell for gameplay. A land patch has one biome, which drives its flora and fauna, and an amount of each resource. An ocean patch only carries sea resources.
+The bottom level of the map (8 km by default): one or more patch cells of the same zone that have merged. A patch has the identity of its root cell and belongs to the zone of that cell, and like a merged zone it is considered to be one large cell for gameplay. A land patch has one biome, a few kinds of flora and fauna that fit the biome, and an amount of each resource. An ocean patch has no biome: it carries sea resources, and flora and fauna of the sea.
 
 The three levels are nested through the patch: a point belongs to a patch, the patch to a zone and the zone to a region. The borders of the patch cells are warped to give the map a more natural look, so the coastlines and the zone and region borders run along patch borders and get the same warped shape.
 
@@ -217,6 +217,14 @@ Biomes will eventually be a fixed set of 10-20 predetermined biomes. The current
 
 Ice & snow, Tundra, Cold steppe, Boreal forest, Cold desert, Temperate grassland, Woodland & shrubland, Temperate mixed forest, Temperate broadleaf forest, Temperate rain forest, Hot desert, Thorn scrub, Savanna, Tropical dry forest, Tropical rain forest, Mangrove
 
+#### Flora and fauna
+
+The plants and the creatures of a patch. Flora has eleven types: Tree, Shrub, Flower, Herb, Fruit, Grass, Vine, Fungus, Moss, Aquatic and Arcane. Fauna has four: Critter, Animal, Beast and Monster. A kind is one entry of either: the oak, the grey wolf, the griffin.
+
+The flora and the fauna are two lists in the Parameter Set, not fixed sets in the code. Each kind has an id, a name, a type, a toggle, the biomes it lives in (or the sea), a frequency and the Supernatural it needs. The default lists hold 207 kinds of flora and 167 kinds of fauna. Only the arcane plants and the monsters need the Supernatural Field, so they are found where it is high.
+
+A patch gets a few kinds of each (3 to 6 by default), drawn by frequency from the kinds that fit it, when its biome is chosen. The flora and fauna of a patch do not change its resources yet.
+
 #### Resource
 
 What a patch holds for people to use. The generation gives every patch an amount for each of 27 raw resources, and a variant of each: rye is a variant of grain. One of them, the arcane materials, lies only where the Supernatural Field is high. A potential is what the land can yield. A deposit is a rare find that often needs to be mined.
@@ -273,7 +281,7 @@ An NPC in the game. The Stub of a person holds name, age, sex, vocation, role, f
 
 #### Vocation
 
-The work a person does: farmer, smith, priest. A person has one vocation and can have a by-work, a second vocation beside it. The vocation is not the role: the role is the position of the person in the household, in the vocation or in a faction. The vocations will be a list in the Parameter Set, like the races. They are not specified yet.
+The work a person does: farmer, smith, priest. A person has one vocation and can have a by-work, a second vocation beside it. The vocation is not the role: the role is the position of the person in the household, in the vocation or in a faction. The vocations are a list in the Parameter Set, like the races. Each vocation has an id, a name, a toggle, a sector (one of nine), the lowest tier of place it is found in (countryside, town, city or capital), a starting share of the labour force and its variants: the shepherd is a variant of the herder. The default list holds 51 vocations. How a place and a person get their vocations is not specified yet, so no vocation is generated.
 
 #### Looks
 
@@ -293,7 +301,7 @@ What a portrait of a person must show: the body and the face, the hair, the outf
 | [docs/races-and-worldbuilding.md](docs/races-and-worldbuilding.md) | A framework for building a near-human race: origin, anchor traits, culture and the relation to humans |
 | [docs/NameGenerator-Reuse.md](docs/NameGenerator-Reuse.md) | The person-name generator |
 | [docs/RegionNameGenerator-Reuse.md](docs/RegionNameGenerator-Reuse.md) | The region-name generator of an earlier project. It is not ported yet |
-| [docs/research/](docs/research/) | The source notes behind the research document, and research for what is not specified yet: factions, flora and fauna, heraldry, and sequential art for graphic short stories |
+| [docs/research/](docs/research/) | The source notes behind the research document, and research for the society and the living world: factions, vocations, flora and fauna, heraldry, and sequential art for graphic short stories |
 | [docs/plans/](docs/plans/) | Plans for changes, each with its status |
 | [braindump.md](braindump.md) | Notes and ideas in progress, not decided |
 
