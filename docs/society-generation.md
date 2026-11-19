@@ -694,6 +694,7 @@ when it stands in sections 1 to 9.
 | [research/human-races.md](research/human-races.md) | An earlier candidate list in which every race looks like a regular human or nearly so. Not adopted | Section 2 |
 | [research/factions.md](research/factions.md) | Faction archetypes, their axes and relations, and a design note | Section 4 |
 | [research/vocations.md](research/vocations.md) | 51 vocations with their lore, resources, biomes, races and factions, the proposals for new resources, and a design note | Section 8 |
+| [tools-basis.md](tools-basis.md) | 146 real tools for the 51 vocations, each with a sourced description, lore and the fitting vocations. Material: no rule reads it | Sections 8, 9 |
 | [research/portrait-components.md](research/portrait-components.md) | Lists of hairstyles, outfits, colours, race markers and accessories for portraits. Written for the 32 races of the first version of races-basis.md and extended for the Catfolk: it still covers the five that were left out | Section 9 |
 | [NameGenerator-Reuse.md](NameGenerator-Reuse.md) | The person-name generator, ported from an earlier project | Section 7 |
 | [RegionNameGenerator-Reuse.md](RegionNameGenerator-Reuse.md) | The region-name generator of the same project, not ported | Section 5 |

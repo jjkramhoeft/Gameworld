@@ -298,6 +298,7 @@ What a portrait of a person must show: the body and the face, the hair, the outf
 | [docs/parameter-set.schema.json](docs/parameter-set.schema.json) | The JSON Schema of a Parameter Set file. Generated, do not edit |
 | [docs/adding-a-race.md](docs/adding-a-race.md) | The steps to add a race |
 | [docs/races-basis.md](docs/races-basis.md) | The 28 default races: looks, history, way of life, vocations and factions |
+| [docs/tools-basis.md](docs/tools-basis.md) | 146 real tools for the 51 default vocations: a sourced description, lore and the fitting vocations. Material, it binds nothing |
 | [docs/races-and-worldbuilding.md](docs/races-and-worldbuilding.md) | A framework for building a near-human race: origin, anchor traits, culture and the relation to humans |
 | [docs/NameGenerator-Reuse.md](docs/NameGenerator-Reuse.md) | The person-name generator |
 | [docs/RegionNameGenerator-Reuse.md](docs/RegionNameGenerator-Reuse.md) | The region-name generator of an earlier project. It is not ported yet |
