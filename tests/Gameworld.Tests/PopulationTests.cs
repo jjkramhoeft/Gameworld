@@ -21,7 +21,7 @@ public class PopulationTests
     private static readonly string[] HumanRaces = DefaultRaces[..7];
 
     private static PerBiome<double> Everywhere(double f) =>
-        new(f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f);
+        new(f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f);
 
     private static PatchResources Resources(double food, double fish = 0)
     {
@@ -152,7 +152,7 @@ public class PopulationTests
         var schema = ParameterSetSchema.Build()["properties"]!["Races"]!["items"]!;
         var frequency = schema["properties"]!["BiomeFrequency"]!;
         Assert.Null(frequency["required"]);
-        Assert.Equal(16, frequency["properties"]!.AsObject().Count);
+        Assert.Equal(Enum.GetValues<Biome>().Length, frequency["properties"]!.AsObject().Count);
         Assert.DoesNotContain("HeightModifier", schema["required"]!.AsArray().Select(n => n!.GetValue<string>()));
         Assert.False(string.IsNullOrWhiteSpace(schema["properties"]!["HeightModifier"]!["description"]?.GetValue<string>()));
     }
@@ -169,6 +169,12 @@ public class PopulationTests
         foreach (var biome in Enum.GetValues<Biome>())
         {
             var shares = plain.Shares(biome, 100);
+            if (biome == Biome.Volcano)
+            {
+                // Only the Dwarves live on a Volcano: native, 3 · 2.3.
+                Assert.Equal(6.9, plain.Races[At("dwarf")].BiomeFrequency[biome]);
+                Assert.Equal(1, shares[At("dwarf")]);
+            }
             Assert.Equal(28, shares.Length);
             Assert.Equal(1, shares.Sum(), 12);
             var sum = plain.Races.Sum(r => r.BiomeFrequency[biome]);
@@ -177,26 +183,26 @@ public class PopulationTests
             Assert.Equal(shares, plain.Shares(biome, 900));
         }
 
-        // Temperate broadleaf forest: the frequencies sum to 62.5, of which Midlanders and Canal folk 15 each,
-        // elves 6 and dwarves 2. Below 200 m there are no dwarves, from 200 m and up no elves.
+        // Temperate broadleaf forest: the frequencies sum to 62.8, of which Midlanders and Canal folk 15 each,
+        // elves 6 and dwarves 2.3. Below 200 m there are no dwarves, from 200 m and up no elves.
         var low = rules.Shares(Biome.TemperateBroadleafForest, 199);
         Assert.Equal(15 / 60.5, low[At("midlanders")], 12);
         Assert.Equal(15 / 60.5, low[At("canalFolk")], 12);
         Assert.Equal(6 / 60.5, low[At("elf")], 12);
         Assert.Equal(0, low[At("dwarf")]);
         var high = rules.Shares(Biome.TemperateBroadleafForest, 200);
-        Assert.Equal(15 / 56.5, high[At("midlanders")], 12);
+        Assert.Equal(15 / 56.8, high[At("midlanders")], 12);
         Assert.Equal(0, high[At("elf")]);
-        Assert.Equal(2 / 56.5, high[At("dwarf")], 12);
+        Assert.Equal(2.3 / 56.8, high[At("dwarf")], 12);
 
-        // Ice & snow: Northmen 3, Hoarkin 3, dwarves 2 from 200 m and up, and Hearthbloods 1,
+        // Ice & snow: Northmen 3, Hoarkin 3, dwarves 2.3 from 200 m and up, and Hearthbloods 1,
         // at half weight below 100 m and full weight from 400 m.
         var ice = rules.Shares(Biome.IceAndSnow, 450);
         Assert.Equal(4, ice.Count(x => x > 0));
-        Assert.Equal(3 / 9.0, ice[At("northmen")], 12);
-        Assert.Equal(3 / 9.0, ice[At("hoarkin")], 12);
-        Assert.Equal(2 / 9.0, ice[At("dwarf")], 12);
-        Assert.Equal(1 / 9.0, ice[At("hearthbloods")], 12);
+        Assert.Equal(3 / 9.3, ice[At("northmen")], 12);
+        Assert.Equal(3 / 9.3, ice[At("hoarkin")], 12);
+        Assert.Equal(2.3 / 9.3, ice[At("dwarf")], 12);
+        Assert.Equal(1 / 9.3, ice[At("hearthbloods")], 12);
         var shore = rules.Shares(Biome.IceAndSnow, 50);
         Assert.Equal(3 / 6.5, shore[At("hoarkin")], 12);
         Assert.Equal(0, shore[At("dwarf")]);

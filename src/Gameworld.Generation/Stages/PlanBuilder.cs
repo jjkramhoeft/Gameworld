@@ -195,6 +195,7 @@ internal static class PlanBuilder
                 _ => 0.25,
             };
             if (biome.Biome == Biome.Mangrove) buildable *= 0.5;
+            if (biome.Biome == Biome.Volcano) buildable *= 0.2;
             var waterside = Max(
                 water.River >= NavigablePatches ? 1 : water.River >= 2 ? 0.7 : water.River > 0 ? 0.4 : 0,
                 water.Harbour ? 1 : coast ? 0.7 : 0,

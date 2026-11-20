@@ -141,7 +141,8 @@ internal static class DetailBuilder
 
             var type = cells.ZoneType(shape.Zone);
             var riverPoor = world.IsRiverPoorZone(shape.Zone);
-            var seaLevel = biomes.Classify(t0, p0, 0, type, shape.Coastal, riverPoor);
+            var volcano = biomes.IsVolcano(seed, shape.Root, type);
+            var seaLevel = biomes.Classify(t0, p0, 0, type, shape.Coastal, riverPoor, volcano);
             patches[i] = new PatchDetail
             {
                 Shape = shape,
@@ -152,7 +153,7 @@ internal static class DetailBuilder
                 FieldPrecipitationMm = p0,
                 Prosperity = prosperity,
                 Supernatural = supernatural,
-                Biome = biomes.Classify(t0, p0, BiomeRules.TypicalHeightM(type), type, shape.Coastal, riverPoor),
+                Biome = biomes.Classify(t0, p0, BiomeRules.TypicalHeightM(type), type, shape.Coastal, riverPoor, volcano),
                 DesertAtSeaLevel = seaLevel.Biome is Biome.HotDesert or Biome.ColdDesert,
             };
         }
@@ -187,8 +188,10 @@ internal static class DetailBuilder
         if (patch.Shape.Ocean)
             return world.OceanResources(new OceanResourceInput(
                 seed, patch.Root, patch.Shape.Coastal, patch.SeaLevelTemperatureC, patch.Prosperity));
+        // The rock of a Volcano is volcanic, whatever the bedrock of its zone (section 14.1).
+        var bedrock = biome!.Biome == Biome.Volcano ? BedrockIds.Volcanic : patch.Bedrock;
         return world.LandResources(new LandResourceInput(
-            seed, patch.Root, patch.Shape.Zone, biome!, patch.ZoneType, patch.Bedrock,
+            seed, patch.Root, patch.Shape.Zone, biome, patch.ZoneType, bedrock,
             patch.Shape.Coastal, patch.RiverPoor, patch.Water, patch.Prosperity, patch.Supernatural));
     }
 

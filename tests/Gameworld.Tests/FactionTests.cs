@@ -9,7 +9,7 @@ namespace Gameworld.Tests;
 public class FactionTests
 {
     private static PerBiome<double> Everywhere(double f) =>
-        new(f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f);
+        new(f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f);
 
     private static RaceParameters Race(string id, double frequency, PerFactionType<double> leaning) =>
         new(id, id, true, Everywhere(frequency)) { FactionLeaning = leaning };

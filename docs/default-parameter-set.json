@@ -139,6 +139,7 @@
       "RiverPoorPrecipitationFactor": 0.2,
       "MangroveMinTemperatureC": 20,
       "MangroveMinAridity": 0.5,
+      "VolcanoChance": 0.0067,
       "FloraPerPatch": {
         "Min": 3,
         "Max": 6
@@ -891,16 +892,17 @@
       "Name": "Dwarves",
       "Enabled": true,
       "BiomeFrequency": {
-        "IceAndSnow": 2,
-        "Tundra": 4,
-        "ColdSteppe": 2,
-        "BorealForest": 4,
-        "ColdDesert": 2,
-        "TemperateGrassland": 2,
-        "WoodlandAndShrubland": 2,
-        "TemperateMixedForest": 4,
-        "TemperateBroadleafForest": 2,
-        "TemperateRainForest": 2
+        "IceAndSnow": 2.3,
+        "Tundra": 4.6,
+        "ColdSteppe": 2.3,
+        "BorealForest": 4.6,
+        "ColdDesert": 2.3,
+        "TemperateGrassland": 2.3,
+        "WoodlandAndShrubland": 2.3,
+        "TemperateMixedForest": 4.6,
+        "TemperateBroadleafForest": 2.3,
+        "TemperateRainForest": 2.3,
+        "Volcano": 6.9
       },
       "HeightModifier": [
         {
@@ -2794,7 +2796,8 @@
       "Biomes": [
         "Tundra",
         "BorealForest",
-        "TemperateMixedForest"
+        "TemperateMixedForest",
+        "Volcano"
       ],
       "Frequency": 1
     },
@@ -2848,7 +2851,8 @@
         "BorealForest",
         "ColdDesert",
         "TemperateGrassland",
-        "WoodlandAndShrubland"
+        "WoodlandAndShrubland",
+        "Volcano"
       ],
       "Frequency": 1
     },
@@ -3385,7 +3389,8 @@
         "Tundra",
         "BorealForest",
         "TemperateMixedForest",
-        "TemperateRainForest"
+        "TemperateRainForest",
+        "Volcano"
       ],
       "Frequency": 1
     },
@@ -3576,7 +3581,8 @@
       "Biomes": [
         "Tundra",
         "BorealForest",
-        "TemperateMixedForest"
+        "TemperateMixedForest",
+        "Volcano"
       ],
       "Frequency": 1
     },
@@ -3694,7 +3700,8 @@
       "Enabled": true,
       "Biomes": [
         "Tundra",
-        "BorealForest"
+        "BorealForest",
+        "Volcano"
       ],
       "Frequency": 1
     },
@@ -4810,7 +4817,8 @@
       "Biomes": [
         "Tundra",
         "WoodlandAndShrubland",
-        "TemperateRainForest"
+        "TemperateRainForest",
+        "Volcano"
       ],
       "Frequency": 1
     },
@@ -4836,7 +4844,8 @@
         "TemperateGrassland",
         "TemperateMixedForest",
         "TemperateBroadleafForest",
-        "TemperateRainForest"
+        "TemperateRainForest",
+        "Volcano"
       ],
       "Frequency": 1
     },
@@ -5210,7 +5219,8 @@
       "Biomes": [
         "ColdSteppe",
         "ColdDesert",
-        "TemperateGrassland"
+        "TemperateGrassland",
+        "Volcano"
       ],
       "Frequency": 1
     },
@@ -5858,7 +5868,8 @@
         "BorealForest",
         "ColdDesert",
         "WoodlandAndShrubland",
-        "TemperateMixedForest"
+        "TemperateMixedForest",
+        "Volcano"
       ],
       "Frequency": 1
     },
@@ -5907,7 +5918,8 @@
         "ColdSteppe",
         "BorealForest",
         "ColdDesert",
-        "WoodlandAndShrubland"
+        "WoodlandAndShrubland",
+        "Volcano"
       ],
       "Frequency": 1
     },
@@ -5994,7 +6006,8 @@
         "WoodlandAndShrubland",
         "HotDesert",
         "ThornScrub",
-        "Savanna"
+        "Savanna",
+        "Volcano"
       ],
       "Frequency": 1
     },
@@ -6024,7 +6037,8 @@
         "ColdDesert",
         "WoodlandAndShrubland",
         "TemperateMixedForest",
-        "TemperateRainForest"
+        "TemperateRainForest",
+        "Volcano"
       ],
       "Frequency": 1
     },
@@ -6172,7 +6186,8 @@
         "WoodlandAndShrubland",
         "HotDesert",
         "ThornScrub",
-        "Savanna"
+        "Savanna",
+        "Volcano"
       ],
       "Frequency": 1
     },
@@ -6889,7 +6904,8 @@
       "Biomes": [
         "TemperateMixedForest",
         "TemperateBroadleafForest",
-        "TemperateRainForest"
+        "TemperateRainForest",
+        "Volcano"
       ],
       "Frequency": 0.25,
       "MinSupernatural": 60
@@ -6941,7 +6957,8 @@
       "Enabled": true,
       "Biomes": [
         "HotDesert",
-        "ThornScrub"
+        "ThornScrub",
+        "Volcano"
       ],
       "Frequency": 0.25,
       "MinSupernatural": 90
@@ -6992,7 +7009,8 @@
         "ColdDesert",
         "WoodlandAndShrubland",
         "HotDesert",
-        "ThornScrub"
+        "ThornScrub",
+        "Volcano"
       ],
       "Frequency": 0.25,
       "MinSupernatural": 75
@@ -7055,7 +7073,8 @@
       "Biomes": [
         "Savanna",
         "TropicalDryForest",
-        "TropicalRainForest"
+        "TropicalRainForest",
+        "Volcano"
       ],
       "Frequency": 0.25,
       "MinSupernatural": 90

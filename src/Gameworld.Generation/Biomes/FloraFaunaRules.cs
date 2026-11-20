@@ -21,7 +21,8 @@ public sealed class FloraFaunaRules
     /// <summary>The purpose of the draw of the first kind of fauna of the list. The kind at index k has this + k.</summary>
     public const uint FaunaKindPurpose = 0xfa0000;
 
-    private const int SeaBit = 16;
+    /// <summary>The bit of the sea in a habitat mask. The biomes have the bits below it.</summary>
+    private const int SeaBit = 31;
 
     private const int NoType = -1;
 

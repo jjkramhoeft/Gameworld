@@ -552,6 +552,13 @@
               "type": "number",
               "default": 0.5
             },
+            "VolcanoChance": {
+              "description": "The chance that a patch in a mountains zone is a Volcano, whatever its climate. 0 gives no volcanoes. The default gives about one Volcano in nine regions (§13.2).",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.0067
+            },
             "FloraPerPatch": {
               "description": "How many kinds of flora a patch gets: a count drawn evenly from Min to Max. A patch gets fewer when fewer kinds fit it (§13.4).",
               "type": "object",
@@ -2327,6 +2334,10 @@
               "Mangrove": {
                 "description": "Value for Mangrove patches.",
                 "type": "number"
+              },
+              "Volcano": {
+                "description": "Value for Volcano patches.",
+                "type": "number"
               }
             },
             "additionalProperties": false
@@ -2580,7 +2591,8 @@
                 "Savanna",
                 "TropicalDryForest",
                 "TropicalRainForest",
-                "Mangrove"
+                "Mangrove",
+                "Volcano"
               ]
             }
           },
@@ -2674,7 +2686,8 @@
                 "Savanna",
                 "TropicalDryForest",
                 "TropicalRainForest",
-                "Mangrove"
+                "Mangrove",
+                "Volcano"
               ]
             }
           },

@@ -24,7 +24,7 @@ A race is nine things:
 | `Id` | The id generated data knows the race by, in camelCase like `frostFolk`. It must be unique in the list. Keep it when the name changes. |
 | `Name` | The name shown for the race. |
 | `Enabled` | Whether the race lives in the world. A race that is off gets no population. |
-| `BiomeFrequency` | How frequent the race is in each of the 16 biomes, relative to the other races. |
+| `BiomeFrequency` | How frequent the race is in each of the 17 biomes, relative to the other races. |
 | `HeightModifier` | Optional. How the height of the land changes the frequency. Leave it out when the height does not matter to the race. |
 | `FactionLeaning` | Optional. How much the race leans to each of the six types of faction, 0 to 3. Leave it out and the race leans to every type alike, with 1. |
 | `AppreciatedRaces` | Optional. The ids of the other races the race appreciates. |
@@ -42,7 +42,7 @@ frequency(race, biome) = habitat(race, biome) · common(race)
 
 - `habitat` is 0 avoided, 1 tolerated, 2 good or 3 native.
 - `common` is how common the race is in the world: 3 to 5 for the human races, 2 for
-  Elves, Dwarves, Halflings and Orcs, 1 for Gnomes, and 1 or 0.5 for the new races.
+  Elves, Halflings and Orcs, 2.3 for Dwarves, 1 for Gnomes, and 1 or 0.5 for the new races.
 
 Follow the same scheme, so the new race compares to the others. A race with `common` 1
 that is native to a biome gets 3 there, against 15 for Midlanders in Temperate grassland.
@@ -50,7 +50,7 @@ that is native to a biome gets 3 there, against 15 for Midlanders in Temperate g
 The biome keys of a Parameter Set file are: `IceAndSnow`, `Tundra`, `ColdSteppe`,
 `BorealForest`, `ColdDesert`, `TemperateGrassland`, `WoodlandAndShrubland`,
 `TemperateMixedForest`, `TemperateBroadleafForest`, `TemperateRainForest`, `HotDesert`,
-`ThornScrub`, `Savanna`, `TropicalDryForest`, `TropicalRainForest`, `Mangrove`.
+`ThornScrub`, `Savanna`, `TropicalDryForest`, `TropicalRainForest`, `Mangrove`, `Volcano`.
 
 **The height modifier.** A list of control points `(height in m, factor)`. The factor
 multiplies the frequencies of the race. It runs in a straight line between two points and
@@ -129,6 +129,9 @@ The biome and the height are not independent: cold biomes lie higher, deserts lo
 | Tropical rain forest | 4.1 % | 161 m | 35 m | 396 m | 38 % |
 | Mangrove | 2.4 % | 119 m | 23 m | 308 m | 26 % |
 
+Volcano is not in the table. It came after the measurement and is 0.07 % of the land:
+single patches of mountains zones, about one in nine regions.
+
 So a hot desert race that only lives from 200 m and up has about a fifth of the hot
 desert, and a tundra race with the same limit keeps more than half of the tundra.
 
@@ -156,8 +159,9 @@ ones most often (section 4.9). A colour the list lacks is added to `Colours` fir
 **What a new race does to the world.** Adding a race, or toggling one on, does not change
 how many persons the land could feed. It changes how the land is shared: the new race takes
 its share from the races already there. The one exception is land where nobody lived before.
-With the default races there is no such land by the plain shares: the seven human races
-live in every biome and at every height between them. In a world with fewer races a new
+With the default races the only such land by the plain shares is a Volcano patch below
+200 m: the seven human races live in every other biome and at every height between them,
+and the Dwarves live on the Volcano from 200 m and up. In a world with fewer races a new
 race can add persons.
 
 **Where the new race shows up.** A region holds six races: its four main races and two
@@ -238,7 +242,7 @@ Do step 2 first and look at the numbers. Then change these together:
 
 | Where | What |
 |---|---|
-| [src/Gameworld.Domain/ParameterSet.cs](../src/Gameworld.Domain/ParameterSet.cs) | Add a `Make(...)` line to `RaceParameters.Defaults`: id, name, `common`, then the 16 habitat weights in the order of the column header. Every race of the default list is on. Add `with { HeightModifier = ... }` for a height modifier; `OnlyFrom` and `OnlyBelow` make the two steps. Add the race to `DefaultLeanings` in the same record: its leaning to the six types of faction. Add it to `DefaultRelations` too: the races it appreciates and hates, and add its id to the lists of the races that appreciate or hate it. Add it to `DefaultFavouriteColours`: its favourite colours. A default race without an entry in any of the three fails when the list is built. |
+| [src/Gameworld.Domain/ParameterSet.cs](../src/Gameworld.Domain/ParameterSet.cs) | Add a `Make(...)` line to `RaceParameters.Defaults`: id, name, `common`, then the 16 habitat weights in the order of the column header. The Volcano has no column: a seventeenth weight is the one on a Volcano, and without it the race has the frequency 0 there. Only the Dwarves have one. Every race of the default list is on. Add `with { HeightModifier = ... }` for a height modifier; `OnlyFrom` and `OnlyBelow` make the two steps. Add the race to `DefaultLeanings` in the same record: its leaning to the six types of faction. Add it to `DefaultRelations` too: the races it appreciates and hates, and add its id to the lists of the races that appreciate or hate it. Add it to `DefaultFavouriteColours`: its favourite colours. A default race without an entry in any of the three fails when the list is built. |
 | [default-parameter-set.json](default-parameter-set.json) | Add the same entry to `Races`, at the same place in the list, with the frequencies multiplied out. A test checks that this file equals `ParameterSet.Default`. |
 | [society-generation.md](society-generation.md) section 2 | Update the count in the parameter table ("28, all on") and the list of names below it. |
 | [society-generation.md](society-generation.md) Appendix A | Add the row to the table. Update the height modifier table and the note below it ("The other 23 races have none"). Add the row to the table of leanings and to the table of appreciated and hated races, and the name to the rows of the races that list it. Add the row to the table of favourite colours. |

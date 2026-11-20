@@ -118,7 +118,8 @@ public sealed record PerBiome<T>(
     [property: Description("Value for Savanna patches."), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] T Savanna,
     [property: Description("Value for Tropical dry forest patches."), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] T TropicalDryForest,
     [property: Description("Value for Tropical rain forest patches."), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] T TropicalRainForest,
-    [property: Description("Value for Mangrove patches."), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] T Mangrove)
+    [property: Description("Value for Mangrove patches."), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] T Mangrove,
+    [property: Description("Value for Volcano patches."), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)] T Volcano)
 {
     public T this[Biome biome] => biome switch
     {
@@ -138,6 +139,7 @@ public sealed record PerBiome<T>(
         Biome.TropicalDryForest => TropicalDryForest,
         Biome.TropicalRainForest => TropicalRainForest,
         Biome.Mangrove => Mangrove,
+        Biome.Volcano => Volcano,
         _ => throw new ArgumentOutOfRangeException(nameof(biome), biome, null),
     };
 }
@@ -412,6 +414,10 @@ public sealed record BiomeParameters
 
     [Description("The smallest aridity (precipitation ÷ the dryness threshold of the temperature) at which a warm low coast becomes Mangrove. Below 0.5 is desert, 0.5 to 1 steppe, above 1 humid (§13.2).")]
     public double MangroveMinAridity { get; init; } = 0.5;
+
+    [Description("The chance that a patch in a mountains zone is a Volcano, whatever its climate. 0 gives no volcanoes. The default gives about one Volcano in nine regions (§13.2).")]
+    [Range(0, 1)]
+    public double VolcanoChance { get; init; } = 0.0067;
 
     [Description("How many kinds of flora a patch gets: a count drawn evenly from Min to Max. A patch gets fewer when fewer kinds fit it (§13.4).")]
     public IntRange FloraPerPatch { get; init; } = new(3, 6);
@@ -937,6 +943,7 @@ public sealed record RaceParameters(
     /// </summary>
     public static IReadOnlyList<RaceParameters> Defaults { get; } =
     [
+        // The Volcano has no column: a seventeenth weight is the one on a Volcano, and only the Dwarves have one.
         //                                    common   Ice Tun CSt Bor CDs TGr WSh TMx TBl TRn HDs Thn Sav TDf TRf Mgv
         Make("northmen", "Northmen", 3, /*          */ 1, 2, 1, 3, 0, 1, 0, 3, 1, 2, 0, 0, 0, 0, 0, 0),
         Make("midlanders", "Midlanders", 5, /*      */ 0, 0, 1, 1, 0, 3, 2, 2, 3, 2, 0, 0, 0, 0, 0, 0),
@@ -946,7 +953,7 @@ public sealed record RaceParameters(
         Make("rainkeepers", "Rainkeepers", 4, /*    */ 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 2, 3, 2, 2),
         Make("canalFolk", "Canal folk", 5, /*       */ 0, 0, 1, 0, 0, 2, 1, 2, 3, 3, 0, 0, 0, 2, 1, 1),
         Make("elf", "Elves", 2, /*                  */ 0, 0, 0, 2, 0, 1, 1, 3, 3, 3, 0, 0, 0, 1, 2, 0) with { HeightModifier = OnlyBelow(200) },
-        Make("dwarf", "Dwarves", 2, /*              */ 1, 2, 1, 2, 1, 1, 1, 2, 1, 1, 0, 0, 0, 0, 0, 0) with { HeightModifier = OnlyFrom(200) },
+        Make("dwarf", "Dwarves", 2.3, /*            */ 1, 2, 1, 2, 1, 1, 1, 2, 1, 1, 0, 0, 0, 0, 0, 0, /* Volcano */ 3) with { HeightModifier = OnlyFrom(200) },
         Make("halfling", "Halflings", 2, /*         */ 0, 0, 1, 1, 0, 3, 3, 2, 2, 1, 0, 0, 1, 1, 1, 0),
         Make("gnome", "Gnomes", 1, /*               */ 0, 1, 1, 2, 1, 1, 2, 2, 3, 1, 0, 1, 1, 1, 0, 0),
         Make("orc", "Orcs", 2, /*                   */ 0, 1, 3, 1, 2, 2, 2, 1, 1, 1, 2, 2, 2, 1, 0, 0),
@@ -968,21 +975,26 @@ public sealed record RaceParameters(
         Make("catfolk", "Catfolk", 1, /*            */ 0, 0, 1, 0, 1, 2, 1, 1, 1, 1, 2, 2, 3, 2, 2, 1),
     ];
 
-    /// <summary>A race from its habitat weight per biome (in the order of <see cref="Biome"/>) and how common it is.</summary>
-    private static RaceParameters Make(string id, string name, double common, params int[] habitat) =>
-        habitat.Length != 16
-            ? throw new ArgumentException($"The race {id} needs one habitat weight per biome.", nameof(habitat))
+    /// <summary>
+    /// A race from its habitat weight per biome (in the order of <see cref="Biome"/>) and how
+    /// common it is. The weight on a Volcano, the last one, can be left out: it is then 0.
+    /// </summary>
+    private static RaceParameters Make(string id, string name, double common, params int[] habitat)
+    {
+        // Rounded, so that 3 · 2.3 is 6.9 in the file and not 6.8999999999999995.
+        double F(int k) => Math.Round(common * habitat[k], 10);
+        return habitat.Length is not (16 or 17)
+            ? throw new ArgumentException($"The race {id} needs one habitat weight per biome; the one on a Volcano can be left out.", nameof(habitat))
             : new(id, name, true, new PerBiome<double>(
-            common * habitat[0], common * habitat[1], common * habitat[2], common * habitat[3],
-            common * habitat[4], common * habitat[5], common * habitat[6], common * habitat[7],
-            common * habitat[8], common * habitat[9], common * habitat[10], common * habitat[11],
-            common * habitat[12], common * habitat[13], common * habitat[14], common * habitat[15]))
+            F(0), F(1), F(2), F(3), F(4), F(5), F(6), F(7), F(8), F(9), F(10), F(11), F(12), F(13), F(14), F(15),
+            habitat.Length == 17 ? F(16) : 0))
             {
                 FactionLeaning = DefaultLeanings[id],
                 AppreciatedRaces = DefaultRelations[id].Appreciated,
                 HatedRaces = DefaultRelations[id].Hated,
                 FavouriteColours = DefaultFavouriteColours[id],
             };
+    }
 }
 
 /// <summary>The ids of the nine bedrock types the generation currently uses.</summary>

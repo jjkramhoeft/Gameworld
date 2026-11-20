@@ -65,7 +65,8 @@ internal static class ElevationBuilder
             double? mean = heights.MeanHeightByPatch.TryGetValue(patch.Root.Key, out var m) ? m : null;
             var h = mean is { } v ? Math.Max(0, v) : BiomeRules.TypicalHeightM(patch.ZoneType);
             var biome = world.BiomeRules.Classify(
-                patch.SeaLevelTemperatureC, patch.FieldPrecipitationMm, h, patch.ZoneType, patch.Shape.Coastal, patch.RiverPoor);
+                patch.SeaLevelTemperatureC, patch.FieldPrecipitationMm, h, patch.ZoneType, patch.Shape.Coastal, patch.RiverPoor,
+                world.BiomeRules.IsVolcano(seed, patch.Root, patch.ZoneType));
             patches.Add(new PatchFinal
             {
                 Patch = patch,

@@ -63,9 +63,6 @@ How Could it be generated in the Worldgame for fractions (Guild, Kingdoms, famil
 ## Zone landscape features
 ## Race Symbols
 
-Flora and Faune for the biomes
-Animals (Critter,Animals,Beasts and Monsters) Trees, Flowers, Herbs, Fruit etc.
-Make two long list of flora and fauna - with name, description, accosiated bioms, lore and any Vocation relevancy 
 
 add Generator section to readme
 Name generator evaluater

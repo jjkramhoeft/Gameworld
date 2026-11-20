@@ -101,7 +101,7 @@ expected to change late in phase 2, so a race is added or changed by editing the
 - An **id** and a **name**. Generated data points at a race by its id. The ids must be
   given and unique. A Parameter Set that breaks this is refused when the world is created.
 - A **toggle**: the race is on or off. A race that is off does not live in the world.
-- A **frequency for each of the 16 biomes**: how frequent the race is in that biome,
+- A **frequency for each of the 17 biomes**: how frequent the race is in that biome,
   relative to the other races. 0 means the race does not live there.
 - A **height modifier**: a factor on the frequencies of the race that depends on the
   height of the land. It can cut a race off at a height or fade it in and out. A race
@@ -355,8 +355,10 @@ that hold nobody.
 Of all persons 83.5 % are of the seven human races, 10.4 % of the five classic races and
 6.1 % of the sixteen new races. By the plain shares it would be 58.7 %, 20.2 % and 21.1 %:
 the main races are human in most regions. The largest race is the Canal folk with 22 %.
-They are a race of 90 % of the regions, the Elves of 10 %, the Dwarves of 8 % and each
-new race of 6 to 10 %.
+They are a race of 90 % of the regions, the Elves of 10 %, the Dwarves of 9 % and each
+new race of 6 to 10 %. The Dwarves were made a tenth more numerous after this measurement
+(`common` 2.3 for 2, races-basis.md "Measured shares"); the other numbers moved by less
+than their last digit and were not measured again.
 
 A cluster of 30 regions holds all 28 races in 96 % of the cases and 27 in nearly all the
 others (the 30 regions nearest a region, 432 clusters). With one minority race per region
@@ -1140,7 +1142,9 @@ A biome with the weight 0 is left out of the race's entry in the file.
 Columns: Ice & snow, Tundra, Cold steppe, Boreal forest, Cold desert, Temperate grassland,
 Woodland & shrubland, Temperate mixed forest, Temperate broadleaf forest, Temperate rain
 forest, Hot desert, Thorn scrub, Savanna, Tropical dry forest, Tropical rain forest,
-Mangrove.
+Mangrove. The seventeenth biome, Volcano, has no column: the Dwarves are native there,
+with the weight 3 and so the frequency 6.9, and every other race has the weight 0. A
+Volcano patch holds Dwarves where they are a race of the region, and nobody elsewhere.
 
 | Id | Name | Common | Ice | Tun | CSt | Bor | CDs | TGr | WSh | TMx | TBl | TRn | HDs | Thn | Sav | TDf | TRf | Mgv |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -1152,7 +1156,7 @@ Mangrove.
 | `rainkeepers` | Rainkeepers | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 1 | 2 | 3 | 2 | 2 |
 | `canalFolk` | Canal folk | 5 | 0 | 0 | 1 | 0 | 0 | 2 | 1 | 2 | 3 | 3 | 0 | 0 | 0 | 2 | 1 | 1 |
 | `elf` | Elves | 2 | 0 | 0 | 0 | 2 | 0 | 1 | 1 | 3 | 3 | 3 | 0 | 0 | 0 | 1 | 2 | 0 |
-| `dwarf` | Dwarves | 2 | 1 | 2 | 1 | 2 | 1 | 1 | 1 | 2 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 0 |
+| `dwarf` | Dwarves | 2.3 | 1 | 2 | 1 | 2 | 1 | 1 | 1 | 2 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 0 |
 | `halfling` | Halflings | 2 | 0 | 0 | 1 | 1 | 0 | 3 | 3 | 2 | 2 | 1 | 0 | 0 | 1 | 1 | 1 | 0 |
 | `gnome` | Gnomes | 1 | 0 | 1 | 1 | 2 | 1 | 1 | 2 | 2 | 3 | 1 | 0 | 1 | 1 | 1 | 0 | 0 |
 | `orc` | Orcs | 2 | 0 | 1 | 3 | 1 | 2 | 2 | 2 | 1 | 1 | 1 | 2 | 2 | 2 | 1 | 0 | 0 |
@@ -1294,12 +1298,13 @@ reading is marked as judgement.
 | Bitterbloods | Sky blue, Yellow, Orange | The mottling worn with pride: sky blue, sulphur yellow, sometimes orange |
 | Catfolk | Tan, Russet, Cream, Gold | The colours of a cat's coat: sand, russet, cream, tawny gold |
 
-**How common.** `common` is 3 to 5 for the human races, 2 for Elves, Dwarves, Halflings
-and Orcs, 1 for Gnomes, and 1 or 0.5 for a new race: 1 when it has a homeland of its own,
+**How common.** `common` is 3 to 5 for the human races, 2 for Elves, Halflings
+and Orcs, 2.3 for Dwarves, 1 for Gnomes, and 1 or 0.5 for a new race: 1 when it has a homeland of its own,
 0.5 when it lives scattered among others or is rare by its nature.
 
-The seven human races live in every biome and at every height between them, so no land
-is without a race by the plain shares. A patch can still hold nobody, when none of the six
+The seven human races live in every biome but the Volcano and at every height between
+them, and the Dwarves live on the Volcano from 200 m and up, so only a Volcano patch below
+200 m is without a race by the plain shares. A patch can still hold nobody, when none of the six
 races of its region lives on it (section 3.4). In Ice & snow there are Northmen, Hoarkin and Hearthbloods, and
 dwarves from 200 m and up.
 

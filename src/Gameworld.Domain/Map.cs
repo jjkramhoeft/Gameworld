@@ -52,7 +52,7 @@ public enum ThermalBelt
     Tropical,
 }
 
-/// <summary>The current set of biomes: 15 land biomes and Mangrove.</summary>
+/// <summary>The current set of biomes: 15 land biomes, and the two overrides Mangrove and Volcano.</summary>
 public enum Biome
 {
     IceAndSnow,
@@ -71,6 +71,7 @@ public enum Biome
     TropicalDryForest,
     TropicalRainForest,
     Mangrove,
+    Volcano,
 }
 
 /// <summary>

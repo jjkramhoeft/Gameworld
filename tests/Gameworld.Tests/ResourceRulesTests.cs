@@ -27,6 +27,7 @@ public class ResourceRulesTests
         (Biome.TropicalDryForest, 25, 26, 1700),
         (Biome.TropicalRainForest, 26, 26, 3000),
         (Biome.Mangrove, 26, 26, 2000),
+        (Biome.Volcano, 6, 10, 600),
     ];
 
     private static readonly string[] Bedrocks =
@@ -191,6 +192,7 @@ public class ResourceRulesTests
         Assert.Equal(new BiomeFactorRow(0.55, 1, 0.25, 0.7, 1, 0.85, 0.25, 0.2, 0.4, 1.3, 1.4), BiomeFactors.Of(Biome.BorealForest));
         Assert.Equal(new BiomeFactorRow(0.6, 1, 0.8, 0.6, 0.35, 0.4, 0.3, 0.2, 0.4, 1, 1.05), BiomeFactors.Of(Biome.Savanna));
         Assert.Equal(new BiomeFactorRow(0.3, 0.4, 0.1, 0.4, 0.5, 0, 0, 0.1, 0.3, 2, 3), BiomeFactors.Of(Biome.Mangrove));
+        Assert.Equal(new BiomeFactorRow(0.2, 0.2, 0, 0.1, 0, 0, 0, 0, 0.1, 1.5, 5), BiomeFactors.Of(Biome.Volcano));
     }
 
     [Theory]

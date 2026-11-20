@@ -145,6 +145,7 @@ internal static class BiomeCodes
         ["TDf"] = Biome.TropicalDryForest,
         ["TRf"] = Biome.TropicalRainForest,
         ["Mgv"] = Biome.Mangrove,
+        ["Vol"] = Biome.Volcano,
     };
 
     /// <summary>The biomes of a list of codes separated by spaces. The code Sea is not a biome and is skipped.</summary>

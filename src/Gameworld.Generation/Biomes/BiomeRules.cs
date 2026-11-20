@@ -67,6 +67,18 @@ public sealed class BiomeRules
         return aridity < wetBound ? MoistureClass.Humid : MoistureClass.Wet;
     }
 
+    /// <summary>The purpose of the Volcano draw of a patch (section 13.2).</summary>
+    public const uint VolcanoPurpose = 0xb101;
+
+    /// <summary>
+    /// Whether a patch is a Volcano: a patch of a mountains zone, by a chance drawn for its root
+    /// cell. The draw reads neither the climate nor the height, so the estimated and the final
+    /// biome agree on it.
+    /// </summary>
+    public bool IsVolcano(uint seed, GridCoord root, ElevationType zoneType) =>
+        zoneType == ElevationType.Mountains
+        && Hashing.Unit(seed, VolcanoPurpose, root.I, root.J) < _p.VolcanoChance;
+
     /// <summary>
     /// The biome of a land patch.
     /// </summary>
@@ -76,13 +88,15 @@ public sealed class BiomeRules
     /// <param name="zoneType">The elevation type of the patch's zone.</param>
     /// <param name="coastal">One of the patch's cells has an ocean patch cell as neighbour.</param>
     /// <param name="riverPoor">The patch lies in a river-poor flat zone.</param>
+    /// <param name="volcano">The Volcano draw of the patch came out (<see cref="IsVolcano"/>).</param>
     public BiomeRecord Classify(
         double seaLevelTemperatureC,
         double fieldPrecipitationMm,
         double heightM,
         ElevationType zoneType,
         bool coastal,
-        bool riverPoor)
+        bool riverPoor,
+        bool volcano = false)
     {
         var t = seaLevelTemperatureC - Cooling(heightM);
         var p = riverPoor ? fieldPrecipitationMm * _p.RiverPoorPrecipitationFactor : fieldPrecipitationMm;
@@ -96,6 +110,9 @@ public sealed class BiomeRules
             && t >= _p.MangroveMinTemperatureC
             && m >= _p.MangroveMinAridity)
             biome = Biome.Mangrove;
+
+        // Volcano overrides the table on rare patches of the mountains, whatever the climate.
+        if (volcano && zoneType == ElevationType.Mountains) biome = Biome.Volcano;
 
         return new BiomeRecord(biome, belt, t, seaLevelTemperatureC, p, m);
     }
@@ -147,6 +164,7 @@ public sealed class BiomeRules
         Biome.TropicalDryForest => (136, 136, 24),
         Biome.TropicalRainForest => (0, 92, 36),
         Biome.Mangrove => (168, 70, 150),
+        Biome.Volcano => (196, 30, 30),
         _ => (38, 84, 132),
     };
 }

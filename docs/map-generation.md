@@ -1199,6 +1199,26 @@ of a cold steppe, too little for a closed forest.
 patch cells has an ocean patch as neighbour), lies in a flat or lowland zone, has
 `T ≥ 20 °C` and `m ≥ 0.5`.
 
+**Volcano** overrides the table too: a patch of a mountains zone becomes a volcano when
+
+```
+toUnit(hash4(seed, 0xb101, i, j)) < VolcanoChance        # default 0.0067
+```
+
+with `(i, j)` the root cell of the patch. The draw reads neither the climate nor the
+height, so the estimated and the final biome agree on it, and a volcano can stand in any
+climate. The biome record keeps the temperature and the aridity of the patch. Mangrove
+needs a flat or lowland zone, so the two overrides never meet.
+
+A region has 14.6 patches in mountains zones on average, so the default chance gives one
+volcano in nine regions: 181 volcanoes in 1 600 regions, one in 8.8 (16 seeds of 10 × 10
+regions). A chance of 0 gives a world without volcanoes. A volcano is one patch, and it
+differs from the mountains around it in four ways: its rock is volcanic (14.1), it has
+its own few kinds of flora and fauna (13.4), it is hard to build on and to cross (15.3,
+Appendix C), and of the default races only the Dwarves live on it
+([society-generation.md](society-generation.md) Appendix A), so it holds Dwarves where they
+are a race of the region and nobody elsewhere.
+
 The same classification with `T₀` in place of `T` gives the patch's **sea-level biome**,
 which the lakes use to rule out deserts without needing the height map.
 
@@ -1209,7 +1229,7 @@ forest 6 %, temperate broadleaf forest 6 %, tundra 5.5 %, temperate mixed forest
 thorn scrub 5 %, tropical rain forest 4.5 %, temperate grassland 4.5 %, cold steppe 3 %
 and mangrove 2 %. The shares follow from the distributions of the two climate fields
 (9.1), the cooling curve and the river-poor factor. Mangrove is the smallest because it
-is bound to warm low coasts.
+is bound to warm low coasts. Volcano is not in the list: it is 0.07 % of the land.
 
 ### 13.3 Colours
 
@@ -1223,7 +1243,7 @@ is bound to warm low coasts.
 | Cold desert | 216, 184, 184 | Tropical dry forest | 136, 136, 24 |
 | Temperate grassland | 184, 222, 84 | Tropical rain forest | 0, 92, 36 |
 | Woodland & shrubland | 150, 104, 70 | Mangrove | 168, 70, 150 |
-| Temperate mixed forest | 76, 148, 84 | | |
+| Temperate mixed forest | 76, 148, 84 | Volcano | 196, 30, 30 |
 
 ### 13.4 Flora and fauna
 
@@ -1255,6 +1275,11 @@ mushrooms at the end of the list. The frequency is 1, except 0.5 for a beast and
 a monster and for an arcane plant. A monster and an arcane plant need a Supernatural of
 60, 75 or 90, by the tiers S1, S2 and S3 of the note. No other kind needs the field. So
 a monster is found on about a tenth of the map at the most (9, 14.1).
+
+The note knows no Volcano. Seventeen of its kinds live there too in the default lists:
+birch, juniper, heather, fireweed, roseroot, dye lichen and bracken of the flora, and
+pika, wild sheep and ibex, goat, golden eagle, raven and vulture of the fauna, with four
+monsters where the Supernatural is high: salamander, phoenix, hill drake and dragon.
 
 **Fit.** A kind fits a patch when all of these hold:
 
@@ -1353,6 +1378,10 @@ index (Appendix D), so the rules of the first 24 keep their hashes.
   | Carbonate platform | 15 | 30 | 30 | 15 |
   | Clastic basin | 40 | 40 | 20 | 5 |
   | Unconsolidated cover | 60 | 40 | 0 | 0 |
+
+  A **Volcano** patch (13.2) is the exception: its rock is volcanic, so the rules read
+  Volcanic arc as its bedrock, whatever the bedrock of its zone. The loads below still
+  read the bedrock of the zone.
 
 - **Water site**, from the region's rivers and lakes. Only river nodes that are not roots,
   not over the sea, and on land of this region count, here and for the loads:
@@ -1585,7 +1614,7 @@ resources = 0.45·food + 0.2·water + 0.15·materials + 0.1·fish + 0.1·goods
     goods     = clamp((wealth(here) + 0.5 · best neighbour's wealth) / 1.2)
 
 geography = buildable · (0.5 + 0.3·waterside + 0.2·defence) · (0.75 + 0.25·clamp(depth/3))
-    buildable = 1, 0.9, 0.55, 0.25 for flat … mountains; × 0.5 in mangrove
+    buildable = 1, 0.9, 0.55, 0.25 for flat … mountains; × 0.5 in mangrove, × 0.2 on a volcano
     waterside = max(river: 1 navigable, 0.7 from 2, 0.4 any; harbour 1, coast 0.7; lake 0.8)
     defence   = max(0, 0.1, 0.6, 0.7 by elevation type; 0.5 if oceanFrac ≥ 0.5; 0.4 if confluence ≥ 4)
 
@@ -1673,7 +1702,7 @@ For every cell of the region (classified at its centre):
 - **Sea cells**: cost 0.3 per km (0.6 right at the shore, so lanes keep off capes).
 - **Land cells**: road cost per km relative to open flat land =
   zone factor (1, 1.15, 1.8, 4 for flat … mountains) × biome factor (1 for grassland; 1.3
-  forests; 2–2.2 rain forests; 3 mangrove; 3.5–4 deserts; 5 ice) × 8 if the cell centre is
+  forests; 2–2.2 rain forests; 3 mangrove; 3.5–4 deserts; 5 ice and volcano) × 8 if the cell centre is
   in a lake.
 - **Estimated height** (no height raster needed). The hillslope here is the **unblurred**
   one: the elevation type's hillslope × the hillslope multiplier × the relief at the point.
@@ -2176,6 +2205,7 @@ central-place graph (15.2); "road cost" is the biome factor of the travel grid (
 | Tropical dry forest | 0.7 | 1 | 0.45 | 0.6 | 0.8 | 0.35 | 0.3 | 0.2 | 0.6 | 1.3 | 1.3 |
 | Tropical rain forest | 0.4 | 1 | 0.15 | 0.6 | 1 | 0.35 | 0.25 | 0.15 | 0.8 | 2 | 2.2 |
 | Mangrove | 0.3 | 0.4 | 0.1 | 0.4 | 0.5 | 0 | 0 | 0.1 | 0.3 | 2 | 3 |
+| Volcano | 0.2 | 0.2 | 0 | 0.1 | 0 | 0 | 0 | 0 | 0.1 | 1.5 | 5 |
 
 ---
 

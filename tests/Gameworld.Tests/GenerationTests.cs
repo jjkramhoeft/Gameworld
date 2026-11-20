@@ -622,6 +622,91 @@ public class WorldTests
     }
 
     [Fact]
+    public void Volcano_overrides_the_biome_of_a_mountain_patch_only()
+    {
+        var rules = new Gameworld.Generation.Biomes.BiomeRules(ParameterSet.Default.Elevation.Biomes);
+        Biome At(ElevationType type, bool volcano, double temperatureC = 10) =>
+            rules.Classify(temperatureC, 500, 470, type, coastal: false, riverPoor: false, volcano).Biome;
+
+        Assert.Equal(Biome.Volcano, At(ElevationType.Mountains, true));
+        Assert.Equal(Biome.Volcano, At(ElevationType.Mountains, true, temperatureC: -20)); // whatever the climate
+        Assert.NotEqual(Biome.Volcano, At(ElevationType.Mountains, false));
+        Assert.NotEqual(Biome.Volcano, At(ElevationType.Hills, true));
+
+        // The climate of the record is the one of the patch: only the biome is overridden.
+        var plain = rules.Classify(10, 500, 470, ElevationType.Mountains, false, false);
+        var volcano = rules.Classify(10, 500, 470, ElevationType.Mountains, false, false, volcano: true);
+        Assert.Equal(plain with { Biome = Biome.Volcano }, volcano);
+    }
+
+    [Fact]
+    public void The_volcano_draw_follows_the_chance_and_the_mountains()
+    {
+        var defaults = ParameterSet.Default.Elevation.Biomes;
+        Assert.Equal(0.0067, defaults.VolcanoChance);
+        var rules = new Gameworld.Generation.Biomes.BiomeRules(defaults);
+        var never = new Gameworld.Generation.Biomes.BiomeRules(defaults with { VolcanoChance = 0 });
+        var always = new Gameworld.Generation.Biomes.BiomeRules(defaults with { VolcanoChance = 1 });
+
+        var drawn = 0;
+        for (var i = -200; i < 200; i++)
+            for (var j = -200; j < 200; j++)
+            {
+                var root = new GridCoord(i, j);
+                if (rules.IsVolcano(77, root, ElevationType.Mountains)) drawn++;
+                Assert.False(rules.IsVolcano(77, root, ElevationType.Hills));
+                Assert.False(never.IsVolcano(77, root, ElevationType.Mountains));
+                Assert.True(always.IsVolcano(77, root, ElevationType.Mountains));
+                Assert.False(always.IsVolcano(77, root, ElevationType.Lowland));
+            }
+        // 160 000 patches at 0.67 %: 1 072 expected, with a standard deviation of 33.
+        Assert.InRange(drawn, 940, 1200);
+    }
+
+    [Fact]
+    public void A_volcano_is_the_same_in_the_estimated_and_the_final_biome_and_its_rock_is_volcanic()
+    {
+        // Every mountain patch a Volcano, to have some in one region.
+        var parameters = ParameterSet.Default with
+        {
+            Elevation = ParameterSet.Default.Elevation with
+            {
+                Biomes = ParameterSet.Default.Elevation.Biomes with { VolcanoChance = 1 },
+            },
+        };
+        var world = World.Create("cellgen", parameters);
+        var plain = World.Create("cellgen");
+        var id = new RegionId(0, 0);
+        var detail = world.DetailOf(id);
+        var elevation = world.ElevationOf(id);
+        var mountains = detail.Patches.Where(p => !p.Shape.Ocean && p.ZoneType == ElevationType.Mountains).ToArray();
+        Assert.NotEmpty(mountains);
+        foreach (var patch in detail.Patches.Where(p => !p.Shape.Ocean))
+        {
+            var isMountain = patch.ZoneType == ElevationType.Mountains;
+            Assert.Equal(isMountain, patch.Biome!.Biome == Biome.Volcano);
+            Assert.Equal(isMountain, elevation.Find(patch.Root)!.Biome.Biome == Biome.Volcano);
+            // Outside the mountains the chance changes nothing.
+            if (!isMountain) Assert.Equal(plain.DetailOf(id).Find(patch.Root)!.Biome, patch.Biome);
+        }
+        // Volcanic rock gives its stone, whatever the bedrock of the zone.
+        string[] volcanicStone = ["basalt", "pumice and pozzolana", "obsidian"];
+        var stone = mountains.Select(p => p.Resources[Resource.Stone]).Where(s => s.Amount > 0).ToArray();
+        Assert.NotEmpty(stone);
+        Assert.All(stone, s => Assert.Contains(s.Variant, volcanicStone));
+        // A Volcano has its own few kinds of flora and fauna, none of the sea.
+        var flora = parameters.Flora.ToDictionary(f => f.Id);
+        var fauna = parameters.Fauna.ToDictionary(f => f.Id);
+        Assert.All(mountains, p =>
+        {
+            Assert.NotEmpty(p.Flora);
+            Assert.NotEmpty(p.Fauna);
+            Assert.All(p.Flora, id => Assert.Contains(Biome.Volcano, flora[id].Biomes));
+            Assert.All(p.Fauna, id => Assert.Contains(Biome.Volcano, fauna[id].Biomes));
+        });
+    }
+
+    [Fact]
     public void A_distribution_gives_each_share_of_the_map_its_value()
     {
         var parameters = ParameterSet.Default.Fields;

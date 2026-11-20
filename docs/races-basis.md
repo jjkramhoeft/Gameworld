@@ -739,10 +739,10 @@ about charcoal: a forge eats forests. Gnomes are cousins who went down the hill
 instead of into it. Orcs fight them for the passes. Hearthbloods share the cold heights
 and hire out to the forges.
 
-**Biomes.** Good (2): Tundra, Boreal forest, Temperate mixed forest. Tolerated (1): Ice
+**Biomes.** Native (3): Volcano. Good (2): Tundra, Boreal forest, Temperate mixed forest. Tolerated (1): Ice
 & snow, Cold steppe, Cold desert, Temperate grassland, Woodland & shrubland, Temperate
 broadleaf forest, Temperate rain forest. Height: `(200, 0), (200, 1)`, only from 200 m.
-Common: 2. Also wants: hill and mountain zones, and a bedrock with ore: fold belt,
+Common: 2.3. Also wants: hill and mountain zones, and a bedrock with ore: fold belt,
 granite or volcanic arc.
 
 **Vocations.** Miner, prospector, smith, armourer, mason, engineer, tunnel warden,
@@ -2225,6 +2225,7 @@ frequency of a race in a biome is its habitat weight times `common`. Columns: Ic
 snow, Tundra, Cold steppe, Boreal forest, Cold desert, Temperate grassland, Woodland &
 shrubland, Temperate mixed forest, Temperate broadleaf forest, Temperate rain forest,
 Hot desert, Thorn scrub, Savanna, Tropical dry forest, Tropical rain forest, Mangrove.
+The Volcano has no column: the Dwarves have the weight 3 there and every other race 0.
 
 | # | Id | Common | Ice | Tun | CSt | Bor | CDs | TGr | WSh | TMx | TBl | TRn | HDs | Thn | Sav | TDf | TRf | Mgv |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -2236,7 +2237,7 @@ Hot desert, Thorn scrub, Savanna, Tropical dry forest, Tropical rain forest, Man
 | 6 | `rainkeepers` | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 1 | 2 | 3 | 2 | 2 |
 | 7 | `canalFolk` | 5 | 0 | 0 | 1 | 0 | 0 | 2 | 1 | 2 | 3 | 3 | 0 | 0 | 0 | 2 | 1 | 1 |
 | 8 | `elf` | 2 | 0 | 0 | 0 | 2 | 0 | 1 | 1 | 3 | 3 | 3 | 0 | 0 | 0 | 1 | 2 | 0 |
-| 9 | `dwarf` | 2 | 1 | 2 | 1 | 2 | 1 | 1 | 1 | 2 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 0 |
+| 9 | `dwarf` | 2.3 | 1 | 2 | 1 | 2 | 1 | 1 | 1 | 2 | 1 | 1 | 0 | 0 | 0 | 0 | 0 | 0 |
 | 10 | `halfling` | 2 | 0 | 0 | 1 | 1 | 0 | 3 | 3 | 2 | 2 | 1 | 0 | 0 | 1 | 1 | 1 | 0 |
 | 11 | `gnome` | 1 | 0 | 1 | 1 | 2 | 1 | 1 | 2 | 2 | 3 | 1 | 0 | 1 | 1 | 1 | 0 | 0 |
 | 12 | `orc` | 2 | 0 | 1 | 3 | 1 | 2 | 2 | 2 | 1 | 1 | 1 | 2 | 2 | 2 | 1 | 0 | 0 |
@@ -2270,8 +2271,8 @@ Hot desert, Thorn scrub, Savanna, Tropical dry forest, Tropical rain forest, Man
 
 The other 23 races have none.
 
-**`common`.** 3 to 5 for the human races, 2 for four of the classic races and 1 for
-the Gnomes. A new race has 1 when it has a homeland of its own and 0.5 when it lives
+**`common`.** 3 to 5 for the human races, 2 for Elves, Halflings and Orcs, 2.3 for the
+Dwarves and 1 for the Gnomes. A new race has 1 when it has a homeland of its own and 0.5 when it lives
 scattered among others or is rare by its nature. The human races sum to 27, against 10
 for the single `human` of the earlier default list.
 
@@ -2306,7 +2307,7 @@ races.
 | 6 | Rainkeepers | Human | 7.43 % | 7.54 % | 45 % | 39.1 % | 3 | 60 |
 | 7 | Canal folk | Human | 11.97 % | 21.93 % | 90 % | 88.8 % | 340 | 90 |
 | 8 | Elves | Classic | 3.04 % | 0.65 % | 10 % | 1.7 % | 0 | 22 |
-| 9 | Dwarves | Classic | 1.46 % | 0.36 % | 8 % | 0.2 % | 0 | 16 |
+| 9 | Dwarves | Classic | 1.67 % | 0.40 % | 9 % | 0.6 % | 0 | 16 |
 | 10 | Halflings | Classic | 5.50 % | 2.44 % | 20 % | 10.9 % | 0 | 45 |
 | 11 | Gnomes | Classic | 3.04 % | 0.72 % | 9 % | 0.0 % | 0 | 28 |
 | 12 | Orcs | Classic | 7.14 % | 6.23 % | 35 % | 26.7 % | 15 | 63 |
@@ -2326,6 +2327,14 @@ races.
 | 26 | Twofold | New | 1.57 % | 0.34 % | 8 % | 0.1 % | 0 | 17 |
 | 27 | Bitterbloods | New | 0.43 % | 0.29 % | 7 % | 0.0 % | 0 | 16 |
 | 28 | Catfolk | New | 3.45 % | 0.89 % | 10 % | 0.0 % | 0 | 32 |
+
+The row of the Dwarves is of 2026-11-20, measured on the same regions after their
+`common` went from 2 to 2.3 to make them about a tenth more numerous. It gave 11 % more
+Dwarves: a race of 96 regions for 89 and a main race in 6 for 2. A `common` of 2.2 gave
+5 % more and 2.25 gave 8 %: Dwarves are mostly a minority race, lifted to the same share
+whatever their frequency, so their number grows in steps, where they win one more place.
+The median of their row and the rows of the other races were not measured again; the
+other races lost 0.04 % of the persons between them.
 
 | Group | Plain share | Share of all persons | Seed `cellgen` | Seed `gameworld` | Seed `atlas` | Seed `ember` |
 |---|---|---|---|---|---|---|
@@ -2362,11 +2371,11 @@ What the numbers show:
   Rainkeepers share five of their six biomes with the Sunlanders, at an equal or lower
   frequency everywhere except Mangrove, which is 2 % of the land.
 - **Orcs are a main race in 27 % of the regions**, more often than Northmen and Grass
-  riders. They have a weight of 2 in six biomes and live in 13 of the 16. Halflings are
+  riders. They have a weight of 2 in six biomes and live in 13 of the 17 biomes. Halflings are
   a main race in 11 %. Both keep the weights of the earlier default list, where they
   stood against one human race with `common` 10.
-- **Elves, Dwarves and Gnomes are minority races.** They are a main race in 1.7 %, 0.2 %
-  and 0.0 % of the regions, and a race of the region in 10 %, 8 % and 9 %. By the plain
+- **Elves, Dwarves and Gnomes are minority races.** They are a main race in 1.7 %, 0.6 %
+  and 0.0 % of the regions, and a race of the region in 10 %, 9 % and 9 %. By the plain
   shares nearly every region has both elves and dwarves.
 - **Each new race is in 6 to 10 % of the regions**, always as a minority race or nearly so.
   Together the new races hold 6.1 % of the persons. Where a new race is present it

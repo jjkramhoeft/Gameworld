@@ -50,6 +50,7 @@ public static class BiomeFactors
     private static readonly BiomeFactorRow DryForest =   new(0.7,  1,    0.45, 0.6,  0.8,  0.35, 0.3,  0.2,  0.6,  1.3, 1.3);
     private static readonly BiomeFactorRow RainForest =  new(0.4,  1,    0.15, 0.6,  1,    0.35, 0.25, 0.15, 0.8,  2,   2.2);
     private static readonly BiomeFactorRow Mangrove =    new(0.3,  0.4,  0.1,  0.4,  0.5,  0,    0,    0.1,  0.3,  2,   3);
+    private static readonly BiomeFactorRow Volcano =     new(0.2,  0.2,  0,    0.1,  0,    0,    0,    0,    0.1,  1.5, 5);
 
     /// <summary>The row of a land biome.</summary>
     public static BiomeFactorRow Of(Biome biome) => biome switch
@@ -70,6 +71,7 @@ public static class BiomeFactors
         Biome.TropicalDryForest => DryForest,
         Biome.TropicalRainForest => RainForest,
         Biome.Mangrove => Mangrove,
+        Biome.Volcano => Volcano,
         _ => throw new ArgumentOutOfRangeException(nameof(biome)),
     };
 }

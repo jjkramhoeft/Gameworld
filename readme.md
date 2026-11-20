@@ -212,11 +212,11 @@ The actual height of the land of a region. It is calculated in the Elevated stag
 
 #### Biome
 
-The kind of nature of a land patch. It comes from the temperature of the patch (the Initial Temperature field cooled by the height) and its aridity (the precipitation relative to what the temperature demands). Mangrove is an override on warm, wet and low coasts.
+The kind of nature of a land patch. It comes from the temperature of the patch (the Initial Temperature field cooled by the height) and its aridity (the precipitation relative to what the temperature demands). Mangrove is an override on warm, wet and low coasts. Volcano is an override on rare patches of the mountains, whatever their climate: about one region in nine has one.
 
-Biomes will eventually be a fixed set of 10-20 predetermined biomes. The current set, not binding yet, is 15 land biomes and Mangrove:
+Biomes will eventually be a fixed set of 10-20 predetermined biomes. The current set, not binding yet, is 15 land biomes and the two overrides, Mangrove and Volcano:
 
-Ice & snow, Tundra, Cold steppe, Boreal forest, Cold desert, Temperate grassland, Woodland & shrubland, Temperate mixed forest, Temperate broadleaf forest, Temperate rain forest, Hot desert, Thorn scrub, Savanna, Tropical dry forest, Tropical rain forest, Mangrove
+Ice & snow, Tundra, Cold steppe, Boreal forest, Cold desert, Temperate grassland, Woodland & shrubland, Temperate mixed forest, Temperate broadleaf forest, Temperate rain forest, Hot desert, Thorn scrub, Savanna, Tropical dry forest, Tropical rain forest, Mangrove, Volcano
 
 #### Flora and fauna
 
