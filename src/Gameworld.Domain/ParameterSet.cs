@@ -785,6 +785,12 @@ public sealed record RaceParameters(
     [Description("How much the race leans to each type of faction, 0 to 3: 3 for the kind of group it forms first, 0 for a kind it never forms. It weighs the race in the draws for the type and the lead race of a faction. Left out, the race leans to every type alike (society §4.4).")]
     public PerFactionType<double> FactionLeaning { get; init; } = new(1, 1, 1, 1, 1, 1);
 
+    [Description("The ids of the other races this race appreciates: peoples it trades with, lives well beside or looks up to. One-directional: the other race need not appreciate it back. Every id must be another race of the list, and no id may also stand in HatedRaces. Left out, the race appreciates no race in particular. No generation rule reads it yet; it is meant for the factions of a region (society §2).")]
+    public IReadOnlyList<string> AppreciatedRaces { get; init; } = [];
+
+    [Description("The ids of the other races this race hates: peoples it fears, fights or holds a grudge against. One-directional: the other race need not hate it back. Every id must be another race of the list, and no id may also stand in AppreciatedRaces. Left out, the race hates no race in particular. No generation rule reads it yet; it is meant for the factions of a region (society §2).")]
+    public IReadOnlyList<string> HatedRaces { get; init; } = [];
+
     /// <summary>
     /// The leaning of each default race to each type of faction (society-generation.md
     /// Appendix A), from the "Factions" line of its entry in races-basis.md.
@@ -820,6 +826,43 @@ public sealed record RaceParameters(
         ["twofold"] = new(3, 1, 1, 2, 1, 1),
         ["bitterbloods"] = new(1, 2, 3, 1, 2, 2),
         ["catfolk"] = new(1, 2, 2, 2, 1, 1),
+    };
+
+    /// <summary>
+    /// The races each default race appreciates and hates (society-generation.md Appendix A),
+    /// from the "Relations" part of its entry in races-basis.md. A first assignment.
+    /// </summary>
+    private static readonly Dictionary<string, (string[] Appreciated, string[] Hated)> DefaultRelations = new()
+    {
+        //               appreciated, hated
+        ["northmen"] = (["dwarf", "hoarkin", "widegaze"], ["elf", "hearthbloods"]),
+        ["midlanders"] = (["halfling", "dwarf", "gnome", "flinchless", "catfolk"], ["northmen", "grassRiders", "elf"]),
+        ["saltroadFolk"] = (["sunlanders", "duskreaders", "lanternkin", "noonfolk", "catfolk"], ["grassRiders", "orc"]),
+        ["sunlanders"] = (["saltroadFolk", "noonfolk", "boughwalkers", "twofold", "catfolk"], ["orc", "brinefolk"]),
+        ["grassRiders"] = (["widegaze", "brinefolk"], ["orc", "canalFolk", "saltroadFolk"]),
+        ["rainkeepers"] = (["boughwalkers", "saltroadFolk", "shoalfolk", "catfolk"], ["canalFolk", "twofold"]),
+        ["canalFolk"] = (["lanternkin", "gnome", "dwarf", "catfolk"], ["grassRiders", "elf", "shoalfolk"]),
+        ["elf"] = (["halfling", "swiftborn", "amberbloods"], ["midlanders", "canalFolk", "dwarf"]),
+        ["dwarf"] = (["gnome", "hearthbloods", "northmen", "midlanders"], ["orc", "elf", "amberbloods"]),
+        ["halfling"] = (["midlanders", "elf", "gnome", "swiftborn", "catfolk"], ["orc", "grassRiders"]),
+        ["gnome"] = (["dwarf", "halfling", "lanternkin", "swiftborn"], ["orc"]),
+        ["orc"] = (["widegaze", "sunlanders", "flinchless"], ["dwarf", "catfolk", "grassRiders"]),
+        ["hoarkin"] = (["northmen"], ["hearthbloods"]),
+        ["hearthbloods"] = (["dwarf", "northmen", "midlanders"], ["hoarkin"]),
+        ["widegaze"] = (["grassRiders", "orc", "northmen"], ["catfolk"]),
+        ["amberbloods"] = (["elf", "stillfaces"], ["dwarf", "midlanders", "hearthbloods"]),
+        ["brinefolk"] = (["saltroadFolk", "grassRiders", "shoalfolk"], ["canalFolk"]),
+        ["duskreaders"] = (["noonfolk", "saltroadFolk"], ["midlanders", "catfolk"]),
+        ["noonfolk"] = (["duskreaders", "sunlanders", "catfolk", "swiftborn", "flinchless"], ["midlanders", "northmen"]),
+        ["boughwalkers"] = (["rainkeepers", "sunlanders", "shoalfolk"], ["bitterbloods"]),
+        ["shoalfolk"] = (["boughwalkers", "brinefolk", "northmen"], ["canalFolk", "bitterbloods"]),
+        ["swiftborn"] = (["elf", "gnome", "halfling", "noonfolk", "flinchless", "bitterbloods"], ["midlanders"]),
+        ["flinchless"] = (["midlanders", "noonfolk", "swiftborn", "bitterbloods"], ["orc"]),
+        ["lanternkin"] = (["gnome", "canalFolk", "saltroadFolk"], ["midlanders"]),
+        ["stillfaces"] = (["amberbloods", "catfolk"], ["bitterbloods"]),
+        ["twofold"] = (["sunlanders", "rainkeepers"], ["canalFolk"]),
+        ["bitterbloods"] = (["noonfolk", "swiftborn", "flinchless"], ["stillfaces"]),
+        ["catfolk"] = (["halfling", "noonfolk", "sunlanders", "stillfaces", "midlanders"], ["orc", "duskreaders"]),
     };
 
     /// <summary>The height modifier of a race that only lives from a height and up.</summary>
@@ -878,6 +921,8 @@ public sealed record RaceParameters(
             common * habitat[12], common * habitat[13], common * habitat[14], common * habitat[15]))
             {
                 FactionLeaning = DefaultLeanings[id],
+                AppreciatedRaces = DefaultRelations[id].Appreciated,
+                HatedRaces = DefaultRelations[id].Hated,
             };
 }
 

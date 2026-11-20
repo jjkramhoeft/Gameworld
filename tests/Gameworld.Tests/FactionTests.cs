@@ -86,6 +86,42 @@ public class FactionTests
     }
 
     [Fact]
+    public void The_default_races_carry_the_appreciated_and_hated_races_of_the_appendix()
+    {
+        var races = ParameterSet.Default.Races.ToDictionary(r => r.Id);
+        Assert.Equal(["halfling", "dwarf", "gnome", "flinchless", "catfolk"], races["midlanders"].AppreciatedRaces);
+        Assert.Equal(["northmen", "grassRiders", "elf"], races["midlanders"].HatedRaces);
+        Assert.Equal(["northmen"], races["hoarkin"].AppreciatedRaces);
+        Assert.Equal(["hearthbloods"], races["hoarkin"].HatedRaces);
+        foreach (var race in races.Values)
+        {
+            // Every default race appreciates and hates some race, each another race of the list, and none in both.
+            Assert.NotEmpty(race.AppreciatedRaces);
+            Assert.NotEmpty(race.HatedRaces);
+            Assert.All(race.AppreciatedRaces.Concat(race.HatedRaces), id => Assert.True(races.ContainsKey(id) && id != race.Id, $"{race.Id}: {id}"));
+            Assert.Empty(race.AppreciatedRaces.Intersect(race.HatedRaces));
+            Assert.Equal(race.AppreciatedRaces.Count, race.AppreciatedRaces.Distinct().Count());
+            Assert.Equal(race.HatedRaces.Count, race.HatedRaces.Distinct().Count());
+        }
+        _ = new PopulationRules(ParameterSet.Default); // the default list passes the check of the lists
+
+        // A race that says nothing has empty lists, and the lists are read back from a file.
+        var plain = new RaceParameters("x", "X", true, Everywhere(1));
+        Assert.Empty(plain.AppreciatedRaces);
+        Assert.Empty(plain.HatedRaces);
+        var read = ParameterSet.FromJson(ParameterSet.Default.ToJson());
+        Assert.Equal(races["elf"].AppreciatedRaces, read.Races.Single(r => r.Id == "elf").AppreciatedRaces);
+        Assert.Equal(races["elf"].HatedRaces, read.Races.Single(r => r.Id == "elf").HatedRaces);
+
+        // A race that lists itself, an unknown race, or one race in both lists is refused.
+        var other = new RaceParameters("y", "Y", true, Everywhere(1));
+        Assert.Throws<ArgumentException>(() => new PopulationRules(With(null, plain with { HatedRaces = ["x"] }, other)));
+        Assert.Throws<ArgumentException>(() => new PopulationRules(With(null, plain with { AppreciatedRaces = ["z"] }, other)));
+        Assert.Throws<ArgumentException>(() => new PopulationRules(With(null, plain with { AppreciatedRaces = ["y"], HatedRaces = ["y"] }, other)));
+        _ = new PopulationRules(With(null, plain with { AppreciatedRaces = ["y"] }, other with { HatedRaces = ["x"], Enabled = false }));
+    }
+
+    [Fact]
     public void The_kinds_of_lesser_faction_gather_vocations_of_the_default_list()
     {
         var vocations = ParameterSet.Default.Vocations.Select(v => v.Id).ToHashSet();

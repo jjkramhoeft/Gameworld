@@ -110,6 +110,15 @@ expected to change late in phase 2, so a race is added or changed by editing the
   the race forms first, 0 for a kind it never forms. It weighs the race in the draws for
   the type and the lead race of a faction (section 4.4). A race without a leaning leans to
   every type alike, with 1.
+- A list of the **races it appreciates** and a list of the **races it hates**: the ids of
+  other races. To appreciate is to trade with a people, live well beside it or look up to
+  it. To hate is to fear it, fight it or hold a grudge against it. The lists run one way:
+  the Midlanders appreciate the Halflings whether or not the Halflings appreciate them. An
+  id in a list must be another race of the Parameter Set, and no race stands in both lists
+  of one race. A Parameter Set that breaks this is refused when the world is created. A
+  race that is off can still be listed. A race without the lists appreciates and hates no
+  race in particular. No rule reads the lists yet: they are meant for the factions of a
+  region (section 4).
 
 In a Parameter Set file a race lists only the biomes it lives in. A biome that is left out
 has the frequency 0, and a frequency of 0 is not written to the file. A race without a
@@ -120,6 +129,7 @@ height modifier does not carry one in the file.
 | Races | 28, all on (Appendix A) |
 | Height modifiers | Elves, Dwarves, Hearthbloods, Widegaze and Shoalfolk (Appendix A) |
 | Leanings to the types of faction | One row per race (Appendix A) |
+| Appreciated and hated races | Two lists per race (Appendix A) |
 
 The default list was decided on 2026-11-15. It holds:
 
@@ -1084,6 +1094,44 @@ races-basis.md, and they are starting values.
 | Twofold | 3 | 1 | 1 | 2 | 1 | 1 | A house and its chain, a temple of the Pair |
 | Bitterbloods | 1 | 2 | 3 | 1 | 2 | 2 | A swamp village, an apothecaries' house, a school of poisoners |
 | Catfolk | 1 | 2 | 2 | 2 | 1 | 1 | A granary ward, a hunting band, a temple of the Small Huntress |
+
+**The races a race appreciates and hates.** Two lists of other races per race (section 2).
+They are read from the "Relations" part of each entry of races-basis.md, and they are a
+first assignment: starting values, like the leanings. "Hates" gathers fear, rivalry and an
+old grudge. Where the lore is silent or only hints, the reading is marked as judgement.
+The lists run one way. Orcs are hated by the most races (8), then Canal folk (6). Catfolk are
+appreciated by the most (8).
+
+| Race | Appreciates | Hates | Read from |
+|---|---|---|---|
+| Northmen | Dwarves, Hoarkin, Widegaze | Elves, Hearthbloods | Honours Dwarves as smiths, buys ivory from the Hoarkin, hires Widegaze lookouts. Elves make them uneasy, and hungry Hearthblood halls raid them |
+| Midlanders | Halflings, Dwarves, Gnomes, Flinchless, Catfolk | Northmen, Grass riders, Elves | Fed by the Halflings in the ash, dwarven iron, Gnomes and Flinchless in their towns, a Catfolk ward by the granary. Fears Northmen and Grass riders, and the Elves stand between the plough and the forest |
+| Saltroad folk | Sunlanders, Duskreaders, Lanternkin, Noonfolk, Catfolk | Grass riders, Orcs | The oldest partnership with the Sunlanders, Duskreader night guides, Lanternkin letters, Noonfolk grain, Catfolk scouts. Grass riders are rivals for the trade. Orcs raid the dry edge (judgement) |
+| Sunlanders | Saltroad folk, Noonfolk, Boughwalkers, Twofold, Catfolk | Orcs, Brinefolk | Partners in the gold trade, neighbours and trading partners of forest and grassland. Orcs raid the dry edge. The Brinefolk set the price of salt (judgement) |
+| Grass riders | Widegaze, Brinefolk | Orcs, Canal folk, Saltroad folk | The Widegaze are allies and lookouts, the Brinefolk sell salt for the herds. Orcs are rivals for the grass, the Canal folk build walls, the Saltroad folk are rivals for the trade |
+| Rainkeepers | Boughwalkers, Saltroad folk, Shoalfolk, Catfolk | Canal folk, Twofold | Boughwalker dyes, Saltroad carriers, Shoalfolk pearls, a Catfolk ward. Canal folk are rivals in trade, and the Twofold fit no rank of birth |
+| Canal folk | Lanternkin, Gnomes, Dwarves, Catfolk | Grass riders, Elves, Shoalfolk | Lanternkin notaries, Gnomes in their towns, dwarven iron, a Catfolk ward. The Grass riders are the danger the walls face, the Elves guard the forest, and the Shoalfolk pay no land tax and smuggle (judgement) |
+| Elves | Halflings, Swiftborn, Amberbloods | Midlanders, Canal folk, Dwarves | Fond of Halflings, drawn to the Swiftborn, kin of a prickly kind with the Amberbloods. The slow war with those who clear the forest, and the quarrel with the Dwarves over charcoal |
+| Dwarves | Gnomes, Hearthbloods, Northmen, Midlanders | Orcs, Elves, Amberbloods | Gnomes are cousins, Hearthbloods work the forges, Northmen and Midlanders buy the iron and grow the grain. Orcs fight them for the passes, and charcoal is a dispute with Elves and Amberbloods |
+| Halflings | Midlanders, Elves, Gnomes, Swiftborn, Catfolk | Orcs, Grass riders | Gets on with nearly everyone. Fears Orcs and Grass riders above all |
+| Gnomes | Dwarves, Halflings, Lanternkin, Swiftborn | Orcs | Dwarves are cousins, Halflings share the markets, Lanternkin are partners in banking, a Gnome holds a Swiftborn trust. The lore names no enemy: Orcs as raiders of a people that never fights (judgement) |
+| Orcs | Widegaze, Sunlanders, Flinchless | Dwarves, Catfolk, Grass riders | Keeps its treaties with the Widegaze, serves in the Sunlander empires, respects the other legion of the Old Realms (judgement). Fights Dwarves for the passes, competes with Catfolk for game and guard contracts and with Grass riders for the grass |
+| Hoarkin | Northmen | Hearthbloods | Trades with the Northmen. The Hearthbloods are their opposite, and a handshake hurts both |
+| Hearthbloods | Dwarves, Northmen, Midlanders | Hoarkin | Dwarves hire them and sell them grain, Northmen and Midlanders pay them as pass wardens. The Hoarkin are their opposite |
+| Widegaze | Grass riders, Orcs, Northmen | Catfolk | Allies of the Grass riders, treaties with the Orcs, hired by the Northmen. Their mothers were hunted by great cats (judgement) |
+| Amberbloods | Elves, Stillfaces | Dwarves, Midlanders, Hearthbloods | Shares the forest with the Elves, Stillfaces are quiet neighbours. Dwarven charcoal, the loggers and tappers of the old provinces, and a people of fire: resin burns (judgement) |
+| Brinefolk | Saltroad folk, Grass riders, Shoalfolk | Canal folk | The Saltroad folk carry the salt, the Grass riders buy it, the Shoalfolk share the salt-pan coasts. The Canal folk run a state monopoly of salt (judgement) |
+| Duskreaders | Noonfolk, Saltroad folk | Midlanders, Catfolk | The Day-and-Night Pact with the Noonfolk, hired by the Saltroad folk. The mobs of the fallen Realms, and the Catfolk as rivals for the night watch (judgement) |
+| Noonfolk | Duskreaders, Sunlanders, Catfolk, Swiftborn, Flinchless | Midlanders, Northmen | Those who guard their nights, and the other made races. The heirs of the Realm that claim them as property, and a people that keeps thralls (judgement) |
+| Boughwalkers | Rainkeepers, Sunlanders, Shoalfolk | Bitterbloods | Sells dyes to the Rainkeepers, trades at the root markets of the Sunlanders, rigs for the Shoalfolk. The Bitterbloods hold the floor beneath them |
+| Shoalfolk | Boughwalkers, Brinefolk, Northmen | Canal folk, Bitterbloods | Boughwalkers work their rigging, Brinefolk share the coasts, the cold-water branch deals with the Northmen. No ground, no lord: the officials of the Realm (judgement). Keeps out of the creeks of the Bitterbloods |
+| Swiftborn | Elves, Gnomes, Halflings, Noonfolk, Flinchless, Bitterbloods | Midlanders | An Elf or a Gnome as trustee, Halflings hire the harvest gangs, the other made races are kin. Human lords treat them as children and outwait them |
+| Flinchless | Midlanders, Noonfolk, Swiftborn, Bitterbloods | Orcs | Lives among the Midlanders, a fellowship of the made races. Orcs are the rival companies for hire (judgement) |
+| Lanternkin | Gnomes, Canal folk, Saltroad folk | Midlanders | Gnomes build the vaults, the Canal folk employ them, Saltroad merchants honour their letters. Lords who owe them money, hunt them or keep one as a living lamp |
+| Stillfaces | Amberbloods, Catfolk | Bitterbloods | Likes the resin smell of the Amberbloods and finds the Catfolk restful. Bitterbloods smell of every warning there is |
+| Twofold | Sunlanders, Rainkeepers | Canal folk | Trades with the Sunlanders and lives beside the Rainkeepers. The lore names no enemy: a people that registers every race in a named category (judgement) |
+| Bitterbloods | Noonfolk, Swiftborn, Flinchless | Stillfaces | The other made races are kin. Stillfaces shun them and are the poison finders of the courts (judgement) |
+| Catfolk | Halflings, Noonfolk, Sunlanders, Stillfaces, Midlanders | Orcs, Duskreaders | Wards and night watch of those who grow grain and herd. Orcs compete for game and contracts, and a people behind masks to one that has no use for a straight face (judgement) |
 
 **How common.** `common` is 3 to 5 for the human races, 2 for Elves, Dwarves, Halflings
 and Orcs, 1 for Gnomes, and 1 or 0.5 for a new race: 1 when it has a homeland of its own,

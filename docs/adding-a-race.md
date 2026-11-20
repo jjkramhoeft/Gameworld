@@ -17,7 +17,7 @@ that exist are not touched.
 
 ## 1. Decide what the race is
 
-A race is six things:
+A race is eight things:
 
 | Field | What to decide |
 |---|---|
@@ -27,6 +27,8 @@ A race is six things:
 | `BiomeFrequency` | How frequent the race is in each of the 16 biomes, relative to the other races. |
 | `HeightModifier` | Optional. How the height of the land changes the frequency. Leave it out when the height does not matter to the race. |
 | `FactionLeaning` | Optional. How much the race leans to each of the six types of faction, 0 to 3. Leave it out and the race leans to every type alike, with 1. |
+| `AppreciatedRaces` | Optional. The ids of the other races the race appreciates. |
+| `HatedRaces` | Optional. The ids of the other races the race hates. |
 
 **The frequencies.** By the plain shares, the races that are on share a patch in proportion
 to their frequency in its biome. Only the proportions between the races within one biome
@@ -136,6 +138,14 @@ race when the type and the lead race of a faction are drawn
 (society-generation.md section 4.4). A race that leans 3 to Race and 0 to Place is a people
 under its chiefs wherever it leads, and never a free town.
 
+**The appreciated and the hated races.** Two lists of ids of other races. To appreciate
+is to trade with a people, live well beside it or look up to it. To hate is to fear it,
+fight it or hold a grudge against it. The lists run one way, so decide both directions:
+whom the new race appreciates and hates, and which of the other races should list the new
+race. Read them from the relations of the race, as the default list does from the
+"Relations" part of races-basis.md. No generation rule reads the lists yet. They are meant
+for the factions of a region.
+
 **What a new race does to the world.** Adding a race, or toggling one on, does not change
 how many persons the land could feed. It changes how the land is shared: the new race takes
 its share from the races already there. The one exception is land where nobody lived before.
@@ -179,7 +189,9 @@ minority place once in every 29 regions.
        { "HeightM": 100, "Factor": 0 },
        { "HeightM": 300, "Factor": 1 }
      ],
-     "FactionLeaning": { "Family": 1, "Race": 3, "Vocation": 1, "Belief": 2, "Magic": 2, "Place": 1 }
+     "FactionLeaning": { "Family": 1, "Race": 3, "Vocation": 1, "Belief": 2, "Magic": 2, "Place": 1 },
+     "AppreciatedRaces": ["elf", "stillfaces"],
+     "HatedRaces": ["orc"]
    }
    ```
 
@@ -206,7 +218,10 @@ minority place once in every 29 regions.
    from 1,000 m and up has 1.4 % of the land, and no patch lies above 2,000 m.
 
 A Parameter Set with a race without an id, or with the same id twice, is refused when the
-world is created.
+world is created. So is one where a race lists itself, an id that is not in the `Races`
+list, or the same race as both appreciated and hated. Taking a race out of the list
+therefore means taking its id out of the lists of the other races. Toggling it off does
+not.
 
 ## 3. Add the race to the default list
 
@@ -214,10 +229,10 @@ Do step 2 first and look at the numbers. Then change these together:
 
 | Where | What |
 |---|---|
-| [src/Gameworld.Domain/ParameterSet.cs](../src/Gameworld.Domain/ParameterSet.cs) | Add a `Make(...)` line to `RaceParameters.Defaults`: id, name, `common`, then the 16 habitat weights in the order of the column header. Every race of the default list is on. Add `with { HeightModifier = ... }` for a height modifier; `OnlyFrom` and `OnlyBelow` make the two steps. Add the race to `DefaultLeanings` in the same record: its leaning to the six types of faction. A default race without an entry there fails when the list is built. |
+| [src/Gameworld.Domain/ParameterSet.cs](../src/Gameworld.Domain/ParameterSet.cs) | Add a `Make(...)` line to `RaceParameters.Defaults`: id, name, `common`, then the 16 habitat weights in the order of the column header. Every race of the default list is on. Add `with { HeightModifier = ... }` for a height modifier; `OnlyFrom` and `OnlyBelow` make the two steps. Add the race to `DefaultLeanings` in the same record: its leaning to the six types of faction. Add it to `DefaultRelations` too: the races it appreciates and hates, and add its id to the lists of the races that appreciate or hate it. A default race without an entry in either fails when the list is built. |
 | [default-parameter-set.json](default-parameter-set.json) | Add the same entry to `Races`, at the same place in the list, with the frequencies multiplied out. A test checks that this file equals `ParameterSet.Default`. |
 | [society-generation.md](society-generation.md) section 2 | Update the count in the parameter table ("28, all on") and the list of names below it. |
-| [society-generation.md](society-generation.md) Appendix A | Add the row to the table. Update the height modifier table and the note below it ("The other 23 races have none"). Add the row to the table of leanings. |
+| [society-generation.md](society-generation.md) Appendix A | Add the row to the table. Update the height modifier table and the note below it ("The other 23 races have none"). Add the row to the table of leanings and to the table of appreciated and hated races, and the name to the rows of the races that list it. |
 | [races-basis.md](races-basis.md) | Add the entry of the race, its row in the list and in the habitat table, and the counts at the top. |
 | [readme.md](../readme.md), Race | Update the count ("The default list holds 28 races") and the groups. |
 | [map-generation-research.md](map-generation-research.md) section 10.7 | Update the count of 28 and say where the weights of the new race come from. |

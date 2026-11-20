@@ -2369,6 +2369,20 @@
               "Place"
             ],
             "additionalProperties": false
+          },
+          "AppreciatedRaces": {
+            "description": "The ids of the other races this race appreciates: peoples it trades with, lives well beside or looks up to. One-directional: the other race need not appreciate it back. Every id must be another race of the list, and no id may also stand in HatedRaces. Left out, the race appreciates no race in particular. No generation rule reads it yet; it is meant for the factions of a region (society §2).",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "HatedRaces": {
+            "description": "The ids of the other races this race hates: peoples it fears, fights or holds a grudge against. One-directional: the other race need not hate it back. Every id must be another race of the list, and no id may also stand in AppreciatedRaces. Left out, the race hates no race in particular. No generation rule reads it yet; it is meant for the factions of a region (society §2).",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [

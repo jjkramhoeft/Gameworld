@@ -588,7 +588,16 @@
         "Belief": 1,
         "Magic": 1,
         "Place": 3
-      }
+      },
+      "AppreciatedRaces": [
+        "dwarf",
+        "hoarkin",
+        "widegaze"
+      ],
+      "HatedRaces": [
+        "elf",
+        "hearthbloods"
+      ]
     },
     {
       "Id": "midlanders",
@@ -610,7 +619,19 @@
         "Belief": 2,
         "Magic": 1,
         "Place": 2
-      }
+      },
+      "AppreciatedRaces": [
+        "halfling",
+        "dwarf",
+        "gnome",
+        "flinchless",
+        "catfolk"
+      ],
+      "HatedRaces": [
+        "northmen",
+        "grassRiders",
+        "elf"
+      ]
     },
     {
       "Id": "saltroadFolk",
@@ -632,7 +653,18 @@
         "Belief": 2,
         "Magic": 1,
         "Place": 1
-      }
+      },
+      "AppreciatedRaces": [
+        "sunlanders",
+        "duskreaders",
+        "lanternkin",
+        "noonfolk",
+        "catfolk"
+      ],
+      "HatedRaces": [
+        "grassRiders",
+        "orc"
+      ]
     },
     {
       "Id": "sunlanders",
@@ -653,7 +685,18 @@
         "Belief": 2,
         "Magic": 1,
         "Place": 2
-      }
+      },
+      "AppreciatedRaces": [
+        "saltroadFolk",
+        "noonfolk",
+        "boughwalkers",
+        "twofold",
+        "catfolk"
+      ],
+      "HatedRaces": [
+        "orc",
+        "brinefolk"
+      ]
     },
     {
       "Id": "grassRiders",
@@ -675,7 +718,16 @@
         "Belief": 1,
         "Magic": 1,
         "Place": 0
-      }
+      },
+      "AppreciatedRaces": [
+        "widegaze",
+        "brinefolk"
+      ],
+      "HatedRaces": [
+        "orc",
+        "canalFolk",
+        "saltroadFolk"
+      ]
     },
     {
       "Id": "rainkeepers",
@@ -696,7 +748,17 @@
         "Belief": 3,
         "Magic": 1,
         "Place": 2
-      }
+      },
+      "AppreciatedRaces": [
+        "boughwalkers",
+        "saltroadFolk",
+        "shoalfolk",
+        "catfolk"
+      ],
+      "HatedRaces": [
+        "canalFolk",
+        "twofold"
+      ]
     },
     {
       "Id": "canalFolk",
@@ -720,7 +782,18 @@
         "Belief": 1,
         "Magic": 1,
         "Place": 1
-      }
+      },
+      "AppreciatedRaces": [
+        "lanternkin",
+        "gnome",
+        "dwarf",
+        "catfolk"
+      ],
+      "HatedRaces": [
+        "grassRiders",
+        "elf",
+        "shoalfolk"
+      ]
     },
     {
       "Id": "elf",
@@ -753,7 +826,17 @@
         "Belief": 1,
         "Magic": 2,
         "Place": 1
-      }
+      },
+      "AppreciatedRaces": [
+        "halfling",
+        "swiftborn",
+        "amberbloods"
+      ],
+      "HatedRaces": [
+        "midlanders",
+        "canalFolk",
+        "dwarf"
+      ]
     },
     {
       "Id": "dwarf",
@@ -788,7 +871,18 @@
         "Belief": 1,
         "Magic": 1,
         "Place": 1
-      }
+      },
+      "AppreciatedRaces": [
+        "gnome",
+        "hearthbloods",
+        "northmen",
+        "midlanders"
+      ],
+      "HatedRaces": [
+        "orc",
+        "elf",
+        "amberbloods"
+      ]
     },
     {
       "Id": "halfling",
@@ -813,7 +907,18 @@
         "Belief": 1,
         "Magic": 0,
         "Place": 3
-      }
+      },
+      "AppreciatedRaces": [
+        "midlanders",
+        "elf",
+        "gnome",
+        "swiftborn",
+        "catfolk"
+      ],
+      "HatedRaces": [
+        "orc",
+        "grassRiders"
+      ]
     },
     {
       "Id": "gnome",
@@ -840,7 +945,16 @@
         "Belief": 1,
         "Magic": 2,
         "Place": 2
-      }
+      },
+      "AppreciatedRaces": [
+        "dwarf",
+        "halfling",
+        "lanternkin",
+        "swiftborn"
+      ],
+      "HatedRaces": [
+        "orc"
+      ]
     },
     {
       "Id": "orc",
@@ -868,7 +982,17 @@
         "Belief": 1,
         "Magic": 1,
         "Place": 0
-      }
+      },
+      "AppreciatedRaces": [
+        "widegaze",
+        "sunlanders",
+        "flinchless"
+      ],
+      "HatedRaces": [
+        "dwarf",
+        "catfolk",
+        "grassRiders"
+      ]
     },
     {
       "Id": "hoarkin",
@@ -886,7 +1010,13 @@
         "Belief": 1,
         "Magic": 1,
         "Place": 3
-      }
+      },
+      "AppreciatedRaces": [
+        "northmen"
+      ],
+      "HatedRaces": [
+        "hearthbloods"
+      ]
     },
     {
       "Id": "hearthbloods",
@@ -916,7 +1046,15 @@
         "Belief": 1,
         "Magic": 1,
         "Place": 2
-      }
+      },
+      "AppreciatedRaces": [
+        "dwarf",
+        "northmen",
+        "midlanders"
+      ],
+      "HatedRaces": [
+        "hoarkin"
+      ]
     },
     {
       "Id": "widegaze",
@@ -946,7 +1084,15 @@
         "Belief": 1,
         "Magic": 2,
         "Place": 2
-      }
+      },
+      "AppreciatedRaces": [
+        "grassRiders",
+        "orc",
+        "northmen"
+      ],
+      "HatedRaces": [
+        "catfolk"
+      ]
     },
     {
       "Id": "amberbloods",
@@ -965,7 +1111,16 @@
         "Belief": 2,
         "Magic": 1,
         "Place": 2
-      }
+      },
+      "AppreciatedRaces": [
+        "elf",
+        "stillfaces"
+      ],
+      "HatedRaces": [
+        "dwarf",
+        "midlanders",
+        "hearthbloods"
+      ]
     },
     {
       "Id": "brinefolk",
@@ -985,7 +1140,15 @@
         "Belief": 2,
         "Magic": 1,
         "Place": 2
-      }
+      },
+      "AppreciatedRaces": [
+        "saltroadFolk",
+        "grassRiders",
+        "shoalfolk"
+      ],
+      "HatedRaces": [
+        "canalFolk"
+      ]
     },
     {
       "Id": "duskreaders",
@@ -1004,7 +1167,15 @@
         "Belief": 1,
         "Magic": 2,
         "Place": 2
-      }
+      },
+      "AppreciatedRaces": [
+        "noonfolk",
+        "saltroadFolk"
+      ],
+      "HatedRaces": [
+        "midlanders",
+        "catfolk"
+      ]
     },
     {
       "Id": "noonfolk",
@@ -1025,7 +1196,18 @@
         "Belief": 2,
         "Magic": 1,
         "Place": 3
-      }
+      },
+      "AppreciatedRaces": [
+        "duskreaders",
+        "sunlanders",
+        "catfolk",
+        "swiftborn",
+        "flinchless"
+      ],
+      "HatedRaces": [
+        "midlanders",
+        "northmen"
+      ]
     },
     {
       "Id": "boughwalkers",
@@ -1044,7 +1226,15 @@
         "Belief": 1,
         "Magic": 1,
         "Place": 2
-      }
+      },
+      "AppreciatedRaces": [
+        "rainkeepers",
+        "sunlanders",
+        "shoalfolk"
+      ],
+      "HatedRaces": [
+        "bitterbloods"
+      ]
     },
     {
       "Id": "shoalfolk",
@@ -1075,7 +1265,16 @@
         "Belief": 1,
         "Magic": 1,
         "Place": 3
-      }
+      },
+      "AppreciatedRaces": [
+        "boughwalkers",
+        "brinefolk",
+        "northmen"
+      ],
+      "HatedRaces": [
+        "canalFolk",
+        "bitterbloods"
+      ]
     },
     {
       "Id": "swiftborn",
@@ -1096,7 +1295,18 @@
         "Belief": 1,
         "Magic": 1,
         "Place": 3
-      }
+      },
+      "AppreciatedRaces": [
+        "elf",
+        "gnome",
+        "halfling",
+        "noonfolk",
+        "flinchless",
+        "bitterbloods"
+      ],
+      "HatedRaces": [
+        "midlanders"
+      ]
     },
     {
       "Id": "flinchless",
@@ -1117,7 +1327,16 @@
         "Belief": 1,
         "Magic": 1,
         "Place": 1
-      }
+      },
+      "AppreciatedRaces": [
+        "midlanders",
+        "noonfolk",
+        "swiftborn",
+        "bitterbloods"
+      ],
+      "HatedRaces": [
+        "orc"
+      ]
     },
     {
       "Id": "lanternkin",
@@ -1141,7 +1360,15 @@
         "Belief": 1,
         "Magic": 2,
         "Place": 1
-      }
+      },
+      "AppreciatedRaces": [
+        "gnome",
+        "canalFolk",
+        "saltroadFolk"
+      ],
+      "HatedRaces": [
+        "midlanders"
+      ]
     },
     {
       "Id": "stillfaces",
@@ -1161,7 +1388,14 @@
         "Belief": 1,
         "Magic": 2,
         "Place": 1
-      }
+      },
+      "AppreciatedRaces": [
+        "amberbloods",
+        "catfolk"
+      ],
+      "HatedRaces": [
+        "bitterbloods"
+      ]
     },
     {
       "Id": "twofold",
@@ -1181,7 +1415,14 @@
         "Belief": 2,
         "Magic": 1,
         "Place": 1
-      }
+      },
+      "AppreciatedRaces": [
+        "sunlanders",
+        "rainkeepers"
+      ],
+      "HatedRaces": [
+        "canalFolk"
+      ]
     },
     {
       "Id": "bitterbloods",
@@ -1200,7 +1441,15 @@
         "Belief": 1,
         "Magic": 2,
         "Place": 2
-      }
+      },
+      "AppreciatedRaces": [
+        "noonfolk",
+        "swiftborn",
+        "flinchless"
+      ],
+      "HatedRaces": [
+        "stillfaces"
+      ]
     },
     {
       "Id": "catfolk",
@@ -1228,7 +1477,18 @@
         "Belief": 2,
         "Magic": 1,
         "Place": 1
-      }
+      },
+      "AppreciatedRaces": [
+        "halfling",
+        "noonfolk",
+        "sunlanders",
+        "stillfaces",
+        "midlanders"
+      ],
+      "HatedRaces": [
+        "orc",
+        "duskreaders"
+      ]
     }
   ],
   "Vocations": [

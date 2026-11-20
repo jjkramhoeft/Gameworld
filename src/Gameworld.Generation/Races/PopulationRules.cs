@@ -80,6 +80,21 @@ public sealed class PopulationRules
             if (!ids.Add(race.Id))
                 throw new ArgumentException($"The Parameter Set lists the race id \"{race.Id}\" more than once.", nameof(parameters));
         }
+        // The races a race appreciates and hates are other races of the list, and no race is in both.
+        foreach (var race in parameters.Races)
+        {
+            foreach (var (list, name) in new[] { (race.AppreciatedRaces, nameof(race.AppreciatedRaces)), (race.HatedRaces, nameof(race.HatedRaces)) })
+                foreach (var other in list ?? [])
+                {
+                    if (other == race.Id)
+                        throw new ArgumentException($"The race \"{race.Id}\" lists itself in {name}.", nameof(parameters));
+                    if (other is null || !ids.Contains(other))
+                        throw new ArgumentException($"The race \"{race.Id}\" lists \"{other}\" in {name}, which is not a race of the Parameter Set.", nameof(parameters));
+                }
+            var both = (race.AppreciatedRaces ?? []).Intersect(race.HatedRaces ?? [], StringComparer.Ordinal).FirstOrDefault();
+            if (both is not null)
+                throw new ArgumentException($"The race \"{race.Id}\" both appreciates and hates \"{both}\".", nameof(parameters));
+        }
         _races = parameters.Races.Where(r => r.Enabled).ToArray();
 
         // Sorted by height; points at the same height keep the order of the list (the sort is stable).
