@@ -467,6 +467,9 @@ public sealed record PlanningParameters
 
     [Description("The factions of a region: its ruling faction, its opposition and its lesser factions, from the races, the biomes, the resources and the wealth of the region (society §4).")]
     public FactionParameters Factions { get; init; } = new();
+
+    [Description("The name of a region: when a region is small or large to the region-name generator (society §4.10).")]
+    public RegionNameParameters Names { get; init; } = new();
 }
 
 public sealed record PopulationParameters
@@ -510,6 +513,18 @@ public sealed record PopulationParameters
     [Description("How much of the potential population of the whole region a city or a town draws on, beside the patch of its Prospect and the land patches around it, 0 to 1. It lets a race of the region that does not live nearby into the city or town (society §5.1).")]
     [Range(0, 1)]
     public double HinterlandShare { get; init; } = 0.02;
+}
+
+/// <summary>Parameters of the name of a region (society-generation.md section 4.10).</summary>
+public sealed record RegionNameParameters
+{
+    [Description("A region with fewer persons than this is small. When the lead race of its ruling faction is human, its name can end in Duchy, Province, Len or County. With the defaults about 1 region in 4 is small (society §4.10).")]
+    [Range(0, double.PositiveInfinity)]
+    public double SmallRegionPersons { get; init; } = 250;
+
+    [Description("A region with more persons than this is large. When the lead race of its ruling faction is human, its name can start with Gran, Grand or Great. With the defaults about 1 region in 5 is large (society §4.10).")]
+    [Range(0, double.PositiveInfinity)]
+    public double LargeRegionPersons { get; init; } = 500;
 }
 
 /// <summary>Parameters of the Settled stage: the cities and towns of a region (society-generation.md section 5.2).</summary>
@@ -822,6 +837,13 @@ public sealed record RaceParameters(
     [property: Description("Whether the race lives in the world. A race that is off gets no population, and the races that are on share the land without it.")] bool Enabled,
     [property: Description("How frequent the race is in each biome, relative to the other races. The potential population of a patch is shared between the races that are on in proportion to these numbers, so only the proportions between the races within one biome matter. List only the biomes the race lives in: a biome that is left out has the frequency 0, and a frequency of 0 is not written to the file. A negative number counts as 0 (society §3.2).")] PerBiome<double> BiomeFrequency)
 {
+    [Description("Whether the race is a human people. The name of a region is drawn from the word lists of the human races when the lead race of its ruling faction is human, and from the lists of the other races when it is not. Left out, the race is not human (society §2 and §4.10).")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool Human { get; init; }
+
+    [Description("Which name model the names of the race are drawn from: Common (British given names and surnames), Exotic (elven) or Dark (dark elven). The surname of a house that rules a region comes from the model of its lead race, and the names of the persons of the race are meant to. Left out, the race uses Common (society §2, §4.10 and §7).")]
+    public NameStyle NameStyle { get; init; } = NameStyle.Common;
+
     [Description("How the height of the land changes the frequency of the race: control points from the mean height of a patch to a factor on its biome frequencies. The factor runs in a straight line between two points and is constant beyond the first and the last. Two points at the same height make a step: the first holds below that height, the second from that height and up. So [200 → 0, 200 → 1] is a race that only lives from 200 m and up, and [200 → 1, 200 → 0] one that only lives below 200 m. Left out, the height does not matter to the race (society §3.2).")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public IReadOnlyList<HeightFactorPoint>? HeightModifier { get; init; }
@@ -948,6 +970,48 @@ public sealed record RaceParameters(
         ["catfolk"] = ["tan", "russet", "cream", "gold"],
     };
 
+    /// <summary>The human races of the default list (society-generation.md Appendix A): its first seven.</summary>
+    private static readonly HashSet<string> DefaultHumanRaces =
+        ["northmen", "midlanders", "saltroadFolk", "sunlanders", "grassRiders", "rainkeepers", "canalFolk"];
+
+    /// <summary>
+    /// The name style of each default race (society-generation.md Appendix A). A first
+    /// assignment: Common for the human races and the races that are their kin or live among
+    /// them, Exotic for the Elves and the races of the forest, the water and the gods, Dark for
+    /// the Orcs and the races of harsh land, night and poison.
+    /// </summary>
+    private static readonly Dictionary<string, NameStyle> DefaultNameStyles = new()
+    {
+        ["northmen"] = NameStyle.Common,
+        ["midlanders"] = NameStyle.Common,
+        ["saltroadFolk"] = NameStyle.Common,
+        ["sunlanders"] = NameStyle.Common,
+        ["grassRiders"] = NameStyle.Common,
+        ["rainkeepers"] = NameStyle.Common,
+        ["canalFolk"] = NameStyle.Common,
+        ["elf"] = NameStyle.Exotic,
+        ["dwarf"] = NameStyle.Common,
+        ["halfling"] = NameStyle.Common,
+        ["gnome"] = NameStyle.Common,
+        ["orc"] = NameStyle.Dark,
+        ["hoarkin"] = NameStyle.Common,
+        ["hearthbloods"] = NameStyle.Dark,
+        ["widegaze"] = NameStyle.Dark,
+        ["amberbloods"] = NameStyle.Exotic,
+        ["brinefolk"] = NameStyle.Dark,
+        ["duskreaders"] = NameStyle.Dark,
+        ["noonfolk"] = NameStyle.Exotic,
+        ["boughwalkers"] = NameStyle.Exotic,
+        ["shoalfolk"] = NameStyle.Exotic,
+        ["swiftborn"] = NameStyle.Common,
+        ["flinchless"] = NameStyle.Common,
+        ["lanternkin"] = NameStyle.Common,
+        ["stillfaces"] = NameStyle.Exotic,
+        ["twofold"] = NameStyle.Exotic,
+        ["bitterbloods"] = NameStyle.Dark,
+        ["catfolk"] = NameStyle.Exotic,
+    };
+
     /// <summary>The height modifier of a race that only lives from a height and up.</summary>
     public static IReadOnlyList<HeightFactorPoint> OnlyFrom(double heightM) => [new(heightM, 0), new(heightM, 1)];
 
@@ -1008,6 +1072,8 @@ public sealed record RaceParameters(
             F(0), F(1), F(2), F(3), F(4), F(5), F(6), F(7), F(8), F(9), F(10), F(11), F(12), F(13), F(14), F(15),
             habitat.Length == 17 ? F(16) : 0))
             {
+                Human = DefaultHumanRaces.Contains(id),
+                NameStyle = DefaultNameStyles[id],
                 FactionLeaning = DefaultLeanings[id],
                 AppreciatedRaces = DefaultRelations[id].Appreciated,
                 HatedRaces = DefaultRelations[id].Hated,

@@ -2,6 +2,7 @@ using Gameworld.Domain;
 using Gameworld.Generation.Biomes;
 using Gameworld.Generation.Cells;
 using Gameworld.Generation.Factions;
+using Gameworld.Generation.Names;
 using Gameworld.Generation.Races;
 using Gameworld.Generation.Resources;
 using Gameworld.Generation.Rivers;
@@ -37,6 +38,7 @@ public sealed partial class World
         BiomeRules = new BiomeRules(foundation.Parameters.Elevation.Biomes);
         PopulationRules = new PopulationRules(foundation.Parameters, foundation.Seed.Value);
         FactionRules = new FactionRules(foundation.Parameters, foundation.Seed.Value);
+        RegionNameRules = new RegionNameRules(foundation.Parameters, foundation.Seed.Value);
         SettlementRules = new SettlementRules(foundation.Parameters, PopulationRules);
         FloraFaunaRules = new FloraFaunaRules(foundation.Parameters);
     }
@@ -52,6 +54,7 @@ public sealed partial class World
     public BiomeRules BiomeRules { get; }
     public PopulationRules PopulationRules { get; }
     public FactionRules FactionRules { get; }
+    public RegionNameRules RegionNameRules { get; }
     public SettlementRules SettlementRules { get; }
     public FloraFaunaRules FloraFaunaRules { get; }
 

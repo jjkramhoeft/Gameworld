@@ -81,15 +81,18 @@ public sealed record PotentialPopulation(IReadOnlyList<RacePopulation> Races)
 
 /// <summary>
 /// What the Planned stage adds: the Prospects for cities and towns, the potential population
-/// per race, the races a city or a town on each Prospect holds, and the factions of the region.
+/// per race, the races a city or a town on each Prospect holds, the factions of the region and
+/// the name of the region.
 /// </summary>
 /// <param name="ProspectRaces">For each Prospect, in the order of <paramref name="Prospects"/>: the ids of the races of a city or a town on it, the largest first and the drawn one last. They are races of the region.</param>
 /// <param name="Factions">The factions of the region, by slot: the ruling faction, the opposition when there is one, then the lesser factions. Empty in a region without persons.</param>
+/// <param name="Name">The name of the region, from the region-name generator (society-generation.md section 4.10). Null in a region without a ruling faction.</param>
 public sealed record RegionPlan(
     IReadOnlyList<Prospect> Prospects,
     PotentialPopulation Population,
     IReadOnlyList<IReadOnlyList<string>> ProspectRaces,
-    IReadOnlyList<Faction> Factions)
+    IReadOnlyList<Faction> Factions,
+    string? Name = null)
 {
     /// <summary>The ruling faction; null in a region without persons.</summary>
     public Faction? Ruling => Factions.FirstOrDefault(f => f.Role == FactionRole.Ruling);

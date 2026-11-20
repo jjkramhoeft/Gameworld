@@ -17,13 +17,15 @@ that exist are not touched.
 
 ## 1. Decide what the race is
 
-A race is nine things:
+A race is eleven things:
 
 | Field | What to decide |
 |---|---|
 | `Id` | The id generated data knows the race by, in camelCase like `frostFolk`. It must be unique in the list. Keep it when the name changes. |
 | `Name` | The name shown for the race. |
 | `Enabled` | Whether the race lives in the world. A race that is off gets no population. |
+| `Human` | Optional. `true` for a human people. A region whose ruling faction it leads is then named from the word lists of the human races (society-generation.md section 4.10). Leave it out for any other race. |
+| `NameStyle` | Optional. Which name model the names of the race come from: `Common` (British), `Exotic` (elven) or `Dark` (dark elven). Leave it out and the race has `Common`. |
 | `BiomeFrequency` | How frequent the race is in each of the 17 biomes, relative to the other races. |
 | `HeightModifier` | Optional. How the height of the land changes the frequency. Leave it out when the height does not matter to the race. |
 | `FactionLeaning` | Optional. How much the race leans to each of the six types of faction, 0 to 3. Leave it out and the race leans to every type alike, with 1. |
@@ -196,6 +198,7 @@ minority place once in every 29 regions.
        "TemperateMixedForest": 6,
        "TemperateBroadleafForest": 4
      },
+     "NameStyle": "Exotic",
      "HeightModifier": [
        { "HeightM": 100, "Factor": 0 },
        { "HeightM": 300, "Factor": 1 }
@@ -242,10 +245,10 @@ Do step 2 first and look at the numbers. Then change these together:
 
 | Where | What |
 |---|---|
-| [src/Gameworld.Domain/ParameterSet.cs](../src/Gameworld.Domain/ParameterSet.cs) | Add a `Make(...)` line to `RaceParameters.Defaults`: id, name, `common`, then the 16 habitat weights in the order of the column header. The Volcano has no column: a seventeenth weight is the one on a Volcano, and without it the race has the frequency 0 there. Only the Dwarves have one. Every race of the default list is on. Add `with { HeightModifier = ... }` for a height modifier; `OnlyFrom` and `OnlyBelow` make the two steps. Add the race to `DefaultLeanings` in the same record: its leaning to the six types of faction. Add it to `DefaultRelations` too: the races it appreciates and hates, and add its id to the lists of the races that appreciate or hate it. Add it to `DefaultFavouriteColours`: its favourite colours. A default race without an entry in any of the three fails when the list is built. |
+| [src/Gameworld.Domain/ParameterSet.cs](../src/Gameworld.Domain/ParameterSet.cs) | Add a `Make(...)` line to `RaceParameters.Defaults`: id, name, `common`, then the 16 habitat weights in the order of the column header. The Volcano has no column: a seventeenth weight is the one on a Volcano, and without it the race has the frequency 0 there. Only the Dwarves have one. Every race of the default list is on. Add `with { HeightModifier = ... }` for a height modifier; `OnlyFrom` and `OnlyBelow` make the two steps. Add the race to `DefaultLeanings` in the same record: its leaning to the six types of faction. Add it to `DefaultRelations` too: the races it appreciates and hates, and add its id to the lists of the races that appreciate or hate it. Add it to `DefaultFavouriteColours`: its favourite colours. Add it to `DefaultNameStyles`: its name style. A default race without an entry in any of the four fails when the list is built. Add a human race to `DefaultHumanRaces` too. |
 | [default-parameter-set.json](default-parameter-set.json) | Add the same entry to `Races`, at the same place in the list, with the frequencies multiplied out. A test checks that this file equals `ParameterSet.Default`. |
 | [society-generation.md](society-generation.md) section 2 | Update the count in the parameter table ("28, all on") and the list of names below it. |
-| [society-generation.md](society-generation.md) Appendix A | Add the row to the table. Update the height modifier table and the note below it ("The other 23 races have none"). Add the row to the table of leanings and to the table of appreciated and hated races, and the name to the rows of the races that list it. Add the row to the table of favourite colours. |
+| [society-generation.md](society-generation.md) Appendix A | Add the row to the table. Update the height modifier table and the note below it ("The other 23 races have none"). Add the row to the table of leanings and to the table of appreciated and hated races, and the name to the rows of the races that list it. Add the row to the table of favourite colours, and the name to its row in the table of name styles. Update the counts of the name styles in section 2. |
 | [races-basis.md](races-basis.md) | Add the entry of the race, its row in the list and in the habitat table, and the counts at the top. |
 | [readme.md](../readme.md), Race | Update the count ("The default list holds 28 races") and the groups. |
 | [map-generation-research.md](map-generation-research.md) section 10.7 | Update the count of 28 and say where the weights of the new race come from. |
@@ -274,8 +277,11 @@ dotnet test -c Release
 
 ## What a race does not have yet
 
-- **Names.** The name generator has three styles (GB, elven and dark elven) and nothing
-  maps a race to a style. See [NameGenerator-Reuse.md](NameGenerator-Reuse.md).
+- **Names of its own.** The name generator has three styles (GB, elven and dark elven),
+  and a race picks one of them with `NameStyle`. A new name model needs a new style in the
+  code. See [NameGenerator-Reuse.md](NameGenerator-Reuse.md), "Making a new model". So far
+  only the surname of a house that rules a region is drawn from the style
+  (society-generation.md section 4.10).
 - **Families and persons.** How they get their race is not decided. A faction has a lead
   race (society-generation.md section 4).
 - **Its own density.** A race changes its share of the land, not the capacity of the land.

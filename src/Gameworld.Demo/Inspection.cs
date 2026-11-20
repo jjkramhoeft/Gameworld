@@ -105,7 +105,9 @@ internal sealed class Inspection
             RegionPopulation(land.LandKm2),
             Factions(),
             Reading(),
-            Settled());
+            Settled(),
+            _plan?.Naming?.Name,
+            _plan?.Naming?.RulingHouse);
     }
 
     private ProspectsInfo ProspectsOf(IEnumerable<int> slots, double? scoreSum)
@@ -467,6 +469,8 @@ public sealed record FieldValues(double InitialTemperatureC, double Precipitatio
 /// <param name="Factions">By slot: the ruling faction, the opposition when there is one, then the lesser factions. Null until the region is Planned.</param>
 /// <param name="Reading">How the factions read the region. Null until the region is Planned, and in a region without persons.</param>
 /// <param name="Settled">The cities and towns. Null until the region is Settled.</param>
+/// <param name="Name">The name of the region. Null until the region is Planned, and in a region without a ruling faction.</param>
+/// <param name="RulingHouse">The surname of the ruling house. Null when the ruling faction is not of the type Family.</param>
 public sealed record RegionInfo(
     RegionId Id,
     RegionStage Stage,
@@ -484,7 +488,9 @@ public sealed record RegionInfo(
     PopulationInfo? Population,
     FactionInfo[]? Factions,
     FactionReadingInfo? Reading,
-    SettledInfo? Settled);
+    SettledInfo? Settled,
+    string? Name,
+    string? RulingHouse);
 
 /// <summary>A zone, with what its patches hold together.</summary>
 /// <param name="Region">The region that owns the root cell of the zone.</param>

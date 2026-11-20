@@ -7,10 +7,10 @@ their looks. It is the specification of the society generation, as
 the concepts and holds the names, and the names in this document follow the readme.
 
 Only the first steps are specified and implemented: the races (section 2), the races of a
-region with their potential population (section 3), the factions of a region (section 4),
-the races of a city or a town (section 5.1) and the cities and towns of a region with
-their persons (section 5.2). The rest of sections 5 to 9 holds what is decided and what is
-still open. Detailing it is a later task.
+region with their potential population (section 3), the factions of a region (section 4)
+and its name (section 4.10), the races of a city or a town (section 5.1) and the cities
+and towns of a region with their persons (section 5.2). The rest of sections 5 to 9 holds
+what is decided and what is still open. Detailing it is a later task.
 
 Sections 2 and 3 and Appendix A were section 19 and Appendix E of map-generation.md until
 2026-11-15. The research notes cite them under those numbers.
@@ -43,6 +43,7 @@ and the travel network are its inputs.
 | Races | none: a list in the Parameter Set | Specified and implemented (section 2) |
 | The races of a region and its potential population | Planned | Specified and implemented (section 3) |
 | Factions | Planned | Specified and implemented (section 4): a ruling faction, an opposition and lesser factions per region |
+| The name of a region | Planned | Specified and implemented (section 4.10): from the region-name generator |
 | Cities and towns | Settled; their races Planned | Specified and implemented: the races of a city or a town (section 5.1), and which Prospects get one and how many persons live in each (section 5.2). Their names are not specified |
 | Families | Settled | Not specified (section 6) |
 | Persons | Settled for the important persons, later for the rest | The names are implemented, the rest is not specified (section 7) |
@@ -103,6 +104,14 @@ expected to change late in phase 2, so a race is added or changed by editing the
 - An **id** and a **name**. Generated data points at a race by its id. The ids must be
   given and unique. A Parameter Set that breaks this is refused when the world is created.
 - A **toggle**: the race is on or off. A race that is off does not live in the world.
+- Whether it is **human**: a human people or not. The name of a region is drawn from other
+  word lists when the lead race of its ruling faction is human (section 4.10). A race that
+  does not say so is not human.
+- A **name style**: which name model the names of the race are drawn from. There are
+  three: Common (British given names and surnames), Exotic (elven) and Dark (dark elven).
+  The surname of a house that rules a region comes from the model of its lead race
+  (section 4.10), and the names of the persons of the race are meant to (section 7). A
+  race that does not say so has the style Common.
 - A **frequency for each of the 17 biomes**: how frequent the race is in that biome,
   relative to the other races. 0 means the race does not live there.
 - A **height modifier**: a factor on the frequencies of the race that depends on the
@@ -134,6 +143,8 @@ height modifier does not carry one in the file.
 | Parameter | Default |
 |---|---|
 | Races | 28, all on (Appendix A) |
+| Human | The first seven races (Appendix A) |
+| Name styles | Common for 14 races, Exotic for 8, Dark for 6 (Appendix A) |
 | Height modifiers | Elves, Dwarves, Hearthbloods, Widegaze and Shoalfolk (Appendix A) |
 | Leanings to the types of faction | One row per race (Appendix A) |
 | Appreciated and hated races | Two lists per race (Appendix A) |
@@ -828,6 +839,143 @@ Open:
 - Whether the factions of neighbouring regions should be told apart too. That would read
   another region, which no rule of section 4 does.
 
+### 4.10 The name of the region
+
+Every region with a ruling faction has a **name**: "Western Watson Kingdom", "New Sumerian
+State", "Icag". It is the name of the realm of the ruling faction. The name is not
+authored. It comes from the region-name generator, as the name of a person comes from the
+name generator (section 7), so a region has its name as soon as it is Planned. A region
+without persons has no ruling faction and no name.
+
+The generator is a port of the region-name generator of an earlier project, in its
+corrected form. [RegionNameGenerator-Reuse.md](RegionNameGenerator-Reuse.md) describes the
+original, its defects and the corrections. The code is `src/Gameworld.Generation/Names`:
+`RegionNameGenerator` holds the word lists and the rules, and `RegionNameRules` what a
+region gives it.
+
+| Parameter | Default |
+|---|---|
+| Small region | Fewer than 250 persons |
+| Large region | More than 500 persons |
+| Human | A flag on each race: the seven human races (Appendix A) |
+| Name style | One per race (Appendix A) |
+
+The two limits are `Planning.Names` in the Parameter Set. The flag is `Human` on each
+race and the name style is `NameStyle`. The draws use the hash purposes 0x4b07 and 0x4b08.
+
+**What the generator is given.** Four facts of the region, and nothing from another region:
+
+| Input | Where it comes from |
+|---|---|
+| Human or not | The lead race of the ruling faction: whether it is human (section 2) |
+| Size | The potential population of the region (section 3.4): small below the small limit, large above the large limit, middling between |
+| Ruler | A ruling faction of the type Family is a house. A ruling faction of any other type is not |
+| Ruling house | The surname of the house, when a house rules |
+
+**The ruling house.** The surname comes from the name generator (section 7): from the
+surname model of the name style of the lead race (section 2). So a house of the Midlanders
+has a common surname, a house of the Elves an exotic one and a house of the Orcs a dark
+one. The draws use one sfc32 generator per region, seeded with `hash4(seed, 0x4b08, i, j)`. A
+surname of more than 12 characters is drawn again from the same generator, and the tenth
+surname is kept whatever its length.
+
+**The name.** A name is prefix + middle + suffix. The prefix and the suffix can be empty.
+Every word has a weight, and a word is drawn by weight from the lists that hold for the
+region. The lists with their weights are in `RegionNameGenerator`.
+
+| Part | List | Words |
+|---|---|---|
+| Prefix | every region | North, East, South, West, Northern, Eastern, Southern, Western |
+| | human | none, New, Neo-, United, Free |
+| | not human | none, Old |
+| | not human, with a suffix | none, Second, Third, Fourth, Fifth, Sixth |
+| | human and large, with a suffix | none, Gran, Grand, Great |
+| Middle | every region | none and 305 words: Abbasid, Khmer, Sokoto, Zimshath |
+| | human | 53 words: Roman, British, Ottoman, Zulu |
+| | not human | 29 words: Eternia, Florania, Ashanti, Xopfand |
+| Suffix | every region | Kingdom, Dynasty, Empire, Region, Nation |
+| | human | none, Republic, Alliance, State, Union, Territory |
+| | human and small | Duchy, Province, Len, County |
+| | not human | none, Ground, Sect, Land, land, Khaganate, Sultanate |
+
+The rules, in the order they are applied:
+
+1. The lists of the region are put together: the lists of every region, the lists of the
+   human races or of the others, and the small suffixes for a small human region.
+2. The suffix follows the ruler. Under a house there is no Republic, Alliance or Union.
+   Without a house there is no Kingdom, Dynasty, Empire, Duchy, County, Len, Khaganate or
+   Sultanate.
+3. The suffix is drawn, then the middle.
+4. A name with a suffix gets more prefixes to draw from: the ordinals for a region that is
+   not human, and Gran, Grand and Great for a large human region. Then the prefix is drawn.
+5. A prefix that starts with the same two letters as the suffix is dropped: no "United …
+   Union" and no "Second … Sect".
+6. In a name with a suffix, the surname of the ruling house takes the place of the middle
+   in three cases of six.
+7. The middle can be empty only between a prefix and a suffix: "North Kingdom". Otherwise
+   it is drawn again without the empty entry.
+8. The parts are joined, a double space becomes one and the ends are trimmed.
+
+- The draws use one sfc32 generator per region, seeded with `hash4(seed, 0x4b07, i, j)`.
+  It gives its numbers in this order: the suffix, the middle, the prefix, the ruling house
+  (only in a name with a suffix, where a house rules) and the second middle (only when the
+  first one may not be empty).
+- A draw takes `x = floor(u · total)`, the total being the sum of the weights. The lists
+  are walked in the order of rule 1, and the draw falls on the first word where the
+  running sum of the weights passes `x`.
+- Under a house a human region of middling size has a suffix in 21 cases of 36, so the
+  surname of its house is in 29 % of the names.
+
+**What differs from the original.**
+
+- It is the Corrected mode of the reuse doc: the draws are independent, every word has
+  exactly its weight, a large region gets the large prefixes and the middle is seldom
+  empty.
+- The numbers come from sfc32 and the hash of the region, not from the seeded random
+  generator of .NET. So a region does not get the name the earlier project gave a seed.
+- Rule 2 is new. The original knows nothing about the ruler.
+- The surname is used only where a house rules. In the original every region has a ruling
+  family.
+- The limits are 250 and 500 persons for 10,000 and 100,000: a region of this world holds
+  far fewer persons.
+- Ten misspelled words are corrected: Southen, Greath, Bazil, Brazillian, Ethioian, Italin,
+  Portugese, Selecuid and Xiognu, and Gran, which had no space after it. Portuguese,
+  Seleucid and Xiongnu now stand twice in the list, as Seljuk did, and are twice as likely.
+
+A test holds the reference names of the reuse doc: the lists and the rules give the names
+of the Corrected mode for the same seeds, apart from the corrected words.
+
+**Measured.** The generator on 324 regions (the 9 × 9 regions around (0, 0) of the seeds
+`cellgen`, `gameworld`, `atlas` and `north`), with the default Parameter Set. 323 of them
+have a ruling faction, and so a name.
+
+- The lead race of the ruling faction is human in 95 % of the regions.
+- 27 % of the regions are small and 22 % are large.
+- A house rules 42 % of the regions, and its surname is in the name of 12 %. Two of the
+  houses are of a race that is not human, both Orcish with a dark surname. Every other
+  surname is a common one.
+- 321 of the 323 names are different. The longest has 28 characters.
+
+Open:
+
+- The word lists are those of the earlier project. The middles hold real peoples, dynasties
+  and countries (Roman, British, Brazil, Israel) beside invented words and words that are
+  no name alone (Later, Central, Golden). Whether real names belong in this world is not
+  decided.
+- A race is human or not to the generator. Nothing in a name tells an Elven realm from an
+  Orcish one, apart from the surname of its house.
+- The suffix follows the house only. The other forms of a ruling faction (section 4.2) have
+  no words of their own: a Temple state can be a Nation or a State, and a Merchant republic
+  is not always a Republic.
+- Two regions can get the same name. Telling them apart would read another region, which
+  no rule of section 4 does.
+- The surname of the ruling house is not a fact of the Stub of the faction. The families
+  (section 6) must give the house that rules a region this surname.
+- The name styles of the default races are a first assignment (Appendix A), and there are
+  only three models: the seven human races share one.
+- The word lists as lists in the Parameter Set.
+- The names of cities and towns (section 5).
+
 ---
 
 ## 5. Cities and towns
@@ -843,8 +991,9 @@ for cities. A city or a town stands on every Prospect on show, and on no other.
 
 Open:
 
-- The names of cities and regions. [RegionNameGenerator-Reuse.md](RegionNameGenerator-Reuse.md)
-  describes the region-name generator of an earlier project. It has not been ported.
+- The names of cities and towns. A region has a name (section 4.10). The generator behind
+  it has a stub for city names that was never written
+  ([RegionNameGenerator-Reuse.md](RegionNameGenerator-Reuse.md), "Not covered").
 - What a city or a town holds beside its persons and their races: its families
   (section 6) and its vocations (section 8).
 - Whether a Prospect that is not on show gets a city or a town later, as play progresses.
@@ -1079,14 +1228,19 @@ family links, faction membership and home. The vocation can have a by-work besid
 
 **Names.** The name of a person is not authored. It comes from the name generator, so a
 person has a name already as a Stub. The generator is a character-level Markov chain with
-nine pregenerated models. The code is `src/Gameworld.Generation/Names`, and
-[NameGenerator-Reuse.md](NameGenerator-Reuse.md) describes it.
+nine pregenerated models: a male, a female and a surname model for each of the three name
+styles. The code is `src/Gameworld.Generation/Names`, and
+[NameGenerator-Reuse.md](NameGenerator-Reuse.md) describes it. A race has a name style
+(section 2), and the names of a person are meant to come from the models of the style of
+its race. No person is generated yet, so only the surname of the house that rules a region
+is drawn this way (section 4.10).
 
 Open:
 
 - Which persons of a region are important, and how many there are.
 - How age, sex, vocation, role, family links, faction membership and home are drawn.
-- Which name model a race uses.
+- How a person gets its race, and with it its name style.
+- More name models. The seven human races share the common one, which is British.
 
 ---
 
@@ -1287,7 +1441,8 @@ Open:
 
 The default list of races of the Parameter Set (section 2): 28 races, all on. The first
 seven are the human races, the next five the classic races and the last sixteen the new
-races. [races-basis.md](races-basis.md) describes each of them.
+races. The seven human races carry the flag `Human`, and no other race does.
+[races-basis.md](races-basis.md) describes each of them.
 
 The frequency of a race in a biome is its habitat weight in that biome times how common
 the race is:
@@ -1459,6 +1614,28 @@ reading is marked as judgement.
 | Bitterbloods | Sky blue, Yellow, Orange | The mottling worn with pride: sky blue, sulphur yellow, sometimes orange |
 | Catfolk | Tan, Russet, Cream, Gold | The colours of a cat's coat: sand, russet, cream, tawny gold |
 
+**Name styles.** The name style of each race (section 2). They are a first assignment, by
+judgement from the entries of races-basis.md: Common for the human races and the races
+that are their kin or live among them, Exotic for the Elves and the races of the forest,
+the water and the gods, Dark for the Orcs and the races of harsh land, night and poison.
+The earlier project gave the Elves the exotic names, the Orcs the dark ones and the
+Dwarves and Halflings the common ones, and that is kept.
+
+| Name style | Races | Read from |
+|---|---|---|
+| Common | Northmen, Midlanders, Saltroad folk, Sunlanders, Grass riders, Rainkeepers, Canal folk | The human races. The common model is the only human one |
+| | Dwarves, Halflings, Gnomes | As in the earlier project. Halflings are small cousins of the humans, and Gnomes are kin of the Dwarves |
+| | Hoarkin | Cousins of the humans who live beside the Northmen |
+| | Swiftborn, Flinchless, Lanternkin | Made or shaped in the realms of humans, and living in their provinces, legions and towns |
+| Exotic | Elves | As in the earlier project |
+| | Amberbloods, Boughwalkers, Stillfaces | Peoples of the forest: a compact with the old forest, the canopy of the rain forest, a speech of scent |
+| | Shoalfolk | A people of the shallows |
+| | Noonfolk, Twofold, Catfolk | Peoples of the sun and of the gods |
+| Dark | Orcs | As in the earlier project |
+| | Hearthbloods, Widegaze, Brinefolk | Peoples of harsh land: the tundra, the cold steppe, the cold desert |
+| | Duskreaders | A people of the night |
+| | Bitterbloods | A people of poison |
+
 **How common.** `common` is 3 to 5 for the human races, 2 for Elves, Halflings
 and Orcs, 2.3 for Dwarves, 1 for Gnomes, and 1 or 0.5 for a new race: 1 when it has a homeland of its own,
 0.5 when it lives scattered among others or is rare by its nature.
@@ -1493,4 +1670,4 @@ when it stands in sections 1 to 9.
 | [tools-basis.md](tools-basis.md) | 146 real tools for the 51 vocations, each with a sourced description, lore and the fitting vocations. Material: no rule reads it | Sections 8, 9 |
 | [research/portrait-components.md](research/portrait-components.md) | Lists of hairstyles, outfits, colours, race markers and accessories for portraits. Written for the 32 races of the first version of races-basis.md and extended for the Catfolk: it still covers the five that were left out | Section 9 |
 | [NameGenerator-Reuse.md](NameGenerator-Reuse.md) | The person-name generator, ported from an earlier project | Section 7 |
-| [RegionNameGenerator-Reuse.md](RegionNameGenerator-Reuse.md) | The region-name generator of the same project, not ported | Section 5 |
+| [RegionNameGenerator-Reuse.md](RegionNameGenerator-Reuse.md) | The region-name generator of the same project: the original, its defects and the corrected form that was ported | Section 4.10 |

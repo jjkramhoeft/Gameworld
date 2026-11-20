@@ -1863,6 +1863,25 @@
             }
           },
           "additionalProperties": false
+        },
+        "Names": {
+          "description": "The name of a region: when a region is small or large to the region-name generator (society §4.10).",
+          "type": "object",
+          "properties": {
+            "SmallRegionPersons": {
+              "description": "A region with fewer persons than this is small. When the lead race of its ruling faction is human, its name can end in Duchy, Province, Len or County. With the defaults about 1 region in 4 is small (society §4.10).",
+              "type": "number",
+              "minimum": 0,
+              "default": 250
+            },
+            "LargeRegionPersons": {
+              "description": "A region with more persons than this is large. When the lead race of its ruling faction is human, its name can start with Gran, Grand or Great. With the defaults about 1 region in 5 is large (society §4.10).",
+              "type": "number",
+              "minimum": 0,
+              "default": 500
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false
@@ -2368,6 +2387,18 @@
               }
             },
             "additionalProperties": false
+          },
+          "Human": {
+            "description": "Whether the race is a human people. The name of a region is drawn from the word lists of the human races when the lead race of its ruling faction is human, and from the lists of the other races when it is not. Left out, the race is not human (society §2 and §4.10).",
+            "type": "boolean"
+          },
+          "NameStyle": {
+            "description": "Which name model the names of the race are drawn from: Common (British given names and surnames), Exotic (elven) or Dark (dark elven). The surname of a house that rules a region comes from the model of its lead race, and the names of the persons of the race are meant to. Left out, the race uses Common (society §2, §4.10 and §7).",
+            "enum": [
+              "Common",
+              "Exotic",
+              "Dark"
+            ]
           },
           "HeightModifier": {
             "description": "How the height of the land changes the frequency of the race: control points from the mean height of a patch to a factor on its biome frequencies. The factor runs in a straight line between two points and is constant beyond the first and the last. Two points at the same height make a step: the first holds below that height, the second from that height and up. So [200 → 0, 200 → 1] is a race that only lives from 200 m and up, and [200 → 1, 200 → 0] one that only lives below 200 m. Left out, the height does not matter to the race (society §3.2).",

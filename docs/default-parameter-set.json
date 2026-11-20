@@ -376,6 +376,10 @@
           "High": 0.5
         }
       }
+    },
+    "Names": {
+      "SmallRegionPersons": 250,
+      "LargeRegionPersons": 500
     }
   },
   "Settlement": {
@@ -591,6 +595,8 @@
         "TemperateBroadleafForest": 3,
         "TemperateRainForest": 6
       },
+      "Human": true,
+      "NameStyle": "Common",
       "FactionLeaning": {
         "Family": 2,
         "Race": 1,
@@ -627,6 +633,8 @@
         "TemperateBroadleafForest": 15,
         "TemperateRainForest": 10
       },
+      "Human": true,
+      "NameStyle": "Common",
       "FactionLeaning": {
         "Family": 3,
         "Race": 1,
@@ -667,6 +675,8 @@
         "Savanna": 6,
         "TropicalDryForest": 3
       },
+      "Human": true,
+      "NameStyle": "Common",
       "FactionLeaning": {
         "Family": 2,
         "Race": 2,
@@ -704,6 +714,8 @@
         "TropicalRainForest": 8,
         "Mangrove": 4
       },
+      "Human": true,
+      "NameStyle": "Common",
       "FactionLeaning": {
         "Family": 3,
         "Race": 2,
@@ -743,6 +755,8 @@
         "WoodlandAndShrubland": 3,
         "HotDesert": 3
       },
+      "Human": true,
+      "NameStyle": "Common",
       "FactionLeaning": {
         "Family": 2,
         "Race": 3,
@@ -778,6 +792,8 @@
         "TropicalRainForest": 8,
         "Mangrove": 8
       },
+      "Human": true,
+      "NameStyle": "Common",
       "FactionLeaning": {
         "Family": 2,
         "Race": 1,
@@ -818,6 +834,8 @@
         "TropicalRainForest": 5,
         "Mangrove": 5
       },
+      "Human": true,
+      "NameStyle": "Common",
       "FactionLeaning": {
         "Family": 2,
         "Race": 1,
@@ -857,6 +875,7 @@
         "TropicalDryForest": 2,
         "TropicalRainForest": 4
       },
+      "NameStyle": "Exotic",
       "HeightModifier": [
         {
           "HeightM": 200,
@@ -909,6 +928,7 @@
         "TemperateRainForest": 2.3,
         "Volcano": 6.9
       },
+      "NameStyle": "Common",
       "HeightModifier": [
         {
           "HeightM": 200,
@@ -960,6 +980,7 @@
         "TropicalDryForest": 2,
         "TropicalRainForest": 2
       },
+      "NameStyle": "Common",
       "FactionLeaning": {
         "Family": 2,
         "Race": 1,
@@ -1003,6 +1024,7 @@
         "Savanna": 1,
         "TropicalDryForest": 1
       },
+      "NameStyle": "Common",
       "FactionLeaning": {
         "Family": 1,
         "Race": 1,
@@ -1045,6 +1067,7 @@
         "Savanna": 4,
         "TropicalDryForest": 2
       },
+      "NameStyle": "Dark",
       "FactionLeaning": {
         "Family": 1,
         "Race": 3,
@@ -1078,6 +1101,7 @@
         "Tundra": 2,
         "BorealForest": 1
       },
+      "NameStyle": "Common",
       "FactionLeaning": {
         "Family": 1,
         "Race": 2,
@@ -1109,6 +1133,7 @@
         "BorealForest": 1,
         "TemperateMixedForest": 0.5
       },
+      "NameStyle": "Dark",
       "HeightModifier": [
         {
           "HeightM": 100,
@@ -1152,6 +1177,7 @@
         "ThornScrub": 1,
         "Savanna": 2
       },
+      "NameStyle": "Dark",
       "HeightModifier": [
         {
           "HeightM": 300,
@@ -1194,6 +1220,7 @@
         "TemperateBroadleafForest": 2,
         "TemperateRainForest": 2
       },
+      "NameStyle": "Exotic",
       "FactionLeaning": {
         "Family": 1,
         "Race": 2,
@@ -1228,6 +1255,7 @@
         "ThornScrub": 1,
         "Mangrove": 1
       },
+      "NameStyle": "Dark",
       "FactionLeaning": {
         "Family": 1,
         "Race": 1,
@@ -1260,6 +1288,7 @@
         "ThornScrub": 2,
         "Savanna": 1
       },
+      "NameStyle": "Dark",
       "FactionLeaning": {
         "Family": 2,
         "Race": 1,
@@ -1294,6 +1323,7 @@
         "Savanna": 3,
         "TropicalDryForest": 1
       },
+      "NameStyle": "Exotic",
       "FactionLeaning": {
         "Family": 0,
         "Race": 1,
@@ -1329,6 +1359,7 @@
         "TropicalRainForest": 3,
         "Mangrove": 1
       },
+      "NameStyle": "Exotic",
       "FactionLeaning": {
         "Family": 2,
         "Race": 2,
@@ -1363,6 +1394,7 @@
         "TropicalRainForest": 1,
         "Mangrove": 3
       },
+      "NameStyle": "Exotic",
       "HeightModifier": [
         {
           "HeightM": 20,
@@ -1408,6 +1440,7 @@
         "ThornScrub": 1,
         "Savanna": 1
       },
+      "NameStyle": "Common",
       "FactionLeaning": {
         "Family": 0,
         "Race": 1,
@@ -1445,6 +1478,7 @@
         "TemperateBroadleafForest": 1,
         "Savanna": 0.5
       },
+      "NameStyle": "Common",
       "FactionLeaning": {
         "Family": 1,
         "Race": 1,
@@ -1483,6 +1517,7 @@
         "TropicalRainForest": 1,
         "Mangrove": 0.5
       },
+      "NameStyle": "Common",
       "FactionLeaning": {
         "Family": 1,
         "Race": 1,
@@ -1516,6 +1551,7 @@
         "TemperateBroadleafForest": 2,
         "TemperateRainForest": 1
       },
+      "NameStyle": "Exotic",
       "FactionLeaning": {
         "Family": 1,
         "Race": 2,
@@ -1548,6 +1584,7 @@
         "TropicalRainForest": 2,
         "Mangrove": 1
       },
+      "NameStyle": "Exotic",
       "FactionLeaning": {
         "Family": 3,
         "Race": 1,
@@ -1579,6 +1616,7 @@
         "TropicalRainForest": 1.5,
         "Mangrove": 1.5
       },
+      "NameStyle": "Dark",
       "FactionLeaning": {
         "Family": 1,
         "Race": 2,
@@ -1620,6 +1658,7 @@
         "TropicalRainForest": 2,
         "Mangrove": 1
       },
+      "NameStyle": "Exotic",
       "FactionLeaning": {
         "Family": 1,
         "Race": 2,

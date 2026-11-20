@@ -1,6 +1,7 @@
 using Gameworld.Domain;
 using Gameworld.Generation.Basics;
 using Gameworld.Generation.Factions;
+using Gameworld.Generation.Names;
 using Gameworld.Generation.Races;
 using Gameworld.Generation.Resources;
 
@@ -51,14 +52,17 @@ public sealed class PlanWork
     /// <summary>The factions of the region and how the region was read for them.</summary>
     public required FactionWork Factions { get; init; }
 
-    public RegionPlan ToDomain() => new(Prospects, Population, ProspectRaces, Factions.Factions);
+    /// <summary>The name of the region and what it was drawn from; null in a region without a ruling faction.</summary>
+    public required RegionNaming? Naming { get; init; }
+
+    public RegionPlan ToDomain() => new(Prospects, Population, ProspectRaces, Factions.Factions, Naming?.Name);
 }
 
 /// <summary>
 /// Prospects for cities and towns (map-generation.md section 15), the potential population
 /// (society-generation.md section 3), the races of a city or a town on each Prospect
-/// (society-generation.md section 5.1) and the factions of the region (society-generation.md
-/// section 4). The Prospects only read the estimated biomes and resources, so they never
+/// (society-generation.md section 5.1), the factions of the region (society-generation.md
+/// section 4) and its name (section 4.10). The Prospects only read the estimated biomes and resources, so they never
 /// depend on the height map. The potential population and the factions read the final form:
 /// the mean height of each patch and the biomes and resources calculated with it.
 /// </summary>
@@ -297,6 +301,10 @@ internal static class PlanBuilder
             races,
             seats);
 
+        // society-generation.md 4.10 The name of the region: from its ruling faction and its persons.
+        var naming = world.RegionNameRules.Name(
+            region, factions.Factions.FirstOrDefault(f => f.Role == FactionRole.Ruling), races.Population.Total);
+
         return new PlanWork
         {
             Region = region,
@@ -306,6 +314,7 @@ internal static class PlanBuilder
             ProspectRaces = prospectRaces,
             Places = seats,
             Factions = factions,
+            Naming = naming,
         };
     }
 

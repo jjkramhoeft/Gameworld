@@ -1,23 +1,14 @@
+using Gameworld.Domain;
 using Gameworld.Generation.Basics;
 
 namespace Gameworld.Generation.Names;
-
-/// <summary>Which trained "language" a name is drawn from. Maps to the file prefix.</summary>
-public enum NameStyle
-{
-    /// <summary>British given names and surnames (files: GB_*).</summary>
-    Common,
-    /// <summary>Elven (files: elven_*).</summary>
-    Exotic,
-    /// <summary>Dark elven (files: darkelve_*).</summary>
-    Dark,
-}
 
 public enum NameKind { Male, Female, Surname }
 
 /// <summary>
 /// The person-name generator (docs/NameGenerator-Reuse.md): nine pre-generated Markov models,
-/// one per <see cref="NameStyle"/> and <see cref="NameKind"/>. The models are the files of
+/// one per <see cref="NameStyle"/> and <see cref="NameKind"/>. The style maps to the file
+/// prefix, and a race says which style its names have. The models are the files of
 /// <c>pregenerated-data/</c>, embedded in this assembly. Immutable and safe to share.
 /// </summary>
 public sealed class NameGenerator

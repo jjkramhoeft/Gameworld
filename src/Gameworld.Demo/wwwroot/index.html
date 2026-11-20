@@ -793,7 +793,7 @@ function factionCard(f) {
 
 function regionSection(d) {
   const r = d.Region, l = r.Land, total = l.LandKm2 + l.OceanKm2, p = r.Prospects, pop = r.Population, t = r.Settled;
-  const tag = [r.Stage, r.HasSeaAccess ? 'sea access' : 'landlocked', `${km2(l.LandKm2)} km² land`].join(' · ');
+  const tag = [r.Name ? `<b>${esc(r.Name)}</b>` : null, r.Stage, r.HasSeaAccess ? 'sea access' : 'landlocked', `${km2(l.LandKm2)} km² land`].filter(Boolean).join(' · ');
   const body = stageBar(r) +
     tileRow([
       tile('Land', `${km2(l.LandKm2)} km²`, `${pct(total ? l.LandKm2 / total : 0)} land`),
@@ -820,7 +820,10 @@ function regionSection(d) {
     resourceGroup('r-resources', l, !l.LandPatches) +
     populationGroup('r-population', pop) +
     (r.Factions ? group('r-factions', 'Factions', r.Factions.length ? count(r.Factions.length, 'faction', 'factions') : 'none',
-      r.Factions.length ? r.Factions.map(factionCard).join('') : note('None: the region holds nobody.')) : '') +
+      r.Factions.length
+        ? (r.Name ? kv([['Region name', esc(r.Name)], ['Ruling house', r.RulingHouse ? esc(r.RulingHouse) : '<span class="muted">none: no house rules</span>']]) : '') +
+          r.Factions.map(factionCard).join('')
+        : note('None: the region holds nobody.')) : '') +
     (r.Reading ? group('r-reading', 'How the factions read the region', `tension ${num(r.Reading.Tension)}`,
       sub(`The terms of the tension (${num(r.Reading.Tension)} without its random part)`) + valueMeters(r.Reading.Terms) +
       sub('The fit of each type as the ruler') + valueMeters(r.Reading.Fits) +

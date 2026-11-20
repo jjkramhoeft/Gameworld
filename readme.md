@@ -44,7 +44,7 @@ The project is in phase 1.
 
 ### Status
 
-The map is generated through all its stages, from the cells to the travel network, with the flora and fauna of every patch. Of the society, the races of each region, their potential population, the factions of each region, the cities and towns of each region with their persons and races, and the person names are generated. The vocations are a list in the Parameter Set and are not drawn yet. Families and persons are defined below but not generated yet, and neither is there a database: the apps compute everything in memory.
+The map is generated through all its stages, from the cells to the travel network, with the flora and fauna of every patch. Of the society, the races of each region, their potential population, the factions of each region, the name of each region, the cities and towns of each region with their persons and races, and the person names are generated. The vocations are a list in the Parameter Set and are not drawn yet. Families and persons are defined below but not generated yet, and neither is there a database: the apps compute everything in memory.
 
 ## Concepts
 
@@ -62,6 +62,7 @@ Foundation = seed + generator version + Parameter Set
    └─ Society                           docs/society-generation.md
       ├─ Race                           six of them share the potential population of a region
       ├─ Faction                        a ruling faction per region, an opposition, lesser factions
+      ├─ Region name                    the realm of the ruling faction
       └─ City and Town, Family, Person with a vocation and looks
 ```
 
@@ -116,7 +117,7 @@ A region moves through the stages below, in the order of the table and one stage
 | Outlined | Zones linked, expanded and merged. Sea access | All regions within the link range + 5 rings Sited (7 rings at the defaults) |
 | Detailed | Patch mergers, rivers, lakes. Estimated biomes and resources | All bordering regions Outlined |
 | Elevated | Height map. Final biomes and resources | All bordering regions Detailed |
-| Planned | Factions and Prospects for cities and towns. The races of the region, their potential population and the races of a city or a town on each Prospect | The region Elevated |
+| Planned | Factions and Prospects for cities and towns. The races of the region, their potential population and the races of a city or a town on each Prospect. The name of the region | The region Elevated |
 | Settled | Travel network. Actual cities and towns, families and important persons | The region and all bordering regions Planned |
 
 Sited is not a state a region is in. It needs only the seed, so it is a pure function that can be calculated for any region at any time, and it is never persisted. Stored regions start at Outlined. The Sited row describes what the function yields.
@@ -250,7 +251,7 @@ The peoples that live on the map. The Stub of every entity in this group is deri
 
 A people that can live in the world: Northmen, Elves, Dwarves and so on. Races are needed to generate factions, families and persons. Race is the only level: a race has no sub-races, and each human people is a race of its own, so there is no plain human race.
 
-The races are a list in the Parameter Set, not a fixed set in the code. Each race has an id, a name, a toggle (on or off), a frequency for each biome, a height modifier, a leaning to each type of faction, two lists of other races (the races it appreciates and the races it hates) and a list of favourite colours. The default list holds 28 races, all on: seven human races (Northmen, Midlanders, Saltroad folk, Sunlanders, Grass riders, Rainkeepers, Canal folk), five classic races (Elves, Dwarves, Halflings, Gnomes, Orcs) and sixteen new near-human races (docs/society-generation.md Appendix A). A faction has a lead race. How a family or a person gets its race is not decided yet.
+The races are a list in the Parameter Set, not a fixed set in the code. Each race has an id, a name, a toggle (on or off), a mark for a human race, a name style (which of the three name models its names come from), a frequency for each biome, a height modifier, a leaning to each type of faction, two lists of other races (the races it appreciates and the races it hates) and a list of favourite colours. The default list holds 28 races, all on: seven human races (Northmen, Midlanders, Saltroad folk, Sunlanders, Grass riders, Rainkeepers, Canal folk), five classic races (Elves, Dwarves, Halflings, Gnomes, Orcs) and sixteen new near-human races (docs/society-generation.md Appendix A). A faction has a lead race. How a family or a person gets its race is not decided yet.
 
 #### Main race and minority race
 
@@ -277,6 +278,12 @@ A faction has a main colour and a secondary colour: the field and the device of 
 The role of a faction is how it stands in its region. Every region with persons has exactly one ruling faction, which governs it. A region can have one opposition, which wants the rule or wants out of it, and up to four lesser factions, which live under the ruler: a guild, an order, a circle, a great house, a chartered town or an enclave.
 
 The type and the lead race of the ruling faction are drawn from how well the land suits each type and how much each race of the region leans to it: grain land with many persons gets a house, open herding land a people, trading towns the guilds, supernatural land a faith. A region has an opposition when its tension is high: another kind of ruler would fit it as well, its land is rough, it has a second city, precious finds or poor land. The ground of an opposition is the largest of these. The lesser factions follow the resources of the region and its persons. The grip of a faction says how firmly it stands: the ruling faction has what the tension leaves, the opposition the tension.
+
+#### Region name
+
+The name of a region is the name of the realm of its ruling faction: Western Watson Kingdom, New Sumerian State, Icag. It belongs to the Planned stage, and a region without a ruling faction has no name. The name is not authored: it comes from the region-name generator, so a region has its name as soon as it is Planned.
+
+A name is a prefix, a middle and a suffix from weighted word lists, and the prefix and the suffix can be missing. The lead race of the ruling faction picks the lists: the human races have theirs and the other races theirs. A region with few persons can be a Duchy or a County and one with many can be Grand or Great. A ruling faction of the type Family is a house: only a house rules a Kingdom or an Empire, and its surname can be the middle of the name. The surname comes from the name model of the lead race.
 
 #### City and town
 
@@ -322,7 +329,7 @@ A named colour of cloth, paint and banners: red, indigo, saffron. The colours ar
 | [docs/tools-basis.md](docs/tools-basis.md) | 146 real tools for the 51 default vocations: a sourced description, lore and the fitting vocations. Material, it binds nothing |
 | [docs/races-and-worldbuilding.md](docs/races-and-worldbuilding.md) | A framework for building a near-human race: origin, anchor traits, culture and the relation to humans |
 | [docs/NameGenerator-Reuse.md](docs/NameGenerator-Reuse.md) | The person-name generator |
-| [docs/RegionNameGenerator-Reuse.md](docs/RegionNameGenerator-Reuse.md) | The region-name generator of an earlier project. It is not ported yet |
+| [docs/RegionNameGenerator-Reuse.md](docs/RegionNameGenerator-Reuse.md) | The region-name generator of an earlier project: the original and the corrected form that names the regions here |
 | [docs/research/](docs/research/) | The source notes behind the research document, and research for the society and the living world: factions, vocations, flora and fauna, heraldry, and sequential art for graphic short stories |
 | [docs/plans/](docs/plans/) | Plans for changes, each with its status |
 | [braindump.md](braindump.md) | Notes and ideas in progress, not decided |
