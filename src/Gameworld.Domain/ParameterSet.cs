@@ -429,7 +429,7 @@ public sealed record BiomeParameters
     public IntRange FaunaPerPatch { get; init; } = new(3, 6);
 }
 
-/// <summary>Parameters of the Planned stage (section 15).</summary>
+/// <summary>Parameters of the Planned stage (map-generation.md section 15, society-generation.md sections 3 and 4).</summary>
 public sealed record PlanningParameters
 {
     [Description("Prospects per region. Regions with little habitable land end up with fewer (§15.5).")]
@@ -821,15 +821,15 @@ public sealed record BedrockParameters(
     ];
 }
 
-/// <summary>
-/// A race: a people that can live in the world. The races are a list in the Parameter Set, so
-/// a race is added, changed or switched off without touching the generation code.
-/// </summary>
 [Description("One control point of the height modifier of a race: the factor at a height.")]
 public sealed record HeightFactorPoint(
     [property: Description("Height in metres above sea level.")] double HeightM,
     [property: Description("What the biome frequencies of the race are multiplied by at that height. 0 means the race does not live at that height; a negative number counts as 0.")] double Factor);
 
+/// <summary>
+/// A race: a people that can live in the world. The races are a list in the Parameter Set, so
+/// a race is added, changed or switched off without touching the generation code.
+/// </summary>
 [Description("A race: a people that can live in the world, and how frequent it is in each biome and at each height.")]
 public sealed record RaceParameters(
     [property: Description("The id the generated data knows the race by. Unique in the list; keep it when the name changes.")] string Id,

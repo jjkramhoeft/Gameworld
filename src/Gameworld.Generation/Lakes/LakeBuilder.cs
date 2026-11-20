@@ -15,13 +15,12 @@ public sealed class LakeShape
 
     static LakeShape()
     {
-        const double twoPi = 6.283185307179586;
         for (var k = 0; k < RayCount; k++)
         {
-            DirX[k] = DetMath.Cos(twoPi * k / RayCount);
-            DirY[k] = DetMath.Sin(twoPi * k / RayCount);
+            DirX[k] = DetMath.Cos(DetMath.TwoPi * k / RayCount);
+            DirY[k] = DetMath.Sin(DetMath.TwoPi * k / RayCount);
         }
-        SinStep = DetMath.Sin(twoPi / RayCount);
+        SinStep = DetMath.Sin(DetMath.TwoPi / RayCount);
     }
 
     /// <summary>The root cell of the patch the lake is placed in.</summary>

@@ -1,4 +1,3 @@
-using Gameworld.Domain;
 using Gameworld.Generation.Settlements;
 
 namespace Gameworld.Generation.Stages;
@@ -23,7 +22,7 @@ public static class SettlementBuilder
                 i, plan.Names[i].Name, prospect.Patch, prospect.ForCity, place.Races,
                 world.PopulationRules.SettlementWeights(plan.Races, place.Around)));
         }
-        var capital = plan.Factions.Factions.FirstOrDefault(f => f.Role == FactionRole.Ruling)?.Seat;
+        var capital = plan.Factions.Ruling?.Seat;
         return world.SettlementRules.Build(plan.Races, sites, capital);
     }
 }

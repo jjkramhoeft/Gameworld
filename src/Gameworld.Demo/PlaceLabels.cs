@@ -31,7 +31,7 @@ public sealed partial class WorldHost
             foreach (var region in regions.OrderBy(r => r.Key))
             {
                 var plan = world.PlanOf(new RegionId(region));
-                var capital = plan.Factions.Factions.FirstOrDefault(f => f.Role == FactionRole.Ruling)?.Seat;
+                var capital = plan.Factions.Ruling?.Seat;
                 for (var i = 0; i < plan.Prospects.Length; i++)
                 {
                     var prospect = plan.Prospects[i];

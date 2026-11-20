@@ -74,6 +74,7 @@ public sealed class PlanWork
 internal static class PlanBuilder
 {
     private const double NavigablePatches = 8;
+    private static readonly Trapezoid Comfort = new(-8, 4, 24, 34);
 
     public static PlanWork Build(World world, DetailWork detail, ElevationWork elevation)
     {
@@ -244,7 +245,7 @@ internal static class PlanBuilder
             var trade = Clamp(Math.Max(gateway, centrality[i]) + 0.25 * Math.Min(gateway, centrality[i]));
 
             // climate
-            var comfort = Trap(biome.TemperatureC, -8, 4, 24, 34);
+            var comfort = Comfort.At(biome.TemperatureC);
             var climate = comfort * (0.4 + 0.6 * Ramp(biome.Aridity, 0.2, 1)) * (biome.Aridity > 6 ? 0.85 : 1);
 
             var prosperity = world.Fields.Sample01(FieldKind.Prosperity, spot);
@@ -280,16 +281,14 @@ internal static class PlanBuilder
 
         // society-generation.md 5.1 The races of a city or a town on each Prospect: from the patch
         // of the Prospect and its neighbouring land patches of the region.
-        var final = new Dictionary<long, int>();
-        for (var i = 0; i < elevation.Patches.Length; i++) final[elevation.Patches[i].Patch.Root.Key] = i;
         var prospects = Select(world, scores);
         var seats = prospects.Select(prospect =>
         {
             var root = prospect.Patch.Coord;
-            var around = new List<int>();
-            if (final.TryGetValue(root.Key, out var own)) around.Add(own);
-            foreach (var k in landNeighbours[index[root.Key]])
-                if (final.TryGetValue(land[k].Root.Key, out var neighbour)) around.Add(neighbour);
+            // The land patches of the Elevated stage are the land patches here, in the same order.
+            var own = index[root.Key];
+            var around = new List<int> { own };
+            around.AddRange(landNeighbours[own]);
             var local = new double[races.Races.Length];
             foreach (var patch in around)
                 for (var r = 0; r < local.Length; r++) local[r] += races.PatchPersons[patch][r];
@@ -307,7 +306,7 @@ internal static class PlanBuilder
             seats);
 
         // society-generation.md 4.10 The name of the region: from its ruling faction and its persons.
-        var ruling = factions.Factions.FirstOrDefault(f => f.Role == FactionRole.Ruling);
+        var ruling = factions.Ruling;
         var naming = world.RegionNameRules.Name(region, ruling, races.Population.Total);
 
         // society-generation.md 5.3 The name of a city or a town on each Prospect: from the site
@@ -322,11 +321,7 @@ internal static class PlanBuilder
             return new NamedProspect(
                 prospect.Patch.Coord,
                 capital ? [ruling!.LeadRace] : prospectRaces[i],
-                capital ? [1.0] : seats[i].Races.Select(race =>
-                {
-                    var at = Array.IndexOf(races.Races, race);
-                    return at >= 0 && at < weights.Length ? weights[at] : 0;
-                }).ToArray(),
+                capital ? [1.0] : seats[i].Races.Select(race => weights[Array.IndexOf(races.Races, race)]).ToArray(),
                 SettlementNameRules.SitesOf(
                     prospect.Facts, patch.ZoneType, patch.Biome!.Biome, patch.Resources, prospect.Factors.Trade,
                     capital || prospect.ForCity,
@@ -570,14 +565,6 @@ internal static class PlanBuilder
     private static double Clamp(double v) => Math.Clamp(v, 0, 1);
 
     private static double Ramp(double v, double a, double b) => Clamp((v - a) / (b - a));
-
-    private static double Trap(double v, double a, double b, double c, double d)
-    {
-        if (v <= a || v >= d) return 0;
-        if (v < b) return (v - a) / (b - a);
-        if (v <= c) return 1;
-        return (d - v) / (d - c);
-    }
 
     private static double Max(double a, double b, double c, double d) => Math.Max(Math.Max(a, b), Math.Max(c, d));
 }

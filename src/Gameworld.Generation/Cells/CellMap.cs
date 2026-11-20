@@ -268,8 +268,8 @@ public sealed partial class CellMap
     {
         var u = Hashing.Unit(_seed, unchecked((uint)(0x5e10 + pass)), zoneCell.I, zoneCell.J);
         for (var k = 0; k < _expansionCdf.Length; k++)
-            if (u < _expansionCdf[k]) return Math.Min(k, 3);
-        return _expansionCdf.Length > 0 && _expansionCdf[^1] > 0 ? Math.Min(_expansionCdf.Length - 1, 3) : 0;
+            if (u < _expansionCdf[k]) return k;
+        return _expansionCdf.Length > 0 && _expansionCdf[^1] > 0 ? _expansionCdf.Length - 1 : 0;
     }
 
     private bool Expands(GridCoord zoneCell, int pass)
@@ -484,7 +484,7 @@ public sealed partial class CellMap
         for (var dj = -DrawnSearchRings; dj <= DrawnSearchRings; dj++)
             for (var di = -DrawnSearchRings; di <= DrawnSearchRings; di++)
                 foreach (var c in OwnedZoneCells(region.Offset(di, dj)))
-                    if (RegionOfZoneCell(ZoneRoot(c)) == region)
+                    if (RegionOfZone(c) == region)
                         list.Add(c);
         list.Sort();
         cells = list.ToArray();

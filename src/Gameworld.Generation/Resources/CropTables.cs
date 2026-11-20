@@ -78,8 +78,6 @@ public sealed record Crop(
 /// </summary>
 public static class CropTables
 {
-    public const int Count = 108;
-
     /// <summary>All crops; the index is the crop number.</summary>
     public static IReadOnlyList<Crop> All { get; }
 

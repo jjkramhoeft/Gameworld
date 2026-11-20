@@ -36,7 +36,6 @@ internal sealed class CostGrid
     {
         var cells = world.Cells;
         var region = detail.Region;
-        var hp = world.Parameters.Elevation.HeightMap;
 
         // The bounding box of the region's zone cell sites, with room for the cells around them.
         var margin = 2 * cells.ZoneSize * (1 + cells.Zones.Warp) + 2 * cells.PatchSize;
@@ -117,7 +116,7 @@ internal sealed class CostGrid
                 var biomeFactor = biome is { } b ? BiomeFactors.Of(b).RoadCost : 1;
                 cost[c] = (float)(zoneFactor * biomeFactor * (detail.InLake(cx, cy) ? 8 : 1));
                 // The unblurred hillslope: the type's hillslope × the multiplier × the relief at the point.
-                slope[c] = hp.Hillslope[type] * hp.HillslopeMultiplier * HeightRules.Relief(world, cx, cy);
+                slope[c] = HeightRules.TypeHillslope(world, type, cx, cy);
                 height[c] = float.NaN;
                 if (shore) height[c] = (float)(slope[c] * 1000);
             }
@@ -163,7 +162,7 @@ internal sealed class CostGrid
                     if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
                     var n = ny * w + nx;
                     if (kind[n] != Land) continue;
-                    var length = dx != 0 && dy != 0 ? CellSize * 1.4142135623730951 : CellSize;
+                    var length = dx != 0 && dy != 0 ? CellSize * DetMath.Sqrt2 : CellSize;
                     var nd = d + length * 0.5 * (slope[c] + slope[n]);
                     if (nd < dist[n])
                     {

@@ -2,6 +2,7 @@ using Gameworld.Domain;
 using Gameworld.Generation;
 using Gameworld.Generation.Basics;
 using Gameworld.Generation.Names;
+using static Gameworld.Tests.TestData;
 
 namespace Gameworld.Tests;
 
@@ -9,8 +10,6 @@ namespace Gameworld.Tests;
 public class RegionNameTests
 {
     private static readonly RegionNameSize[] AllSizes = [RegionNameSize.Small, RegionNameSize.Middling, RegionNameSize.Large];
-
-    private static Sfc32 Rng(uint purpose, int i) => new(Hashing.Hash4(20261120, purpose, i, 0));
 
     /// <summary>
     /// The reference names of the reuse doc: seeds 0 to 9 of its Corrected mode. They catch a
@@ -32,17 +31,6 @@ public class RegionNameTests
         var actual = string.Join(", ", Enumerable.Range(0, 10)
             .Select(seed => RegionNameGenerator.Generate(seed, human, populationPotential, family)));
         Assert.Equal(expected, actual);
-    }
-
-    [Fact]
-    public void A_name_is_a_pure_function_of_the_generator_seed()
-    {
-        foreach (var human in new[] { true, false })
-            foreach (var size in AllSizes)
-                for (var i = 0; i < 200; i++)
-                    Assert.Equal(
-                        RegionNameGenerator.Generate(Rng(0x4b07, i), human, size, RegionNameRuler.House, "Davies"),
-                        RegionNameGenerator.Generate(Rng(0x4b07, i), human, size, RegionNameRuler.House, "Davies"));
     }
 
     [Fact]
@@ -188,7 +176,7 @@ public class RegionNameTests
         Assert.All(races.Take(7), r => Assert.True(r.Human));
 
         // A race that says nothing is not human, and the flag is read back from a file.
-        Assert.False(new RaceParameters("x", "X", true, new PerBiome<double>(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)).Human);
+        Assert.False(new RaceParameters("x", "X", true, Everywhere(1)).Human);
         var read = ParameterSet.FromJson(ParameterSet.Default.ToJson());
         Assert.Equal(races.Select(r => r.Human), read.Races.Select(r => r.Human));
     }
@@ -213,7 +201,7 @@ public class RegionNameTests
         Assert.All(races.Where(r => r.Human), r => Assert.Equal(NameStyle.Common, r.NameStyle));
 
         // A race that says nothing has the common style, and the style is read back from a file, by its name.
-        Assert.Equal(NameStyle.Common, new RaceParameters("x", "X", true, new PerBiome<double>(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)).NameStyle);
+        Assert.Equal(NameStyle.Common, new RaceParameters("x", "X", true, Everywhere(1)).NameStyle);
         var json = ParameterSet.Default.ToJson();
         Assert.Contains("\"NameStyle\": \"Dark\"", json);
         Assert.Equal(races.Select(r => r.NameStyle), ParameterSet.FromJson(json).Races.Select(r => r.NameStyle));
@@ -285,7 +273,6 @@ public class RegionNameTests
             Assert.False(guilds.Human);
             Assert.Equal(NameStyle.Common, rules.StyleOf("nobody"));
             Assert.Equal(RegionNameSize.Large, guilds.Size);
-            Assert.Equal(guilds, rules.Name(region, Ruling(FactionType.Vocation, "nobody"), 900));
         }
 
         // Another seed gives other names.

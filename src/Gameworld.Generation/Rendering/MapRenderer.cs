@@ -51,9 +51,6 @@ public sealed record MapLayers
 /// <summary>The part of the world an image shows: the world position of its top-left corner and the scale.</summary>
 public readonly record struct MapView(double Left, double Top, double MetresPerPixel, int Width, int Height)
 {
-    public static MapView Centred(WorldPoint centre, double metresPerPixel, int width, int height) =>
-        new(centre.X - width * metresPerPixel / 2, centre.Y - height * metresPerPixel / 2, metresPerPixel, width, height);
-
     public double ToPixelX(double worldX) => (worldX - Left) / MetresPerPixel;
     public double ToPixelY(double worldY) => (worldY - Top) / MetresPerPixel;
 }

@@ -1,6 +1,5 @@
 using Gameworld.Domain;
 using Gameworld.Generation.Cells;
-using Gameworld.Generation.Stages;
 
 namespace Gameworld.Generation.Rendering;
 
@@ -119,7 +118,7 @@ public static partial class MapRenderer
         foreach (var region in regions.OrderBy(r => r.Key))
         {
             var plan = world.PlanOf(new RegionId(region));
-            var capital = plan.Factions.Factions.FirstOrDefault(f => f.Role == FactionRole.Ruling)?.Seat;
+            var capital = plan.Factions.Ruling?.Seat;
             foreach (var prospect in plan.Prospects)
             {
                 if (!prospect.OnShow) continue;

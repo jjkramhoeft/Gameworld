@@ -1,6 +1,5 @@
 using Gameworld.Domain;
 using Gameworld.Generation.Basics;
-using Gameworld.Generation.Rivers;
 using Gameworld.Generation.Settlements;
 
 namespace Gameworld.Generation.Travel;
@@ -11,8 +10,6 @@ public sealed class SettlementWork
     public required GridCoord Region { get; init; }
     /// <summary>The links this region decides.</summary>
     public required TravelLink[] Links { get; init; }
-    /// <summary>All candidate links between the Prospects of the 3 × 3 regions, before pruning.</summary>
-    public int CandidateCount { get; init; }
     /// <summary>The cities and towns of the region, and the persons on the land between them.</summary>
     public required RegionSettlements Places { get; init; }
 
@@ -28,7 +25,6 @@ internal static class TravelBuilder
 {
     private const double Cell = CostGrid.CellSize;
     private const double CellKm = Cell / 1000;
-    private const double Sqrt2 = 1.4142135623730951;
     private const double Sqrt5 = 2.23606797749979;
 
     private static readonly (int Dx, int Dy)[] Moves8 =
@@ -62,7 +58,6 @@ internal static class TravelBuilder
         var kind = new byte[n];
         var cost = new double[n];      // land: road cost × (1 + height / 1500 m); sea: lane cost
         var height = new float[n];
-        var gridOf = new sbyte[n];
         var hasRiver = new bool[n];
         var linkNode = new int[n * 8]; // per 8-move: the river node of the link, −1 without one
         var linkGrid = new sbyte[n * 8];
@@ -79,7 +74,6 @@ internal static class TravelBuilder
                     var c = (grid.J0 - j0 + y) * w + grid.I0 - i0 + x;
                     kind[c] = k;
                     height[c] = grid.HeightM[y * grid.Width + x];
-                    gridOf[c] = (sbyte)g;
                     cost[c] = k == CostGrid.Land
                         ? grid.Cost[y * grid.Width + x] * (1 + height[c] / 1500.0)
                         : grid.Cost[y * grid.Width + x];
@@ -213,7 +207,7 @@ internal static class TravelBuilder
             {
                 c = (cost[a] + cost[b]) / 2;
                 climb = Math.Abs(height[b] - height[a]);
-                lengthKm = dx != 0 && dy != 0 ? CellKm * Sqrt2 : CellKm;
+                lengthKm = dx != 0 && dy != 0 ? CellKm * DetMath.Sqrt2 : CellKm;
             }
             var slope = climb / (lengthKm * 1000);
             var steep = slope / 0.05;
@@ -231,7 +225,7 @@ internal static class TravelBuilder
             var by = ay + dy;
             if (bx < 0 || by < 0 || bx >= w || by >= h) return -1;
             var b = by * w + bx;
-            var lengthKm = dx != 0 && dy != 0 ? CellKm * Sqrt2 : CellKm;
+            var lengthKm = dx != 0 && dy != 0 ? CellKm * DetMath.Sqrt2 : CellKm;
             if (linkNode[a * 8 + move] >= 0) return lengthKm * 0.4;
             if (kind[a] != CostGrid.Sea || kind[b] != CostGrid.Sea) return -1;
             // A diagonal sea move is not allowed when both cells it squeezes between are not sea.
@@ -385,7 +379,6 @@ internal static class TravelBuilder
         {
             Region = region,
             Links = links.ToArray(),
-            CandidateCount = candidates.Length,
             Places = settlements,
         };
     }

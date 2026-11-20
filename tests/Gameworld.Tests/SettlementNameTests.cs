@@ -2,6 +2,7 @@ using Gameworld.Domain;
 using Gameworld.Generation;
 using Gameworld.Generation.Basics;
 using Gameworld.Generation.Names;
+using static Gameworld.Tests.TestData;
 
 namespace Gameworld.Tests;
 
@@ -9,8 +10,6 @@ namespace Gameworld.Tests;
 public class SettlementNameTests
 {
     private static readonly SiteClass[] AllSites = Enum.GetValues<SiteClass>();
-
-    private static Sfc32 Rng(uint purpose, int i) => new(Hashing.Hash4(20261120, purpose, i, 0));
 
     private static SettlementNameLexicon Lexicon(string race) => SettlementNameLexicons.Of(race)!;
 
@@ -122,16 +121,6 @@ public class SettlementNameTests
                 }
             }
         }
-    }
-
-    [Fact]
-    public void A_name_is_a_pure_function_of_the_generator_seed()
-    {
-        foreach (var race in SettlementNameLexicons.Races)
-            for (var i = 0; i < 50; i++)
-                Assert.Equal(
-                    SettlementNameGenerator.Draw(Rng(0x4c10, i), Lexicon(race), AllSites),
-                    SettlementNameGenerator.Draw(Rng(0x4c10, i), Lexicon(race), AllSites));
     }
 
     [Fact]

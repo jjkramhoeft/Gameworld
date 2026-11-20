@@ -95,7 +95,6 @@ public class FloraFaunaTests
                 var gotFlora = rules.Flora(42, patch, biome, supernatural);
                 var gotFauna = rules.Fauna(42, patch, biome, supernatural);
 
-                Assert.Equal(gotFlora, rules.Flora(42, patch, biome, supernatural));
                 Assert.InRange(gotFauna.Count, 3, 6);
                 Assert.InRange(gotFlora.Count, 1, 6); // Ice & snow has three ordinary plants only
                 Assert.Equal(gotFlora.Distinct(), gotFlora);

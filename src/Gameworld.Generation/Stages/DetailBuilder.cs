@@ -186,11 +186,11 @@ internal static class DetailBuilder
     {
         var seed = world.Foundation.Seed.Value;
         if (patch.Shape.Ocean)
-            return world.OceanResources(new OceanResourceInput(
+            return ResourceRules.Ocean(new OceanResourceInput(
                 seed, patch.Root, patch.Shape.Coastal, patch.SeaLevelTemperatureC, patch.Prosperity));
         // The rock of a Volcano is volcanic, whatever the bedrock of its zone (section 14.1).
         var bedrock = biome!.Biome == Biome.Volcano ? BedrockIds.Volcanic : patch.Bedrock;
-        return world.LandResources(new LandResourceInput(
+        return ResourceRules.Land(new LandResourceInput(
             seed, patch.Root, patch.Shape.Zone, biome, patch.ZoneType, bedrock,
             patch.Shape.Coastal, patch.RiverPoor, patch.Water, patch.Prosperity, patch.Supernatural));
     }

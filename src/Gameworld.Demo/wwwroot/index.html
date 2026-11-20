@@ -672,7 +672,6 @@ function factionStatistics(f) {
 }
 function settlementStatistics(t) {
   const persons = t.CityPersons + t.TownPersons + t.RuralPersons;
-  const share = (name, colour, n) => ({ Name: name, Colour: colour, Share: persons ? n / persons : 0, AreaKm2: 0 });
   return kv([
       ['Cities', `${t.Cities} <span class="muted">· largest ${big(t.LargestCity)}</span>`], ['Towns', `${t.Towns} <span class="muted">· largest ${big(t.LargestTown)}</span>`],
       ['Persons', big(persons)], ['Regions', `${t.Regions} Settled`],

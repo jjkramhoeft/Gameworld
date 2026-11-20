@@ -57,23 +57,16 @@ app.MapGet("/api/tiles/{version:int}/{z:int}/{x:int}/{y:int}.png",
 // The legends: every biome with the colour the renderer draws it in, and the bands of every field layer.
 app.MapGet("/api/legend", () => Results.Json(new
 {
-    Biomes = Enum.GetValues<Biome>().Select(b =>
-    {
-        var (r, g, bl) = Gameworld.Generation.Biomes.BiomeRules.Colour(b);
-        return new { Biome = b.ToString(), Colour = $"#{r:x2}{g:x2}{bl:x2}" };
-    }),
+    Biomes = Enum.GetValues<Biome>().Select(b => new { Biome = b.ToString(), Colour = MapColours.Of(b) }),
     Fields = WorldHost.FieldLayers.Select(f => new
     {
         f.Layer,
         f.Name,
         f.Unit,
-        Bands = MapRenderer.FieldBands(f.Kind).Select(b => new { b.From, b.To, Colour = $"#{b.Colour.R:x2}{b.Colour.G:x2}{b.Colour.B:x2}" }),
+        Bands = MapRenderer.FieldBands(f.Kind).Select(b => new { b.From, b.To, Colour = MapColours.Hex(b.Colour) }),
     }),
     Prospects = Enum.GetValues<ProspectClass>().Reverse().Select(c =>
-    {
-        var colour = MapRenderer.ProspectColour(c);
-        return new { Class = c.ToString(), Colour = $"#{colour.R:x2}{colour.G:x2}{colour.B:x2}" };
-    }),
+        new { Class = c.ToString(), Colour = MapColours.Hex(MapRenderer.ProspectColour(c)) }),
 }, new JsonSerializerOptions()));
 
 // The region, zone and patch at a point. Looking takes the region to Detailed; with a stage it is taken that far first.

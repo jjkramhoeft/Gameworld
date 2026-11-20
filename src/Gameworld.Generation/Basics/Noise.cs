@@ -9,7 +9,6 @@ public static class Noise
     private const double F = 0.3660254037844386;   // (√3 − 1) / 2
     private const double G = 0.21132486540518713;  // (3 − √3) / 6
     private const double H = 0.8660254037844387;
-    private const double Sqrt2 = 1.4142135623730951;
 
     private static readonly double[] GradX = [1, H, 0.5, 0, -0.5, -H, -1, -H, -0.5, 0, 0.5, H];
     private static readonly double[] GradY = [0, 0.5, H, 1, H, 0.5, 0, -0.5, -H, -1, -H, -0.5];
@@ -73,7 +72,7 @@ public static class Noise
         var n11 = Dot(seed, i + 1, j + 1, fx - 1, fy - 1);
         var a = n00 + u * (n10 - n00);
         var b = n01 + u * (n11 - n01);
-        return Sqrt2 * (a + v * (b - a));
+        return DetMath.Sqrt2 * (a + v * (b - a));
     }
 
     private static int OctaveCount(double octaves) => Math.Max(1, (int)Math.Floor(octaves));

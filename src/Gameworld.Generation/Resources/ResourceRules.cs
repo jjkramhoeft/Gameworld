@@ -273,6 +273,9 @@ internal sealed class LandRules
     private double ByZone(double flat, double lowland, double hills, double mountains) =>
         _mountains ? mountains : _hills ? hills : _lowland ? lowland : flat;
 
+    /// <summary>A dry river-poor flat zone that passes the gate of the playa salt (deposit 9).</summary>
+    private bool PlayaZone() => _riverPoor && _m < 0.5 && ZoneGate(0x5e02, 0.08);
+
     private bool ZoneGate(uint purpose, double share) =>
         Hashing.Unit(_seed, purpose, _zone.I, _zone.J) < share;
 
@@ -526,7 +529,7 @@ internal sealed class LandRules
         if (_biome != Biome.IceAndSnow)
         {
             var amount = ByZone(0.7, 0.6, 0.25, 0.1);
-            if (_river >= 1 && _low) amount += 0.3;
+            if (_floodplain) amount += 0.3;
             if (_cover) amount += 0.1;
             if (_biome == Biome.Tundra) amount *= 0.3; // read as scaling the whole sum
             var dry = _m < 1;
@@ -593,7 +596,7 @@ internal sealed class LandRules
         _out.Deposit(8, r, "solar sea salt", _coastal && _low && _m < 1 && _t >= 12 ? 0.25 : 0);
 
         // "River-poor flat zone" is the input's river-poor flag, which is only set in flat zones.
-        if (_riverPoor && _m < 0.5 && ZoneGate(0x5e02, 0.08))
+        if (PlayaZone())
         {
             _out.Deposit(9, r, "lake and playa salt", 0.3);
             _out.Deposit(10, r, "natron and soda", 0.05, 0.8);
@@ -824,7 +827,7 @@ internal sealed class LandRules
         if (amount > 0) _out.Put(Resource.HorsesAndPackAnimals, amount, variant);
     }
 
-    // ---- The resources of 2026-11-15: reagents, herbs and arcane materials ------------------
+    // ---- Reagents, herbs and arcane materials -----------------------------------------------
 
     private void Reagents()
     {
@@ -840,7 +843,7 @@ internal sealed class LandRules
         if (_clastic && (_hills || _lowland)) _out.Deposit(54, r, "alum shale and vitriol", 0.03, 0.7);
 
         // "As 9": the zones of the playa salt, behind the same gate.
-        if (_riverPoor && _m < 0.5 && ZoneGate(0x5e02, 0.08))
+        if (PlayaZone())
         {
             _out.Deposit(57, r, "saltpetre", 0.1, 0.8);
             _out.Deposit(59, r, "borax", 0.05, 0.8);

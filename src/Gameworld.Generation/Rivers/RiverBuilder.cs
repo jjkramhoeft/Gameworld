@@ -4,12 +4,11 @@ using Gameworld.Generation.Cells;
 
 namespace Gameworld.Generation.Rivers;
 
-/// <summary>The grown rivers of one region with the counts the later layers and the statistics read.</summary>
+/// <summary>The grown rivers of one region with the counts of its attractors.</summary>
 /// <param name="Rivers">The river nodes as the domain sees them.</param>
-/// <param name="Reached">The attractors reached at each node (flow before it is summed downstream).</param>
 /// <param name="AttractorCount">The attractors scattered over the region.</param>
 /// <param name="UnreachedCount">The attractors that were never reached or were given up.</param>
-public sealed record RiverResult(Domain.Rivers Rivers, int[] Reached, int AttractorCount, int UnreachedCount)
+public sealed record RiverResult(Domain.Rivers Rivers, int AttractorCount, int UnreachedCount)
 {
     public IReadOnlyList<RiverNode> Nodes => Rivers.Nodes;
 }
@@ -630,15 +629,7 @@ internal sealed class RiverBuilder
                 _cells.CellAt(_nx[k], _ny[k]).Ocean,
                 tree[k]);
         }
-        return new RiverResult(new Domain.Rivers(nodes, _exempt), _reached.ToArray(), _ax.Count, _aliveCount + GivenUp());
-    }
-
-    private int GivenUp()
-    {
-        // Attractors that are no longer alive but were never reached.
-        var reached = 0;
-        foreach (var r in _reached) reached += r;
-        return _ax.Count - _aliveCount - reached;
+        return new RiverResult(new Domain.Rivers(nodes, _exempt), _ax.Count, _ax.Count - _reached.Sum());
     }
 
     // ───────────────────────── The grid of cell size dᵢ ─────────────────────────

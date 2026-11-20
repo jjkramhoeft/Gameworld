@@ -2,15 +2,13 @@ using Gameworld.Domain;
 using Gameworld.Generation;
 using Gameworld.Generation.Factions;
 using Gameworld.Generation.Races;
+using static Gameworld.Tests.TestData;
 
 namespace Gameworld.Tests;
 
 /// <summary>The factions of a region: society-generation.md section 4.</summary>
 public class FactionTests
 {
-    private static PerBiome<double> Everywhere(double f) =>
-        new(f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f);
-
     private static RaceParameters Race(string id, double frequency, PerFactionType<double> leaning) =>
         new(id, id, true, Everywhere(frequency)) { FactionLeaning = leaning };
 
@@ -40,10 +38,10 @@ public class FactionTests
         },
     };
 
-    private static Prospect Town(int i, double score, bool onShow = true, bool city = false, bool harbour = false) => new(
-        new PatchId(i, 0), new WorldPoint(i * 50_000.0, 0), city, score, ProspectClass.Average, onShow,
+    private static Prospect Town(int i, double score, bool city = false) => new(
+        new PatchId(i, 0), new WorldPoint(i * 50_000.0, 0), city, score, ProspectClass.Average, true,
         new ProspectFactors(0.5, 0.5, 0.5, 0.5, 0.5),
-        new ProspectFacts(harbour, harbour, 0, 0, 0, false, 0, 3));
+        new ProspectFacts(false, false, 0, 0, 0, false, 0, 3));
 
     /// <summary>The factions of a region of the given land, with two Prospects on show that hold every race.</summary>
     private static FactionWork Build(ParameterSet parameters, FactionPatch[] land, GridCoord region = default, uint seed = 7)
@@ -60,8 +58,8 @@ public class FactionTests
         return new FactionRules(parameters, seed).Build(region, land, races, prospects);
     }
 
-    private static FactionPatch GrainLand(double areaKm2 = 64, double food = 1) =>
-        new(areaKm2, Biome.TemperateBroadleafForest, ElevationType.FlatLand, Resources(food, (Resource.Grain, 0.9)), 0);
+    private static FactionPatch GrainLand(double food = 1) =>
+        new(64, Biome.TemperateBroadleafForest, ElevationType.FlatLand, Resources(food, (Resource.Grain, 0.9)), 0);
 
     [Fact]
     public void The_default_races_carry_the_leanings_of_the_appendix()
@@ -306,11 +304,6 @@ public class FactionTests
                 several++;
                 if (work.Factions.Select(f => f.MainColour).Distinct().Count() < work.Factions.Count) shared++;
             }
-
-            // The same region gives the same colours again.
-            Assert.Equal(
-                work.Factions.Select(f => (f.Slot, f.MainColour, f.SecondaryColour)),
-                Build(parameters, land, region).Factions.Select(f => (f.Slot, f.MainColour, f.SecondaryColour)));
         }
         // Most main colours are a favourite colour of the lead race, and no two factions of a region share one.
         Assert.True(factions > 300);

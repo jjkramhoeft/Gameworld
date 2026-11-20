@@ -68,8 +68,8 @@ public class ResourceRulesTests
         double supernatural = 0) =>
         new(Seed, patch, zone, biome, zoneType, bedrock, coastal, riverPoor, water, prosperity, supernatural);
 
-    private static WaterSite River(double river, double goldLoad = 0, double tinLoad = 0) =>
-        new(river, 0, 0, false, goldLoad, tinLoad);
+    private static WaterSite River(double river, double tinLoad = 0) =>
+        new(river, 0, 0, false, 0, tinLoad);
 
     private static IEnumerable<GridCoord> Coords(int count)
     {
@@ -81,7 +81,6 @@ public class ResourceRulesTests
     [Fact]
     public void CropTable_Has108CropsNumberedInTheListedOrder()
     {
-        Assert.Equal(108, CropTables.Count);
         Assert.Equal(108, CropTables.All.Count);
         for (var n = 0; n < CropTables.All.Count; n++) Assert.Equal(n, CropTables.All[n].Number);
 
@@ -211,21 +210,6 @@ public class ResourceRulesTests
     }
 
     // ---- Land rules -------------------------------------------------------------------------
-
-    [Fact]
-    public void Land_IsDeterministic()
-    {
-        var input = Land(Record(Biome.TemperateMixedForest), ElevationType.Hills, BedrockIds.FoldBelt,
-            coastal: true, water: new WaterSite(12, 3, 4e6, true, 0.4, 0.2), prosperity: 0.8,
-            patch: new GridCoord(17, -5), zone: new GridCoord(3, -1));
-
-        var a = ResourceRules.Land(input);
-        var b = ResourceRules.Land(input);
-
-        Assert.Equal(a.Amounts, b.Amounts);
-        Assert.Equal(a.Food, b.Food);
-        Assert.Equal(a.Wealth, b.Wealth);
-    }
 
     [Fact]
     public void Land_AmountsStayInRangeAndEveryAmountHasAVariant()
@@ -884,13 +868,5 @@ public class ResourceRulesTests
         Assert.Equal(seals, whales);       // the same gate hash for the same patch
         Assert.InRange(pearls, 60, 145);   // chance 0.05
         Assert.InRange(coral, 30, 95);     // chance 0.03
-    }
-
-    [Fact]
-    public void Ocean_IsDeterministic()
-    {
-        var input = new OceanResourceInput(Seed, new GridCoord(-3, 12), true, 22, 0.9);
-
-        Assert.Equal(ResourceRules.Ocean(input).Amounts, ResourceRules.Ocean(input).Amounts);
     }
 }

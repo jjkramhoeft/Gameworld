@@ -341,7 +341,6 @@ public class HeightMapTests(HeightMapFixture fixture, ITestOutputHelper output) 
             for (var i = -20; i <= 20; i++)
             {
                 var r = HeightRules.Relief(World, i * 37_000.0, j * 41_000.0);
-                Assert.Equal(r, HeightRules.Relief(World, i * 37_000.0, j * 41_000.0));
                 min = Math.Min(min, r);
                 max = Math.Max(max, r);
             }

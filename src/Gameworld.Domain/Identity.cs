@@ -79,8 +79,9 @@ public enum EntityKind
 /// Stub is addressable before it is Realised.
 /// </summary>
 /// <remarks>
-/// The parent of a faction is its region (<see cref="Faction.IdIn"/>). The readme does not yet
-/// decide the parent of a city, a family and a person, so the parent is a type parameter here.
+/// The parent of a faction, a city and a town is its region (<see cref="Faction.IdIn"/>,
+/// <see cref="Settlement.IdIn"/>). The readme does not yet decide the parent of a family and a
+/// person, so the parent is a type parameter here.
 /// </remarks>
 public readonly record struct SlotId<TParent>(TParent Parent, int Slot)
     where TParent : struct

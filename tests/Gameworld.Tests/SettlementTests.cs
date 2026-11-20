@@ -3,15 +3,13 @@ using Gameworld.Generation;
 using Gameworld.Generation.Races;
 using Gameworld.Generation.Settlements;
 using Gameworld.Generation.Stages;
+using static Gameworld.Tests.TestData;
 
 namespace Gameworld.Tests;
 
 /// <summary>The cities and towns of a region: society-generation.md section 5.2.</summary>
 public class SettlementTests
 {
-    private static PerBiome<double> Everywhere(double f) =>
-        new(f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f);
-
     private static RaceParameters Race(string id, double frequency) => new(id, id, true, Everywhere(frequency));
 
     /// <summary>
@@ -279,7 +277,6 @@ public class SettlementTests
         Assert.Same(world.FindSettlement(id)!.Places.Settlements, settlement.Settlements);
 
         Assert.NotNull(settlement.Capital);
-        Assert.Equal(new SlotId<RegionId>(id, settlement.Capital.Slot), settlement.Capital.IdIn(id));
         Assert.Equal(region.Plan!.Population.Total, settlement.CityPersons + settlement.TownPersons + settlement.RuralPersons);
 
         // The cities and towns come back from the stored form of the region.

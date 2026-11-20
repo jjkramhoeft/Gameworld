@@ -123,8 +123,6 @@ public sealed class VoronoiLevel
         return result;
     }
 
-    public bool AreNeighbours(GridCoord a, GridCoord b) => Array.IndexOf(Neighbours(a), b) >= 0;
-
     /// <summary>No third site lies strictly inside the circle whose diameter is the segment between the two sites.</summary>
     private bool IsGabriel(GridCoord p, double px, double py, GridCoord q, double qx, double qy, double d2)
     {

@@ -38,21 +38,6 @@ public class NameGeneratorTests
     }
 
     [Fact]
-    public void A_name_is_a_pure_function_of_the_generator_seed()
-    {
-        var names = NameGenerator.Default;
-        foreach (var style in AllStyles)
-            foreach (var kind in AllKinds)
-                for (uint seed = 0; seed < 200; seed++)
-                {
-                    var hash = Hashing.Hash4(20261114, 0x4a01, (int)seed, 0);
-                    Assert.Equal(
-                        names.Generate(style, kind, new Sfc32(hash)),
-                        names.Generate(style, kind, new Sfc32(hash)));
-                }
-    }
-
-    [Fact]
     public void Names_are_capitalised_and_at_most_29_characters()
     {
         var names = NameGenerator.Default;

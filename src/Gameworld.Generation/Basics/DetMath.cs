@@ -7,8 +7,8 @@ namespace Gameworld.Generation.Basics;
 public static class DetMath
 {
     private const double Ln2 = 0.6931471805599453;
-    private const double Sqrt2 = 1.4142135623730951;
-    private const double TwoPi = 6.283185307179586;
+    public const double Sqrt2 = 1.4142135623730951;
+    public const double TwoPi = 6.283185307179586;
     private const double HalfPi = 1.5707963267948966;
 
     private static double Round(double x) => Math.Floor(x + 0.5);

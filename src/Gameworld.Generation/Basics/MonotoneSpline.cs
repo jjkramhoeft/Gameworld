@@ -3,7 +3,7 @@ namespace Gameworld.Generation.Basics;
 /// <summary>
 /// A monotone cubic spline through a few control points (Fritsch &amp; Carlson 1980,
 /// map-generation.md section 2.4). The curve is constant beyond its end points, unless
-/// <paramref name="extendLastSlope"/> lets it continue along the last segment's slope.
+/// <c>extendLastSlope</c> lets it continue along the last segment's slope.
 /// </summary>
 public sealed class MonotoneSpline
 {

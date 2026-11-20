@@ -46,8 +46,6 @@ public sealed class FactionReading
     public required double Ore { get; init; }
     public required double Precious { get; init; }
     public required double Arcane { get; init; }
-    /// <summary>The value the index arcane is read from: the mean over the land of how far the Supernatural field lies above 60.</summary>
-    public required double ArcaneRaw { get; init; }
     public required double People { get; init; }
     public required double Small { get; init; }
     public required double Mixed { get; init; }
@@ -75,6 +73,9 @@ public sealed class FactionWork
     public required double Tension { get; init; }
     /// <summary>The factions of the region, by slot.</summary>
     public required IReadOnlyList<Faction> Factions { get; init; }
+
+    /// <summary>The ruling faction; null in a region without persons.</summary>
+    public Faction? Ruling => Factions.FirstOrDefault(f => f.Role == FactionRole.Ruling);
 }
 
 /// <summary>A kind of lesser faction (society-generation.md section 4.7).</summary>
@@ -311,7 +312,6 @@ public sealed class FactionRules
             Ore = Ramp(ListedSum(OreResources), ranges.Ore),
             Precious = Ramp(ListedSum(PreciousResources), ranges.Precious),
             Arcane = Ramp(arcane, ranges.Supernatural),
-            ArcaneRaw = arcane,
             People = Ramp(persons, ranges.Persons),
             Small = 1 - Ramp(persons, ranges.SmallRegion),
             Mixed = 1 - Ramp(largest, ranges.LargestRace),
@@ -357,6 +357,7 @@ public sealed class FactionRules
 
         // The races of the region in the order of the Parameter Set, with their share and their standing.
         var members = races.Races.OrderBy(k => k).ToArray();
+        int Largest() => members.OrderByDescending(k => races.Persons[k]).ThenBy(k => k).First();
         double Share(int race) => races.Persons[race] / persons;
         double Lean(int race, FactionType type) => Math.Max(0, _races[race].FactionLeaning[type]) / 3;
 
@@ -384,7 +385,7 @@ public sealed class FactionRules
         else
         {
             // No race leans to any type: the largest race and the type with the best fit.
-            leadRace = members.OrderByDescending(k => races.Persons[k]).ThenBy(k => k).First();
+            leadRace = Largest();
             rulingType = (FactionType)Array.IndexOf(fits, fits.Max());
         }
 
@@ -534,7 +535,7 @@ public sealed class FactionRules
                     w[m, 0] = Share(members[m]) * Lean(members[m], kind.Type) * (races.IsMinority(members[m]) ? _minorityBoost : 1);
                     sum += w[m, 0];
                 }
-                race = sum > 0 ? members[Draw(w, sum, u)] : members.OrderByDescending(k => races.Persons[k]).ThenBy(k => k).First();
+                race = sum > 0 ? members[Draw(w, sum, u)] : Largest();
 
                 double Pull(FactionProspect p)
                 {

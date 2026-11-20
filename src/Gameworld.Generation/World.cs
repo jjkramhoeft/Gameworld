@@ -2,12 +2,12 @@ using Gameworld.Domain;
 using Gameworld.Generation.Biomes;
 using Gameworld.Generation.Cells;
 using Gameworld.Generation.Factions;
+using Gameworld.Generation.Heights;
 using Gameworld.Generation.Names;
 using Gameworld.Generation.Races;
-using Gameworld.Generation.Resources;
-using Gameworld.Generation.Rivers;
 using Gameworld.Generation.Settlements;
 using Gameworld.Generation.Stages;
+using Gameworld.Generation.Travel;
 
 namespace Gameworld.Generation;
 
@@ -16,14 +16,17 @@ namespace Gameworld.Generation;
 /// of the foundation that is computed on demand and cached. The world is unbounded and regions
 /// come into existence lazily. Not thread-safe.
 /// </summary>
-public sealed partial class World
+public sealed class World
 {
     /// <summary>The version of the generation algorithms in this library.</summary>
     public static readonly GeneratorVersion GeneratorVersion = new(1);
 
     private readonly Dictionary<RegionId, Region> _regions = new();
     private readonly Dictionary<RegionId, DetailWork> _detail = new();
+    private readonly Dictionary<RegionId, ElevationWork> _elevation = new();
     private readonly Dictionary<RegionId, PlanWork> _plan = new();
+    private readonly Dictionary<RegionId, SettlementWork> _settlement = new();
+    private readonly Dictionary<RegionId, CostGrid> _costGrids = new();
     private readonly Dictionary<long, bool> _riverPoor = new();
 
     public World(Foundation foundation)
@@ -42,6 +45,7 @@ public sealed partial class World
         SettlementNameRules = new SettlementNameRules(foundation.Parameters, foundation.Seed.Value);
         SettlementRules = new SettlementRules(foundation.Parameters, PopulationRules);
         FloraFaunaRules = new FloraFaunaRules(foundation.Parameters);
+        RiverBeds = new RiverBeds(this);
     }
 
     /// <summary>A world for a seed text and a Parameter Set, at the current generator version.</summary>
@@ -61,6 +65,12 @@ public sealed partial class World
     public FloraFaunaRules FloraFaunaRules { get; }
 
     /// <summary>
+    /// The river bed profiles of the height maps (map-generation.md section 12.2), cached per
+    /// region for the whole world: every height map that a region's rivers cross reads the same beds.
+    /// </summary>
+    internal RiverBeds RiverBeds { get; }
+
+    /// <summary>
     /// A river-poor flat zone: a flat zone whose site (the site of its root cell) gets less
     /// precipitation than the cutoff. It gets few rivers, is drier for the biomes and holds no lakes.
     /// </summary>
@@ -73,10 +83,6 @@ public sealed partial class World
         _riverPoor[root.Key] = poor;
         return poor;
     }
-
-    /// <summary>Grows the rivers of a region. Pure: nothing is stored.</summary>
-    public RiverResult GrowRivers(RegionId id) =>
-        RiverBuilder.Build(Cells, id.Coord, Foundation.Seed.Value, Parameters.Detail.Rivers, IsRiverPoorZone);
 
     /// <summary>The stored regions.</summary>
     public IReadOnlyCollection<Region> Regions => _regions.Values;
@@ -134,6 +140,19 @@ public sealed partial class World
         return _detail[id];
     }
 
+    /// <summary>
+    /// The Elevated working data of a region: the height map and the final biomes and resources.
+    /// The region is taken to the Elevated stage first.
+    /// </summary>
+    public ElevationWork ElevationOf(RegionId id)
+    {
+        Advance(id, RegionStage.Elevated);
+        return _elevation[id];
+    }
+
+    /// <summary>The Elevated working data of a region if the region is Elevated or later; null otherwise.</summary>
+    public ElevationWork? FindElevation(RegionId id) => _elevation.GetValueOrDefault(id);
+
     /// <summary>The Planned working data of a region. The region is taken to the Planned stage first, through Elevated.</summary>
     public PlanWork PlanOf(RegionId id)
     {
@@ -143,6 +162,62 @@ public sealed partial class World
 
     /// <summary>The Planned working data of a region if the region is Planned or later; null otherwise.</summary>
     public PlanWork? FindPlan(RegionId id) => _plan.GetValueOrDefault(id);
+
+    /// <summary>
+    /// The Settled working data of a region: the travel links the region decides and its cities
+    /// and towns. The region is taken to the Settled stage first, which takes the regions around
+    /// it to Planned.
+    /// </summary>
+    public SettlementWork SettlementOf(RegionId id)
+    {
+        Advance(id, RegionStage.Settled);
+        return _settlement[id];
+    }
+
+    /// <summary>The Settled working data of a region if the region is Settled; null otherwise.</summary>
+    public SettlementWork? FindSettlement(RegionId id) => _settlement.GetValueOrDefault(id);
+
+    /// <summary>The travel cost grid of a region. It reads the region's Detailed data only.</summary>
+    internal CostGrid CostGridOf(RegionId id)
+    {
+        if (!_costGrids.TryGetValue(id, out var grid))
+        {
+            grid = CostGrid.Build(this, DetailOf(id));
+            _costGrids[id] = grid;
+        }
+        return grid;
+    }
+
+    /// <summary>
+    /// Whether two ocean zones are on the same sea: a sea is a connected set of ocean zones. This
+    /// is not stored as a region fact, because the world is unbounded; it is answered by a search
+    /// over the regions that are Outlined (stored) now, so a sea that connects only through
+    /// regions that are not yet Outlined is not found.
+    /// </summary>
+    public bool AreOnSameSea(ZoneId a, ZoneId b)
+    {
+        var start = Cells.ZoneRoot(a.Coord);
+        var goal = Cells.ZoneRoot(b.Coord);
+        if (!Cells.IsOceanCell(start) || !Cells.IsOceanCell(goal)) return false;
+        if (start == goal) return true;
+
+        var seen = new HashSet<long> { start.Key };
+        var queue = new Queue<GridCoord>();
+        queue.Enqueue(start);
+        while (queue.Count > 0)
+        {
+            var cell = queue.Dequeue();
+            foreach (var nb in Cells.Zones.Neighbours(cell))
+            {
+                if (!seen.Add(nb.Key)) continue;
+                if (!Cells.IsOceanZone(nb)) continue;
+                if (Cells.ZoneRoot(nb) == goal) return true;
+                if (!_regions.ContainsKey(new RegionId(Cells.RegionOfZone(nb)))) continue;
+                queue.Enqueue(nb);
+            }
+        }
+        return false;
+    }
 
     private void AdvanceOne(Region region, RegionStage next)
     {
@@ -154,18 +229,24 @@ public sealed partial class World
                 _detail[id] = detail;
                 region.Advance(detail.ToDomain());
                 break;
+            case RegionStage.Elevated:
+                var elevation = ElevationBuilder.Build(this, _detail[id]);
+                _elevation[id] = elevation;
+                region.Advance(elevation.ToDomain());
+                break;
             case RegionStage.Planned:
                 var plan = PlanBuilder.Build(this, _detail[id], _elevation[id]);
                 _plan[id] = plan;
                 region.Advance(plan.ToDomain());
                 break;
-            default:
-                AdvanceLater(region, next);
+            case RegionStage.Settled:
+                var places = SettlementBuilder.Build(this, _plan[id]);
+                var settlement = TravelBuilder.Build(this, id.Coord, places);
+                _settlement[id] = settlement;
+                region.Advance(settlement.ToDomain());
                 break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(next), next, null);
         }
     }
-
-    internal PatchResources LandResources(in LandResourceInput input) => ResourceRules.Land(input);
-
-    internal PatchResources OceanResources(in OceanResourceInput input) => ResourceRules.Ocean(input);
 }

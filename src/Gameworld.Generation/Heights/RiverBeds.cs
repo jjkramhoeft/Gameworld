@@ -179,10 +179,12 @@ internal sealed class BedProfile
 }
 
 /// <summary>
-/// The river beds of the regions one height map needs (map-generation.md section 12.2). The
+/// The river beds of the regions the height maps need (map-generation.md section 12.2). The
 /// final beds of a region are a function of that region and the simple beds of its 8 grid
-/// neighbours only, so they are the same on every raster they appear on. The dictionaries are
-/// a cache for one build; nothing is shared between builds.
+/// neighbours only, so they are the same on every raster they appear on. One instance belongs
+/// to the World and caches the beds of every region it is asked for, whatever the order: a
+/// region's beds are computed once, not once per height map that reads them. The arrays it
+/// returns are shared and must not be changed.
 /// </summary>
 internal sealed class RiverBeds
 {
@@ -191,7 +193,6 @@ internal sealed class RiverBeds
     private const double NeighbourReachM = 10_000;
     private const int MaxCapRounds = 6;
     private const double CapSlackM = 5;
-    private const double Sqrt2 = 1.4142135623730951;
 
     private readonly World _world;
     private readonly HeightMapParameters _hp;
@@ -373,16 +374,7 @@ internal sealed class RiverBeds
                         if (!double.IsPositiveInfinity(surface[c])) heap.Push(surface[c], c);
                         continue;
                     }
-                    var coastal = false;
-                    for (var dj = -1; dj <= 1 && !coastal; dj++)
-                        for (var di = -1; di <= 1; di++)
-                        {
-                            int ni = i + di, nj = j + dj;
-                            if (ni < 0 || nj < 0 || ni >= gw || nj >= gh || type[nj * gw + ni] == 0) continue;
-                            coastal = true;
-                            break;
-                        }
-                    if (coastal) heap.Push(0, c);
+                    if (Geometry.TouchesLand(type, gw, gh, i, j)) heap.Push(0, c);
                 }
             while (heap.Count > 0)
             {
@@ -399,7 +391,7 @@ internal sealed class RiverBeds
                         var nc = nj * gw + ni;
                         if (type[nc] == 0) continue;
                         var mean = sea ? slope[nc] : 0.5 * (slope[c] + slope[nc]);
-                        var next = key + CoarseCellM * mean * (di != 0 && dj != 0 ? Sqrt2 : 1);
+                        var next = key + CoarseCellM * mean * (di != 0 && dj != 0 ? DetMath.Sqrt2 : 1);
                         if (next < surface[nc])
                         {
                             surface[nc] = next;
@@ -504,6 +496,18 @@ internal sealed class TypeCounts
 
 internal static class Geometry
 {
+    /// <summary>A cell of a grid of types (0 = sea) has a land cell among the eight around it.</summary>
+    public static bool TouchesLand(byte[] type, int width, int height, int i, int j)
+    {
+        for (var dj = -1; dj <= 1; dj++)
+            for (var di = -1; di <= 1; di++)
+            {
+                int ni = i + di, nj = j + dj;
+                if (ni >= 0 && nj >= 0 && ni < width && nj < height && type[nj * width + ni] != 0) return true;
+            }
+        return false;
+    }
+
     /// <summary>The distance from a point to the segment a → b; t is the position of the projection (0 at a, 1 at b).</summary>
     public static double DistanceToSegment(double px, double py, double ax, double ay, double bx, double by, out double t)
     {

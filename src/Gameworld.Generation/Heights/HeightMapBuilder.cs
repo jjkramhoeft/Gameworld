@@ -36,7 +36,6 @@ internal static class HeightMapBuilder
     private const double ValleyMaskM = 40;
     private const double NoiseScaleM = 6_000;
     private const float Epsilon = 0.01f;
-    private const double Sqrt2 = 1.4142135623730951;
 
     /// <summary>A river segment parent → node with the node on land (12.3).</summary>
     private struct Segment
@@ -166,7 +165,7 @@ internal static class HeightMapBuilder
         // The rivers on the raster: those of every region with land on it, and of this region and
         // its 8 grid neighbours in any case (a landlocked neighbour's rivers cross other regions' land).
         // Every region's rivers get that region's own final beds, so two rasters see the same river.
-        var beds = new RiverBeds(world);
+        var beds = world.RiverBeds;
         var riverRegions = new List<GridCoord>(regions);
         for (var dj = -1; dj <= 1; dj++)
             for (var di = -1; di <= 1; di++)
@@ -273,14 +272,7 @@ internal static class HeightMapBuilder
                     if (!double.IsPositiveInfinity(envelope[c])) heap.Push(envelope[c], c);
                     continue;
                 }
-                for (var dj = -1; dj <= 1 && !coast[c]; dj++)
-                    for (var di = -1; di <= 1; di++)
-                    {
-                        int ni = i + di, nj = j + dj;
-                        if (ni < 0 || nj < 0 || ni >= width || nj >= height || type[nj * width + ni] == 0) continue;
-                        coast[c] = true;
-                        break;
-                    }
+                coast[c] = Geometry.TouchesLand(type, width, height, i, j);
                 if (coast[c]) heap.Push(0, c);
             }
         while (heap.Count > 0)
@@ -299,7 +291,7 @@ internal static class HeightMapBuilder
                     if (type[nc] == 0) continue;
                     // From an ocean cell, use the slope of the land cell.
                     var mean = sea ? slope[nc] : 0.5 * (slope[c] + slope[nc]);
-                    var next = key + res * mean * (di != 0 && dj != 0 ? Sqrt2 : 1);
+                    var next = key + res * mean * (di != 0 && dj != 0 ? DetMath.Sqrt2 : 1);
                     if (next < envelope[nc])
                     {
                         envelope[nc] = next;
@@ -517,7 +509,7 @@ internal static class HeightMapBuilder
     private static double[] Chamfer(bool[] sources, int width, int height, double res)
     {
         var d = new double[sources.Length];
-        var diagonal = Sqrt2 * res;
+        var diagonal = DetMath.Sqrt2 * res;
         for (var c = 0; c < d.Length; c++) d[c] = sources[c] ? 0.5 * res : double.PositiveInfinity;
         for (var j = 0; j < height; j++)
             for (var i = 0; i < width; i++)
