@@ -29,8 +29,11 @@ public sealed record ParameterSet
     [Description("Elevated stage: the height map and the biomes (§12, §13).")]
     public ElevationParameters Elevation { get; init; } = new();
 
-    [Description("Planned stage: Prospects for cities and towns, which of them are on show (§15), the potential population (society §3) and the factions (society §4). The Settled stage has no parameters of its own: the travel network connects the Prospects on show (§16).")]
+    [Description("Planned stage: Prospects for cities and towns, which of them are on show (§15), the potential population (society §3) and the factions (society §4).")]
     public PlanningParameters Planning { get; init; } = new();
+
+    [Description("Settled stage: the cities and towns of a region, and how many of its persons live in them (society §5.2). The travel network of this stage has no parameters of its own: it connects the Prospects on show (§16).")]
+    public SettlementParameters Settlement { get; init; } = new();
 
     [Description("The four Fields: noise maps that drive climate, biomes and resources. They have no stage (§9).")]
     public FieldsParameters Fields { get; init; } = new();
@@ -507,6 +510,22 @@ public sealed record PopulationParameters
     [Description("How much of the potential population of the whole region a city or a town draws on, beside the patch of its Prospect and the land patches around it, 0 to 1. It lets a race of the region that does not live nearby into the city or town (society §5.1).")]
     [Range(0, 1)]
     public double HinterlandShare { get; init; } = 0.02;
+}
+
+/// <summary>Parameters of the Settled stage: the cities and towns of a region (society-generation.md section 5.2).</summary>
+public sealed record SettlementParameters
+{
+    [Description("The share of the persons of a region that live in its cities, 0 to 1. A city stands on every Prospect on show for a city and on the capital of the region, and the cities share these persons by their rank. A region without a city keeps the share on the land, and every city holds at least one person where the region has one for it, so the share of a whole world lies near this number, not exactly on it. If the two shares sum to more than 1, both are scaled down (society §5.2).")]
+    [Range(0, 1)]
+    public double CityShare { get; init; } = 0.1;
+
+    [Description("The share of the persons of a region that live in its towns, 0 to 1. A town stands on every other Prospect on show, and the towns share these persons by their rank. A region without a town keeps the share on the land, and every town holds at least one person where the region has one for it (society §5.2).")]
+    [Range(0, 1)]
+    public double TownShare { get; init; } = 0.1;
+
+    [Description("How unequal the cities and towns of a region are: the weight of a city or a town is its rank in the region raised to minus this. The capital has rank 1, then come the other cities, then the towns. With 1 the second city holds half the persons of the capital and the third a third; 0 gives all cities the same size and all towns the same size (society §5.2).")]
+    [Range(0, double.PositiveInfinity)]
+    public double RankExponent { get; init; } = 1;
 }
 
 /// <summary>Parameters of the factions of a region (society-generation.md section 4).</summary>

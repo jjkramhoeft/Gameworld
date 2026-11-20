@@ -175,12 +175,21 @@ public class DomainTests
 
         region.Advance(new RegionElevation(new HeightMap(0, 0, 1, 1, 1000, [0f]), []));
         region.Advance(plan);
-        region.Advance(new RegionSettlement(new TravelNetwork([])));
+        var settlement = new RegionSettlement(
+            new TravelNetwork([]),
+            [new Settlement(0, SettlementKind.City, true, new PatchId(4, 5), 1, 120, [new RacePersons("midlanders", 120)])],
+            [new RacePersons("midlanders", 1080)]);
+        region.Advance(settlement);
         Assert.Equal(RegionStage.Settled, region.Stage);
 
         var restored = Region.FromSnapshot(DomainJson.Deserialize<RegionSnapshot>(DomainJson.Serialize(region.ToSnapshot())));
         Assert.Equal(RegionStage.Settled, restored.Stage);
         Assert.Equal(region.Id, restored.Id);
+
+        // The cities and towns come back as they were, and a city is its region and its slot.
+        Assert.Equal(DomainJson.Serialize(settlement), DomainJson.Serialize(restored.Settlement));
+        Assert.Equal(new SlotId<RegionId>(region.Id, 0), restored.Settlement!.Capital!.IdIn(region.Id));
+        Assert.Equal((120, 0, 1080), (restored.Settlement.CityPersons, restored.Settlement.TownPersons, restored.Settlement.RuralPersons));
     }
 
     [Fact]

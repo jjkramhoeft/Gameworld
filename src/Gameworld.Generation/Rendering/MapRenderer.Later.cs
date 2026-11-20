@@ -10,6 +10,7 @@ public static partial class MapRenderer
     private static readonly Rgb RiverRouteColour = new(206, 236, 255);
     private static readonly Rgb SeaLaneColour = new(238, 242, 250);
     private static readonly Rgb MarkerEdge = new(24, 20, 20);
+    private static readonly Rgb CapitalRing = new(250, 247, 238);
 
     private static readonly (double HeightM, Rgb Colour)[] HypsometricStops =
     [
@@ -107,18 +108,32 @@ public static partial class MapRenderer
                 }
     }
 
-    /// <summary>A diamond for a city Prospect and a dot for a town Prospect, coloured by class. Only Prospects on show are drawn.</summary>
+    /// <summary>
+    /// A diamond for a city Prospect and a dot for a town Prospect, coloured by class. Only
+    /// Prospects on show are drawn. The capital of the region, the seat of its ruling faction, is
+    /// a larger diamond with a light ring, whatever its Prospect is for: the capital is a city.
+    /// </summary>
     private static void DrawProspects(World world, Canvas canvas, MapView view, HashSet<GridCoord> regions)
     {
         var zoom = Math.Clamp(2000 / view.MetresPerPixel / 7, 0.7, 1.8);
         foreach (var region in regions.OrderBy(r => r.Key))
-            foreach (var prospect in world.PlanOf(new RegionId(region)).Prospects)
+        {
+            var plan = world.PlanOf(new RegionId(region));
+            var capital = plan.Factions.Factions.FirstOrDefault(f => f.Role == FactionRole.Ruling)?.Seat;
+            foreach (var prospect in plan.Prospects)
             {
                 if (!prospect.OnShow) continue;
                 var x = view.ToPixelX(prospect.Spot.X);
                 var y = view.ToPixelY(prospect.Spot.Y);
                 var colour = ProspectColour(prospect.Class);
-                if (prospect.ForCity)
+                if (prospect.Patch == capital)
+                {
+                    canvas.Diamond(x, y, 10.5 * zoom, MarkerEdge);
+                    canvas.Diamond(x, y, 8.8 * zoom, CapitalRing);
+                    canvas.Diamond(x, y, 7 * zoom, MarkerEdge);
+                    canvas.Diamond(x, y, 5.5 * zoom, colour);
+                }
+                else if (prospect.ForCity)
                 {
                     canvas.Diamond(x, y, 7.5 * zoom, MarkerEdge);
                     canvas.Diamond(x, y, 5.5 * zoom, colour);
@@ -129,6 +144,7 @@ public static partial class MapRenderer
                     canvas.Disc(x, y, 2.9 * zoom, colour);
                 }
             }
+        }
     }
 
     /// <summary>Gold for a Rich Prospect, silver for an Average one and bronze for a Poor one.</summary>

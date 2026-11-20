@@ -44,7 +44,7 @@ The project is in phase 1.
 
 ### Status
 
-The map is generated through all its stages, from the cells to the travel network, with the flora and fauna of every patch. Of the society, the races of each region, their potential population, the factions of each region, the races of a city or a town on each Prospect and the person names are generated. The vocations are a list in the Parameter Set and are not drawn yet. Cities and towns, families and persons are defined below but not generated yet, and neither is there a database: the apps compute everything in memory.
+The map is generated through all its stages, from the cells to the travel network, with the flora and fauna of every patch. Of the society, the races of each region, their potential population, the factions of each region, the cities and towns of each region with their persons and races, and the person names are generated. The vocations are a list in the Parameter Set and are not drawn yet. Families and persons are defined below but not generated yet, and neither is there a database: the apps compute everything in memory.
 
 ## Concepts
 
@@ -102,7 +102,7 @@ All structural identities are deterministic. No database generated ids appear in
 
 * Region, zone cell and patch cell = coordinate in the grid of its level
 * Zone and patch = the identity of its root cell (see Zone)
-* City, faction, family and person = parent + slot index. The parent of a faction is its region
+* City, faction, family and person = parent + slot index. The parent of a faction, a city and a town is its region
 
 This lets player state and authored data point at derived data that may be evicted and recomputed, and it makes a Stub addressable before it is Realised.
 
@@ -236,7 +236,7 @@ Resources are split in groups to make trade and needs manageable: Food, Material
 
 A potential location for a city or a town, with information about its resources, its travel options and so on. Every land patch of a region gets a score, and the best patches become the Prospects of the region (20 by default, of which up to 4 are for cities), with a minimum spacing between them. A Prospect never touches the land of another region.
 
-A Prospect is Rich, Average or Poor by its score. The sum of the scores of a region decides how many of its Prospects are on show: all of them in the best regions, a single one in the poorest. Only the Prospects on show are drawn on a map and connected by the travel network.
+A Prospect is Rich, Average or Poor by its score. The sum of the scores of a region decides how many of its Prospects are on show: all of them in the best regions, a single one in the poorest. Only the Prospects on show are drawn on a map and connected by the travel network, and only they get a city or a town.
 
 #### Travel network
 
@@ -244,7 +244,7 @@ Roads, river routes and sea lanes that connect the Prospects on show. The networ
 
 ### The society
 
-The peoples that live on the map. The Stub of every entity in this group is derived data, and its presentation is authored. The rules are in [docs/society-generation.md](docs/society-generation.md). Only the races, the potential population and the factions are specified there so far. Detailing the rest is a later task.
+The peoples that live on the map. The Stub of every entity in this group is derived data, and its presentation is authored. The rules are in [docs/society-generation.md](docs/society-generation.md). Only the races, the potential population, the factions and the cities and towns are specified there so far. Detailing the rest is a later task.
 
 #### Race
 
@@ -258,7 +258,7 @@ A region does not hold every race. It holds up to six: four main races and two m
 
 #### Potential population
 
-An estimate of how many persons the land of a region can feed, for each race of the region. It is not a count of people that exist: cities, families and persons come in the Settled stage.
+An estimate of how many persons the land of a region can feed, for each race of the region. It is not a count of people that exist: cities, families and persons come in the Settled stage, where the potential population becomes the persons of the cities, the towns and the land.
 
 Every land patch has a capacity that comes from its area, its food resources and the Prosperity field. The races of the region share it by their frequency in the biome of the patch and their height modifier at its height. So the races compete for the same land, and toggling a race off leaves its share to the others. A minority race is lifted towards a twentieth of the region, so that it is large enough to be met. A patch where no race of the region lives holds nobody. The potential population is calculated in the Planned stage.
 
@@ -282,7 +282,11 @@ The type and the lead race of the ruling faction are drawn from how well the lan
 
 An actual settlement on a Prospect. Cities and towns belong to the Settled stage. A city can exist with a population count long before any individual in it is authored.
 
-A city or a town holds some of the races of its region: the largest around its Prospect, and a last one that is drawn with the minority races weighted up. Which races a city or a town on a Prospect holds is worked out in the Planned stage, with the Prospects.
+A city or a town stands on every Prospect on show, and on no other: a city on a Prospect for a city, a town on a Prospect for a town. The capital of the region, the seat of its ruling faction, is always a city, whatever its Prospect is for. The identity of a city or a town is its region and a slot, the place of its Prospect among the Prospects of the region.
+
+The potential population of a region becomes its persons: a share of them lives in its cities, a share in its towns and the rest on the land. The two shares are Parameter Set values, a tenth each by default. The cities of a region share their persons by rank, and so do the towns: the capital is the first, then the other cities, then the towns, and a place weighs one over its rank. No city or town stands empty where the region has a person for it.
+
+A city or a town holds some of the races of its region: the largest around its Prospect, and a last one that is drawn with the minority races weighted up. Which races a city or a town on a Prospect holds is worked out in the Planned stage, with the Prospects. Its persons are shared between these races by how many of each live around it, so every person of a region has a race and lives in a city, in a town or on the land.
 
 #### Family
 

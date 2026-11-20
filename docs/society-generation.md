@@ -7,9 +7,10 @@ their looks. It is the specification of the society generation, as
 the concepts and holds the names, and the names in this document follow the readme.
 
 Only the first steps are specified and implemented: the races (section 2), the races of a
-region with their potential population (section 3), the factions of a region (section 4)
-and the races of a city or a town (section 5.1). The rest of sections 5 to 9 holds what is
-decided and what is still open. Detailing it is a later task.
+region with their potential population (section 3), the factions of a region (section 4),
+the races of a city or a town (section 5.1) and the cities and towns of a region with
+their persons (section 5.2). The rest of sections 5 to 9 holds what is decided and what is
+still open. Detailing it is a later task.
 
 Sections 2 and 3 and Appendix A were section 19 and Appendix E of map-generation.md until
 2026-11-15. The research notes cite them under those numbers.
@@ -42,7 +43,7 @@ and the travel network are its inputs.
 | Races | none: a list in the Parameter Set | Specified and implemented (section 2) |
 | The races of a region and its potential population | Planned | Specified and implemented (section 3) |
 | Factions | Planned | Specified and implemented (section 4): a ruling faction, an opposition and lesser factions per region |
-| Cities and towns | Settled; their races Planned | The races of a city or a town are specified and implemented (section 5.1), the rest is not specified |
+| Cities and towns | Settled; their races Planned | Specified and implemented: the races of a city or a town (section 5.1), and which Prospects get one and how many persons live in each (section 5.2). Their names are not specified |
 | Families | Settled | Not specified (section 6) |
 | Persons | Settled for the important persons, later for the rest | The names are implemented, the rest is not specified (section 7) |
 | Vocations | Planned for the countryside, Settled for the cities and towns | The list is in the Parameter Set. The rules are decided in part and not specified (section 8) |
@@ -61,8 +62,9 @@ These rules come from the readme and are decided.
   truth and are never regenerated or evicted. Authored data must not contradict the Stub.
 - **Identity is deterministic.** A city, a faction, a family or a person is its parent
   plus a slot index. So a Stub is addressable before it is Realised, and player state and
-  authored data can point at it. The parent of a faction is its region (section 4.2). The
-  parent of a city, a family and a person has not been decided.
+  authored data can point at it. The parent of a faction is its region (section 4.2), and
+  so is the parent of a city or a town (section 5.2). The parent of a family and a person
+  has not been decided.
 - **Only a small and relevant set is precalculated.** The game supports a very large
   number of persons, cities and towns. Only a small and relevant set of them is generated
   at game start, and more are generated as play progresses.
@@ -464,7 +466,8 @@ The Stub of a faction holds:
 | Main colour | The id of a colour (section 4.9): the field of its banner and the cloth of its livery |
 | Secondary colour | The id of another colour (section 4.9): the device on the banner and the trim of the livery |
 
-The seat of the ruling faction is the capital of the region.
+The seat of the ruling faction is the capital of the region. The capital is a city,
+whatever its Prospect is for (section 5.2).
 
 ### 4.3 The indices of a region
 
@@ -829,21 +832,23 @@ Open:
 
 ## 5. Cities and towns
 
-Stage: Settled. Not specified yet, apart from the races of a city or a town (section 5.1).
+Stage: Settled. The races of a city or a town are worked out in the Planned stage
+(section 5.1). Which Prospects get a city or a town, and how many persons live in each, is
+section 5.2.
 
 A city or a town is an actual settlement on a Prospect. The Prospects are the map's
 answer to where a settlement can lie, and how good the place is
 (map-generation.md section 15). A region has 20 Prospects by default, of which up to 4 are
-for cities.
+for cities. A city or a town stands on every Prospect on show, and on no other.
 
 Open:
 
-- Which Prospects become cities and towns.
-- How the potential population of a region is turned into the population of its cities,
-  its towns and the land between them.
-- What a city holds as a Stub, and what the parent of its identity is.
 - The names of cities and regions. [RegionNameGenerator-Reuse.md](RegionNameGenerator-Reuse.md)
   describes the region-name generator of an earlier project. It has not been ported.
+- What a city or a town holds beside its persons and their races: its families
+  (section 6) and its vocations (section 8).
+- Whether a Prospect that is not on show gets a city or a town later, as play progresses.
+  Its slot is kept free for it (section 5.2).
 
 ### 5.1 The races of a city or a town
 
@@ -886,8 +891,164 @@ minority race is in a city or a town on show of its region in 97 % of the cases,
 half of them in the median case. A cluster of 30 regions holds all 28 races in its cities
 and towns on show in 90 % of the cases.
 
-How many persons of each race a city or a town holds is open, with the population of the
-city or town itself.
+How many persons a city or a town holds, and how many of each race, follows in section
+5.2.
+
+### 5.2 The cities and towns of a region
+
+Stage: Settled. The rule needs the region itself only: its Prospects on show with their
+races (section 5.1), its potential population (section 3.4) and the seat of its ruling
+faction (section 4.4). Nothing is read from another region, and the rule holds no random
+choice. It was adopted on 2026-11-20 as planned in
+[plans/cities-and-towns.md](plans/cities-and-towns.md), which holds what was measured and
+what was weighed.
+
+| Parameter | Default |
+|---|---|
+| City share | 0.1 |
+| Town share | 0.1 |
+| Rank exponent | 1 |
+
+The parameters are `Settlement` in the Parameter Set.
+
+In the Settled stage the potential population of a region becomes its persons. A share of
+them lives in its cities, a share in its towns and the rest on the land.
+
+**Which Prospects get a city or a town.**
+
+```
+capital = the Prospect on show that is the seat of the ruling faction (section 4.4)
+city    = the capital, and every other Prospect on show that is for a city
+town    = every other Prospect on show
+```
+
+- A Prospect that is not on show gets no city and no town.
+- The capital is a city whatever its Prospect is for. The best place of a region is a
+  Prospect for a town when it lies one patch from the border patches
+  (map-generation.md section 15.5), and such a Prospect is the capital in about one region
+  in five. Its races are still those of its Prospect (section 5.1), so such a capital
+  holds up to four races.
+- A region without persons has no ruling faction and so no capital. A region without a
+  Prospect on show has no city and no town, and all its persons live on the land.
+
+**The rank.** The cities and towns of a region are ranked together:
+
+```
+order     = the capital, the other cities, then the towns
+            # the other cities and the towns each in the order of the Prospects (map-generation.md section 15.5): the best score first
+rank(s)   = 1, 2, 3 … in that order
+weight(s) = rank(s)^(−rank exponent)
+```
+
+- With the default exponent of 1 the weight is exactly `1 / rank`: the rank-size rule. An
+  exponent of 0 gives every weight 1, and a negative one counts as 0. Any other exponent
+  goes through the deterministic exponential and logarithm: `exp(−exponent · ln(rank))`.
+- The towns continue the ranks of the cities. In a region with three cities the first town
+  has rank 4, so the towns of a region differ less in size than its cities do.
+
+**The persons of the cities and of the towns.**
+
+```
+P = Σ population(r)                          # section 3.4, each race rounded
+
+pool(share, n) = 0                           if n = 0 or share = 0
+                 max(round(share · P), n)    otherwise; round is half up
+
+cityPersons = pool(city share, the number of cities)
+townPersons = pool(town share, the number of towns)
+if cityPersons + townPersons > P:   cityPersons = min(cityPersons, P),  townPersons = P − cityPersons
+```
+
+- Each share is clamped to 0–1. If the two sum to more than 1, both are divided by the sum.
+- A region without a city keeps the city share on the land, and a region without a town
+  the town share.
+- The pool is never smaller than the number of places that share it, so that no city or
+  town stands empty. This lifts a pool only in a region with fewer than ten persons per
+  place at the default shares, which the default density gives next to never.
+- A share of 0 leaves the cities, or the towns, standing with nobody in them.
+
+The cities share `cityPersons` by their weights, and the towns `townPersons` by theirs:
+
+```
+quota(s)   = pool · weight(s) / Σ weight          over the cities, or over the towns
+persons(s) = ⌊quota(s)⌋
+the persons left in the pool go one each to the largest remainders quota(s) − ⌊quota(s)⌋; ties to the lower rank
+then, by rank: a place with nobody takes one person from the place of its kind with the most persons
+               (ties to the lower rank), as long as that place holds two or more
+```
+
+- A region with fewer persons than places fills the lowest ranks first, one person each,
+  and the last places stand empty.
+
+**The races of a city or a town.** Its persons are shared between the races of its
+Prospect by the weights of section 5.1. A race is never placed beyond the persons it has
+in the region.
+
+```
+left(r) = population(r)                           # section 3.4, rounded; before the first city
+
+for each city and town s, by rank:
+    list     = the races of its Prospect (section 5.1), in their order
+    w(r)     = weight(r) of section 5.1           # local(r) + hinterland share · population(r)
+    quota(r) = persons(s) · w(r) / Σ w            over the races of the list
+    n(r)     = min(⌊quota(r)⌋, left(r))
+    while persons(s) > Σ n:
+        one more person to the race of the list with left(r) > n(r) and the largest quota(r) − n(r); ties to the first in the list
+        if the list has no such race: the rest goes to the other races of the region, the one with the
+        largest left(r) first, ties in the order of the Parameter Set. They join the list at its end
+    left(r) = left(r) − n(r)
+
+rural(r) = left(r) after the last city or town
+```
+
+- Without a cap this is the largest remainder again. In a small place a race of the list
+  can hold nobody: the list says which races the place is open to, the persons say who
+  lives there now.
+- A race from outside the list only enters when the shares are set far above the defaults,
+  so that the cities and towns ask for more of a race than the region has.
+- Every person of the region is counted once: for every race,
+  `population(r) = the persons of r in the cities and towns + rural(r)`.
+
+**The Stub** of a city or a town holds:
+
+| Fact | Meaning |
+|---|---|
+| Slot | Its identity is the region and the slot. The slot is the index of its Prospect among the Prospects of the region (map-generation.md section 15.5), so the slot of a Prospect that is not on show stays free |
+| Kind | City or town |
+| Capital | Whether it is the capital of the region |
+| Patch | The patch of its Prospect |
+| Rank | Its rank in the region, from 1 |
+| Persons | How many persons live in it |
+| Races | The persons of each race, in the order of the races of its Prospect |
+
+The result of a region is its cities and towns by rank, and `rural(r)` for every race that
+is on, in the order of the Parameter Set.
+
+**The land.** `rural(r)` is the persons of race `r` that live on the land of the region.
+A rural person belongs to a patch (section 8). The share of a patch is that of section
+3.4: `rural(r) · the persons of r on the patch / population(r)`. This is not rounded.
+Whole persons per patch are open, with the vocations of the countryside.
+
+With the defaults 10.0 % of all persons live in cities, 9.9 % in towns and 80.0 % on the
+land (measured on 676 regions of four seeds with 252,980 persons). A region has 3.1 cities
+and 9.8 towns on average. Every region with persons has a capital, and 1 in 28 has no
+town. No city or town stands empty, and no pool is lifted. The share of one region lies
+within a person of a tenth: 9.8 to 10.3 % in cities for nine regions in ten.
+
+| Persons | Lowest | 5 % | Median | 95 % | Highest |
+|---|---|---|---|---|---|
+| The capital | 1 | 8 | 20 | 34 | 57 |
+| Another city | 2 | 4 | 8 | 15 | 29 |
+| A town | 1 | 2 | 3 | 8 | 20 |
+
+The capital holds 5.4 % of its region in the median region, and the whole city share
+where it is the only city. In 55 % of the regions the largest town is larger than the
+smallest city, mostly by a person or two: with equal shares ten towns hold as many persons
+as three cities. A minority race has a person in a city or a town of its region in 80 % of
+the cases, and a quarter of the listed races of all places hold nobody.
+
+With a city share of 0.05 and a town share of 0.2 the same regions hold 5.0 % of all
+persons in cities and 19.9 % in towns.
 
 ---
 
@@ -1032,8 +1193,8 @@ Open:
 - The age at which a person gets a vocation, and what a child and an old person hold.
 - The factors per race, which races keep slaves, and which races other than the Twofold
   switch the division by sex off.
-- The capital of a region is the seat of its ruling faction (section 4.4). What a vocation
-  of the tier capital needs beyond that.
+- The capital of a region is the seat of its ruling faction (section 4.4), and it is a
+  city (section 5.2). What a vocation of the tier capital needs beyond that.
 
 Material: [research/vocations.md](research/vocations.md) describes each of the 51
 vocations (what it covers, its lore, its resources, where it is found, how frequent it is,
@@ -1326,6 +1487,8 @@ when it stands in sections 1 to 9.
 | [research/factions.md](research/factions.md) | Faction archetypes, their axes and relations, and a design note | Section 4 |
 | [research/faction-generation.md](research/faction-generation.md) | How generators and games compute the kind of ruler of a land, and the scholarship on what decides a ruler, an opposition and guilds | Section 4 |
 | [plans/region-factions.md](plans/region-factions.md) | The plan behind the factions of a region: the proposal, its test on 1,154 regions, what was weighed and what changed when it was implemented | Section 4 |
+| [plans/cities-and-towns.md](plans/cities-and-towns.md) | The plan behind the cities and towns of a region: what a region knows when they are made, the rule, its measurement on 676 regions and what was weighed | Section 5.2 |
+| [research/settlement-siting.md](research/settlement-siting.md) §2.6, §2.7 and §6.7 | The rank-size rule and the urban shares of medieval Europe. A map note: it uses the names of an earlier prototype | Section 5.2 |
 | [research/vocations.md](research/vocations.md) | 51 vocations with their lore, resources, biomes, races and factions, the proposals for new resources, and a design note | Section 8 |
 | [tools-basis.md](tools-basis.md) | 146 real tools for the 51 vocations, each with a sourced description, lore and the fitting vocations. Material: no rule reads it | Sections 8, 9 |
 | [research/portrait-components.md](research/portrait-components.md) | Lists of hairstyles, outfits, colours, race markers and accessories for portraits. Written for the 32 races of the first version of races-basis.md and extended for the Catfolk: it still covers the five that were left out | Section 9 |

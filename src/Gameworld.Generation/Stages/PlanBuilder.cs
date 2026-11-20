@@ -42,6 +42,12 @@ public sealed class PlanWork
     /// <summary>For each Prospect, in the order of <see cref="Prospects"/>: the ids of the races of a city or a town on it.</summary>
     public required string[][] ProspectRaces { get; init; }
 
+    /// <summary>
+    /// For each Prospect, in the order of <see cref="Prospects"/>: how the society reads it. Its
+    /// races, the land patches around it and the persons of each race of the region on them.
+    /// </summary>
+    public required FactionProspect[] Places { get; init; }
+
     /// <summary>The factions of the region and how the region was read for them.</summary>
     public required FactionWork Factions { get; init; }
 
@@ -298,6 +304,7 @@ internal static class PlanBuilder
             Prospects = prospects,
             Races = races,
             ProspectRaces = prospectRaces,
+            Places = seats,
             Factions = factions,
         };
     }

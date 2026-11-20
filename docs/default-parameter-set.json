@@ -378,6 +378,11 @@
       }
     }
   },
+  "Settlement": {
+    "CityShare": 0.1,
+    "TownShare": 0.1,
+    "RankExponent": 1
+  },
   "Fields": {
     "Precipitation": {
       "FeatureSizeKm": 80,

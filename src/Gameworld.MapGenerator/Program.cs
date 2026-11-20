@@ -41,7 +41,11 @@ Console.WriteLine();
 // Generate.
 var total = Stopwatch.StartNew();
 var regions = new List<Region>();
-Console.WriteLine($"{"region",-10} {"stage",-9} {"zones",5} {"sea",5} {"patches",7} {"rivers",6} {"lakes",5} {"prospects",9} {"people",9} {"factions",8} {"links",5} {"ms",6}");
+// Cities and towns: how many, and the persons that live in them.
+static string Places(RegionSettlement? s, SettlementKind kind) => s is null
+    ? "-"
+    : $"{s.Settlements.Count(x => x.Kind == kind)}/{(kind == SettlementKind.City ? s.CityPersons : s.TownPersons)}";
+Console.WriteLine($"{"region",-10} {"stage",-9} {"zones",5} {"sea",5} {"patches",7} {"rivers",6} {"lakes",5} {"prospects",9} {"people",9} {"factions",8} {"cities",8} {"towns",8} {"links",5} {"ms",6}");
 foreach (var id in RegionStageRules.RegionsWithin(options.Centre, options.Rings))
 {
     var sw = Stopwatch.StartNew();
@@ -52,6 +56,7 @@ foreach (var id in RegionStageRules.RegionsWithin(options.Centre, options.Rings)
         + $"{region.Detail?.Patches.Count.ToString() ?? "-",7} {region.Detail?.Rivers.Nodes.Count.ToString() ?? "-",6} "
         + $"{region.Detail?.Lakes.Count.ToString() ?? "-",5} {region.Plan?.Prospects.Count.ToString() ?? "-",9} "
         + $"{region.Plan?.Population.Total.ToString() ?? "-",9} {region.Plan?.Factions.Count.ToString() ?? "-",8} "
+        + $"{Places(region.Settlement, SettlementKind.City),8} {Places(region.Settlement, SettlementKind.Town),8} "
         + $"{region.Settlement?.Travel.Links.Count.ToString() ?? "-",5} {sw.ElapsedMilliseconds,6}");
 }
 Console.WriteLine($"Generated {regions.Count} regions in {total.Elapsed.TotalSeconds:F1} s ({world.Regions.Count} stored, the rest as far as the stages around them need)");

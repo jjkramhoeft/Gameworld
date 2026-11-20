@@ -380,11 +380,7 @@ public sealed class PopulationRules
         var places = Math.Max(0, forCity ? _parameters.RacesPerCity : _parameters.RacesPerTown);
         if (places == 0 || region.Races.Length == 0) return [];
 
-        var weight = new double[region.Races.Length];
-        foreach (var p in patches)
-            for (var r = 0; r < weight.Length; r++) weight[r] += region.PatchPersons[p][r];
-        var hinterland = Math.Clamp(_parameters.HinterlandShare, 0, 1);
-        for (var r = 0; r < weight.Length; r++) weight[r] += hinterland * region.Persons[region.Races[r]];
+        var weight = SettlementWeights(region, patches);
 
         // Positions in the region's race list, in the order of the Parameter Set.
         var present = Enumerable.Range(0, weight.Length)
@@ -400,6 +396,22 @@ public sealed class PopulationRules
             main.Add(Draw(rest, r => weight[r] * (r >= region.MainCount ? minorityBoost : 1), u));
         }
         return main.Select(r => region.Races[r]).ToArray();
+    }
+
+    /// <summary>
+    /// 5.1 The weight of each race of a region in a city or a town on a Prospect, in the order of
+    /// <see cref="RegionRaces.Races"/>: its persons on the patches around the Prospect, and a
+    /// share of its persons in the whole region.
+    /// </summary>
+    /// <param name="patches">The patch of the Prospect and its neighbouring land patches of the region, as indexes into the land patches the region was shared over.</param>
+    public double[] SettlementWeights(RegionRaces region, IEnumerable<int> patches)
+    {
+        var weight = new double[region.Races.Length];
+        foreach (var p in patches)
+            for (var r = 0; r < weight.Length; r++) weight[r] += region.PatchPersons[p][r];
+        var hinterland = Math.Clamp(_parameters.HinterlandShare, 0, 1);
+        for (var r = 0; r < weight.Length; r++) weight[r] += hinterland * region.Persons[region.Races[r]];
+        return weight;
     }
 
     /// <summary>One of the candidates by weight, walked in the order given; the first one when no weight is positive.</summary>

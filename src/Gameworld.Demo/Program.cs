@@ -356,6 +356,9 @@ namespace Gameworld.Demo
                 var prospectAt = plan is null ? -1 : Array.FindIndex(plan.Prospects, p => p.Patch.Coord == info.Patch);
                 var prospect = prospectAt < 0 ? null : plan!.Prospects[prospectAt];
                 string NameOf(string race) => world.Parameters.Races.FirstOrDefault(x => x.Id == race)?.Name ?? race;
+                // Cities and towns belong to the Settled stage: they are shown once the region has reached it.
+                var settled = world.FindSettlement(regionId)?.Places;
+                var place = settled?.Settlements.FirstOrDefault(s => s.Patch.Coord == info.Patch);
                 string VocationNameOf(string id) => world.Parameters.Vocations.FirstOrDefault(x => x.Id == id)?.Name ?? id;
                 FactionInfo InfoOf(Faction f) => new(
                     f.Slot, f.Role, f.Type, f.Form, NameOf(f.LeadRace),
@@ -384,6 +387,10 @@ namespace Gameworld.Demo
                         .Select(r => new RacePopulationInfo(r.Race, NameOf(r.Race), r.Persons, r.Standing))
                         .ToArray(),
                     plan?.Factions.Factions.Select(InfoOf).ToArray(),
+                    settled is null ? null : new SettledInfo(
+                        settled.Settlements.Count(s => s.Kind == SettlementKind.City), settled.CityPersons,
+                        settled.Settlements.Count(s => s.Kind == SettlementKind.Town), settled.TownPersons,
+                        settled.RuralPersons),
                     info.Ocean,
                     new ZoneInfo(
                         new ZoneId(new ZoneCellId(info.Zone)),
@@ -416,6 +423,9 @@ namespace Gameworld.Demo
                         score?.Factors),
                     prospect,
                     prospectAt < 0 ? null : plan!.ProspectRaces[prospectAt].Select(NameOf).ToArray(),
+                    place is null ? null : new SettlementInfo(
+                        place.Kind, place.Capital, place.Rank, place.Persons,
+                        place.Races.Select(r => new RacePersonsInfo(NameOf(r.Race), r.Persons)).ToArray()),
                     elevation?.Heights.Map.Sample(point),
                     new FieldValues(
                         world.Fields.Sample(FieldKind.InitialTemperature, point),
@@ -472,6 +482,8 @@ namespace Gameworld.Demo
     /// <param name="RegionPopulation">The potential population of the region per race that is on, in the order of the Parameter Set. Null until the region is Planned.</param>
     /// <param name="ProspectRaces">The names of the races of a city or a town on the Prospect of the patch, the largest first and the drawn one last. Null when the patch has no Prospect.</param>
     /// <param name="RegionFactions">The factions of the region, by slot: the ruling faction, the opposition when there is one, then the lesser factions. Null until the region is Planned.</param>
+    /// <param name="RegionSettled">The cities and towns of the region and the persons in them. Null until the region is Settled.</param>
+    /// <param name="Settlement">The city or town on the Prospect of the patch. Null when the patch has none, and until the region is Settled.</param>
     public sealed record PointInfo(
         WorldPoint Point,
         RegionId Region,
@@ -481,13 +493,25 @@ namespace Gameworld.Demo
         double? RegionScoreSum,
         RacePopulationInfo[]? RegionPopulation,
         FactionInfo[]? RegionFactions,
+        SettledInfo? RegionSettled,
         bool Ocean,
         ZoneInfo Zone,
         PatchInfo? Patch,
         Prospect? Prospect,
         string[]? ProspectRaces,
+        SettlementInfo? Settlement,
         double? HeightM,
         FieldValues Fields);
+
+    /// <summary>The cities and towns of a Settled region: how many there are, the persons in them and the persons on the land.</summary>
+    public sealed record SettledInfo(int Cities, long CityPersons, int Towns, long TownPersons, long RuralPersons);
+
+    /// <summary>A city or a town, with the names of its races.</summary>
+    /// <param name="Rank">Its rank among the cities and towns of its region, from 1.</param>
+    /// <param name="Races">The persons of each of its races, in the order of the races of its Prospect.</param>
+    public sealed record SettlementInfo(SettlementKind Kind, bool Capital, int Rank, long Persons, RacePersonsInfo[] Races);
+
+    public sealed record RacePersonsInfo(string Name, long Persons);
 
     /// <summary>A faction of a region, with the names of its lead race, its kind and its vocations.</summary>
     /// <param name="Kind">The name of the kind of a lesser faction, and of the trade of a guild in opposition.</param>

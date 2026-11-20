@@ -101,9 +101,68 @@ public sealed record RegionPlan(
     public IEnumerable<Faction> Lesser => Factions.Where(f => f.Role == FactionRole.Lesser);
 }
 
-/// <summary>What the Settled stage adds: the travel network.</summary>
-/// <remarks>Actual cities and towns, families and important persons belong to this stage too and are not modelled yet.</remarks>
-public sealed record RegionSettlement(TravelNetwork Travel);
+/// <summary>What a place of the society is: a city or a town.</summary>
+public enum SettlementKind
+{
+    /// <summary>A town: on a Prospect on show for a town.</summary>
+    Town,
+    /// <summary>A city: on a Prospect on show for a city, or the capital of the region.</summary>
+    City,
+}
+
+/// <summary>A number of persons of one race.</summary>
+/// <param name="Race">The id of the race in the Parameter Set.</param>
+public sealed record RacePersons(string Race, long Persons);
+
+/// <summary>
+/// A city or a town as a Stub: an actual settlement on a Prospect on show
+/// (society-generation.md section 5.2). Its identity is the region and the slot. Everything in
+/// it is derived data.
+/// </summary>
+/// <param name="Slot">The slot in the region: the index of its Prospect among the Prospects of the region.</param>
+/// <param name="Kind">A city or a town. The capital is a city whatever its Prospect is for.</param>
+/// <param name="Capital">The city is the capital of the region: the seat of its ruling faction.</param>
+/// <param name="Patch">The patch of its Prospect.</param>
+/// <param name="Rank">Its rank among the cities and towns of the region, from 1: the capital, the other cities, then the towns.</param>
+/// <param name="Persons">How many persons live in it.</param>
+/// <param name="Races">The persons of each of its races, in the order of the races of the Prospect: the largest around it first and the drawn one last. A race of the list can hold nobody in a small place.</param>
+public sealed record Settlement(
+    int Slot,
+    SettlementKind Kind,
+    bool Capital,
+    PatchId Patch,
+    int Rank,
+    long Persons,
+    IReadOnlyList<RacePersons> Races)
+{
+    /// <summary>The identity of the city or town: its region and its slot.</summary>
+    public SlotId<RegionId> IdIn(RegionId region) => new(region, Slot);
+}
+
+/// <summary>
+/// What the Settled stage adds: the travel network, the cities and towns of the region and the
+/// persons that live on the land between them.
+/// </summary>
+/// <param name="Settlements">The cities and towns of the region, by rank: one on every Prospect on show.</param>
+/// <param name="Rural">The persons on the land, outside the cities and towns: one entry for every race that is on, in the order of the Parameter Set.</param>
+/// <remarks>Families and important persons belong to this stage too and are not modelled yet.</remarks>
+public sealed record RegionSettlement(
+    TravelNetwork Travel,
+    IReadOnlyList<Settlement> Settlements,
+    IReadOnlyList<RacePersons> Rural)
+{
+    /// <summary>The capital of the region; null in a region without a ruling faction or without a Prospect on show.</summary>
+    public Settlement? Capital => Settlements.FirstOrDefault(s => s.Capital);
+
+    /// <summary>The persons that live in the cities of the region.</summary>
+    public long CityPersons => Settlements.Where(s => s.Kind == SettlementKind.City).Sum(s => s.Persons);
+
+    /// <summary>The persons that live in the towns of the region.</summary>
+    public long TownPersons => Settlements.Where(s => s.Kind == SettlementKind.Town).Sum(s => s.Persons);
+
+    /// <summary>The persons that live on the land, outside the cities and towns.</summary>
+    public long RuralPersons => Rural.Sum(r => r.Persons);
+}
 
 /// <summary>
 /// A region as it is stored: its stage and what each stage it has reached added. Everything in

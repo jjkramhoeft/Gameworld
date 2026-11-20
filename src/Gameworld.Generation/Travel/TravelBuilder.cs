@@ -1,6 +1,7 @@
 using Gameworld.Domain;
 using Gameworld.Generation.Basics;
 using Gameworld.Generation.Rivers;
+using Gameworld.Generation.Settlements;
 
 namespace Gameworld.Generation.Travel;
 
@@ -12,8 +13,10 @@ public sealed class SettlementWork
     public required TravelLink[] Links { get; init; }
     /// <summary>All candidate links between the Prospects of the 3 × 3 regions, before pruning.</summary>
     public int CandidateCount { get; init; }
+    /// <summary>The cities and towns of the region, and the persons on the land between them.</summary>
+    public required RegionSettlements Places { get; init; }
 
-    public RegionSettlement ToDomain() => new(new TravelNetwork(Links));
+    public RegionSettlement ToDomain() => new(new TravelNetwork(Links), Places.Settlements, Places.Rural);
 }
 
 /// <summary>
@@ -38,7 +41,8 @@ internal static class TravelBuilder
 
     private sealed record Candidate(int A, int B, bool Water, double Cost, int CellA, int CellB);
 
-    public static SettlementWork Build(World world, GridCoord region)
+    /// <param name="settlements">The cities and towns of the region: they are carried into the working data as they are.</param>
+    public static SettlementWork Build(World world, GridCoord region, RegionSettlements settlements)
     {
         var cells = world.Cells;
 
@@ -382,6 +386,7 @@ internal static class TravelBuilder
             Region = region,
             Links = links.ToArray(),
             CandidateCount = candidates.Length,
+            Places = settlements,
         };
     }
 

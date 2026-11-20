@@ -608,7 +608,7 @@
       "additionalProperties": false
     },
     "Planning": {
-      "description": "Planned stage: Prospects for cities and towns, which of them are on show (§15), the potential population (society §3) and the factions (society §4). The Settled stage has no parameters of its own: the travel network connects the Prospects on show (§16).",
+      "description": "Planned stage: Prospects for cities and towns, which of them are on show (§15), the potential population (society §3) and the factions (society §4).",
       "type": "object",
       "properties": {
         "ProspectsPerRegion": {
@@ -1863,6 +1863,33 @@
             }
           },
           "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "Settlement": {
+      "description": "Settled stage: the cities and towns of a region, and how many of its persons live in them (society §5.2). The travel network of this stage has no parameters of its own: it connects the Prospects on show (§16).",
+      "type": "object",
+      "properties": {
+        "CityShare": {
+          "description": "The share of the persons of a region that live in its cities, 0 to 1. A city stands on every Prospect on show for a city and on the capital of the region, and the cities share these persons by their rank. A region without a city keeps the share on the land, and every city holds at least one person where the region has one for it, so the share of a whole world lies near this number, not exactly on it. If the two shares sum to more than 1, both are scaled down (society §5.2).",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.1
+        },
+        "TownShare": {
+          "description": "The share of the persons of a region that live in its towns, 0 to 1. A town stands on every other Prospect on show, and the towns share these persons by their rank. A region without a town keeps the share on the land, and every town holds at least one person where the region has one for it (society §5.2).",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.1
+        },
+        "RankExponent": {
+          "description": "How unequal the cities and towns of a region are: the weight of a city or a town is its rank in the region raised to minus this. The capital has rank 1, then come the other cities, then the towns. With 1 the second city holds half the persons of the capital and the third a third; 0 gives all cities the same size and all towns the same size (society §5.2).",
+          "type": "number",
+          "minimum": 0,
+          "default": 1
         }
       },
       "additionalProperties": false

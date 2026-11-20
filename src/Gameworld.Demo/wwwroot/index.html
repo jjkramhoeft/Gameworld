@@ -458,6 +458,13 @@ async function inspect(p) {
       if (!d.RegionFactions.length) row('Factions', '<span class="muted">none: the region holds nobody</span>');
       d.RegionFactions.forEach((f, n) => row(n ? '' : 'Factions', factionLine(f, d.Patch)));
     }
+    // The cities and towns belong to the Settled stage, which the travel layer takes a region to.
+    const count = (n, one, many) => `${n.toLocaleString('en-US')} ${n === 1 ? one : many}`;
+    if (d.RegionSettled) {
+      const s = d.RegionSettled;
+      row('Persons', `${s.CityPersons.toLocaleString('en-US')} in ${count(s.Cities, 'city', 'cities')} · ` +
+        `${s.TownPersons.toLocaleString('en-US')} in ${count(s.Towns, 'town', 'towns')} · ${s.RuralPersons.toLocaleString('en-US')} on the land`);
+    } else if (d.RegionPopulation) row('', '<span class="muted">Cities and towns are made once the region is Settled (Travel network layer).</span>');
     row('Zone', `(${d.Zone.Id[0]}, ${d.Zone.Id[1]}) · ${words(d.Zone.ElevationType)} · ${d.Zone.Cells} cell${d.Zone.Cells > 1 ? 's' : ''}`);
     if (d.Zone.Prospects) row('', 'Prospects: ' + prospectCount(d.Zone.Prospects));
     else if (!d.Ocean && !d.RegionProspects) row('', '<span class="muted">Prospects are counted once the region is Planned (Prospects layer).</span>');
@@ -488,6 +495,11 @@ async function inspect(p) {
         const f = patch.Factors;
         row('Score', `${num(patch.Score, 1)}${d.Prospect ? ` · ${d.Prospect.Class} Prospect for a ${d.Prospect.ForCity ? 'city' : 'town'}${d.Prospect.OnShow ? ' · on show' : ' · not on show'}` : ''}`);
         row('Factors', `resources ${num(f.Resources)} · geography ${num(f.Geography)} · trade ${num(f.Trade)} · climate ${num(f.Climate)} · prosperity ${num(f.Prosperity)}`);
+        if (d.Settlement) {
+          const s = d.Settlement;
+          const races = s.Races.filter(r => r.Persons > 0).map(r => `${esc(r.Name)} ${r.Persons.toLocaleString('en-US')}`).join(' · ');
+          row(s.Capital ? 'Capital' : s.Kind, `${count(s.Persons, 'person', 'persons')} · rank ${s.Rank} in the region${races ? ' <span class="muted">(' + races + ')</span>' : ''}`);
+        }
         if (d.ProspectRaces) row('Races', d.ProspectRaces.length ? d.ProspectRaces.map(esc).join(' · ') : 'none');
       }
       if (patch.Resources.length)
@@ -550,7 +562,7 @@ function showLegendItems() {
   if (!l) return;
   $('legend').innerHTML =
     legend('mode', 'biomes', 'Biomes', l.Biomes.map(b => [b.Colour, words(b.Biome)])) +
-    legend('layer', 'prospects', 'Prospects on show (◆ city · ● town)', l.Prospects.map(c => [c.Colour, prospectClassLabel(c.Class, state.planning)])) +
+    legend('layer', 'prospects', 'Prospects on show (◆ city · ● town · ◈ capital)', l.Prospects.map(c => [c.Colour, prospectClassLabel(c.Class, state.planning)])) +
     l.Fields.map(f => legend('layer', f.Layer, `${f.Name} (${f.Unit})`, f.Bands.map(b => [b.Colour, bandLabel(b)]))).join('');
   showLegends();
 }

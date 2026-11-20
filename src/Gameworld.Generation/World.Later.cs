@@ -35,14 +35,18 @@ public sealed partial class World
     }
 
     /// <summary>
-    /// The Settled working data of a region: the travel links the region decides. The region is
-    /// taken to the Settled stage first, which takes the regions around it to Planned.
+    /// The Settled working data of a region: the travel links the region decides and its cities
+    /// and towns. The region is taken to the Settled stage first, which takes the regions around
+    /// it to Planned.
     /// </summary>
     public SettlementWork SettlementOf(RegionId id)
     {
         Advance(id, RegionStage.Settled);
         return _settlement[id];
     }
+
+    /// <summary>The Settled working data of a region if the region is Settled; null otherwise.</summary>
+    public SettlementWork? FindSettlement(RegionId id) => _settlement.GetValueOrDefault(id);
 
     /// <summary>
     /// Whether two ocean zones are on the same sea: a sea is a connected set of ocean zones. This
@@ -85,7 +89,8 @@ public sealed partial class World
                 region.Advance(elevation.ToDomain());
                 break;
             case RegionStage.Settled:
-                var settlement = TravelBuilder.Build(this, region.Id.Coord);
+                var places = SettlementBuilder.Build(this, _plan[region.Id]);
+                var settlement = TravelBuilder.Build(this, region.Id.Coord, places);
                 _settlement[region.Id] = settlement;
                 region.Advance(settlement.ToDomain());
                 break;

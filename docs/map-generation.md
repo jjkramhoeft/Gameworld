@@ -1678,6 +1678,9 @@ are set equal, the number steps from 1 to all at that sum. A region without Pros
 shows none. The Prospects on show are the best by score, in the order of 15.5 (ties
 included), whether they are for a city or a town.
 
+In the Settled stage a city or a town is made on every Prospect on show, and on no other
+(society-generation.md section 5.2).
+
 With the defaults about 1 region in 20 has a single Prospect on show, about 1 in 10 has
 all 20, and the median is 13 (measured on 600 regions of six seeds).
 
@@ -1831,7 +1834,10 @@ the pixel's world position with `cellAt` and colour it.
 - **Lakes**: their polygons, filled, drawn together with the rivers.
 - **Prospects**: only the ones on show (15.6). A diamond for a city Prospect and a dot for
   a town Prospect, with a dark edge, coloured by class: Rich in gold (244, 196, 48),
-  Average in silver (228, 231, 236), Poor in bronze (170, 104, 50).
+  Average in silver (228, 231, 236), Poor in bronze (170, 104, 50). The capital of a
+  region, the seat of its ruling faction, is a larger diamond with a light ring
+  (250, 247, 238) inside its dark edge, whatever its Prospect is for: the capital is a
+  city (society-generation.md section 5.2).
 - **Travel**: roads, river routes and sea lanes as lines; stretches shared by several
   links are drawn once.
 

@@ -892,8 +892,9 @@ The generator uses Tier M "in a first, simpler form": a ranked list of scored si
 | Per-region, order-independent scoring and selection | Adopted |
 | Gateway and central-place terms; Hansen accessibility | Adopted |
 | Resources factor from the resource layer | Adopted |
-| Settlement hierarchy (villages, market villages, county towns) and populations | Open |
-| Rank-size check | Open |
+| Settlement hierarchy (villages, market villages, county towns) | Open |
+| Populations | Adopted in a simpler form: a city or a town on every Prospect on show, a share of the region's persons for its cities and one for its towns (a tenth each by default), shared by rank (society-generation.md section 5.2) |
+| Rank-size check | Open. The cities and the towns of a region each follow 1 / rank, but the two shares are pinned, so the sizes of a whole region do not follow one line |
 | Fall lines and lowest bridging points (need bed heights) | Open |
 | Tier T: site refinement by HAND, slope and domination; pass towns | Open |
 | Settlement potential replacing the prosperity noise | Open (prosperity is an input instead) |
@@ -1061,7 +1062,7 @@ Ordered by layer. "Value" is the notes' own assessment where they give one.
 | Resources | Tier 2 and 3 goods placed by the material index | Completes the 39-resource set | TRADE §5.2 |
 | Resources | Signature export and deficit checks | Guarantees trade | TRADE §5.5 |
 | Resources | Fantasy layer triggered by the supernatural field | Done as the arcane materials (§9.9) | RES §5 |
-| Prospects | Hierarchy and populations with a rank-size test | Turns scored sites into settlements | SITES §6.5–§6.7 |
+| Prospects | Hierarchy with a rank-size test | The populations are done in a simpler form (society-generation.md section 5.2). The five orders are not | SITES §6.5–§6.7 |
 | Prospects | Tier T site refinement; fall lines; bridging points | The exact spot; needs bed heights and the tile | SITES §6.6 |
 | Trade | Model A prices, then Model B flows | Order-independent trade on the existing network | TRADE §5.7 |
 
