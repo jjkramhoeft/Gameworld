@@ -250,7 +250,7 @@ The peoples that live on the map. The Stub of every entity in this group is deri
 
 A people that can live in the world: Northmen, Elves, Dwarves and so on. Races are needed to generate factions, families and persons. Race is the only level: a race has no sub-races, and each human people is a race of its own, so there is no plain human race.
 
-The races are a list in the Parameter Set, not a fixed set in the code. Each race has an id, a name, a toggle (on or off), a frequency for each biome, a height modifier, a leaning to each type of faction, and two lists of other races: the races it appreciates and the races it hates. The default list holds 28 races, all on: seven human races (Northmen, Midlanders, Saltroad folk, Sunlanders, Grass riders, Rainkeepers, Canal folk), five classic races (Elves, Dwarves, Halflings, Gnomes, Orcs) and sixteen new near-human races (docs/society-generation.md Appendix A). A faction has a lead race. How a family or a person gets its race is not decided yet.
+The races are a list in the Parameter Set, not a fixed set in the code. Each race has an id, a name, a toggle (on or off), a frequency for each biome, a height modifier, a leaning to each type of faction, two lists of other races (the races it appreciates and the races it hates) and a list of favourite colours. The default list holds 28 races, all on: seven human races (Northmen, Midlanders, Saltroad folk, Sunlanders, Grass riders, Rainkeepers, Canal folk), five classic races (Elves, Dwarves, Halflings, Gnomes, Orcs) and sixteen new near-human races (docs/society-generation.md Appendix A). A faction has a lead race. How a family or a person gets its race is not decided yet.
 
 #### Main race and minority race
 
@@ -269,6 +269,8 @@ A group of people in one region: a political grouping. It could be a kingdom, a 
 The type of a faction is what binds its members. There are six: Family (a house and its household), Race (a people), Vocation (a trade), Belief (a faith), Magic (the arcane) and Place (a town or a valley that rules itself). The form is the name of a type in a role: a Family that rules is a Crown, a Vocation under the ruler is a Guild. It is a label for the authoring, and it is race-neutral: a crown of the Northmen is a jarldom.
 
 A faction has a lead race, the race of its leaders. A faction of the type Race holds that race only. Any other faction is open to the races of its seat. The seat is the Prospect the faction sits on, and the seat of the ruling faction is the capital of the region.
+
+A faction has a main colour and a secondary colour: the field and the device of its banner. They are drawn mostly from the favourite colours of its lead race, and the secondary colour is one that stands out against the main one.
 
 #### Ruling faction, opposition and lesser faction
 
@@ -296,7 +298,11 @@ The work a person does: farmer, smith, priest. A person has one vocation and can
 
 #### Looks
 
-What a portrait of a person must show: the body and the face, the hair, the outfit and the accessories. Looks are not specified yet.
+What a portrait of a person must show: the body and the face, the hair, the outfit and the accessories. Looks are not specified yet, apart from the colours.
+
+#### Colour
+
+A named colour of cloth, paint and banners: red, indigo, saffron. The colours are a list in the Parameter Set, like the races. Each colour has an id, a name and a value as #RRGGBB. The default list holds 24 colours. A race has favourite colours, and a faction has a main colour and a secondary colour. The colours of hair, skin and eyes are not in the list.
 
 ## Documentation
 

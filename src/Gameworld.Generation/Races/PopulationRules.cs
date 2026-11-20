@@ -80,6 +80,22 @@ public sealed class PopulationRules
             if (!ids.Add(race.Id))
                 throw new ArgumentException($"The Parameter Set lists the race id \"{race.Id}\" more than once.", nameof(parameters));
         }
+        // The colours have an id each and are colours, and a favourite colour of a race is one of them.
+        var colours = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var colour in parameters.Colours)
+        {
+            if (string.IsNullOrWhiteSpace(colour.Id))
+                throw new ArgumentException("A colour of the Parameter Set has no id.", nameof(parameters));
+            if (!colours.Add(colour.Id))
+                throw new ArgumentException($"The Parameter Set lists the colour id \"{colour.Id}\" more than once.", nameof(parameters));
+            if (!ColourParameters.TryLightness(colour.Hex, out _))
+                throw new ArgumentException($"The colour \"{colour.Id}\" has the value \"{colour.Hex}\", which is not a colour as #RRGGBB.", nameof(parameters));
+        }
+        foreach (var race in parameters.Races)
+            foreach (var colour in race.FavouriteColours ?? [])
+                if (colour is null || !colours.Contains(colour))
+                    throw new ArgumentException($"The race \"{race.Id}\" lists \"{colour}\" in FavouriteColours, which is not a colour of the Parameter Set.", nameof(parameters));
+
         // The races a race appreciates and hates are other races of the list, and no race is in both.
         foreach (var race in parameters.Races)
         {

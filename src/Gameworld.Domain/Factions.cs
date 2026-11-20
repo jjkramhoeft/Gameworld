@@ -98,6 +98,8 @@ public enum OppositionGround
 /// <param name="Vocations">The ids of the vocations the faction gathers, for a guild, an order and a circle. Empty otherwise.</param>
 /// <param name="Ground">What an opposition stands on. Null for the other roles.</param>
 /// <param name="Grip">0 to 1. The ruling faction: 1 − the tension of the region. The opposition: the tension. A lesser faction: its fit.</param>
+/// <param name="MainColour">The id of its main colour: the field of its banner and the cloth of its livery. Null when the Parameter Set has no colours.</param>
+/// <param name="SecondaryColour">The id of its secondary colour: the device on the banner and the trim of the livery. Never the main colour. Null when the Parameter Set has fewer than two colours.</param>
 public sealed record Faction(
     int Slot,
     FactionRole Role,
@@ -108,7 +110,9 @@ public sealed record Faction(
     string? Kind,
     IReadOnlyList<string> Vocations,
     OppositionGround? Ground,
-    double Grip)
+    double Grip,
+    string? MainColour = null,
+    string? SecondaryColour = null)
 {
     /// <summary>The slot of the ruling faction.</summary>
     public const int RulingSlot = 0;

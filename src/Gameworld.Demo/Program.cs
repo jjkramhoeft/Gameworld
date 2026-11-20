@@ -360,7 +360,10 @@ namespace Gameworld.Demo
                 FactionInfo InfoOf(Faction f) => new(
                     f.Slot, f.Role, f.Type, f.Form, NameOf(f.LeadRace),
                     f.Kind is null ? null : FactionRules.KindName(f.Kind),
-                    f.Vocations.Select(VocationNameOf).ToArray(), f.Ground, f.Grip, f.Seat);
+                    f.Vocations.Select(VocationNameOf).ToArray(), f.Ground, f.Grip, f.Seat,
+                    ColourOf(f.MainColour), ColourOf(f.SecondaryColour));
+                ColourInfo? ColourOf(string? id) =>
+                    world.Parameters.Colours.FirstOrDefault(x => x.Id == id) is { } colour ? new(colour.Name, colour.Hex) : null;
                 string FloraNameOf(string id) => world.Parameters.Flora.FirstOrDefault(x => x.Id == id)?.Name ?? id;
                 string FaunaNameOf(string id) => world.Parameters.Fauna.FirstOrDefault(x => x.Id == id)?.Name ?? id;
                 var elevation = world.FindElevation(regionId);
@@ -489,9 +492,15 @@ namespace Gameworld.Demo
     /// <summary>A faction of a region, with the names of its lead race, its kind and its vocations.</summary>
     /// <param name="Kind">The name of the kind of a lesser faction, and of the trade of a guild in opposition.</param>
     /// <param name="Seat">The patch of the Prospect the faction sits on.</param>
+    /// <param name="MainColour">Its main colour. Null when the Parameter Set has no colours.</param>
+    /// <param name="SecondaryColour">Its secondary colour. Null when the Parameter Set has fewer than two colours.</param>
     public sealed record FactionInfo(
         int Slot, FactionRole Role, FactionType Type, FactionForm Form, string LeadRace, string? Kind,
-        string[] Vocations, OppositionGround? Ground, double Grip, PatchId? Seat);
+        string[] Vocations, OppositionGround? Ground, double Grip, PatchId? Seat,
+        ColourInfo? MainColour, ColourInfo? SecondaryColour);
+
+    /// <summary>A colour of a faction: its name and its value as #RRGGBB.</summary>
+    public sealed record ColourInfo(string Name, string Hex);
 
     /// <summary>The four Fields sampled at the point itself, not at the site of its patch.</summary>
     public sealed record FieldValues(double InitialTemperatureC, double PrecipitationMm, double Prosperity, double Supernatural);

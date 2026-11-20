@@ -101,6 +101,8 @@ public sealed class FactionRules
     public const uint LesserPurpose = 0x4b04;
     /// <summary>Hash purpose of the draws for the lead races of the lesser factions.</summary>
     public const uint LesserRacePurpose = 0x4b05;
+    /// <summary>Hash purpose of the draws for the colours of the factions.</summary>
+    public const uint ColourPurpose = 0x4b06;
 
     /// <summary>The id of the kind Enclave: its fit comes from the races, not from the land.</summary>
     public const string EnclaveKind = "enclave";
@@ -193,6 +195,10 @@ public sealed class FactionRules
     private readonly double _minorityBoost;
     private readonly RaceParameters[] _races;
     private readonly HashSet<string> _vocations;
+    /// <summary>The colours that are colours, in the order of the Parameter Set, with their lightness.</summary>
+    private readonly (string Id, double Lightness)[] _colours;
+    /// <summary>Per race that is on, per colour of <see cref="_colours"/>: the place of the colour among the favourite colours of the race from 1, or 0.</summary>
+    private readonly int[][] _favourite;
     private readonly uint _seed;
 
     /// <param name="seed">The seed of the foundation: it gives the draws.</param>
@@ -202,6 +208,20 @@ public sealed class FactionRules
         _minorityBoost = Math.Max(0, parameters.Planning.Population.MinorityBoost);
         _races = parameters.Races.Where(r => r.Enabled).ToArray();
         _vocations = parameters.Vocations.Where(v => v.Enabled).Select(v => v.Id).ToHashSet(StringComparer.Ordinal);
+        _colours = parameters.Colours
+            .Select(c => (c.Id, Known: ColourParameters.TryLightness(c.Hex, out var lightness), Lightness: lightness))
+            .Where(c => c.Known && !string.IsNullOrWhiteSpace(c.Id))
+            .DistinctBy(c => c.Id)
+            .Select(c => (c.Id, c.Lightness))
+            .ToArray();
+        _favourite = _races
+            .Select(r =>
+            {
+                // The place of a colour that is listed twice is its first one.
+                var favourites = (r.FavouriteColours ?? []).Where(id => Array.Exists(_colours, c => c.Id == id)).Distinct().ToArray();
+                return _colours.Select(c => Array.IndexOf(favourites, c.Id) + 1).ToArray();
+            })
+            .ToArray();
         _seed = seed;
     }
 
@@ -531,7 +551,79 @@ public sealed class FactionRules
                 _races[race].Id, SeatOf(seat), kind.Id, VocationsOf(kind), null, Math.Clamp(fit, 0, 1)));
         }
 
+        Colour(region, factions);
         return new FactionWork { Reading = reading, Fits = fits, Terms = terms, Tension = tension, Factions = factions };
+    }
+
+    /// <summary>
+    /// 4.9 The colours: every faction gets a main and a secondary colour, in the order of the
+    /// slots, mostly from the favourite colours of its lead race. Two numbers are drawn per faction.
+    /// </summary>
+    private void Colour(GridCoord region, List<Faction> factions)
+    {
+        var rng = new Sfc32(Hashing.Hash4(_seed, ColourPurpose, region.I, region.J));
+        var taken = new bool[_colours.Length];
+        var weights = new double[_colours.Length];
+        for (var f = 0; f < factions.Count; f++)
+        {
+            double uMain = rng.Next(), uSecondary = rng.Next();
+            if (_colours.Length == 0) continue;
+            var race = Array.FindIndex(_races, r => r.Id == factions[f].LeadRace);
+            double Weight(int c)
+            {
+                var place = race < 0 ? 0 : _favourite[race][c];
+                return place > 0 ? Math.Max(0, _parameters.FavouriteColourWeight) / place : Math.Max(0, _parameters.OtherColourWeight);
+            }
+
+            // The main colour: a colour that a faction in a lower slot has taken is seldom taken again.
+            for (var c = 0; c < weights.Length; c++)
+                weights[c] = Weight(c) * (taken[c] ? Math.Clamp(_parameters.TakenColourFactor, 0, 1) : 1);
+            var main = DrawColour(weights, uMain, c => true);
+            taken[main] = true;
+
+            // The secondary colour: another colour, one that stands out against the main colour when there is one.
+            for (var c = 0; c < weights.Length; c++) weights[c] = Weight(c);
+            bool Other(int c) => c != main;
+            bool StandsOut(int c) => Other(c) && Math.Abs(_colours[c].Lightness - _colours[main].Lightness) >= _parameters.ColourContrast;
+            var secondary = _colours.Length < 2 ? -1
+                : DrawColour(weights, uSecondary, Enumerable.Range(0, _colours.Length).Any(StandsOut) ? StandsOut : Other);
+
+            factions[f] = factions[f] with
+            {
+                MainColour = _colours[main].Id,
+                SecondaryColour = secondary < 0 ? null : _colours[secondary].Id,
+            };
+        }
+    }
+
+    /// <summary>
+    /// One of the colours that are allowed, by weight. When none of them has a weight, they
+    /// weigh alike. At least one colour must be allowed.
+    /// </summary>
+    private static int DrawColour(double[] weights, double u, Func<int, bool> allowed)
+    {
+        var total = 0.0;
+        var count = 0;
+        for (var c = 0; c < weights.Length; c++)
+            if (allowed(c))
+            {
+                count++;
+                if (weights[c] > 0) total += weights[c];
+            }
+        var even = !(total > 0);
+        var target = u * (even ? count : total);
+        var sum = 0.0;
+        var last = -1;
+        for (var c = 0; c < weights.Length; c++)
+        {
+            if (!allowed(c)) continue;
+            var w = even ? 1 : weights[c];
+            if (!(w > 0)) continue;
+            sum += w;
+            last = c;
+            if (target < sum) return c;
+        }
+        return last;
     }
 
     /// <summary>

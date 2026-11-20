@@ -423,7 +423,15 @@ function factionLine(f, patch) {
   if (f.Vocations.length) notes.push(f.Vocations.map(esc).join(', '));
   const here = patch && f.Seat && f.Seat[0] === patch.Id[0] && f.Seat[1] === patch.Id[1];
   const seat = f.Seat ? ` · seat (${f.Seat[0]}, ${f.Seat[1]})${here ? ' <b>here</b>' : ''}` : '';
-  return `${f.Role}: ${esc(what)} of the ${esc(f.LeadRace)} <span class="muted">(${notes.join(' · ')})</span>${seat}`;
+  // The colours: the main colour as a square with the secondary colour as its border.
+  const safe = c => c && /^#[0-9a-f]{6}$/i.test(c.Hex) ? c.Hex : null;
+  const main = safe(f.MainColour), secondary = safe(f.SecondaryColour);
+  const names = [f.MainColour, f.SecondaryColour].filter(c => c).map(c => c.Name).join(' and ');
+  const colours = main
+    ? `<span title="${esc(names)}" style="display:inline-block;width:.7em;height:.7em;margin-right:.35em;vertical-align:baseline;background:${main};border:.22em solid ${secondary ?? main}"></span>`
+    : '';
+  if (names) notes.push(esc(names.toLowerCase()));
+  return `${colours}${f.Role}: ${esc(what)} of the ${esc(f.LeadRace)} <span class="muted">(${notes.join(' · ')})</span>${seat}`;
 }
 
 async function inspect(p) {

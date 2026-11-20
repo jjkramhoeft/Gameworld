@@ -119,6 +119,11 @@ expected to change late in phase 2, so a race is added or changed by editing the
   race that is off can still be listed. A race without the lists appreciates and hates no
   race in particular. No rule reads the lists yet: they are meant for the factions of a
   region (section 4).
+- A list of **favourite colours**, the dearest first: the ids of colours of the colour
+  list (section 9.1). They are the colours of its dress, its banners and its goods. The
+  colours of a faction are drawn mostly from the favourite colours of its lead race
+  (section 4.9). An id that is not a colour of the Parameter Set is refused when the world
+  is created. A race without the list has no favourite colour.
 
 In a Parameter Set file a race lists only the biomes it lives in. A biome that is left out
 has the frequency 0, and a frequency of 0 is not written to the file. A race without a
@@ -130,6 +135,7 @@ height modifier does not carry one in the file.
 | Height modifiers | Elves, Dwarves, Hearthbloods, Widegaze and Shoalfolk (Appendix A) |
 | Leanings to the types of faction | One row per race (Appendix A) |
 | Appreciated and hated races | Two lists per race (Appendix A) |
+| Favourite colours | Three or four per race (Appendix A) |
 
 The default list was decided on 2026-11-15. It holds:
 
@@ -385,12 +391,20 @@ what was weighed. Its fits, weights and tables are starting values for phase 1.
 | Most lesser factions | 4 |
 | Lowest fit of a lesser faction | 0.75 |
 | Lesser jitter | 0.1 |
+| Favourite colour weight | 4 |
+| Other colour weight | 0.05 |
+| Taken colour factor | 0 |
+| Colour contrast | 0.25 |
 | Cleavage and favour | the tables of section 4.6 |
 | Index ranges | the table of section 4.3 |
 | Leaning of each race to each type | Appendix A |
+| Favourite colours of each race | Appendix A |
+| Colours | the list of section 9.1 |
 
 The parameters are `Planning.Factions` in the Parameter Set. The leaning is
-`FactionLeaning` on each race. The draws use the hash purposes 0x4b01 to 0x4b05.
+`FactionLeaning` on each race, and its favourite colours are `FavouriteColours`. The
+colours are `Colours` at the top of the Parameter Set. The draws use the hash purposes
+0x4b01 to 0x4b06.
 
 ### 4.1 The types
 
@@ -445,6 +459,8 @@ The Stub of a faction holds:
 | Vocations | The vocations a guild, an order and a circle gather |
 | Ground | What an opposition stands on (section 4.6) |
 | Grip | 0 to 1. The ruling faction: 1 − the tension. The opposition: the tension. A lesser faction: its fit |
+| Main colour | The id of a colour (section 4.9): the field of its banner and the cloth of its livery |
+| Secondary colour | The id of another colour (section 4.9): the device on the banner and the trim of the livery |
 
 The seat of the ruling faction is the capital of the region.
 
@@ -753,6 +769,60 @@ games compute the kind of ruler of a land, and what decides a ruler, an oppositi
 guilds in the scholarship. Every entry of [races-basis.md](races-basis.md) lists the kinds
 of group the race forms.
 
+### 4.9 The colours
+
+Every faction has a **main colour** and a **secondary colour** from the colour list
+(section 9.1). The main colour is the field of its banner and the cloth of its livery, and
+the secondary colour is the device on the banner and the trim. They are facts of the Stub
+and material for the looks (section 9): no other rule reads them.
+
+The colours come mostly from the favourite colours of the lead race, so the factions of
+the Northmen run to red, blue and silver. The factions of a region are told apart by their
+main colour, and the secondary colour stands out against the main one. With the default
+taken colour factor of 0, no two factions of a region share a main colour while there are
+colours left, so a ruler and its opposition never fly the same banner. Two factions of one
+race can still fly each other's colours the other way round: red on gold and gold on red.
+
+```
+weight(c) = favourite colour weight / k    when c is the k-th favourite colour of the lead race, k from 1
+          = other colour weight            for every other colour
+lightness(c) = (0.299 · R + 0.587 · G + 0.114 · B) / 255
+
+for the factions of the region in the order of their slots:
+    main      = one draw by weight over all colours, with
+                weight(c) · taken colour factor   when a faction in a lower slot has c as its main colour
+    secondary = one draw by weight(c) over the colours other than main
+                with |lightness(c) − lightness(main)| ≥ colour contrast
+```
+
+- When no colour stands out that much against the main colour, the secondary colour is
+  drawn from all colours other than the main one.
+- When no colour that is allowed has a weight above 0, the colours that are allowed weigh
+  alike.
+- The colours are walked in the order of the Parameter Set, and a draw falls on the first
+  colour where the running sum of the weights passes `u` times the total.
+- The draws use one sfc32 generator per region, seeded with `hash4(seed, 0x4b06, i, j)`. It
+  gives two numbers per faction in the order of the slots: one for the main colour, then
+  one for the secondary colour.
+- A lead race without favourite colours draws from every colour alike.
+- With no colours in the Parameter Set a faction has no colours, and with one colour it
+  has a main colour only.
+
+The lightness rule is the old rule of the heralds in a plain form: a light device on a
+dark field or a dark one on a light field, never red on blue. With the default list and a
+lead race with three favourite colours, the main colour of the first faction of that race
+in a region is a favourite colour about seven times in eight: 4 + 2 + 1.33 against
+21 · 0.05. A race that leads more factions in a region than it has favourite colours gives
+the later ones another colour.
+
+Open:
+
+- A tint from the type of the faction: white and gold for a faith, purple for the mages.
+- A charge on the banner. [research/heraldry-coat-of-arms-generation.md](research/heraldry-coat-of-arms-generation.md)
+  holds the material.
+- Whether the factions of neighbouring regions should be told apart too. That would read
+  another region, which no rule of section 4 does.
+
 ---
 
 ## 5. Cities and towns
@@ -973,7 +1043,7 @@ new resources and holds a design note for the generator. Every entry of
 
 ## 9. Looks
 
-Not specified yet.
+Not specified yet, apart from the colour list of section 9.1.
 
 The looks of a person are what a portrait must show: the body and the face, the hair, the
 outfit and the accessories. The portrait itself is authored by a diffusion model.
@@ -992,6 +1062,61 @@ a portrait of the race must show. [research/portrait-components.md](research/por
 holds lists of hairstyles, outfits, hair, skin and eye colours, race markers and
 accessories, a fit to races and climates, and what the image-model vendors say about
 keeping a person consistent between pictures.
+
+### 9.1 Colours
+
+A colour is a named colour of cloth, paint and banners. The colours are a list in the
+Parameter Set, like the races, so a colour is added or changed by editing the list. Each
+colour has:
+
+- An **id** and a **name**. Generated data points at a colour by its id. The ids must be
+  given and unique.
+- A **value** as `#RRGGBB`: what a picture shows. Its lightness decides which secondary
+  colour stands out against a main colour (section 4.9).
+
+A Parameter Set with a colour without an id, with the same id twice or with a value that
+is not `#RRGGBB` is refused when the world is created.
+
+Two things point at the list so far: the favourite colours of a race (section 2) and the
+main and the secondary colour of a faction (section 4.9). The list holds the colours of
+things that are made: the colours of hair, skin and eyes are not in it.
+
+The default list holds 24 colours, from undyed cloth to the costly dyes. The values are
+starting values.
+
+| Id | Name | Value | Lightness | What it is |
+|---|---|---|---|---|
+| `white` | White | `#F2F0E6` | 0.94 | Bleached linen, chalk, lime wash |
+| `cream` | Cream | `#E8DCC0` | 0.86 | Undyed wool and linen, ivory, pearl |
+| `silver` | Silver | `#C0C4C8` | 0.77 | Silver, tin, polished steel |
+| `grey` | Grey | `#8A8D8F` | 0.55 | Undyed grey wool, ash, stone |
+| `black` | Black | `#1E1E22` | 0.12 | Oak gall and iron, soot |
+| `tan` | Tan | `#C8A977` | 0.68 | Raw hide, sand, straw |
+| `brown` | Brown | `#6B4423` | 0.30 | Walnut husk, bark, undyed dark wool |
+| `russet` | Russet | `#8B3A1E` | 0.31 | Rust, tanned leather, red earth |
+| `ochre` | Ochre | `#C98A2B` | 0.57 | Yellow earth, amber, honey |
+| `gold` | Gold | `#D4A017` | 0.63 | Gold leaf, brass, gilt thread |
+| `yellow` | Yellow | `#F2CB05` | 0.75 | Weld, sulphur |
+| `saffron` | Saffron | `#F28C0F` | 0.61 | Saffron, turmeric |
+| `orange` | Orange | `#E0651A` | 0.51 | Madder over weld, flame |
+| `red` | Red | `#C1272D` | 0.34 | Madder |
+| `crimson` | Crimson | `#8C1127` | 0.22 | Kermes and lac: a costly dye |
+| `rose` | Rose | `#D9778B` | 0.59 | Weak madder, coral, pink salt |
+| `purple` | Purple | `#6A2C8C` | 0.29 | Sea-snail purple, lichen, wine: the costliest dye |
+| `indigo` | Indigo | `#2B2D6E` | 0.20 | Indigo dyed deep |
+| `blue` | Blue | `#1F5FA8` | 0.33 | Woad |
+| `skyBlue` | Sky blue | `#7FB6DE` | 0.67 | Weak woad, the clear sky |
+| `teal` | Teal | `#1F7A7A` | 0.37 | Woad over weld, jade, the sea |
+| `green` | Green | `#2E8B3D` | 0.40 | Weld over woad, new leaves |
+| `forestGreen` | Forest green | `#1F4D2B` | 0.23 | Deep green of old forest |
+| `olive` | Olive | `#6B7A2A` | 0.43 | Olive leaf, moss, bronze gone green |
+
+Open:
+
+- Whether the outfit of a person takes its colours from the favourite colours of the race,
+  from the faction the person belongs to, or from both.
+- A cost per colour, so that crimson and purple are the colours of the rich.
+- Whether hair, skin and eye colours become lists of the same kind.
 
 ---
 
@@ -1132,6 +1257,42 @@ appreciated by the most (8).
 | Twofold | Sunlanders, Rainkeepers | Canal folk | Trades with the Sunlanders and lives beside the Rainkeepers. The lore names no enemy: a people that registers every race in a named category (judgement) |
 | Bitterbloods | Noonfolk, Swiftborn, Flinchless | Stillfaces | The other made races are kin. Stillfaces shun them and are the poison finders of the courts (judgement) |
 | Catfolk | Halflings, Noonfolk, Sunlanders, Stillfaces, Midlanders | Orcs, Duskreaders | Wards and night watch of those who grow grain and herd. Orcs compete for game and contracts, and a people behind masks to one that has no use for a straight face (judgement) |
+
+**Favourite colours.** The favourite colours of each race, the dearest first (section 2).
+They are read from the "Appearance" and "Way of life" parts of each entry of
+races-basis.md, and they are a first assignment. Where the lore names no colour, the
+reading is marked as judgement.
+
+| Race | Favourite colours | Read from |
+|---|---|---|
+| Northmen | Red, Blue, Silver | Madder and woad on wool, and wealth worn as silver arm-rings |
+| Midlanders | Blue, Red, Gold, Green | Dyed cloth cut to the fashion of a guild, and coats of arms (judgement) |
+| Saltroad folk | Indigo, White, Ochre | The wound cloth and veil of the desert clans, loose pale robes, sand and mud brick (judgement) |
+| Sunlanders | Indigo, Gold, Red, Orange | Wrapped cotton in strong dyes, indigo first among them, and gold |
+| Grass riders | Sky blue, Red, Gold | They worship the Sky. Red and gold are judgement |
+| Rainkeepers | Saffron, Crimson, Green, Rose | Cotton in colours that tell the community, and a mark of coloured paste on the brow (judgement) |
+| Canal folk | Red, Yellow, Teal | Silk in the colour of a grade, lacquer, jade (judgement) |
+| Elves | Forest green, Grey, Brown, Silver | They dress in greens, greys and browns that are hard to see between trees. Silver for the silver-haired of the cold woods |
+| Dwarves | Gold, Russet, Black | Gold and gems, leather, the forge (judgement) |
+| Halflings | Yellow, Green, Red | Bright waistcoats, garden and orchard (judgement) |
+| Gnomes | Purple, Gold, Teal | The lore names no colour: fine work for those who pay for the costly dyes (judgement) |
+| Orcs | Black, Crimson, Tan | Scars rubbed with ash, hide and leather, the standard of a legion (judgement) |
+| Hoarkin | White, Sky blue, Grey | Skin as pale as skimmed milk shading to blue-grey, snow and sea ice |
+| Hearthbloods | Orange, Red, Black | The fire inside them, flushed copper skin, the last coals |
+| Widegaze | Gold, Tan, Black | Pale gold eyes with a dark bar, tawny skin, bold striped weaving |
+| Amberbloods | Ochre, Forest green, Brown | Amber eyes and resin, the old forest, bark-brown hair |
+| Brinefolk | White, Rose, Russet | Pale wrapped linen, and pans in squares of white, pink and rust |
+| Duskreaders | Black, Grey, Indigo | Colour means little to them: eyes black from lid to lid, dark gauze, the night |
+| Noonfolk | Yellow, Olive, Cream | The sun, the green-bronze veining, a plain wrap at the hips |
+| Boughwalkers | Brown, White, Purple | Cloth that looks plain brown or white to everyone else. Purple stands for the high colour beyond violet |
+| Shoalfolk | Teal, Cream, Rose | The shallows, pearl and shell, coral |
+| Swiftborn | Purple, Olive, Orange | The vineyards and the olive harvest of the province they were made to fill, and a festival every month (judgement) |
+| Flinchless | Silver, White, Crimson | Pale silver eyes, a lattice of white scars, the legion (judgement) |
+| Lanternkin | Teal, Silver, Black | The blue-green light in the veins, ash-coloured hair, the shadow it shows in |
+| Stillfaces | Grey, Brown, Olive | Tawny-grey skin, hair brindled in brown and grey, the mixed forest |
+| Twofold | Saffron, Indigo, Gold | The sash: saffron before the Turning, indigo after it. The patch at the throat is pale gold, then indigo |
+| Bitterbloods | Sky blue, Yellow, Orange | The mottling worn with pride: sky blue, sulphur yellow, sometimes orange |
+| Catfolk | Tan, Russet, Cream, Gold | The colours of a cat's coat: sand, russet, cream, tawny gold |
 
 **How common.** `common` is 3 to 5 for the human races, 2 for Elves, Dwarves, Halflings
 and Orcs, 1 for Gnomes, and 1 or 0.5 for a new race: 1 when it has a homeland of its own,

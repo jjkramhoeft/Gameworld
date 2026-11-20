@@ -44,6 +44,9 @@ public sealed record ParameterSet
     [Description("The vocations: the work a person does, in nine sectors. Add a vocation by adding an entry, and switch one on or off with Enabled. The vocations are not drawn for places or persons yet (society §8). A file that gives this list replaces the whole default list.")]
     public IReadOnlyList<VocationParameters> Vocations { get; init; } = VocationParameters.Defaults;
 
+    [Description("The colours: the named colours of cloth, paint and banners. A race lists its favourite colours by id, and a faction gets a main and a secondary colour from the list (society §4.9 and §9.1). Add a colour by adding an entry. A file that gives this list replaces the whole default list.")]
+    public IReadOnlyList<ColourParameters> Colours { get; init; } = ColourParameters.Defaults;
+
     [Description("The flora: the plants that can grow in the world. Every patch gets a few of the kinds that fit its biome (§13.4). A file that gives this list replaces the whole default list.")]
     public IReadOnlyList<FloraParameters> Flora { get; init; } = FloraParameters.Defaults;
 
@@ -557,6 +560,22 @@ public sealed record FactionParameters
     [Range(0, double.PositiveInfinity)]
     public double LesserJitter { get; init; } = 0.1;
 
+    [Description("The weight of the first favourite colour of the lead race when a colour of a faction is drawn. The second favourite has half of it, the third a third and so on (society §4.9).")]
+    [Range(0, double.PositiveInfinity)]
+    public double FavouriteColourWeight { get; init; } = 4;
+
+    [Description("The weight of a colour that is not a favourite colour of the lead race when a colour of a faction is drawn. 0 keeps a faction to the favourite colours of its lead race; a higher number gives more factions a colour of their own (society §4.9).")]
+    [Range(0, double.PositiveInfinity)]
+    public double OtherColourWeight { get; init; } = 0.05;
+
+    [Description("What the weight of a colour is multiplied by in the draw for the main colour when a faction in a lower slot of the region already has it as its main colour. With the default 0 no two factions of a region share a main colour while there are colours left, so a ruler and its opposition never fly the same banner. 1 lets them share a main colour freely (society §4.9).")]
+    [Range(0, 1)]
+    public double TakenColourFactor { get; init; } = 0;
+
+    [Description("How much the lightness of the secondary colour must differ from that of the main colour, 0 to 1, so that the one stands out on the other. The lightness of a colour is (0.299 R + 0.587 G + 0.114 B) / 255. When no colour differs that much, the secondary colour is drawn from every other colour (society §4.9).")]
+    [Range(0, 1)]
+    public double ColourContrast { get; init; } = 0.25;
+
     [Description("The ranges the indices of a region are read through: each index runs from 0 at Low to 1 at High. The defaults are about the 10th and the 90th percentile of generated regions, so a change to the map parameters can call for new ranges (society §4.3).")]
     public FactionIndexRanges Indices { get; init; } = new();
 }
@@ -791,6 +810,9 @@ public sealed record RaceParameters(
     [Description("The ids of the other races this race hates: peoples it fears, fights or holds a grudge against. One-directional: the other race need not hate it back. Every id must be another race of the list, and no id may also stand in AppreciatedRaces. Left out, the race hates no race in particular. No generation rule reads it yet; it is meant for the factions of a region (society §2).")]
     public IReadOnlyList<string> HatedRaces { get; init; } = [];
 
+    [Description("The ids of the favourite colours of the race, the dearest first: the colours of its dress, its banners and its goods. Every id must be a colour of the Colours list. The main and the secondary colour of a faction are drawn mostly from the favourite colours of its lead race, the first ones most often. Left out, the race has no favourite colour and its factions draw from every colour alike (society §2 and §4.9).")]
+    public IReadOnlyList<string> FavouriteColours { get; init; } = [];
+
     /// <summary>
     /// The leaning of each default race to each type of faction (society-generation.md
     /// Appendix A), from the "Factions" line of its entry in races-basis.md.
@@ -865,6 +887,42 @@ public sealed record RaceParameters(
         ["catfolk"] = (["halfling", "noonfolk", "sunlanders", "stillfaces", "midlanders"], ["orc", "duskreaders"]),
     };
 
+    /// <summary>
+    /// The favourite colours of each default race, the dearest first (society-generation.md
+    /// Appendix A), from the "Appearance" and "Way of life" parts of its entry in races-basis.md.
+    /// </summary>
+    private static readonly Dictionary<string, string[]> DefaultFavouriteColours = new()
+    {
+        ["northmen"] = ["red", "blue", "silver"],
+        ["midlanders"] = ["blue", "red", "gold", "green"],
+        ["saltroadFolk"] = ["indigo", "white", "ochre"],
+        ["sunlanders"] = ["indigo", "gold", "red", "orange"],
+        ["grassRiders"] = ["skyBlue", "red", "gold"],
+        ["rainkeepers"] = ["saffron", "crimson", "green", "rose"],
+        ["canalFolk"] = ["red", "yellow", "teal"],
+        ["elf"] = ["forestGreen", "grey", "brown", "silver"],
+        ["dwarf"] = ["gold", "russet", "black"],
+        ["halfling"] = ["yellow", "green", "red"],
+        ["gnome"] = ["purple", "gold", "teal"],
+        ["orc"] = ["black", "crimson", "tan"],
+        ["hoarkin"] = ["white", "skyBlue", "grey"],
+        ["hearthbloods"] = ["orange", "red", "black"],
+        ["widegaze"] = ["gold", "tan", "black"],
+        ["amberbloods"] = ["ochre", "forestGreen", "brown"],
+        ["brinefolk"] = ["white", "rose", "russet"],
+        ["duskreaders"] = ["black", "grey", "indigo"],
+        ["noonfolk"] = ["yellow", "olive", "cream"],
+        ["boughwalkers"] = ["brown", "white", "purple"],
+        ["shoalfolk"] = ["teal", "cream", "rose"],
+        ["swiftborn"] = ["purple", "olive", "orange"],
+        ["flinchless"] = ["silver", "white", "crimson"],
+        ["lanternkin"] = ["teal", "silver", "black"],
+        ["stillfaces"] = ["grey", "brown", "olive"],
+        ["twofold"] = ["saffron", "indigo", "gold"],
+        ["bitterbloods"] = ["skyBlue", "yellow", "orange"],
+        ["catfolk"] = ["tan", "russet", "cream", "gold"],
+    };
+
     /// <summary>The height modifier of a race that only lives from a height and up.</summary>
     public static IReadOnlyList<HeightFactorPoint> OnlyFrom(double heightM) => [new(heightM, 0), new(heightM, 1)];
 
@@ -923,6 +981,7 @@ public sealed record RaceParameters(
                 FactionLeaning = DefaultLeanings[id],
                 AppreciatedRaces = DefaultRelations[id].Appreciated,
                 HatedRaces = DefaultRelations[id].Hated,
+                FavouriteColours = DefaultFavouriteColours[id],
             };
 }
 

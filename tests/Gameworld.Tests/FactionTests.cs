@@ -235,6 +235,119 @@ public class FactionTests
     }
 
     [Fact]
+    public void The_default_colours_and_the_favourite_colours_of_the_default_races()
+    {
+        var colours = ParameterSet.Default.Colours;
+        Assert.Equal(24, colours.Count);
+        Assert.Equal(colours.Count, colours.Select(c => c.Id).Distinct().Count());
+        Assert.All(colours, c => Assert.True(ColourParameters.TryLightness(c.Hex, out var l) && l is > 0 and < 1, c.Id));
+        Assert.True(ColourParameters.TryLightness("#FFFFFF", out var white));
+        Assert.Equal(1, white, 12);
+        Assert.False(ColourParameters.TryLightness("red", out _));
+        Assert.False(ColourParameters.TryLightness("#12345G", out _));
+
+        var ids = colours.Select(c => c.Id).ToHashSet();
+        var races = ParameterSet.Default.Races.ToDictionary(r => r.Id);
+        Assert.Equal(["saffron", "indigo", "gold"], races["twofold"].FavouriteColours);
+        Assert.Equal(["forestGreen", "grey", "brown", "silver"], races["elf"].FavouriteColours);
+        foreach (var race in races.Values)
+        {
+            Assert.InRange(race.FavouriteColours.Count, 3, 4);
+            Assert.All(race.FavouriteColours, id => Assert.Contains(id, ids));
+            Assert.Equal(race.FavouriteColours.Count, race.FavouriteColours.Distinct().Count());
+        }
+
+        // A race that says nothing has no favourite colour, and the lists are read back from a file.
+        var plain = new RaceParameters("x", "X", true, Everywhere(1));
+        Assert.Empty(plain.FavouriteColours);
+        var read = ParameterSet.FromJson(ParameterSet.Default.ToJson());
+        Assert.Equal(colours, read.Colours);
+        Assert.Equal(races["elf"].FavouriteColours, read.Races.Single(r => r.Id == "elf").FavouriteColours);
+
+        // A favourite colour that is no colour, a colour twice and a value that is no colour are refused.
+        Assert.Throws<ArgumentException>(() => new PopulationRules(With(null, plain with { FavouriteColours = ["mauve"] })));
+        Assert.Throws<ArgumentException>(() => new PopulationRules(With(null, plain) with { Colours = [new("red", "Red", "#C1272D"), new("red", "Red", "#C1272D")] }));
+        Assert.Throws<ArgumentException>(() => new PopulationRules(With(null, plain) with { Colours = [new("red", "Red", "red")] }));
+        Assert.Throws<ArgumentException>(() => new PopulationRules(With(null, plain) with { Colours = [new("", "Red", "#C1272D")] }));
+    }
+
+    [Fact]
+    public void A_faction_gets_a_main_and_a_secondary_colour_from_its_lead_race()
+    {
+        RaceParameters[] races =
+        [
+            Race("a", 3, new(3, 2, 2, 2, 1, 2)) with { FavouriteColours = ["red", "blue", "silver"] },
+            Race("b", 2, new(2, 3, 2, 1, 1, 2)) with { FavouriteColours = ["black", "gold", "white"] },
+            Race("c", 1, new(1, 1, 3, 2, 1, 3)),
+        ];
+        FactionPatch[] land = [GrainLand(), GrainLand(), new(64, Biome.BorealForest, ElevationType.Mountains, Resources(0.9, (Resource.Gold, 0.5), (Resource.Salt, 0.5)), 0)];
+        var parameters = With(new FactionParameters { OppositionTension = 0, TensionJitter = 0, LesserFit = 0 }, races);
+        var lightness = parameters.Colours.ToDictionary(c => c.Id, c => { ColourParameters.TryLightness(c.Hex, out var l); return l; });
+        var favourites = races.ToDictionary(r => r.Id, r => r.FavouriteColours);
+
+        int factions = 0, favourite = 0, shared = 0, several = 0;
+        for (var i = 0; i < 200; i++)
+        {
+            var region = new GridCoord(i, 3);
+            var work = Build(parameters, land, region);
+            foreach (var f in work.Factions)
+            {
+                Assert.NotNull(f.MainColour);
+                Assert.NotNull(f.SecondaryColour);
+                Assert.NotEqual(f.MainColour, f.SecondaryColour);
+                // The secondary colour stands out against the main colour: every default colour has one that does.
+                Assert.True(Math.Abs(lightness[f.MainColour!] - lightness[f.SecondaryColour!]) >= 0.25, $"{f.MainColour} and {f.SecondaryColour}");
+                if (f.LeadRace == "c") continue;
+                factions++;
+                if (favourites[f.LeadRace].Contains(f.MainColour)) favourite++;
+            }
+            if (work.Factions.Count > 1)
+            {
+                several++;
+                if (work.Factions.Select(f => f.MainColour).Distinct().Count() < work.Factions.Count) shared++;
+            }
+
+            // The same region gives the same colours again.
+            Assert.Equal(
+                work.Factions.Select(f => (f.Slot, f.MainColour, f.SecondaryColour)),
+                Build(parameters, land, region).Factions.Select(f => (f.Slot, f.MainColour, f.SecondaryColour)));
+        }
+        // Most main colours are a favourite colour of the lead race, and no two factions of a region share one.
+        Assert.True(factions > 300);
+        Assert.InRange((double)favourite / factions, 0.5, 0.97);
+        Assert.Equal(0, shared);
+        Assert.True(several > 100);
+
+        // A main colour that is taken is not taken again with the factor 0, seldom with 0.1 and more often with 1.
+        int Shared(double factor)
+        {
+            var with = With(new FactionParameters { OppositionTension = 0, TensionJitter = 0, LesserFit = 0, TakenColourFactor = factor }, races);
+            return Enumerable.Range(0, 200).Select(i => Build(with, land, new GridCoord(i, 3)).Factions)
+                .Count(list => list.Select(f => f.MainColour).Distinct().Count() < list.Count);
+        }
+        Assert.Equal(0, Shared(0));
+        Assert.InRange(Shared(0.1), 1, (int)(0.75 * Shared(1)));
+
+        // With only favourite colours allowed and a taken colour free to take again, every colour is one of the lead race.
+        var strict = With(new FactionParameters { OppositionTension = 0, TensionJitter = 0, LesserFit = 0, OtherColourWeight = 0, ColourContrast = 0, TakenColourFactor = 1 }, races[..2]);
+        for (var i = 0; i < 60; i++)
+            foreach (var f in Build(strict, land, new GridCoord(i, 3)).Factions)
+            {
+                Assert.Contains(f.MainColour, favourites[f.LeadRace]);
+                Assert.Contains(f.SecondaryColour, favourites[f.LeadRace]);
+            }
+
+        // Few colours: one colour gives a main colour only, none gives no colours, and red and blue do not stand out but are taken.
+        var bare = With(new FactionParameters { OppositionTension = 0, TensionJitter = 0, LesserFit = 0 }, races.Select(r => r with { FavouriteColours = [] }).ToArray());
+        var one = Build(bare with { Colours = [new("red", "Red", "#C1272D")] }, land).Factions;
+        Assert.All(one, f => { Assert.Equal("red", f.MainColour); Assert.Null(f.SecondaryColour); });
+        var none = Build(bare with { Colours = [] }, land).Factions;
+        Assert.All(none, f => { Assert.Null(f.MainColour); Assert.Null(f.SecondaryColour); });
+        var two = Build(bare with { Colours = [new("red", "Red", "#C1272D"), new("blue", "Blue", "#1F5FA8")] }, land).Factions;
+        Assert.All(two, f => Assert.Equal(new[] { "blue", "red" }, new[] { f.MainColour!, f.SecondaryColour! }.Order()));
+    }
+
+    [Fact]
     public void The_tension_decides_whether_a_region_has_an_opposition()
     {
         RaceParameters[] races =

@@ -285,6 +285,10 @@
       "MaxLesserFactions": 4,
       "LesserFit": 0.75,
       "LesserJitter": 0.1,
+      "FavouriteColourWeight": 4,
+      "OtherColourWeight": 0.05,
+      "TakenColourFactor": 0,
+      "ColourContrast": 0.25,
       "Indices": {
         "Grain": {
           "Low": 0.17,
@@ -597,6 +601,11 @@
       "HatedRaces": [
         "elf",
         "hearthbloods"
+      ],
+      "FavouriteColours": [
+        "red",
+        "blue",
+        "silver"
       ]
     },
     {
@@ -631,6 +640,12 @@
         "northmen",
         "grassRiders",
         "elf"
+      ],
+      "FavouriteColours": [
+        "blue",
+        "red",
+        "gold",
+        "green"
       ]
     },
     {
@@ -664,6 +679,11 @@
       "HatedRaces": [
         "grassRiders",
         "orc"
+      ],
+      "FavouriteColours": [
+        "indigo",
+        "white",
+        "ochre"
       ]
     },
     {
@@ -696,6 +716,12 @@
       "HatedRaces": [
         "orc",
         "brinefolk"
+      ],
+      "FavouriteColours": [
+        "indigo",
+        "gold",
+        "red",
+        "orange"
       ]
     },
     {
@@ -727,6 +753,11 @@
         "orc",
         "canalFolk",
         "saltroadFolk"
+      ],
+      "FavouriteColours": [
+        "skyBlue",
+        "red",
+        "gold"
       ]
     },
     {
@@ -758,6 +789,12 @@
       "HatedRaces": [
         "canalFolk",
         "twofold"
+      ],
+      "FavouriteColours": [
+        "saffron",
+        "crimson",
+        "green",
+        "rose"
       ]
     },
     {
@@ -793,6 +830,11 @@
         "grassRiders",
         "elf",
         "shoalfolk"
+      ],
+      "FavouriteColours": [
+        "red",
+        "yellow",
+        "teal"
       ]
     },
     {
@@ -836,6 +878,12 @@
         "midlanders",
         "canalFolk",
         "dwarf"
+      ],
+      "FavouriteColours": [
+        "forestGreen",
+        "grey",
+        "brown",
+        "silver"
       ]
     },
     {
@@ -882,6 +930,11 @@
         "orc",
         "elf",
         "amberbloods"
+      ],
+      "FavouriteColours": [
+        "gold",
+        "russet",
+        "black"
       ]
     },
     {
@@ -918,6 +971,11 @@
       "HatedRaces": [
         "orc",
         "grassRiders"
+      ],
+      "FavouriteColours": [
+        "yellow",
+        "green",
+        "red"
       ]
     },
     {
@@ -954,6 +1012,11 @@
       ],
       "HatedRaces": [
         "orc"
+      ],
+      "FavouriteColours": [
+        "purple",
+        "gold",
+        "teal"
       ]
     },
     {
@@ -992,6 +1055,11 @@
         "dwarf",
         "catfolk",
         "grassRiders"
+      ],
+      "FavouriteColours": [
+        "black",
+        "crimson",
+        "tan"
       ]
     },
     {
@@ -1016,6 +1084,11 @@
       ],
       "HatedRaces": [
         "hearthbloods"
+      ],
+      "FavouriteColours": [
+        "white",
+        "skyBlue",
+        "grey"
       ]
     },
     {
@@ -1054,6 +1127,11 @@
       ],
       "HatedRaces": [
         "hoarkin"
+      ],
+      "FavouriteColours": [
+        "orange",
+        "red",
+        "black"
       ]
     },
     {
@@ -1092,6 +1170,11 @@
       ],
       "HatedRaces": [
         "catfolk"
+      ],
+      "FavouriteColours": [
+        "gold",
+        "tan",
+        "black"
       ]
     },
     {
@@ -1120,6 +1203,11 @@
         "dwarf",
         "midlanders",
         "hearthbloods"
+      ],
+      "FavouriteColours": [
+        "ochre",
+        "forestGreen",
+        "brown"
       ]
     },
     {
@@ -1148,6 +1236,11 @@
       ],
       "HatedRaces": [
         "canalFolk"
+      ],
+      "FavouriteColours": [
+        "white",
+        "rose",
+        "russet"
       ]
     },
     {
@@ -1175,6 +1268,11 @@
       "HatedRaces": [
         "midlanders",
         "catfolk"
+      ],
+      "FavouriteColours": [
+        "black",
+        "grey",
+        "indigo"
       ]
     },
     {
@@ -1207,6 +1305,11 @@
       "HatedRaces": [
         "midlanders",
         "northmen"
+      ],
+      "FavouriteColours": [
+        "yellow",
+        "olive",
+        "cream"
       ]
     },
     {
@@ -1234,6 +1337,11 @@
       ],
       "HatedRaces": [
         "bitterbloods"
+      ],
+      "FavouriteColours": [
+        "brown",
+        "white",
+        "purple"
       ]
     },
     {
@@ -1274,6 +1382,11 @@
       "HatedRaces": [
         "canalFolk",
         "bitterbloods"
+      ],
+      "FavouriteColours": [
+        "teal",
+        "cream",
+        "rose"
       ]
     },
     {
@@ -1306,6 +1419,11 @@
       ],
       "HatedRaces": [
         "midlanders"
+      ],
+      "FavouriteColours": [
+        "purple",
+        "olive",
+        "orange"
       ]
     },
     {
@@ -1336,6 +1454,11 @@
       ],
       "HatedRaces": [
         "orc"
+      ],
+      "FavouriteColours": [
+        "silver",
+        "white",
+        "crimson"
       ]
     },
     {
@@ -1368,6 +1491,11 @@
       ],
       "HatedRaces": [
         "midlanders"
+      ],
+      "FavouriteColours": [
+        "teal",
+        "silver",
+        "black"
       ]
     },
     {
@@ -1395,6 +1523,11 @@
       ],
       "HatedRaces": [
         "bitterbloods"
+      ],
+      "FavouriteColours": [
+        "grey",
+        "brown",
+        "olive"
       ]
     },
     {
@@ -1422,6 +1555,11 @@
       ],
       "HatedRaces": [
         "canalFolk"
+      ],
+      "FavouriteColours": [
+        "saffron",
+        "indigo",
+        "gold"
       ]
     },
     {
@@ -1449,6 +1587,11 @@
       ],
       "HatedRaces": [
         "stillfaces"
+      ],
+      "FavouriteColours": [
+        "skyBlue",
+        "yellow",
+        "orange"
       ]
     },
     {
@@ -1488,6 +1631,12 @@
       "HatedRaces": [
         "orc",
         "duskreaders"
+      ],
+      "FavouriteColours": [
+        "tan",
+        "russet",
+        "cream",
+        "gold"
       ]
     }
   ],
@@ -2479,6 +2628,128 @@
         "wrecker",
         "rebel"
       ]
+    }
+  ],
+  "Colours": [
+    {
+      "Id": "white",
+      "Name": "White",
+      "Hex": "#F2F0E6"
+    },
+    {
+      "Id": "cream",
+      "Name": "Cream",
+      "Hex": "#E8DCC0"
+    },
+    {
+      "Id": "silver",
+      "Name": "Silver",
+      "Hex": "#C0C4C8"
+    },
+    {
+      "Id": "grey",
+      "Name": "Grey",
+      "Hex": "#8A8D8F"
+    },
+    {
+      "Id": "black",
+      "Name": "Black",
+      "Hex": "#1E1E22"
+    },
+    {
+      "Id": "tan",
+      "Name": "Tan",
+      "Hex": "#C8A977"
+    },
+    {
+      "Id": "brown",
+      "Name": "Brown",
+      "Hex": "#6B4423"
+    },
+    {
+      "Id": "russet",
+      "Name": "Russet",
+      "Hex": "#8B3A1E"
+    },
+    {
+      "Id": "ochre",
+      "Name": "Ochre",
+      "Hex": "#C98A2B"
+    },
+    {
+      "Id": "gold",
+      "Name": "Gold",
+      "Hex": "#D4A017"
+    },
+    {
+      "Id": "yellow",
+      "Name": "Yellow",
+      "Hex": "#F2CB05"
+    },
+    {
+      "Id": "saffron",
+      "Name": "Saffron",
+      "Hex": "#F28C0F"
+    },
+    {
+      "Id": "orange",
+      "Name": "Orange",
+      "Hex": "#E0651A"
+    },
+    {
+      "Id": "red",
+      "Name": "Red",
+      "Hex": "#C1272D"
+    },
+    {
+      "Id": "crimson",
+      "Name": "Crimson",
+      "Hex": "#8C1127"
+    },
+    {
+      "Id": "rose",
+      "Name": "Rose",
+      "Hex": "#D9778B"
+    },
+    {
+      "Id": "purple",
+      "Name": "Purple",
+      "Hex": "#6A2C8C"
+    },
+    {
+      "Id": "indigo",
+      "Name": "Indigo",
+      "Hex": "#2B2D6E"
+    },
+    {
+      "Id": "blue",
+      "Name": "Blue",
+      "Hex": "#1F5FA8"
+    },
+    {
+      "Id": "skyBlue",
+      "Name": "Sky blue",
+      "Hex": "#7FB6DE"
+    },
+    {
+      "Id": "teal",
+      "Name": "Teal",
+      "Hex": "#1F7A7A"
+    },
+    {
+      "Id": "green",
+      "Name": "Green",
+      "Hex": "#2E8B3D"
+    },
+    {
+      "Id": "forestGreen",
+      "Name": "Forest green",
+      "Hex": "#1F4D2B"
+    },
+    {
+      "Id": "olive",
+      "Name": "Olive",
+      "Hex": "#6B7A2A"
     }
   ],
   "Flora": [
