@@ -44,7 +44,7 @@ The project is in phase 1.
 
 ### Status
 
-The map is generated through all its stages, from the cells to the travel network, with the flora and fauna of every patch. Of the society, the races of each region, their potential population, the factions of each region, the name of each region, the cities and towns of each region with their names, their persons and their races, and the person names are generated. The vocations are a list in the Parameter Set and are not drawn yet. Families and persons are defined below but not generated yet, and neither is there a database: the apps compute everything in memory.
+The map is generated through all its stages, from the cells to the travel network, with the flora and fauna of every patch. Of the society, the races of each region, their potential population, the factions of each region, the name of each region, and the cities and towns of each region with their names, their persons and their races are generated. The persons of a city or a town are a count per race so far. The person-name generator is in place, and for now it gives the surnames of the houses that name a region and some of the first parts of city and town names. The vocations are a list in the Parameter Set and are not drawn yet. Families and individual persons are defined below but not generated yet, and neither is there a database: the apps compute everything in memory.
 
 ## Concepts
 
@@ -63,7 +63,9 @@ Foundation = seed + generator version + Parameter Set
       ├─ Race                           six of them share the potential population of a region
       ├─ Faction                        a ruling faction per region, an opposition, lesser factions
       ├─ Region name                    the realm of the ruling faction
-      └─ City and Town, Family, Person with a vocation and looks
+      ├─ City and town                  one on every Prospect on show, with a name and races
+      ├─ Family, Person                 a person with a vocation and looks
+      └─ Colour                         favourite colours of a race, the banner of a faction
 ```
 
 ### The world
@@ -333,7 +335,7 @@ A named colour of cloth, paint and banners: red, indigo, saffron. The colours ar
 | [docs/races-and-worldbuilding.md](docs/races-and-worldbuilding.md) | A framework for building a near-human race: origin, anchor traits, culture and the relation to humans |
 | [docs/NameGenerator-Reuse.md](docs/NameGenerator-Reuse.md) | The person-name generator |
 | [docs/RegionNameGenerator-Reuse.md](docs/RegionNameGenerator-Reuse.md) | The region-name generator of an earlier project: the original and the corrected form that names the regions here |
-| [docs/research/](docs/research/) | The source notes behind the research document, and research for the society and the living world: factions, vocations, flora and fauna, heraldry, and sequential art for graphic short stories |
+| [docs/research/](docs/research/) | 22 source notes: the map notes behind the research document, and research for the society and the living world (races, human races, factions, faction generation, vocations, portrait components, heraldry, flora and fauna, city and town naming), and three notes on sequential art for graphic short stories |
 | [docs/plans/](docs/plans/) | Plans for changes, each with its status |
 | [braindump.md](braindump.md) | Notes and ideas in progress, not decided |
 
@@ -369,7 +371,7 @@ Generates a block of regions of one foundation up to a stage and writes the resu
 dotnet run --project src/Gameworld.MapGenerator -c Release
 ```
 
-Without options it takes the 3 × 3 regions around region (0, 0) of the seed `cellgen` to the Settled stage with the default Parameter Set, and writes to `out/`. Options go after `--`:
+Without options it takes the 3 × 3 regions around region (0, 0) of the seed `cellgen` to the Settled stage with the default Parameter Set, and writes to `out/`. It prints a line per region: its stage, the counts of zones, patches, rivers, lakes, Prospects, persons, factions, cities, towns and travel links, the time it took, the name of the region and the name of its capital. Options go after `--`:
 
 ```bash
 dotnet run --project src/Gameworld.MapGenerator -c Release -- --seed atlas --region 2,2 --rings 2 --out out/atlas
@@ -424,7 +426,7 @@ dotnet run --project src/Gameworld.Demo -c Release
 
 Then open <http://localhost:5062>. Drag to pan, scroll to zoom, and click the map to see the region, zone and patch at that point. The side panel switches the base map (elevation types, biomes, height, or none) and the layers, among them the four Fields, and it replaces the foundation: a new seed, or an edited Parameter Set under "Parameter Set (json)". Replacing the foundation discards all derived data.
 
-"Under the pointer" has a section for the region, one for the zone and one for the patch, each with groups that fold away. The region section shows the stages the region has reached, with a button to take it to each later stage. A row of a Prospect, a city or a town moves the pointer to it. "Statistics" counts the current view: the land, the biomes and the climate, the heights, the water, the resources, the flora and fauna, and for the regions that are Planned or Settled the Prospects, the potential population, the factions and the cities and towns.
+"Under the pointer" has a section for the region, one for the zone and one for the patch, each with groups that fold away. The region section shows the stages the region has reached, with a button to take it to each later stage. A row of a Prospect, a city or a town moves the pointer to it. A Prospect, a city or a town shows its name, the race that named it and what the place word says about its site. "Statistics" counts the current view: the land, the biomes and the climate, the heights, the water, the resources, the flora and fauna, and for the regions that are Planned or Settled the Prospects, the potential population, the factions and the cities and towns.
 
 The Prospects layer draws the Prospects on show and writes the name of the city or town of each beside it: the capitals first, then the other cities and the towns as you zoom in.
 
