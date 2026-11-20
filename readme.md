@@ -414,4 +414,6 @@ dotnet run --project src/Gameworld.Demo -c Release
 
 Then open <http://localhost:5062>. Drag to pan, scroll to zoom, and click the map to see the region, zone and patch at that point. The side panel switches the base map (elevation types, biomes, height, or none) and the layers, among them the four Fields, and it replaces the foundation: a new seed, or an edited Parameter Set under "Parameter Set (json)". Replacing the foundation discards all derived data.
 
+"Under the pointer" has a section for the region, one for the zone and one for the patch, each with groups that fold away. The region section shows the stages the region has reached, with a button to take it to each later stage. A row of a Prospect, a city or a town moves the pointer to it. "Statistics" counts the current view: the land, the biomes and the climate, the heights, the water, the resources, the flora and fauna, and for the regions that are Planned or Settled the Prospects, the potential population, the factions and the cities and towns.
+
 Regions are generated when they come into view, so the first view of an area takes longer than the next. The Prospects and travel layers take the regions through the Elevated stage first, which builds their height maps.

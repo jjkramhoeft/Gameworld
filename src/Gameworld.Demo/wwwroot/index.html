@@ -44,30 +44,128 @@
   .note { color: var(--muted); font-size: 12px; margin: 6px 0 0; }
   .error { color: var(--warn); font-size: 12.5px; margin: 6px 0 0; min-height: 1em; white-space: pre-wrap; }
   details summary { cursor: pointer; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; margin: 20px 0 8px; }
-  dl { display: grid; grid-template-columns: 110px 1fr; gap: 3px 10px; margin: 0; font-size: 13px; }
-  dt { color: var(--muted); }
-  dd { margin: 0; overflow-wrap: anywhere; }
-  dd .muted { color: var(--muted); font-size: 12px; }
-  .res { margin: 6px 0 0; padding: 0; list-style: none; font-size: 13px; }
-  .res li { display: grid; grid-template-columns: 1fr 44px; gap: 8px; padding: 2px 0; border-top: 1px solid var(--line); }
-  .res small { color: var(--muted); }
-  .res .amt { text-align: right; font-variant-numeric: tabular-nums; }
   .abbr { font: 600 11px ui-monospace, Consolas, monospace; letter-spacing: .04em; }
-  .res .abbr { background: var(--muted); color: var(--panel); border-radius: 4px; padding: 1px 5px; margin-right: 4px; }
-  .hist { list-style: none; margin: 8px 0 0; padding: 0; font-size: 13px; transition: opacity .15s; }
-  .hist.stale { opacity: .55; }
-  .hist li { display: grid; grid-template-columns: 160px 1fr 40px; gap: 8px; align-items: center; padding: 2px 0; }
-  .hist .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .hist .track { height: 12px; }
-  .hist .bar { display: block; height: 100%; min-width: 2px; border-radius: 2px; border: 1px solid #0006; }
-  .hist .pct { text-align: right; font-variant-numeric: tabular-nums; }
-  .hist.counts li { grid-template-columns: 22px 1fr 40px; }
-  .hist.counts .name { text-align: right; font-variant-numeric: tabular-nums; }
-  .hist.counts .track { display: flex; }
-  .hist.counts .bar { min-width: 0; border-radius: 0; background: var(--accent); }
-  .hist.counts .bar.towns { opacity: .45; }
+  .muted { color: var(--muted); }
+
+  /* Under the pointer and the statistics: tiles, sections and the groups in them. */
+  #inspect, #statistics-body { transition: opacity .15s; }
+  #inspect.stale, #statistics-body.stale { opacity: .55; }
+  .where { margin: 0 0 6px; }
+  .tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .tiles.c5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .tile { background: var(--field); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px 5px; min-width: 0; }
+  .tiles.c5 .tile { padding: 4px 6px 5px; }
+  .tile > * { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tile .k { font-size: 11px; color: var(--muted); }
+  .tile b { font-size: 13.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .tile small { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .sw { display: inline-block; width: 9px; height: 9px; border-radius: 2px; border: 1px solid #0006; margin-right: 5px; flex: none; }
+
+  details.sec { border: 1px solid var(--line); border-radius: 8px; margin-top: 8px; }
+  details.sec > summary { display: flex; align-items: center; gap: 8px; margin: 0; padding: 8px 10px; font-size: 13px;
+           text-transform: none; letter-spacing: 0; color: var(--ink); border-radius: 8px; }
+  details.sec[open] > summary { border-bottom: 1px solid var(--line); border-radius: 8px 8px 0 0; }
+  details.sec > summary .lvl { font-weight: 700; }
+  details.sec > summary .id { font: 12px ui-monospace, Consolas, monospace; color: var(--muted); white-space: nowrap; }
+  details.sec > summary .tag { margin-left: auto; color: var(--muted); font-size: 12px; min-width: 0; white-space: nowrap;
+           overflow: hidden; text-overflow: ellipsis; }
+  details.sec > .body { padding: 10px; }
+  .lvl-icon { width: 16px; height: 16px; flex: none; }
+  .lvl-icon rect { fill: var(--panel); stroke: var(--muted); stroke-width: 1.2; }
+  .lvl-icon rect.on { fill: var(--accent); stroke: var(--accent); }
+  details.grp { border-top: 1px solid var(--line); margin-top: 10px; }
+  details.grp > summary { display: flex; align-items: center; gap: 8px; margin: 0; padding: 7px 0 0; }
+  details.grp > summary .hint { margin-left: auto; text-transform: none; letter-spacing: 0; font-size: 12px; min-width: 0;
+           white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+  details.grp > .gb { padding-top: 7px; }
+  details.sec > summary::-webkit-details-marker, details.grp > summary::-webkit-details-marker { display: none; }
+  details.sec > summary::before, details.grp > summary::before { content: ''; flex: none; border-left: 5px solid var(--muted);
+           border-top: 4px solid transparent; border-bottom: 4px solid transparent; transition: transform .12s; }
+  details.sec[open] > summary::before, details.grp[open] > summary::before { transform: rotate(90deg); }
+
+  .stages { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 8px; }
+  .stages button { padding: 3px 0; font-size: 11.5px; border-radius: 999px; white-space: nowrap; }
+  .stages button.reached { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; cursor: default; }
+  .stages button:not(.reached) { border-style: dashed; color: var(--muted); }
+  .stages button:not(.reached):hover { color: var(--ink); border-style: solid; }
+
+  .gb .sub, .body > .sub { font-size: 11px; color: var(--muted); margin: 9px 0 3px; }
+  .gb > .sub:first-child { margin-top: 0; }
+  .gb .note { margin: 0 0 5px; }
+  .gb .note.after { margin: 6px 0 0; }
+  .stack { display: flex; height: 13px; border-radius: 3px; overflow: hidden; border: 1px solid #0006; }
+  .stack i { display: block; min-width: 1px; }
+  .keys { display: flex; flex-wrap: wrap; gap: 1px 12px; font-size: 12px; margin-top: 3px; font-variant-numeric: tabular-nums; }
+  .keys span { white-space: nowrap; }
+  dl.kv { display: grid; grid-template-columns: max-content minmax(0, 1fr) max-content minmax(0, 1fr); gap: 2px 10px; margin: 0;
+          font-size: 12.5px; }
+  dl.kv.one { grid-template-columns: max-content minmax(0, 1fr); }
+  dl.kv dt { color: var(--muted); white-space: nowrap; }
+  dl.kv dd { margin: 0; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+  dl.kv + dl.kv { margin-top: 2px; }
+
+  .meters { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 3px 16px; font-size: 12.5px; }
+  .meters.c1 { grid-template-columns: minmax(0, 1fr); }
+  .meters.c3 { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px 12px; }
+  .meter { display: grid; grid-template-columns: minmax(0, 1fr) 46px 34px; gap: 6px; align-items: center; min-width: 0; }
+  .meters.res .meter { grid-template-columns: minmax(0, 1fr) 34px 34px; }
+  .meters.c1 .meter { grid-template-columns: 172px minmax(0, 1fr) 44px; }
+  .meters.c1.pop .meter { grid-template-columns: 150px minmax(0, 1fr) 100px; }
+  .meters.pop2 .meter { grid-template-columns: minmax(0, 1fr) 40px 78px; }
+  .meters.c1.count .meter { grid-template-columns: 22px minmax(0, 1fr) 30px; }
+  .meters.c3 .meter { grid-template-columns: minmax(0, 1fr) 36px 28px; }
+  .meter .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .meters.count .n { text-align: right; font-variant-numeric: tabular-nums; }
+  .meter .t, .grip .t, .res-row .t { height: 8px; border-radius: 4px; overflow: hidden; background: color-mix(in srgb, var(--muted) 22%, transparent); }
+  .meter .t i, .grip .t i, .res-row .t i { display: block; height: 100%; background: var(--accent); border-radius: 4px; }
+  .meter .t.split { display: flex; }
+  .meter .t.split i { border-radius: 0; }
+  .meter .t i.two { opacity: .45; }
+  .meter .v { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .tagline { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); border: 1px solid var(--line);
+           border-radius: 999px; padding: 0 5px; margin-left: 5px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 4px; }
+  .chip { border: 1px solid var(--line); background: var(--field); border-radius: 999px; padding: 0 8px; font-size: 12px; white-space: nowrap; }
+  .chip small { color: var(--muted); }
+  dl.kv.kinds { gap: 5px 10px; align-items: start; }
+  dl.kv.kinds dt { padding-top: 1px; }
+
+  table.tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .tbl th { text-align: left; font-weight: 400; color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .06em;
+           padding: 0 8px 2px 0; white-space: nowrap; }
+  .tbl td { padding: 2px 8px 2px 0; border-top: 1px solid var(--line); white-space: nowrap; font-variant-numeric: tabular-nums; vertical-align: top; }
+  .tbl td:last-child, .tbl th:last-child { padding-right: 0; }
+  .tbl th:last-child { white-space: normal; }
+  .tbl td.wide { white-space: normal; width: 99%; color: var(--muted); font-size: 12px; }
+  .tbl .r { text-align: right; }
+  .tbl tr.off td { color: var(--muted); }
+  .tbl tr.off .sw { opacity: .5; }
+  .tbl tr.here td { font-weight: 600; }
+  .tbl tr[data-go] { cursor: pointer; }
+  .tbl tr[data-go]:hover td, .tbl tr[data-go]:focus-visible td { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+  .tbl tr[data-go]:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  a.go { color: var(--accent); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+
+  .faction { display: grid; grid-template-columns: 18px minmax(0, 1fr) 84px; gap: 0 9px; align-items: start; padding: 5px 0;
+           border-top: 1px solid var(--line); font-size: 13px; }
+  .faction:first-child { border-top: 0; padding-top: 0; }
+  .faction small { display: block; color: var(--muted); font-size: 12px; }
+  .banner { width: 18px; height: 22px; margin-top: 2px; border: 4px solid var(--line); border-radius: 2px 2px 7px 7px; background: var(--field); }
+  .grip { display: grid; grid-template-columns: 1fr 28px; gap: 6px; align-items: center; margin-top: 5px; font-size: 12.5px;
+           font-variant-numeric: tabular-nums; text-align: right; }
+
+  .res-row { display: grid; grid-template-columns: 34px minmax(0, 1fr) 64px 78px 32px 32px; gap: 6px; align-items: center;
+           font-size: 12.5px; padding: 2px 0; border-top: 1px solid var(--line); }
+  .res-row.head { border-top: 0; font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); padding-top: 0; }
+  .nofinal .res-row { grid-template-columns: 34px minmax(0, 1fr) 64px 110px 32px; }
+  .res-row .abbr { background: var(--muted); color: var(--panel); border-radius: 4px; padding: 1px 0; text-align: center; }
+  .res-row .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .res-row small { color: var(--muted); }
+  .res-row .v { text-align: right; font-variant-numeric: tabular-nums; }
   .key { display: inline-block; width: 10px; height: 10px; border-radius: 2px; border: 1px solid #0006; background: var(--accent); vertical-align: -1px; }
   .key.towns { opacity: .45; }
+
   main { position: relative; overflow: hidden; background: var(--map-bg); cursor: grab; touch-action: none; }
   main.dragging { cursor: grabbing; }
   #tiles { position: absolute; inset: 0; }
@@ -94,6 +192,16 @@
   #scale { position: absolute; right: 10px; bottom: 10px; color: #fff; font: 12px ui-monospace, Consolas, monospace; text-align: center; pointer-events: none; }
   #scale div { height: 6px; border: 2px solid #fff; border-top: 0; margin-top: 2px; box-shadow: 0 1px 0 #0008; }
   @media (max-width: 760px) { body { grid-template-columns: 1fr; grid-template-rows: 46vh 1fr; } aside { order: 2; border-right: 0; border-top: 1px solid var(--line); } }
+  @media (max-width: 520px) {
+    .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .tiles.c5 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .meters, .meters.c3 { grid-template-columns: minmax(0, 1fr); }
+    dl.kv { grid-template-columns: max-content minmax(0, 1fr); }
+    .stages button { font-size: 10.5px; }
+    details.sec > summary { flex-wrap: wrap; }
+    .meters.c1 .meter, .meters.c1.pop .meter { grid-template-columns: minmax(0, 1fr) 70px max-content; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body>
@@ -268,6 +376,94 @@ async function loadLabels() {
   }
 }
 
+// Words and numbers.
+const words = s => String(s).replace(/([a-z])([A-Z])/g, '$1 $2').replace(/ And /g, ' & ');
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const num = (v, d = 2) => v == null ? '–' : Number(v).toFixed(d);
+const big = (v, d = 0) => v == null ? '–' : Number(v).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+const km2 = a => a >= 100 ? big(a) : num(a, 1);
+// Persons are few at the default density, and a zone or a patch holds a share of a person: small numbers keep their decimals.
+const people = v => v == null ? '–' : v >= 100 || Number.isInteger(v) ? big(v) : big(v, v >= 10 ? 1 : 2);
+const density = v => v >= 100 ? big(v) : num(v, v >= 10 ? 1 : v >= 1 ? 2 : 3);
+const pct = share => (share * 100).toFixed(share > 0 && share < 0.0995 ? 1 : 0) + '%';
+const coord = c => `(${c[0]}, ${c[1]})`;
+const place = p => `${(p[0] / 1000).toFixed(1)} km E, ${(p[1] / 1000).toFixed(1)} km S`;
+const count = (n, one, many) => `${big(n)} ${n === 1 ? one : many}`;
+const yes = v => v ? 'yes' : 'no';
+const clamp01 = v => Math.max(0, Math.min(1, Number(v) || 0));
+const safeColour = c => typeof c === 'string' && /^#[0-9a-f]{6}$/i.test(c) ? c : null;
+const plain = html => String(html).replace(/<[^>]*>/g, '').replace(/"/g, '&quot;');
+const spread = (s, unit, d = 0) => s ? `${big(s.Min, d)} to ${big(s.Max, d)} ${unit} <span class="muted">· mean ${big(s.Mean, d)}</span>` : '–';
+const river = v => `${num(v, 1)}${v >= 80 ? ' <span class="muted">large</span>' : v >= 8 ? ' <span class="muted">navigable</span>' : ''}`;
+
+// The pieces the panel is built from. Every string that goes in is html: text from the backend is escaped by the caller.
+const tile = (k, v, sub = '') =>
+  `<div class="tile" title="${plain(k)}: ${plain(v)}${sub ? ' · ' + plain(sub) : ''}"><span class="k">${k}</span><b>${v}</b>${sub ? `<small>${sub}</small>` : ''}</div>`;
+const tileRow = (items, cls = '') => `<div class="tiles ${cls}">${items.filter(Boolean).join('')}</div>`;
+const kv = (rows, cls = '') => `<dl class="kv ${cls}">${rows.filter(Boolean).map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`;
+const sub = text => `<p class="sub">${text}</p>`;
+const note = (text, cls = '') => `<p class="note ${cls}">${text}</p>`;
+const swatch = colour => safeColour(colour) ? `<i class="sw" style="background:${colour}"></i>` : '';
+const chips = items => `<div class="chips">${items.map(c => `<span class="chip">${c}</span>`).join('')}</div>`;
+// A list of bars: every item has a name, a value from 0 to 1 for the bar and the text after it.
+const meters = (items, cls = '') => `<div class="meters ${cls}">${items.map(m =>
+  `<div class="meter"${m.title ? ` title="${esc(m.title)}"` : ''}><span class="n">${m.name}</span>` +
+  `<span class="t"><i style="width:${(clamp01(m.value) * 100).toFixed(1)}%${safeColour(m.colour) ? ';background:' + m.colour : ''}"></i></span>` +
+  `<span class="v">${m.text}</span></div>`).join('')}</div>`;
+
+// Which sections and groups are open is remembered, so the next look shows the same ones.
+const openState = (() => { try { return JSON.parse(localStorage.getItem('gameworld-open') || '{}') || {}; } catch { return {}; } })();
+const isOpen = (key, byDefault) => typeof openState[key] === 'boolean' ? openState[key] : byDefault;
+document.addEventListener('toggle', ev => {
+  const key = ev.target.dataset && ev.target.dataset.key;
+  if (!key) return;
+  openState[key] = ev.target.open;
+  try { localStorage.setItem('gameworld-open', JSON.stringify(openState)); } catch { /* The panel works without it. */ }
+}, true);
+const group = (key, title, hint, body, byDefault = true) => body
+  ? `<details class="grp" data-key="${key}"${isOpen(key, byDefault) ? ' open' : ''}><summary><span>${title}</span><span class="hint">${hint ?? ''}</span></summary><div class="gb">${body}</div></details>`
+  : '';
+// The three levels are nested: the icon shows which of the three squares the section is about.
+const levelIcon = level => `<svg class="lvl-icon" viewBox="0 0 16 16" aria-hidden="true">` +
+  `<rect x="1" y="1" width="14" height="14" rx="2"${level === 0 ? ' class="on"' : ''}/>` +
+  `<rect x="4" y="4" width="8" height="8" rx="1.5"${level === 1 ? ' class="on"' : ''}/>` +
+  `<rect x="6.5" y="6.5" width="3" height="3" rx=".8"${level === 2 ? ' class="on"' : ''}/></svg>`;
+const section = (key, level, name, id, tag, body) =>
+  `<details class="sec" data-key="${key}"${isOpen(key, true) ? ' open' : ''}><summary>${levelIcon(level)}<span class="lvl">${name}</span>` +
+  `<span class="id">${id}</span><span class="tag" title="${plain(tag)}">${tag}</span></summary><div class="body">${body}</div></details>`;
+
+// A bar of shares that sum to the whole, with its key under it.
+const beltColours = { Polar: '#dfe9f3', Subpolar: '#a9c8e2', Boreal: '#6f9fc4', Temperate: '#7fb56a', Tropical: '#e39b45' };
+function stackRow(title, shares, colourOf = s => safeColour(s.Colour)) {
+  if (!shares || !shares.length) return '';
+  const colour = s => colourOf(s) ?? '#888888';
+  const shown = shares.slice(0, 6), rest = shares.slice(6);
+  return sub(title) +
+    `<div class="stack">${shares.map(s =>
+      `<i title="${esc(words(s.Name))}: ${pct(s.Share)} · ${km2(s.AreaKm2)} km²" style="flex:${Math.max(s.Share, 0.0001)} 0 0;background:${colour(s)}"></i>`).join('')}</div>` +
+    `<div class="keys">${shown.map(s => `<span><i class="sw" style="background:${colour(s)}"></i>${esc(words(s.Name))} ${pct(s.Share)}</span>`).join('')}` +
+    (rest.length ? `<span class="muted" title="${esc(rest.map(s => `${words(s.Name)} ${pct(s.Share)}`).join(' · '))}">+${rest.length} more</span>` : '') + '</div>';
+}
+const shareMeters = (shares, cls = '') => {
+  const most = Math.max(...shares.map(s => s.Share), 1e-9);
+  return meters(shares.map(s => ({ name: swatch(s.Colour) + esc(words(s.Name)), value: s.Share / most, text: pct(s.Share),
+    colour: s.Colour, title: `${words(s.Name)}: ${km2(s.AreaKm2)} km²` })), cls);
+};
+const countMeters = (list, cls = '') => {
+  const most = Math.max(...list.map(x => x.Count), 1);
+  return meters(list.map(x => ({ name: esc(words(x.Name)), value: x.Count / most, text: big(x.Count) })), cls);
+};
+const valueMeters = (list, cls = '') => meters(list.map(x => ({ name: esc(x.Name), value: x.Value, text: num(x.Value) })), cls);
+const resourceMeters = list => meters(list.map(x => ({
+  name: `<span class="abbr">${esc(x.Abbreviation)}</span> ${esc(words(x.Resource))}`, value: x.ListedShare, text: pct(x.ListedShare),
+  title: `${words(x.Resource)} (${x.Group}): listed on ${pct(x.ListedShare)} · mean amount ${num(x.Mean)} · best patch ${num(x.Best)}` })), 'res');
+const raceMeters = (races, total) => {
+  const most = Math.max(...races.map(r => r.Persons), 1e-9);
+  return meters(races.map(r => ({
+    name: esc(r.Name) + (r.Standing === 'Minority' ? '<span class="tagline">minority</span>' : ''),
+    value: r.Persons / most, text: `${people(r.Persons)} <span class="muted">${total > 0 ? pct(r.Persons / total) : ''}</span>` })), 'c1 pop');
+};
+
 // Statistics of the current view. They are counted only while the section is open, a moment after the view comes to rest.
 let statisticsTimer = 0, statisticsRun = 0, statisticsKey = '';
 function statisticsSoon() {
@@ -286,50 +482,146 @@ async function statistics() {
   if (key === statisticsKey) return;
   statisticsKey = key;
   const run = ++statisticsRun, body = $('statistics-body');
-  body.querySelectorAll('.hist').forEach(h => h.classList.add('stale'));
+  body.classList.add('stale');
   try {
     const r = await fetch('/api/statistics?' + query);
     if (!r.ok) throw new Error(await r.text() || 'The statistics were not counted.');
     const s = await r.json();
     if (run !== statisticsRun) return;
-    const area = km2 => km2 >= 100 ? Math.round(km2).toLocaleString('en') : km2.toFixed(1);
-    const pct = share => (share * 100).toFixed(share < 0.0995 ? 1 : 0) + '%';
-    const total = s.LandKm2 + s.OceanKm2, top = s.Biomes.length ? s.Biomes[0].Share : 1;
-    body.innerHTML =
-      `<dl><dt>Current view</dt><dd>${area(total)} km² · ${s.Regions} region${s.Regions > 1 ? 's' : ''}</dd>` +
-      `<dt>Land · sea</dt><dd>${pct(s.LandKm2 / total)} · ${pct(s.OceanKm2 / total)}</dd></dl>` +
-      (s.Biomes.length
-        ? `<p class="note">${s.FinalBiomes ? 'Final' : 'Estimated'} biomes, share of the land in view.</p><ul class="hist">` +
-          s.Biomes.map(b => `<li title="${esc(words(b.Biome))}: ${area(b.AreaKm2)} km²"><span class="name">${esc(words(b.Biome))}</span>` +
-            `<span class="track"><span class="bar" style="width:${(b.Share / top * 100).toFixed(1)}%;background:${esc(b.Colour)}"></span></span>` +
-            `<span class="pct">${pct(b.Share)}</span></li>`).join('') + '</ul>'
-        : '<p class="note">There is no land in view.</p>') +
-      (s.Biomes.length ? prospectStatistics(s) : '');
+    body.innerHTML = renderStatistics(s);
   } catch (e) {
     if (run !== statisticsRun) return;
     statisticsKey = '';
     body.innerHTML = `<p class="error">${esc(e.message)}</p>`;
+  } finally {
+    if (run === statisticsRun) body.classList.remove('stale');
   }
+}
+
+function renderStatistics(s) {
+  const total = s.LandKm2 + s.OceanKm2, c = s.Cells, form = s.FinalBiomes ? 'final' : 'estimated';
+  const head = tileRow([
+      tile('Current view', `${km2(total)} km²`, count(s.Regions, 'region', 'regions')),
+      tile('Land · sea', `${pct(s.LandKm2 / total)} · ${pct(s.OceanKm2 / total)}`, `${km2(s.LandKm2)} km² land`),
+      tile('Zones', big(c.LandZones + c.OceanZones), `${c.LandZones} land · ${c.OceanZones} sea`),
+      tile('Patches', big(c.LandPatches + c.OceanPatches), `${big(c.LandPatches)} land · ${big(c.OceanPatches)} sea`),
+    ]) +
+    `<div class="keys" style="margin-top:6px"><span class="muted">Regions by stage</span>${s.Stages.map(x => `<span>${esc(x.Name)} ${x.Count}</span>`).join('')}</div>`;
+
+  const zoneKm2 = (state.zoneKm ?? 32) ** 2, patchKm2 = (state.patchKm ?? 8) ** 2;
+  const cells = kv([
+    ['Zone', `${num(c.CellsPerZone)} cells <span class="muted">· about ${km2(c.CellsPerZone * zoneKm2)} km²</span>`],
+    c.LandPatches ? ['Land patch', `${num(c.CellsPerLandPatch)} cells <span class="muted">· about ${km2(c.CellsPerLandPatch * patchKm2)} km²</span>`] : null,
+    c.OceanPatches ? ['Sea patch', `${num(c.CellsPerOceanPatch)} cells <span class="muted">· about ${km2(c.CellsPerOceanPatch * patchKm2)} km²</span>`] : null,
+  ], 'one');
+  const kinds = (name, k) => sub(`${name}: ${k.Found} of the ${k.Enabled} kinds are in view`) +
+    chips(k.Types.map(t => `${esc(t.Type)} <small>${t.Found}/${t.Enabled}</small>`)) +
+    (k.Top.length ? sub('The most widespread, by the share of the view in patches that hold them') + meters(k.Top.map(x => ({
+      name: `${esc(x.Name)} <span class="muted">${esc(x.Type.toLowerCase())}</span>`, value: x.Share / Math.max(k.Top[0].Share, 1e-9), text: pct(x.Share),
+      title: `${x.Name} (${x.Type}): ${pct(x.Share)} of the view` }))) : '');
+  const life = group('s-kinds', 'Flora & fauna', `${s.Flora.Found} · ${s.Fauna.Found} kinds`, kinds('Flora', s.Flora) + kinds('Fauna', s.Fauna), false);
+
+  if (!s.LandKm2)
+    return head + group('s-cells', 'Zones & patches', '', sub('What the mergers left, as a mean') + cells) + life + note('There is no land in view.', 'after');
+
+  const w = s.Water;
+  return head +
+    group('s-land', 'Land', `${s.ElevationTypes.length} elevation types · ${s.Bedrocks.length} bedrocks`,
+      stackRow('Elevation types, share of the land in view', s.ElevationTypes) +
+      sub('Bedrock') + shareMeters(s.Bedrocks) +
+      sub('What the mergers left, as a mean') + cells) +
+    group('s-biomes', 'Biomes & climate', `${s.Biomes.length} biomes · ${form}`,
+      sub(`${s.FinalBiomes ? 'Final' : 'Estimated'} biomes, share of the land in view`) + shareMeters(s.Biomes, 'c1') +
+      stackRow('Thermal belts', s.Belts, x => beltColours[x.Name]) +
+      sub('Climate of the land patches') + kv([
+        ['Temperature', spread(s.TemperatureC, '°C', 1)],
+        ['Precipitation', spread(s.PrecipitationMm, 'mm a year')],
+      ], 'one')) +
+    (s.Heights ? group('s-height', 'Height', `${big(s.Heights.HeightM.Min)} to ${big(s.Heights.HeightM.Max)} m`,
+      kv([['Lowest', `${big(s.Heights.HeightM.Min)} m`], ['Mean', `${big(s.Heights.HeightM.Mean)} m`], ['Highest', `${big(s.Heights.HeightM.Max)} m`]]) +
+      sub('Share of the land by height') + shareMeters(s.Heights.Bands) +
+      (s.Heights.Coverage < 0.995 ? note(`Read in the regions that are Elevated: ${pct(s.Heights.Coverage)} of the land in view.`, 'after') : ''), false) : '') +
+    group('s-water', 'Water & coast', w ? `${pct(w.River)} of the land by a river` : '',
+      w ? sub('Share of the land in patches with') + meters([
+        ['A river', w.River], ['A navigable river', w.NavigableRiver], ['A lake', w.Lake], ['A coast', w.Coastal], ['A harbour', w.Harbour],
+      ].map(([name, value]) => ({ name, value, text: pct(value) }))) : '', false) +
+    group('s-resources', 'Resources', `food ${num(s.Food)} · wealth ${num(s.Wealth)}`,
+      s.Resources.length
+        ? sub(`Share of the land in view where the resource is listed (${form})`) + resourceMeters(s.Resources)
+        : note('No resource is listed on the land in view.'), false) +
+    life +
+    group('s-prospects', 'Prospects', s.Prospects ? `${s.Prospects.Total.OnShow} on show` : 'Planned stage', prospectStatistics(s)) +
+    (s.Population ? group('s-population', 'Potential population', `${big(s.Population.Persons)} persons`, populationStatistics(s.Population), false) : '') +
+    (s.Factions ? group('s-factions', 'Factions', `${s.Factions.Ruling} ruling · ${s.Factions.Oppositions} in opposition`, factionStatistics(s.Factions), false) : '') +
+    (s.Settlements ? group('s-settlements', 'Cities & towns', `${s.Settlements.Cities} cities · ${s.Settlements.Towns} towns`, settlementStatistics(s.Settlements), false) : '') +
+    (s.Heights ? '' : note('Heights are read in Elevated regions: the Height base map, the Hillshade layer or the Final biomes layer take the regions in view there.', 'after')) +
+    (s.Prospects && !s.Settlements ? note('Cities and towns are counted in Settled regions: the Travel network layer takes the regions in view there.', 'after') : '');
 }
 
 // The Prospects of the land zones in view, and a histogram of the zones by their number of Prospects on show.
 const prospectCount = c => `${c.CityOnShow} city · ${c.TownOnShow} town on show, ${c.City + c.Town} in all`;
 function prospectStatistics(s) {
   const p = s.Prospects;
-  if (!p) return '<p class="note">Prospects are counted in Planned regions. Turn on the Prospects layer to plan the regions in view.</p>';
+  if (!p) return note('Prospects, the potential population and the factions are counted in Planned regions. Turn on the Prospects layer to plan the regions in view.');
   const most = Math.max(1, ...p.Zones.map(z => z.Zones));
   const width = n => (n / most * 100).toFixed(1) + '%';
-  return `<dl style="margin-top:14px"><dt>Prospects</dt><dd>${prospectCount(p.Total)}</dd>` +
-    `<dt>Per land zone</dt><dd>${(p.Total.OnShow / Math.max(1, p.LandZones)).toFixed(2)} on show · ${p.LandZones} zone${p.LandZones === 1 ? '' : 's'}</dd></dl>` +
-    (p.PlannedRegions < s.Regions ? `<p class="note">Counted in the ${p.PlannedRegions} of ${s.Regions} regions in view that are Planned.</p>` : '') +
-    `<p class="note">Land zones in view by their number of Prospects on show: ` +
-    `<span class="key"></span> with a city Prospect, <span class="key towns"></span> towns only or none.</p>` +
-    '<ul class="hist counts">' + p.Zones.map(z =>
-      `<li title="${z.Zones} zone${z.Zones === 1 ? '' : 's'} with ${z.Prospects} Prospect${z.Prospects === 1 ? '' : 's'} on show, ${z.ZonesWithCity} of them with a city Prospect">` +
-      `<span class="name">${z.Prospects}</span><span class="track">` +
-      (z.ZonesWithCity ? `<span class="bar" style="width:${width(z.ZonesWithCity)}"></span>` : '') +
-      (z.Zones > z.ZonesWithCity ? `<span class="bar towns" style="width:${width(z.Zones - z.ZonesWithCity)}"></span>` : '') +
-      `</span><span class="pct">${z.Zones}</span></li>`).join('') + '</ul>';
+  return kv([
+      ['Prospects', prospectCount(p.Total)],
+      ['Per land zone', `${(p.Total.OnShow / Math.max(1, p.LandZones)).toFixed(2)} on show · ${count(p.LandZones, 'zone', 'zones')}`],
+      ['On show', p.Classes.map(c => `${swatch(prospectColour(c.Name))}${esc(c.Name)} ${c.Count}`).join(' &nbsp; ')],
+      ['Score', `${p.MeanScore == null ? '–' : num(p.MeanScore, 1)} mean on show <span class="muted">· score sum of a region ${big(p.MeanScoreSum)} mean</span>`],
+    ], 'one') +
+    (p.PlannedRegions < s.Regions ? note(`Counted in the ${p.PlannedRegions} of ${s.Regions} regions in view that are Planned.`, 'after') : '') +
+    sub(`Land zones in view by their number of Prospects on show: <span class="key"></span> with a city Prospect, <span class="key towns"></span> towns only or none`) +
+    '<div class="meters c1 count">' + p.Zones.map(z =>
+      `<div class="meter" title="${count(z.Zones, 'zone', 'zones')} with ${count(z.Prospects, 'Prospect', 'Prospects')} on show, ${z.ZonesWithCity} of them with a city Prospect">` +
+      `<span class="n">${z.Prospects}</span><span class="t split">` +
+      (z.ZonesWithCity ? `<i style="width:${width(z.ZonesWithCity)}"></i>` : '') +
+      (z.Zones > z.ZonesWithCity ? `<i class="two" style="width:${width(z.Zones - z.ZonesWithCity)}"></i>` : '') +
+      `</span><span class="v">${z.Zones}</span></div>`).join('') + '</div>';
+}
+function populationStatistics(p) {
+  const most = Math.max(...p.Races.map(r => r.Persons), 1e-9);
+  return kv([
+      ['Persons', big(p.Persons)], ['Density', `${density(p.PerKm2)} per km²`],
+      ['Regions', `${p.Regions} Planned`], ['Land', `${km2(p.LandKm2)} km²`],
+    ]) +
+    sub('The races of the Planned regions in view, each region whole') +
+    (p.Races.length ? meters(p.Races.map(r => ({
+      name: esc(r.Name), value: r.Persons / most, text: `${big(r.Persons)} <span class="muted">${p.Persons > 0 ? pct(r.Persons / p.Persons) : ''}</span>`,
+      title: `${r.Name}: a main race in ${count(r.MainIn, 'region', 'regions')}, a minority race in ${count(r.MinorityIn, 'region', 'regions')}` })), 'pop2')
+      : note('The Planned regions in view hold nobody.'));
+}
+function factionStatistics(f) {
+  return kv([
+      ['Ruling', `${f.Ruling}`], ['Mean grip', f.MeanGrip == null ? '–' : num(f.MeanGrip)],
+      ['Opposition', `${f.Oppositions}${f.Ruling ? ` <span class="muted">· ${pct(f.Oppositions / f.Ruling)} of the regions</span>` : ''}`],
+      ['Mean tension', f.MeanTension == null ? '–' : num(f.MeanTension)],
+      ['Lesser', `${f.LesserCount}${f.Ruling ? ` <span class="muted">· ${num(f.LesserCount / f.Ruling, 1)} a region</span>` : ''}`],
+    ]) +
+    (f.RulingForms.length ? sub('Ruling factions by form') + countMeters(f.RulingForms) : '') +
+    (f.RulingTypes.length ? sub('Ruling factions by type') + countMeters(f.RulingTypes) : '') +
+    (f.Grounds.length ? sub('What the oppositions stand on') + countMeters(f.Grounds) : '') +
+    (f.Lesser.length ? sub('Lesser factions by kind') + countMeters(f.Lesser) : '');
+}
+function settlementStatistics(t) {
+  const persons = t.CityPersons + t.TownPersons + t.RuralPersons;
+  const share = (name, colour, n) => ({ Name: name, Colour: colour, Share: persons ? n / persons : 0, AreaKm2: 0 });
+  return kv([
+      ['Cities', `${t.Cities} <span class="muted">· largest ${big(t.LargestCity)}</span>`], ['Towns', `${t.Towns} <span class="muted">· largest ${big(t.LargestTown)}</span>`],
+      ['Persons', big(persons)], ['Regions', `${t.Regions} Settled`],
+      ['Roads', t.Roads], ['River routes', t.RiverRoutes], ['Sea lanes', t.SeaLanes],
+    ]) +
+    personsStack(t.CityPersons, t.TownPersons, t.RuralPersons);
+}
+// Where the persons of a region live: in its cities, in its towns and on the land.
+function personsStack(city, town, rural) {
+  const persons = city + town + rural;
+  if (!persons) return '';
+  const parts = [['In cities', '#b5553c', city], ['In towns', '#d9a441', town], ['On the land', '#7fa66a', rural]];
+  return sub('Where the persons live') +
+    `<div class="stack">${parts.map(([name, colour, n]) => `<i title="${name}: ${big(n)}" style="flex:${Math.max(n / persons, 0.0001)} 0 0;background:${colour}"></i>`).join('')}</div>` +
+    `<div class="keys">${parts.map(([name, colour, n]) => `<span><i class="sw" style="background:${colour}"></i>${name} ${big(n)} <span class="muted">${pct(n / persons)}</span></span>`).join('')}</div>`;
 }
 
 function status(x, y) {
@@ -409,110 +701,331 @@ document.querySelectorAll('input[name=mode]').forEach(i => i.addEventListener('c
 $('layers').addEventListener('change', () => { showLegends(); draw(); });
 $('statistics').addEventListener('toggle', statistics);
 
-// Inspect.
-const words = s => String(s).replace(/([a-z])([A-Z])/g, '$1 $2').replace(/ And /g, ' & ');
-const num = (v, d = 2) => v == null ? '–' : Number(v).toFixed(d);
-const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+// Under the pointer: the region, the zone and the patch at the pinned point, a section each.
+const stageNames = ['Outlined', 'Detailed', 'Elevated', 'Planned', 'Settled'];
+const stageAdds = {
+  Outlined: 'zones linked, expanded and merged, and sea access',
+  Detailed: 'patch mergers, rivers, lakes, estimated biomes and resources',
+  Elevated: 'the height map, final biomes and resources',
+  Planned: 'Prospects, the potential population and the factions',
+  Settled: 'the travel network, cities and towns',
+};
+const prospectColour = name => legendData?.Prospects.find(c => c.Class === name)?.Colour;
+const kindOf = p => p.ForCity ? '◆ City' : '● Town';
 
-// One faction of a region: its role, what it is, its lead race and what the rule says about it.
-function factionLine(f, patch) {
+// The stages of the region: the ones it has reached, and a button to take it to each later one.
+function stageBar(region) {
+  const reached = stageNames.indexOf(region.Stage);
+  return `<div class="stages" role="group" aria-label="Region generation stage">${stageNames.map((name, i) => i <= reached
+    ? `<button type="button" class="reached" disabled title="${name}: ${stageAdds[name]}">${name}</button>`
+    : `<button type="button" data-stage="${name}" title="Take the region to ${name}: ${stageAdds[name]}">${name}</button>`).join('')}</div>`;
+}
+
+const heightTile = l => l.HeightM
+  ? tile('Height', `${big(l.HeightM.Mean)} m`, `${big(l.HeightM.Min)} to ${big(l.HeightM.Max)} m`)
+  : tile('Height', '–', 'Elevated stage');
+const climateTile = l => l.TemperatureC
+  ? tile('Climate', `${num(l.TemperatureC.Mean, 1)} °C`, `${big(l.PrecipitationMm.Mean)} mm a year`)
+  : null;
+
+// The climate and the fresh water of the land of a region or a zone. The long rows get the full width.
+function climateAndWater(l, wide = [], short = []) {
+  const w = l.Water;
+  return kv([
+    ['Temperature', spread(l.TemperatureC, '°C', 1)],
+    ['Precipitation', spread(l.PrecipitationMm, 'mm a year')],
+    ['Rivers', `on ${w.RiverPatches} of ${count(l.LandPatches, 'land patch', 'land patches')} <span class="muted">· navigable on ${w.NavigablePatches}</span>`],
+    ...wide,
+  ], 'one') + kv([
+    ['Largest river', w.LargestRiver > 0 ? river(w.LargestRiver) : 'none'],
+    ['Largest mouth', w.LargestMouth > 0 ? river(w.LargestMouth) : 'none'],
+    ['Lakes', w.Lakes ? `${w.Lakes} <span class="muted">· ${num(w.LakeKm2, 1)} km²</span>` : 'none'],
+    ['Harbours', `${w.Harbours} <span class="muted">by a bay</span>`],
+    ['Prosperity', l.Prosperity == null ? '–' : `${num(l.Prosperity, 0)} <span class="muted">mean</span>`],
+    ['Supernatural', l.Supernatural == null ? '–' : `${num(l.Supernatural, 0)} <span class="muted">mean</span>`],
+    ...short,
+  ]);
+}
+const resourceGroup = (key, l, ofSea) => group(key, 'Resources', `food ${num(l.Food)} · wealth ${num(l.Wealth)}`,
+  l.Resources.length
+    ? sub(`Share of the ${ofSea ? 'sea' : 'land'} where the resource is listed (${l.Final && !ofSea ? 'final' : 'estimated'})`) + resourceMeters(l.Resources)
+    : note('No resource is listed here.'));
+const populationGroup = (key, p, byDefault = true) => p ? group(key, 'Potential population', `${people(p.Persons)} persons`,
+  kv([
+    ['Persons', people(p.Persons)], ['Density', `${density(p.PerKm2)} per km²`],
+    p.Capacity == null ? null : ['Capacity', `${people(p.Capacity)} <span class="muted">before the races share it</span>`],
+  ]) + (p.Races.length ? sub('By race') + raceMeters(p.Races, p.Persons) : note('No race of the region lives here.', 'after')), byDefault) : '';
+
+function prospectTable(list) {
+  return `<table class="tbl"><thead><tr><th>For</th><th>Class</th><th class="r">Score</th><th>Zone</th><th>Races of a city or a town</th></tr></thead><tbody>` +
+    list.map(p =>
+      `<tr class="${p.OnShow ? '' : 'off'}${p.Here ? ' here' : ''}" data-go="${p.Spot[0]},${p.Spot[1]}" tabindex="0" ` +
+      `title="${p.OnShow ? 'On show' : 'Not on show'} · patch ${coord(p.Patch)} · click to look at it">` +
+      `<td>${kindOf(p)}</td><td>${swatch(prospectColour(p.Class))}${p.Class}</td><td class="r">${num(p.Score, 1)}</td>` +
+      `<td>${coord(p.Zone)}</td><td class="wide">${p.Races.map(esc).join(', ') || '–'}</td></tr>`).join('') + '</tbody></table>' +
+    note('Greyed Prospects are not on show. Click a row to look at its patch.', 'after');
+}
+const placeKind = s => s.Capital ? '◈ Capital' : s.Kind === 'City' ? '◆ City' : '● Town';
+function placeTable(places) {
+  return `<table class="tbl"><thead><tr><th class="r">Rank</th><th>Place</th><th class="r">Persons</th><th>Zone</th><th>Races</th></tr></thead><tbody>` +
+    places.map(s =>
+      `<tr class="${s.Here ? 'here' : ''}"${s.Spot ? ` data-go="${s.Spot[0]},${s.Spot[1]}" tabindex="0" title="Patch ${coord(s.Patch)} · click to look at it"` : ''}>` +
+      `<td class="r">${s.Rank}</td><td>${placeKind(s)}</td><td class="r">${big(s.Persons)}</td><td>${coord(s.Zone)}</td>` +
+      `<td class="wide">${s.Races.filter(r => r.Persons > 0).map(r => `${esc(r.Name)} ${big(r.Persons)}`).join(', ') || '–'}</td></tr>`).join('') + '</tbody></table>';
+}
+
+// One faction of a region: its banner, its role, what it is, its lead race and what the rule says about it.
+function factionCard(f) {
   const what = f.Kind ?? words(f.Form);
+  const main = safeColour(f.MainColour?.Hex), secondary = safeColour(f.SecondaryColour?.Hex);
+  const names = [f.MainColour, f.SecondaryColour].filter(c => c).map(c => c.Name).join(' and ');
+  // The banner: the main colour as its field with the secondary colour around it.
+  const banner = `<span class="banner"${main ? ` title="${esc(names)}" style="background:${main};border-color:${secondary ?? main}"` : ''}></span>`;
   const notes = [words(f.Type).toLowerCase()];
   if (f.Ground) notes.push('ground: ' + words(f.Ground).toLowerCase());
-  notes.push('grip ' + num(f.Grip));
   if (f.Vocations.length) notes.push(f.Vocations.map(esc).join(', '));
-  const here = patch && f.Seat && f.Seat[0] === patch.Id[0] && f.Seat[1] === patch.Id[1];
-  const seat = f.Seat ? ` · seat (${f.Seat[0]}, ${f.Seat[1]})${here ? ' <b>here</b>' : ''}` : '';
-  // The colours: the main colour as a square with the secondary colour as its border.
-  const safe = c => c && /^#[0-9a-f]{6}$/i.test(c.Hex) ? c.Hex : null;
-  const main = safe(f.MainColour), secondary = safe(f.SecondaryColour);
-  const names = [f.MainColour, f.SecondaryColour].filter(c => c).map(c => c.Name).join(' and ');
-  const colours = main
-    ? `<span title="${esc(names)}" style="display:inline-block;width:.7em;height:.7em;margin-right:.35em;vertical-align:baseline;background:${main};border:.22em solid ${secondary ?? main}"></span>`
-    : '';
   if (names) notes.push(esc(names.toLowerCase()));
-  return `${colours}${f.Role}: ${esc(what)} of the ${esc(f.LeadRace)} <span class="muted">(${notes.join(' · ')})</span>${seat}`;
+  notes.push(!f.Seat ? 'no seat' : f.SeatHere ? '<b>seat here</b>'
+    : f.SeatSpot ? `<a class="go" data-go="${f.SeatSpot[0]},${f.SeatSpot[1]}" tabindex="0">seat ${coord(f.Seat)}</a>` : `seat ${coord(f.Seat)}`);
+  return `<div class="faction">${banner}<div><b>${f.Role}</b> · ${esc(what)} of the ${esc(f.LeadRace)}<small>${notes.join(' · ')}</small></div>` +
+    `<div class="grip" title="Grip ${num(f.Grip)}"><span class="t"><i style="width:${(clamp01(f.Grip) * 100).toFixed(1)}%"></i></span><span>${num(f.Grip)}</span></div></div>`;
 }
 
-async function inspect(p) {
+function regionSection(d) {
+  const r = d.Region, l = r.Land, total = l.LandKm2 + l.OceanKm2, p = r.Prospects, pop = r.Population, t = r.Settled;
+  const tag = [r.Stage, r.HasSeaAccess ? 'sea access' : 'landlocked', `${km2(l.LandKm2)} km² land`].join(' · ');
+  const body = stageBar(r) +
+    tileRow([
+      tile('Land', `${km2(l.LandKm2)} km²`, `${pct(total ? l.LandKm2 / total : 0)} land`),
+      tile('Zones', big(r.LandZones + r.OceanZones), `${r.LandZones} land · ${r.OceanZones} sea`),
+      tile('Patches', big(l.LandPatches + l.OceanPatches), `${l.LandPatches} land · ${l.OceanPatches} sea`),
+      tile('Coast', r.HasSeaAccess ? 'Sea access' : 'Landlocked', `${l.CoastalPatches} coastal`),
+      heightTile(l),
+      climateTile(l),
+      pop ? tile('Persons', people(pop.Persons), `${density(pop.PerKm2)} per km²`) : tile('Persons', '–', 'Planned stage'),
+      p ? tile('Prospects', `${p.Count.OnShow} on show`, `${p.Count.CityOnShow} city · ${p.Count.TownOnShow} town`) : tile('Prospects', '–', 'Planned stage'),
+    ]) +
+    group('r-land', 'Land', `${l.Biomes.length} biomes · ${l.Final ? 'final' : 'estimated'}`,
+      stackRow('Elevation types, share of the land', l.ElevationTypes) +
+      stackRow(`Biomes (${l.Final ? 'final' : 'estimated'})`, l.Biomes) +
+      (l.Bedrocks.length ? sub('Bedrock') + shareMeters(l.Bedrocks) : '') +
+      sub('Sited') + kv([['Site', place(r.Site)]], 'one') + kv([
+        ['Zone cells', `${r.ZoneCells} <span class="muted">owned</span>`], ['Ocean seeds', r.OceanSeeds],
+        ['Zone mergers', r.ZoneMergers],
+      ])) +
+    (l.LandPatches ? group('r-water', 'Climate & water', `${count(r.RiverSystems, 'river system', 'river systems')} · ${count(l.Water.Lakes, 'lake', 'lakes')}`,
+      climateAndWater(l,
+        [r.RiversCrossNeighbours ? ['Landlocked', 'the rivers cross a neighbouring region to reach an ocean'] : null],
+        [['River systems', r.RiverSystems]]), false) : '') +
+    resourceGroup('r-resources', l, !l.LandPatches) +
+    populationGroup('r-population', pop) +
+    (r.Factions ? group('r-factions', 'Factions', r.Factions.length ? count(r.Factions.length, 'faction', 'factions') : 'none',
+      r.Factions.length ? r.Factions.map(factionCard).join('') : note('None: the region holds nobody.')) : '') +
+    (r.Reading ? group('r-reading', 'How the factions read the region', `tension ${num(r.Reading.Tension)}`,
+      sub(`The terms of the tension (${num(r.Reading.Tension)} without its random part)`) + valueMeters(r.Reading.Terms) +
+      sub('The fit of each type as the ruler') + valueMeters(r.Reading.Fits) +
+      sub('The indices of the region') + valueMeters(r.Reading.Indices, 'c3') +
+      sub('The Prospects on show') + kv([
+        ['Harbours', r.Reading.Harbours], ['Best trade factor', num(r.Reading.BestTradeFactor)],
+        ['A city', yes(r.Reading.HasCity)],
+      ]), false) : '') +
+    (p ? group('r-prospects', 'Prospects', `${p.Count.City + p.Count.Town} in all · score sum ${big(p.ScoreSum)}`,
+      kv([
+        ['On show', prospectCount(p.Count)],
+        ['Classes', ['Rich', 'Average', 'Poor'].map(c => `${swatch(prospectColour(c))}${c} ${p[c]}`).join(' &nbsp; ')],
+      ], 'one') + (p.List.length ? `<div style="margin-top:6px">${prospectTable(p.List)}</div>` : ''), false) : '') +
+    (t ? group('r-settled', 'Cities & towns', `${count(t.Cities, 'city', 'cities')} · ${count(t.Towns, 'town', 'towns')}`,
+      personsStack(t.CityPersons, t.TownPersons, t.RuralPersons) +
+      sub('Travel links the region decides') + kv([['Roads', t.Roads], ['River routes', t.RiverRoutes], ['Sea lanes', t.SeaLanes]]) +
+      (t.Places.length ? `<div style="margin-top:8px">${placeTable(t.Places)}</div>` : note('The region has no city or town.', 'after')), false) : '') +
+    (!p ? note('Prospects, the potential population and the factions come with the Planned stage, cities and towns with the Settled stage. Take the region there with the stage buttons above, or with the Prospects and Travel network layers.', 'after')
+      : !t ? note('Cities and towns come with the Settled stage: the Settled button above, or the Travel network layer.', 'after') : '');
+  return section('sec-region', 0, 'Region', coord(r.Id), tag, body);
+}
+
+function zoneSection(d) {
+  const z = d.Zone, l = z.Land, p = z.Prospects, pop = z.Population;
+  const tag = [words(z.ElevationType), z.Ocean ? z.OceanOrigin : z.BedrockName, count(z.Cells, 'cell', 'cells')].filter(Boolean).map(esc).join(' · ');
+  const cellsText = count(z.Cells, 'zone cell', 'zone cells');
+  const body = (z.Ocean
+    ? tileRow([
+        tile('Type', 'Ocean', esc(z.OceanOrigin ?? '')),
+        tile('Size', `${km2(l.OceanKm2)} km²`, cellsText),
+        tile('Patches', big(l.OceanPatches), 'sea patches'),
+        tile('Fish', num(l.Resources.find(x => x.Resource === 'Fish')?.Mean ?? 0), 'mean amount'),
+      ])
+    : tileRow([
+        tile('Type', esc(words(z.ElevationType)), esc(z.BedrockName ?? 'no bedrock')),
+        tile('Size', `${km2(l.LandKm2)} km²`, cellsText),
+        tile('Patches', big(l.LandPatches), `${l.CoastalPatches} coastal`),
+        tile('Food · wealth', `${num(l.Food)} · ${num(l.Wealth)}`, z.RiverPoor ? 'river-poor' : `${l.Water.RiverPatches} river patches`),
+        heightTile(l),
+        climateTile(l),
+        pop ? tile('Persons', people(pop.Persons), `${density(pop.PerKm2)} per km²`) : tile('Persons', '–', 'Planned stage'),
+        p ? tile('Prospects', `${p.Count.OnShow} on show`, `${p.Count.City + p.Count.Town} in all`) : tile('Prospects', '–', 'Planned stage'),
+      ])) +
+    group('z-land', z.Ocean ? 'Zone' : 'Land', z.Ocean ? '' : `${l.Biomes.length} biomes · ${l.Final ? 'final' : 'estimated'}`,
+      (z.Ocean ? '' : stackRow(`Biomes (${l.Final ? 'final' : 'estimated'})`, l.Biomes) + sub('Zone')) + kv([
+        ['Site', `${place(z.Site)} <span class="muted">· ${big(z.SitePrecipitationMm)} mm a year there</span>`],
+        z.Ocean ? ['Became ocean', esc(z.OceanOrigin ?? '–')] : ['Bedrock', esc(z.BedrockName ?? '–')],
+      ], 'one') + kv([
+        ['Region', coord(z.Region)], ['Zone cells', z.Cells],
+        z.Ocean ? null : ['River-poor', yes(z.RiverPoor)],
+        z.Ocean ? null : ['Coastal patches', l.CoastalPatches],
+      ])) +
+    (z.Ocean ? '' : group('z-water', 'Climate & water', `${l.Water.RiverPatches} river patches · ${count(l.Water.Lakes, 'lake', 'lakes')}`, climateAndWater(l), false)) +
+    resourceGroup('z-resources', l, z.Ocean) +
+    populationGroup('z-population', pop, false) +
+    (p && p.List.length ? group('z-prospects', 'Prospects', prospectCount(p.Count), prospectTable(p.List), false) : '') +
+    (z.Places && z.Places.length ? group('z-settled', 'Cities & towns', count(z.Places.length, 'place', 'places'), placeTable(z.Places), false) : '');
+  return section('sec-zone', 1, 'Zone', coord(z.Id), tag, body);
+}
+
+function patchSection(d) {
+  const p = d.Patch;
+  if (!p) return section('sec-patch', 2, 'Patch', '', 'not held by the region', note('The region does not hold the patch at this point.'));
+  const est = p.EstimatedBiome, fin = p.FinalBiome, b = fin ?? est, changed = est && fin && fin.Biome !== est.Biome;
+  const cellsText = count(p.Cells, 'cell', 'cells');
+  const tag = [p.Ocean ? 'Ocean' : words(b.Biome), cellsText, p.Coastal ? (p.Ocean ? 'on the shelf' : 'coastal') : null].filter(Boolean).map(esc).join(' · ');
+  const s = p.Score, pr = p.Prospect, town = p.Settlement, pop = p.Population, w = p.Water, site = p.SiteFields;
+  const listed = p.Resources.filter(x => x.Listed), traces = p.Resources.filter(x => !x.Listed);
+  const hasFinal = p.Resources.some(x => x.FinalAmount != null);
+
+  const tilesHtml = p.Ocean
+    ? tileRow([
+        tile('Type', 'Ocean', p.Coastal ? 'on the shelf' : 'open sea'),
+        tile('Size', `${km2(p.AreaKm2)} km²`, cellsText),
+        tile('Sea temperature', `${num(site.InitialTemperatureC, 1)} °C`, 'at the site'),
+        tile('Food · wealth', `${num(p.Food)} · ${num(p.Wealth)}`, `${listed.length} listed`),
+      ])
+    : tileRow([
+        tile('Biome', swatch(p.BiomeColour) + esc(words(b.Biome)), changed ? `estimated ${esc(words(est.Biome))}` : fin ? 'final' : 'estimated'),
+        tile('Size', `${km2(p.AreaKm2)} km²`, cellsText + (p.Coastal ? ' · coastal' : '')),
+        tile('Height', d.HeightM == null ? '–' : `${big(d.HeightM)} m`,
+          d.HeightM == null ? 'Elevated stage' : p.MeanHeightM == null ? 'at the pointer' : `patch mean ${big(p.MeanHeightM)} m`),
+        tile('Temperature', `${num(b.TemperatureC, 1)} °C`, esc(b.Belt)),
+        tile('Precipitation', `${big(b.PrecipitationMm)} mm`, `aridity ${num(b.Aridity)}`),
+        tile('Food · wealth', `${num(p.Food)} · ${num(p.Wealth)}`,
+          p.FinalFood == null ? 'estimated' : `final ${num(p.FinalFood)} · ${num(p.FinalWealth)}`),
+        s ? tile('Score', num(s.Score, 1), pr ? `${pr.Class} · ${pr.ForCity ? 'city' : 'town'}` : `rank ${s.Rank} of ${s.Of}`) : tile('Score', '–', 'Planned stage'),
+        town ? tile(town.Capital ? 'Capital' : town.Kind, `${big(town.Persons)} persons`, `rank ${town.Rank} in the region`)
+          : pop ? tile('Persons', people(pop.Persons), `${density(pop.PerKm2)} per km²`) : tile('Persons', '–', 'Planned stage'),
+      ]);
+
+  const f = s?.Factors, facts = s?.Facts;
+  const kindRows = kinds => {
+    const byType = new Map();
+    for (const k of kinds) byType.set(k.Type, [...(byType.get(k.Type) ?? []), k.Name]);
+    return kv([...byType].map(([type, names]) => [esc(type || 'Other'), chips(names.map(esc))]), 'one kinds');
+  };
+  const body = tilesHtml +
+    (town ? group('p-settled', town.Capital ? 'Capital' : town.Kind, `${big(town.Persons)} persons · rank ${town.Rank}`,
+      kv([['Place', placeKind(town)], ['Rank', `${town.Rank} in the region`], ['Persons', big(town.Persons)], ['Slot', town.Slot]]) +
+      (town.Races.some(r => r.Persons > 0) ? sub('By race, in the order of the races of its Prospect') + raceMeters(town.Races, town.Persons) : '')) : '') +
+    (s ? group('p-score', pr ? 'Prospect & score' : 'Score', pr
+        ? `${pr.Class} · for a ${pr.ForCity ? 'city' : 'town'} · ${pr.OnShow ? 'on show' : 'not on show'}` : `${num(s.Score, 1)} · rank ${s.Rank} of ${s.Of}`,
+      (pr ? kv([
+        ['Prospect', `${swatch(prospectColour(pr.Class))}${pr.Class} · for a ${pr.ForCity ? 'city' : 'town'} · ${pr.OnShow ? 'on show' : 'not on show'} <span class="muted">· slot ${pr.Slot}</span>`],
+        ['Races', pr.Races.length ? pr.Races.map(esc).join(', ') : 'none'],
+      ], 'one') : '') +
+      sub(`The five factors of the score ${num(s.Score, 1)}, rank ${s.Rank} of the ${s.Of} land patches of the region`) +
+      valueMeters([['Resources', f.Resources], ['Geography', f.Geography], ['Trade', f.Trade], ['Climate', f.Climate], ['Prosperity', f.Prosperity]]
+        .map(([Name, Value]) => ({ Name, Value }))) +
+      sub('What the score reads') + kv([
+        ['Coast', yes(facts.Coast)], ['Harbour', yes(facts.Harbour)],
+        ['River', facts.River > 0 ? river(facts.River) : 'none'], ['Mouth', facts.Mouth > 0 ? river(facts.Mouth) : 'none'],
+        ['Confluence', facts.Confluence > 0 ? num(facts.Confluence, 1) : 'none'], ['Head of navigation', yes(facts.HeadOfNavigation)],
+        ['Lake', facts.LakeAreaM2 > 0 ? `${num(facts.LakeAreaM2 / 1e6, 1)} km²` : 'none'],
+        ['To the border', facts.Depth >= 99 ? 'no land border' : count(facts.Depth, 'patch', 'patches')],
+        ['Sea neighbours', pct(s.OceanFraction)], ['Centrality', num(s.Centrality)],
+        ['On the border', yes(s.Border)],
+      ])) : '') +
+    group('p-climate', p.Ocean ? 'Site' : 'Climate & water', p.Ocean ? '' : w.River > 0 ? `river ${num(w.River, 1)}` : 'no river',
+      kv([['Site', `${place(p.Site)} <span class="muted">· ${p.Neighbours} neighbouring patches</span>`]], 'one') + kv(p.Ocean
+      ? [
+          ['Sea temperature', `${num(site.InitialTemperatureC, 1)} °C`], ['Precipitation', `${big(site.PrecipitationMm)} mm`],
+          ['Prosperity', num(site.Prosperity, 0)], ['Supernatural', num(site.Supernatural, 0)],
+        ]
+      : [
+          ['Thermal belt', esc(b.Belt)], ['Aridity', num(b.Aridity)],
+          ['Temperature', `${num(b.TemperatureC, 1)} °C${changed || (fin && est && fin.TemperatureC !== est.TemperatureC) ? ` <span class="muted">· est. ${num(est.TemperatureC, 1)}</span>` : ''}`],
+          ['At sea level', `${num(b.SeaLevelTemperatureC, 1)} °C`],
+          ['Precipitation', `${big(b.PrecipitationMm)} mm`], ['Field at the site', `${big(site.PrecipitationMm)} mm`],
+          ['Prosperity', `${num(site.Prosperity, 0)} <span class="muted">at the site</span>`], ['Supernatural', `${num(site.Supernatural, 0)} <span class="muted">at the site</span>`],
+          ['River', w.River > 0 ? river(w.River) : 'none'], ['Mouth', w.Mouth > 0 ? river(w.Mouth) : 'none'],
+          ['Lake', w.LakeKm2 > 0 ? `${num(w.LakeKm2, 1)} km²` : 'none'], ['Harbour', yes(w.Harbour)],
+          ['Gold load', pct(w.GoldLoad)], ['Tin load', pct(w.TinLoad)],
+          ['River nodes', w.RiverNodes],
+        ]), false) +
+    group('p-resources', 'Resources', `${listed.length} listed${traces.length ? ` · ${traces.length} traces` : ''}`,
+      (listed.length
+        ? `<div class="${hasFinal ? '' : 'nofinal'}"><div class="res-row head"><span></span><span>Resource</span><span>Group</span><span></span><span class="v">Est.</span>${hasFinal ? '<span class="v">Final</span>' : ''}</div>` +
+          listed.map(x =>
+            `<div class="res-row"><span class="abbr">${esc(x.Abbreviation)}</span><span class="n" title="${esc(words(x.Resource))}${x.Variant ? ': ' + esc(x.Variant) : ''}">${esc(words(x.Resource))} <small>${esc(x.Variant ?? '')}</small></span>` +
+            `<small>${esc(x.Group)}${x.Origin === 'Deposit' ? ' ◆' : ''}</small><span class="t"><i style="width:${(clamp01(x.Amount) * 100).toFixed(1)}%"></i></span>` +
+            `<span class="v">${num(x.Amount)}</span>${hasFinal ? `<span class="v${x.FinalAmount != null && Math.abs(x.FinalAmount - x.Amount) >= 0.005 ? '' : ' muted'}">${num(x.FinalAmount)}</span>` : ''}</div>`).join('') + '</div>' +
+          (listed.some(x => x.Origin === 'Deposit') ? note('◆ a deposit: a rare find, not a potential of the land.', 'after') : '')
+        : note('No resource is listed: none has an amount of 0.25 or more.')) +
+      (traces.length ? note('Below 0.25, not listed: ' + traces.map(x => `${esc(words(x.Resource))} ${num(x.Amount)}`).join(' · '), 'after') : '')) +
+    (p.Flora.length + p.Fauna.length ? group('p-life', 'Flora & fauna', `${p.Flora.length} · ${p.Fauna.length} kinds`,
+      (p.Flora.length ? sub('Flora') + kindRows(p.Flora) : '') + (p.Fauna.length ? sub('Fauna') + kindRows(p.Fauna) : '')) : '') +
+    (town ? populationGroup('p-population', pop, false) : populationGroup('p-population', pop));
+  return section('sec-patch', 2, 'Patch', coord(p.Id), tag, body);
+}
+
+function renderInspect(d) {
+  const f = d.Fields;
+  return note(`The pointer is at ${place(d.Point)}, on ${d.Ocean ? 'sea' : 'land'}. The fields are those at the point itself.`, 'where') +
+    tileRow([
+      tile('Height', d.HeightM == null ? '–' : `${big(d.HeightM)} m`, d.HeightM == null ? 'not Elevated' : 'height map'),
+      tile('Temperature', `${num(f.InitialTemperatureC, 1)} °C`, 'initial'),
+      tile('Precipitation', `${big(f.PrecipitationMm)} mm`, 'a year'),
+      tile('Prosperity', num(f.Prosperity, 0), 'index'),
+      tile('Supernatural', num(f.Supernatural, 0), 'index'),
+    ], 'c5') +
+    regionSection(d) + zoneSection(d) + patchSection(d);
+}
+
+// Looking takes the region to Detailed. With a stage the region is taken that far first.
+let inspectRun = 0;
+async function inspect(p, stage) {
   state.pinned = p;
   draw();
-  const box = $('inspect');
-  box.innerHTML = '<p class="note">Looking…</p>';
+  const box = $('inspect'), run = ++inspectRun;
+  if (box.querySelector('.sec')) box.classList.add('stale');
+  else box.innerHTML = note('Looking…');
+  if (stage) box.insertAdjacentHTML('afterbegin', note(`Taking the region to the ${esc(stage)} stage…`, 'where'));
   try {
-    const r = await fetch(`/api/inspect?x=${p.x}&y=${p.y}`);
-    if (!r.ok) throw new Error(await r.text());
+    const r = await fetch(`/api/inspect?x=${p.x}&y=${p.y}${stage ? '&stage=' + encodeURIComponent(stage) : ''}`);
+    if (!r.ok) throw new Error(await r.text() || 'The point was not found.');
     const d = await r.json();
-    const rows = [];
-    const row = (k, v) => rows.push(`<dt>${esc(k)}</dt><dd>${v}</dd>`);
-    row('Region', `(${d.Region[0]}, ${d.Region[1]}) · ${d.Stage} · ${d.RegionHasSeaAccess ? 'sea access' : 'landlocked'}`);
-    if (d.RegionProspects) row('', `Prospects: ${prospectCount(d.RegionProspects)} · score sum ${num(d.RegionScoreSum, 0)}`);
-    if (d.RegionPopulation) {
-      const people = n => Math.round(n).toLocaleString('en-US');
-      const total = d.RegionPopulation.reduce((sum, r) => sum + r.Persons, 0);
-      const races = d.RegionPopulation.filter(r => r.Standing !== 'Absent').sort((a, b) => b.Persons - a.Persons)
-        .map(r => `${esc(r.Name)} ${people(r.Persons)}${r.Standing === 'Minority' ? ' <span class="muted">(minority)</span>' : ''}`).join(' · ');
-      row('', `Potential population: ${people(total)}${races ? ' (' + races + ')' : ''}`);
-    }
-    if (d.RegionFactions) {
-      if (!d.RegionFactions.length) row('Factions', '<span class="muted">none: the region holds nobody</span>');
-      d.RegionFactions.forEach((f, n) => row(n ? '' : 'Factions', factionLine(f, d.Patch)));
-    }
-    // The cities and towns belong to the Settled stage, which the travel layer takes a region to.
-    const count = (n, one, many) => `${n.toLocaleString('en-US')} ${n === 1 ? one : many}`;
-    if (d.RegionSettled) {
-      const s = d.RegionSettled;
-      row('Persons', `${s.CityPersons.toLocaleString('en-US')} in ${count(s.Cities, 'city', 'cities')} · ` +
-        `${s.TownPersons.toLocaleString('en-US')} in ${count(s.Towns, 'town', 'towns')} · ${s.RuralPersons.toLocaleString('en-US')} on the land`);
-    } else if (d.RegionPopulation) row('', '<span class="muted">Cities and towns are made once the region is Settled (Travel network layer).</span>');
-    row('Zone', `(${d.Zone.Id[0]}, ${d.Zone.Id[1]}) · ${words(d.Zone.ElevationType)} · ${d.Zone.Cells} cell${d.Zone.Cells > 1 ? 's' : ''}`);
-    if (d.Zone.Prospects) row('', 'Prospects: ' + prospectCount(d.Zone.Prospects));
-    else if (!d.Ocean && !d.RegionProspects) row('', '<span class="muted">Prospects are counted once the region is Planned (Prospects layer).</span>');
-    if (d.Zone.BedrockName) row('Bedrock', esc(d.Zone.BedrockName));
-    if (d.Zone.RiverPoor) row('', 'river-poor flat zone');
-    const patch = d.Patch;
-    let resources = '';
-    if (patch) {
-      row('Patch', `(${patch.Id[0]}, ${patch.Id[1]}) · ${patch.Cells} cell${patch.Cells > 1 ? 's' : ''}${patch.Coastal ? ' · coastal' : ''}`);
-      const b = patch.EstimatedBiome;
-      if (b) {
-        row('Biome', `${words(b.Biome)}${patch.FinalBiome && patch.FinalBiome.Biome !== b.Biome ? ' → ' + words(patch.FinalBiome.Biome) + ' (final)' : ''}`);
-        row('Climate', `${num(b.TemperatureC, 1)} °C · ${num(b.PrecipitationMm, 0)} mm · aridity ${num(b.Aridity)} · ${b.Belt}`);
-      }
-      if (d.HeightM != null) row('Height', `${num(d.HeightM, 0)} m${patch.MeanHeightM != null ? ' · patch mean ' + num(patch.MeanHeightM, 0) + ' m' : ''}`);
-      if (patch.River != null) {
-        const water = [];
-        if (patch.River > 0) water.push(`river ${num(patch.River, 1)}${patch.River >= 80 ? ' (large)' : patch.River >= 8 ? ' (navigable)' : ''}`);
-        if (patch.Mouth > 0) water.push(`mouth ${num(patch.Mouth, 1)}`);
-        if (patch.LakeAreaKm2 > 0) water.push(`lake ${num(patch.LakeAreaKm2, 1)} km²`);
-        if (patch.Harbour) water.push('harbour');
-        row('Water', water.length ? water.join(' · ') : 'none');
-        row('Food · wealth', `${num(patch.Food)} · ${num(patch.Wealth)}`);
-      }
-      if (patch.Flora.length) row('Flora', patch.Flora.map(esc).join(' · '));
-      if (patch.Fauna.length) row('Fauna', patch.Fauna.map(esc).join(' · '));
-      if (patch.Score != null) {
-        const f = patch.Factors;
-        row('Score', `${num(patch.Score, 1)}${d.Prospect ? ` · ${d.Prospect.Class} Prospect for a ${d.Prospect.ForCity ? 'city' : 'town'}${d.Prospect.OnShow ? ' · on show' : ' · not on show'}` : ''}`);
-        row('Factors', `resources ${num(f.Resources)} · geography ${num(f.Geography)} · trade ${num(f.Trade)} · climate ${num(f.Climate)} · prosperity ${num(f.Prosperity)}`);
-        if (d.Settlement) {
-          const s = d.Settlement;
-          const races = s.Races.filter(r => r.Persons > 0).map(r => `${esc(r.Name)} ${r.Persons.toLocaleString('en-US')}`).join(' · ');
-          row(s.Capital ? 'Capital' : s.Kind, `${count(s.Persons, 'person', 'persons')} · rank ${s.Rank} in the region${races ? ' <span class="muted">(' + races + ')</span>' : ''}`);
-        }
-        if (d.ProspectRaces) row('Races', d.ProspectRaces.length ? d.ProspectRaces.map(esc).join(' · ') : 'none');
-      }
-      if (patch.Resources.length)
-        resources = '<ul class="res">' + patch.Resources.map(x =>
-          `<li><span><span class="abbr">${esc(x.Abbreviation)}</span>${esc(words(x.Resource))} <small>${esc(x.Variant ?? '')} · ${x.Group}${x.Origin === 'Deposit' ? ' · deposit' : ''}</small></span><span class="amt">${num(x.Amount)}</span></li>`).join('') + '</ul>';
-    }
-    const f = d.Fields;
-    row('Fields', `${num(f.InitialTemperatureC, 1)} °C · ${num(f.PrecipitationMm, 0)} mm · prosperity ${num(f.Prosperity, 0)} · supernatural ${num(f.Supernatural, 0)}`);
-    box.innerHTML = `<dl>${rows.join('')}</dl>${resources}`;
+    if (run !== inspectRun) return;
+    box.innerHTML = renderInspect(d);
+    // A region that has advanced counts differently in the statistics.
+    if (stage) { statisticsKey = ''; statisticsSoon(); }
   } catch (e) {
+    if (run !== inspectRun) return;
     box.innerHTML = `<p class="error">${esc(e.message)}</p>`;
+  } finally {
+    if (run === inspectRun) box.classList.remove('stale');
   }
 }
+// In the panel: a stage button takes the region further, and a row or a link with a place moves the pointer there.
+function panelAction(ev) {
+  const stage = ev.target.closest('[data-stage]');
+  if (stage && state.pinned) { inspect(state.pinned, stage.dataset.stage); return true; }
+  const go = ev.target.closest('[data-go]');
+  if (!go) return false;
+  const [x, y] = go.dataset.go.split(',').map(Number);
+  if (!Number.isFinite(x + y)) return false;
+  state.cx = x; state.cy = y;
+  inspect({ x, y });
+  return true;
+}
+$('inspect').addEventListener('click', panelAction);
+$('inspect').addEventListener('keydown', ev => {
+  if ((ev.key === 'Enter' || ev.key === ' ') && ev.target.matches('[data-go]') && panelAction(ev)) ev.preventDefault();
+});
 
 // Foundation.
 function show(f) {
@@ -520,6 +1033,7 @@ function show(f) {
   state.maxZoom = f.MaxZoom; state.regionSize = f.RegionSizeM;
   state.defaults = JSON.stringify(f.DefaultParameters, null, 2);
   state.planning = f.Parameters.Planning;
+  state.zoneKm = f.Parameters.Siting?.ZoneGridSizeKm; state.patchKm = f.Parameters.Siting?.PatchGridSizeKm;
   showLegendItems();
   $('seed').value = f.Seed;
   $('parameters').value = JSON.stringify(f.Parameters, null, 2);
@@ -528,6 +1042,8 @@ function show(f) {
   tiles.clear();
   clearLabels();
   state.pinned = null;
+  inspectRun++; statisticsKey = '';
+  $('inspect').classList.remove('stale');
   $('inspect').innerHTML = '<p class="note">Click the map to see the region, zone and patch at that point.</p>';
   draw();
 }
@@ -537,10 +1053,10 @@ async function replaceFoundation() {
   error.textContent = '';
   let parameters;
   try { parameters = JSON.parse($('parameters').value); }
-  catch (e) { error.textContent = 'The parameters are not valid json: ' + e.message; document.querySelector('details').open = true; return; }
+  catch (e) { error.textContent = 'The parameters are not valid json: ' + e.message; error.closest('details').open = true; return; }
   const r = await fetch('/api/foundation', { method: 'PUT', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ Seed: $('seed').value, Parameters: parameters }) });
-  if (!r.ok) { error.textContent = (await r.json().catch(() => ({}))).error ?? 'The foundation was not accepted.'; document.querySelector('details').open = true; return; }
+  if (!r.ok) { error.textContent = (await r.json().catch(() => ({}))).error ?? 'The foundation was not accepted.'; error.closest('details').open = true; return; }
   show(await r.json());
 }
 $('seed-form').addEventListener('submit', ev => { ev.preventDefault(); replaceFoundation(); });
