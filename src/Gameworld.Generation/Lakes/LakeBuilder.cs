@@ -29,10 +29,22 @@ public sealed class LakeShape
     public required double Y { get; init; }
     /// <summary>Half the nominal size: the radius the spacing between lakes is measured with.</summary>
     public required double NominalRadius { get; init; }
-    public required double[] Rays { get; init; }
+    /// <summary>The length of each ray. Set once: the array must not be changed after the shape is made.</summary>
+    public required double[] Rays
+    {
+        get => _rays;
+        init
+        {
+            _rays = value;
+            MaxRay = value.Max();
+        }
+    }
+    private readonly double[] _rays = [];
+
     public required double AreaM2 { get; init; }
 
-    public double MaxRay => Rays.Max();
+    /// <summary>The longest ray, computed once when the rays are set: no point of the outline lies further from the centre.</summary>
+    public double MaxRay { get; private init; }
 
     public WorldPoint OutlinePoint(int k) => new(X + DirX[k] * Rays[k], Y + DirY[k] * Rays[k]);
 
