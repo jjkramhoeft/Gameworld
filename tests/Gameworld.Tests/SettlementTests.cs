@@ -39,7 +39,7 @@ public class SettlementTests
     }
 
     /// <summary>A Prospect on show that holds both races, "a" three times as heavy as "b".</summary>
-    private static SettlementSite Site(int slot, bool city) => new(slot, new PatchId(slot, 0), city, [0, 1], [3, 1]);
+    private static SettlementSite Site(int slot, bool city) => new(slot, $"Place {slot}", new PatchId(slot, 0), city, [0, 1], [3, 1]);
 
     private static long Of(IEnumerable<RacePersons> races, string race) => races.Where(r => r.Race == race).Sum(r => r.Persons);
 
@@ -193,12 +193,12 @@ public class SettlementTests
     {
         // Half the region in one city that weighs "b" nine times as heavy as "a": "b" has 250 persons only.
         var (rules, races) = Rules(new SettlementParameters { CityShare = 0.5, TownShare = 0 });
-        var built = rules.Build(races, [new SettlementSite(0, new PatchId(0, 0), true, [1, 0], [1, 9])], new PatchId(0, 0));
+        var built = rules.Build(races, [new SettlementSite(0, "Alderbury", new PatchId(0, 0), true, [1, 0], [1, 9])], new PatchId(0, 0));
         Assert.Equal([new RacePersons("b", 250), new RacePersons("a", 250)], built.Settlements[0].Races);
         Assert.Equal([new RacePersons("a", 500), new RacePersons("b", 0)], built.Rural);
 
         // A city that lists "b" only: the persons "b" cannot fill are of the other race of the region, last in the list.
-        var one = rules.Build(races, [new SettlementSite(0, new PatchId(0, 0), true, [1], [1, 9])], new PatchId(0, 0));
+        var one = rules.Build(races, [new SettlementSite(0, "Alderbury", new PatchId(0, 0), true, [1], [1, 9])], new PatchId(0, 0));
         Assert.Equal(500, one.Settlements[0].Persons);
         Assert.Equal([new RacePersons("b", 250), new RacePersons("a", 250)], one.Settlements[0].Races);
     }

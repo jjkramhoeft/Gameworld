@@ -6,11 +6,12 @@ namespace Gameworld.Generation.Settlements;
 
 /// <summary>A Prospect on show as the cities and towns read it.</summary>
 /// <param name="Slot">The index of the Prospect among the Prospects of the region.</param>
+/// <param name="Name">The name of a city or a town on the Prospect.</param>
 /// <param name="Patch">The patch of the Prospect.</param>
 /// <param name="ForCity">The Prospect is for a city; otherwise for a town.</param>
 /// <param name="Races">The races of a city or a town on the Prospect, as indexes into <see cref="PopulationRules.Races"/>, the largest first and the drawn one last.</param>
 /// <param name="Weights">Per race of the region, in the order of <see cref="RegionRaces.Races"/>: its weight in a city or a town on the Prospect.</param>
-public readonly record struct SettlementSite(int Slot, PatchId Patch, bool ForCity, int[] Races, double[] Weights);
+public readonly record struct SettlementSite(int Slot, string Name, PatchId Patch, bool ForCity, int[] Races, double[] Weights);
 
 /// <summary>The cities and towns of one region, and the persons that live on the land between them.</summary>
 public sealed class RegionSettlements
@@ -113,6 +114,7 @@ public sealed class SettlementRules
             var site = sites[at];
             settlements.Add(new Settlement(
                 site.Slot,
+                site.Name,
                 isCity ? SettlementKind.City : SettlementKind.Town,
                 at == capitalAt,
                 site.Patch,

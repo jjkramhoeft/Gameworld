@@ -81,16 +81,18 @@ public sealed record PotentialPopulation(IReadOnlyList<RacePopulation> Races)
 
 /// <summary>
 /// What the Planned stage adds: the Prospects for cities and towns, the potential population
-/// per race, the races a city or a town on each Prospect holds, the factions of the region and
-/// the name of the region.
+/// per race, the races a city or a town on each Prospect holds and its name, the factions of
+/// the region and the name of the region.
 /// </summary>
 /// <param name="ProspectRaces">For each Prospect, in the order of <paramref name="Prospects"/>: the ids of the races of a city or a town on it, the largest first and the drawn one last. They are races of the region.</param>
+/// <param name="ProspectNames">For each Prospect, in the order of <paramref name="Prospects"/>: the name of a city or a town on it, from the city and town name generator (society-generation.md section 5.3). No two Prospects of a region have the same name.</param>
 /// <param name="Factions">The factions of the region, by slot: the ruling faction, the opposition when there is one, then the lesser factions. Empty in a region without persons.</param>
 /// <param name="Name">The name of the region, from the region-name generator (society-generation.md section 4.10). Null in a region without a ruling faction.</param>
 public sealed record RegionPlan(
     IReadOnlyList<Prospect> Prospects,
     PotentialPopulation Population,
     IReadOnlyList<IReadOnlyList<string>> ProspectRaces,
+    IReadOnlyList<string> ProspectNames,
     IReadOnlyList<Faction> Factions,
     string? Name = null)
 {
@@ -123,6 +125,7 @@ public sealed record RacePersons(string Race, long Persons);
 /// it is derived data.
 /// </summary>
 /// <param name="Slot">The slot in the region: the index of its Prospect among the Prospects of the region.</param>
+/// <param name="Name">Its name: the name of its Prospect (society-generation.md section 5.3). No other city or town of the region has it.</param>
 /// <param name="Kind">A city or a town. The capital is a city whatever its Prospect is for.</param>
 /// <param name="Capital">The city is the capital of the region: the seat of its ruling faction.</param>
 /// <param name="Patch">The patch of its Prospect.</param>
@@ -131,6 +134,7 @@ public sealed record RacePersons(string Race, long Persons);
 /// <param name="Races">The persons of each of its races, in the order of the races of the Prospect: the largest around it first and the drawn one last. A race of the list can hold nobody in a small place.</param>
 public sealed record Settlement(
     int Slot,
+    string Name,
     SettlementKind Kind,
     bool Capital,
     PatchId Patch,

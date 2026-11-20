@@ -105,6 +105,15 @@ app.MapGet("/api/resources", (double left, double top, double width, double heig
         : Results.BadRequest();
 });
 
+// The names of the cities and towns of a rectangle of the world, which the browser sets to the current view.
+app.MapGet("/api/places", (double left, double top, double width, double height, WorldHost host) =>
+{
+    if (!(width > 0 && height > 0) || !double.IsFinite(left + top + width + height)) return Results.BadRequest();
+    return host.PlaceLabels(left, top, width, height) is { } labels
+        ? Results.Json(labels, new JsonSerializerOptions())
+        : Results.BadRequest();
+});
+
 app.MapGet("/api/regions/{i:int}/{j:int}",(int i, int j, string? stage, WorldHost host) =>
 {
     if (!Enum.TryParse<RegionStage>(stage ?? "Detailed", ignoreCase: true, out var target)) return Results.BadRequest();

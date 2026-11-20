@@ -571,4 +571,4 @@ public void Generates_the_reference_region_names()
 
 ## Not covered
 
-`GenerateCityName` ([NameGenerator.cs:134-166](../Generator/NameGenerator.cs#L134)) is an unfinished stub that always returns an empty string. It is the only place in the file that would use a race together with a location's height, biome and climate.
+`GenerateCityName` ([NameGenerator.cs:134-166](../Generator/NameGenerator.cs#L134)) is an unfinished stub that always returns an empty string. It is the only place in the file that would use a race together with a location's height, biome and climate. Gameworld names its cities and towns by a rule of its own, which is not a port of this stub: [society-generation.md](society-generation.md) section 5.3.

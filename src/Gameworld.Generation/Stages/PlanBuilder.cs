@@ -55,15 +55,20 @@ public sealed class PlanWork
     /// <summary>The name of the region and what it was drawn from; null in a region without a ruling faction.</summary>
     public required RegionNaming? Naming { get; init; }
 
-    public RegionPlan ToDomain() => new(Prospects, Population, ProspectRaces, Factions.Factions, Naming?.Name);
+    /// <summary>For each Prospect, in the order of <see cref="Prospects"/>: the name of a city or a town on it, and what it was drawn from.</summary>
+    public required SettlementNaming[] Names { get; init; }
+
+    public RegionPlan ToDomain() =>
+        new(Prospects, Population, ProspectRaces, Names.Select(n => n.Name).ToArray(), Factions.Factions, Naming?.Name);
 }
 
 /// <summary>
 /// Prospects for cities and towns (map-generation.md section 15), the potential population
 /// (society-generation.md section 3), the races of a city or a town on each Prospect
 /// (society-generation.md section 5.1), the factions of the region (society-generation.md
-/// section 4) and its name (section 4.10). The Prospects only read the estimated biomes and resources, so they never
-/// depend on the height map. The potential population and the factions read the final form:
+/// section 4), its name (section 4.10) and the name of a city or a town on each Prospect
+/// (section 5.3). The Prospects and their names only read the estimated biomes and resources,
+/// so they never depend on the height map. The potential population and the factions read the final form:
 /// the mean height of each patch and the biomes and resources calculated with it.
 /// </summary>
 internal static class PlanBuilder
@@ -302,8 +307,31 @@ internal static class PlanBuilder
             seats);
 
         // society-generation.md 4.10 The name of the region: from its ruling faction and its persons.
-        var naming = world.RegionNameRules.Name(
-            region, factions.Factions.FirstOrDefault(f => f.Role == FactionRole.Ruling), races.Population.Total);
+        var ruling = factions.Factions.FirstOrDefault(f => f.Role == FactionRole.Ruling);
+        var naming = world.RegionNameRules.Name(region, ruling, races.Population.Total);
+
+        // society-generation.md 5.3 The name of a city or a town on each Prospect: from the site
+        // of the Prospect, the factions that sit on it and the race that names it. The capital
+        // is named by the lead race of the ruling faction, any other place by one of its races,
+        // drawn by their weight in a city or a town on the Prospect.
+        var names = world.SettlementNameRules.Name(prospects.Select((prospect, i) =>
+        {
+            var patch = scores[index[prospect.Patch.Coord.Key]].Patch;
+            var capital = ruling?.Seat == prospect.Patch;
+            var weights = rules.SettlementWeights(races, seats[i].Around);
+            return new NamedProspect(
+                prospect.Patch.Coord,
+                capital ? [ruling!.LeadRace] : prospectRaces[i],
+                capital ? [1.0] : seats[i].Races.Select(race =>
+                {
+                    var at = Array.IndexOf(races.Races, race);
+                    return at >= 0 && at < weights.Length ? weights[at] : 0;
+                }).ToArray(),
+                SettlementNameRules.SitesOf(
+                    prospect.Facts, patch.ZoneType, patch.Biome!.Biome, patch.Resources, prospect.Factors.Trade,
+                    capital || prospect.ForCity,
+                    factions.Factions.Where(f => f.Seat == prospect.Patch).Select(f => f.Type)));
+        }).ToArray());
 
         return new PlanWork
         {
@@ -315,6 +343,7 @@ internal static class PlanBuilder
             Places = seats,
             Factions = factions,
             Naming = naming,
+            Names = names,
         };
     }
 

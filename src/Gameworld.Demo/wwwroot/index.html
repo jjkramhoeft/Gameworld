@@ -174,6 +174,11 @@
   .toast { position: absolute; transform: translate(-50%, -50%); display: flex; flex-wrap: wrap; justify-content: center;
            gap: 1px 7px; width: max-content; max-width: 124px; padding: 4px 8px; border-radius: 8px; background: #000b; color: #fff;
            box-shadow: 0 1px 4px #0006; pointer-events: auto; }
+  #places { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+  .place { position: absolute; transform: translateX(-50%); white-space: nowrap; color: #fff; font-size: 11px; font-weight: 600;
+           line-height: 1.1; text-shadow: 0 0 2px #000, 0 0 2px #000, 0 0 3px #000, 0 1px 4px #000c; }
+  .place.city { font-size: 12.5px; }
+  .place.capital { font-size: 14px; font-weight: 700; letter-spacing: .02em; }
   #pin { position: absolute; width: 14px; height: 14px; margin: -7px 0 0 -7px; border: 2px solid #fff; border-radius: 50%;
          box-shadow: 0 0 0 2px #000a; pointer-events: none; display: none; }
   #status { position: absolute; left: 10px; bottom: 10px; background: #000a; color: #fff; padding: 4px 9px; border-radius: 6px;
@@ -240,6 +245,7 @@
     <label><input type="checkbox" value="supernatural">Supernatural</label>
     <label><input type="checkbox" id="show-resources" checked>Resources</label>
   </div>
+  <p class="note">Prospects also shows the names of the cities and towns: the capitals first, then the other cities and the towns as you zoom in.</p>
   <p class="note">Resources shows at full zoom: a label on every patch with the abbreviations of its listed resources, the largest amount first.</p>
 
   <h2>Under the pointer</h2>
@@ -264,6 +270,7 @@
 <main id="map" aria-label="Map">
   <div id="tiles"></div>
   <div id="labels"></div>
+  <div id="places"></div>
   <div id="pin"></div>
   <div id="legend"></div>
   <div id="zoom"><button id="zoom-in" type="button" aria-label="Zoom in">+</button><button id="zoom-out" type="button" aria-label="Zoom out">−</button></div>
@@ -279,7 +286,7 @@ const state = { version: 0, tile: 256, baseMpp: 2000, maxZoom: 6, regionSize: 12
 const tiles = new Map();
 
 const mpp = () => state.baseMpp / 2 ** state.zoom;
-// The layers the tiles draw. The resource labels are not one of them: the browser draws those itself.
+// The layers the tiles draw. The resource labels and the names of the cities and towns are not among them: the browser draws those itself.
 const layers = () => [...document.querySelectorAll('#layers input[value]:checked')].map(i => i.value).join(',');
 
 function draw() {
@@ -315,6 +322,8 @@ function draw() {
 
   placeLabels();
   labelsSoon();
+  placeNames();
+  namesSoon();
 
   // A scale bar of a round number of kilometres, about 120 px wide.
   const km = [1, 2, 5, 10, 20, 50, 100, 200].find(k => k * 1000 / m >= 90) ?? 200;
@@ -373,6 +382,63 @@ async function loadLabels() {
   } catch {
     // The map works without the labels: the next move of the view asks again.
     if (run === labelsRun) labelsKey = '';
+  }
+}
+
+// The names of the cities and towns. With the Prospects layer on, every Prospect on show in view carries the name
+// of its city or town: the capitals from zoom 1, the other cities from zoom 2 and the towns from zoom 3. Like the
+// resource labels they are asked for a moment after the view comes to rest, for the view rounded out to whole tiles.
+const namesEl = $('places');
+const nameZoom = { Capital: 1, City: 2, Town: 3 };
+// The radius of the marker the tiles draw for each kind, in pixels before the zoom factor of the renderer.
+const markerRadius = { Capital: 10.5, City: 7.5, Town: 4.2 };
+let names = [], namesKey = '', namesTimer = 0, namesRun = 0;
+const namesOn = () => state.zoom >= nameZoom.Capital && document.querySelector('#layers input[value=prospects]').checked;
+function clearNames() {
+  clearTimeout(namesTimer);
+  namesRun++; namesKey = ''; names = [];
+  namesEl.replaceChildren();
+}
+function placeNames() {
+  const m = mpp(), left = state.cx - map.clientWidth / 2 * m, top = state.cy - map.clientHeight / 2 * m;
+  const k = Math.min(1.8, Math.max(0.7, 2000 / m / 7));
+  for (const l of names) {
+    l.el.hidden = state.zoom < nameZoom[l.kind];
+    l.el.style.left = (l.x - left) / m + 'px';
+    l.el.style.top = (l.y - top) / m + markerRadius[l.kind] * k + 2 + 'px';
+  }
+}
+function namesSoon() {
+  clearTimeout(namesTimer);
+  if (!namesOn()) { if (namesKey || names.length) clearNames(); return; }
+  namesTimer = setTimeout(loadNames, 150);
+}
+async function loadNames() {
+  const w = map.clientWidth, h = map.clientHeight, m = mpp(), span = state.tile * m;
+  if (!w || !h || !state.version) return;
+  const left = Math.floor((state.cx - w / 2 * m) / span) * span, top = Math.floor((state.cy - h / 2 * m) / span) * span;
+  const right = Math.ceil((state.cx + w / 2 * m) / span) * span, bottom = Math.ceil((state.cy + h / 2 * m) / span) * span;
+  const query = `left=${left}&top=${top}&width=${right - left}&height=${bottom - top}`;
+  const key = state.version + '?' + query;
+  if (key === namesKey) return;
+  namesKey = key;
+  const run = ++namesRun;
+  try {
+    const r = await fetch('/api/places?' + query);
+    if (!r.ok) throw new Error(await r.text());
+    const list = await r.json();
+    if (run !== namesRun) return;
+    names = list.map(p => {
+      const el = document.createElement('div');
+      el.className = 'place ' + p.Kind.toLowerCase();
+      el.textContent = p.Name;
+      return { x: p.X, y: p.Y, kind: p.Kind, el };
+    });
+    namesEl.replaceChildren(...names.map(l => l.el));
+    placeNames();
+  } catch {
+    // The map works without the names: the next move of the view asks again.
+    if (run === namesRun) namesKey = '';
   }
 }
 
@@ -757,20 +823,27 @@ const populationGroup = (key, p, byDefault = true) => p ? group(key, 'Potential 
   ]) + (p.Races.length ? sub('By race') + raceMeters(p.Races, p.Persons) : note('No race of the region lives here.', 'after')), byDefault) : '';
 
 function prospectTable(list) {
-  return `<table class="tbl"><thead><tr><th>For</th><th>Class</th><th class="r">Score</th><th>Zone</th><th>Races of a city or a town</th></tr></thead><tbody>` +
+  return `<table class="tbl"><thead><tr><th>Name</th><th>For</th><th>Class</th><th class="r">Score</th><th>Zone</th><th>Races of a city or a town</th></tr></thead><tbody>` +
     list.map(p =>
       `<tr class="${p.OnShow ? '' : 'off'}${p.Here ? ' here' : ''}" data-go="${p.Spot[0]},${p.Spot[1]}" tabindex="0" ` +
       `title="${p.OnShow ? 'On show' : 'Not on show'} · patch ${coord(p.Patch)} · click to look at it">` +
-      `<td>${kindOf(p)}</td><td>${swatch(prospectColour(p.Class))}${p.Class}</td><td class="r">${num(p.Score, 1)}</td>` +
+      `<td>${esc(p.Name)}</td><td>${kindOf(p)}</td><td>${swatch(prospectColour(p.Class))}${p.Class}</td><td class="r">${num(p.Score, 1)}</td>` +
       `<td>${coord(p.Zone)}</td><td class="wide">${p.Races.map(esc).join(', ') || '–'}</td></tr>`).join('') + '</tbody></table>' +
     note('Greyed Prospects are not on show. Click a row to look at its patch.', 'after');
 }
 const placeKind = s => s.Capital ? '◈ Capital' : s.Kind === 'City' ? '◆ City' : '● Town';
+// What the place word of a name says about the site of the city or town.
+const nameSites = { Mouth: 'a river mouth', Haven: 'a harbour', Shore: 'the coast', Landing: 'the head of navigation',
+  Meeting: 'a meeting of rivers', Ford: 'a ford', Bridge: 'a navigable river', Mere: 'a lake', Hill: 'hills', Wood: 'forest',
+  Field: 'grass land', Waste: 'dry or cold land', Salt: 'salt', Delve: 'a deposit', Shrine: 'a faith that sits here',
+  Market: 'trade', Fort: 'a city', Farm: 'a town' };
+const namedHow = p => [p.NamedBy ? `named by the ${esc(p.NamedBy)}` : null,
+  p.NameSite ? `for ${nameSites[p.NameSite] ?? esc(words(p.NameSite).toLowerCase())}` : 'no place word'].filter(Boolean).join(' ');
 function placeTable(places) {
-  return `<table class="tbl"><thead><tr><th class="r">Rank</th><th>Place</th><th class="r">Persons</th><th>Zone</th><th>Races</th></tr></thead><tbody>` +
+  return `<table class="tbl"><thead><tr><th class="r">Rank</th><th>Name</th><th>Place</th><th class="r">Persons</th><th>Zone</th><th>Races</th></tr></thead><tbody>` +
     places.map(s =>
       `<tr class="${s.Here ? 'here' : ''}"${s.Spot ? ` data-go="${s.Spot[0]},${s.Spot[1]}" tabindex="0" title="Patch ${coord(s.Patch)} · click to look at it"` : ''}>` +
-      `<td class="r">${s.Rank}</td><td>${placeKind(s)}</td><td class="r">${big(s.Persons)}</td><td>${coord(s.Zone)}</td>` +
+      `<td class="r">${s.Rank}</td><td>${esc(s.Name)}</td><td>${placeKind(s)}</td><td class="r">${big(s.Persons)}</td><td>${coord(s.Zone)}</td>` +
       `<td class="wide">${s.Races.filter(r => r.Persons > 0).map(r => `${esc(r.Name)} ${big(r.Persons)}`).join(', ') || '–'}</td></tr>`).join('') + '</tbody></table>';
 }
 
@@ -911,7 +984,7 @@ function patchSection(d) {
         tile('Food · wealth', `${num(p.Food)} · ${num(p.Wealth)}`,
           p.FinalFood == null ? 'estimated' : `final ${num(p.FinalFood)} · ${num(p.FinalWealth)}`),
         s ? tile('Score', num(s.Score, 1), pr ? `${pr.Class} · ${pr.ForCity ? 'city' : 'town'}` : `rank ${s.Rank} of ${s.Of}`) : tile('Score', '–', 'Planned stage'),
-        town ? tile(town.Capital ? 'Capital' : town.Kind, `${big(town.Persons)} persons`, `rank ${town.Rank} in the region`)
+        town ? tile(town.Capital ? 'Capital' : town.Kind, esc(town.Name), `${big(town.Persons)} persons · rank ${town.Rank}`)
           : pop ? tile('Persons', people(pop.Persons), `${density(pop.PerKm2)} per km²`) : tile('Persons', '–', 'Planned stage'),
       ]);
 
@@ -922,13 +995,15 @@ function patchSection(d) {
     return kv([...byType].map(([type, names]) => [esc(type || 'Other'), chips(names.map(esc))]), 'one kinds');
   };
   const body = tilesHtml +
-    (town ? group('p-settled', town.Capital ? 'Capital' : town.Kind, `${big(town.Persons)} persons · rank ${town.Rank}`,
+    (town ? group('p-settled', town.Capital ? 'Capital' : town.Kind, `${esc(town.Name)} · ${big(town.Persons)} persons · rank ${town.Rank}`,
+      kv([['Name', `<b>${esc(town.Name)}</b>${pr ? ` <span class="muted">· ${namedHow(pr)}</span>` : ''}`]], 'one') +
       kv([['Place', placeKind(town)], ['Rank', `${town.Rank} in the region`], ['Persons', big(town.Persons)], ['Slot', town.Slot]]) +
       (town.Races.some(r => r.Persons > 0) ? sub('By race, in the order of the races of its Prospect') + raceMeters(town.Races, town.Persons) : '')) : '') +
     (s ? group('p-score', pr ? 'Prospect & score' : 'Score', pr
         ? `${pr.Class} · for a ${pr.ForCity ? 'city' : 'town'} · ${pr.OnShow ? 'on show' : 'not on show'}` : `${num(s.Score, 1)} · rank ${s.Rank} of ${s.Of}`,
       (pr ? kv([
         ['Prospect', `${swatch(prospectColour(pr.Class))}${pr.Class} · for a ${pr.ForCity ? 'city' : 'town'} · ${pr.OnShow ? 'on show' : 'not on show'} <span class="muted">· slot ${pr.Slot}</span>`],
+        ['Name', `${esc(pr.Name)} <span class="muted">· ${namedHow(pr)}</span>`],
         ['Races', pr.Races.length ? pr.Races.map(esc).join(', ') : 'none'],
       ], 'one') : '') +
       sub(`The five factors of the score ${num(s.Score, 1)}, rank ${s.Rank} of the ${s.Of} land patches of the region`) +
@@ -1044,6 +1119,7 @@ function show(f) {
   for (const img of tiles.values()) { img.src = ''; img.remove(); }
   tiles.clear();
   clearLabels();
+  clearNames();
   state.pinned = null;
   inspectRun++; statisticsKey = '';
   $('inspect').classList.remove('stale');

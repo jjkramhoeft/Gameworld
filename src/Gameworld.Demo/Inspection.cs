@@ -3,6 +3,7 @@ using Gameworld.Generation;
 using Gameworld.Generation.Cells;
 using Gameworld.Generation.Factions;
 using Gameworld.Generation.Lakes;
+using Gameworld.Generation.Names;
 using Gameworld.Generation.Stages;
 using Gameworld.Generation.Travel;
 
@@ -125,10 +126,13 @@ internal sealed class Inspection
     private ProspectLine ProspectLine(int slot)
     {
         var p = _plan!.Prospects[slot];
+        var naming = _plan.Names[slot];
         return new ProspectLine(
-            slot, p.Patch, p.Spot, p.ForCity, p.Score, p.Class, p.OnShow,
+            slot, naming.Name, p.Patch, p.Spot, p.ForCity, p.Score, p.Class, p.OnShow,
             new ZoneId(new ZoneCellId(ZoneOf(p.Patch))),
             _plan.ProspectRaces[slot].Select(RaceName).ToArray(),
+            naming.Race is null ? null : RaceName(naming.Race),
+            naming.Site,
             p.Patch.Coord == _info.Patch);
     }
 
@@ -236,7 +240,7 @@ internal sealed class Inspection
     }
 
     private PlaceLine PlaceLine(Settlement s) => new(
-        s.Slot, s.Kind, s.Capital, s.Rank, s.Persons, s.Patch, SpotOf(s.Patch),
+        s.Slot, s.Name, s.Kind, s.Capital, s.Rank, s.Persons, s.Patch, SpotOf(s.Patch),
         new ZoneId(new ZoneCellId(ZoneOf(s.Patch))),
         s.Races.Select(r => new RaceLine(RaceName(r.Race), r.Persons, RaceStanding.Main)).ToArray(),
         s.Patch.Coord == _info.Patch);
@@ -612,11 +616,14 @@ public sealed record PatchScoreInfo(
 public sealed record ProspectsInfo(ProspectCount Count, double? ScoreSum, int Rich, int Average, int Poor, ProspectLine[] List);
 
 /// <param name="Slot">The index of the Prospect among the Prospects of its region.</param>
+/// <param name="Name">The name of a city or a town on the Prospect.</param>
 /// <param name="Races">The names of the races of a city or a town on the Prospect, the largest first and the drawn one last.</param>
+/// <param name="NamedBy">The name of the race that named the place. Null where the Prospect holds no race.</param>
+/// <param name="NameSite">What the place word of the name says about the site. Null for a name without a place word.</param>
 /// <param name="Here">The Prospect is on the patch under the pointer.</param>
 public sealed record ProspectLine(
-    int Slot, PatchId Patch, WorldPoint Spot, bool ForCity, double Score, ProspectClass Class, bool OnShow, ZoneId Zone,
-    string[] Races, bool Here);
+    int Slot, string Name, PatchId Patch, WorldPoint Spot, bool ForCity, double Score, ProspectClass Class, bool OnShow, ZoneId Zone,
+    string[] Races, string? NamedBy, SiteClass? NameSite, bool Here);
 
 /// <summary>Persons and the races they belong to, the largest race first.</summary>
 /// <param name="Capacity">The persons the land can feed before the races share it. Null for a region, where it is the total.</param>
@@ -657,5 +664,5 @@ public sealed record SettledInfo(
 /// <param name="Races">The persons of each of its races, in the order of the races of its Prospect.</param>
 /// <param name="Here">It stands on the patch under the pointer.</param>
 public sealed record PlaceLine(
-    int Slot, SettlementKind Kind, bool Capital, int Rank, long Persons, PatchId Patch, WorldPoint? Spot, ZoneId Zone,
+    int Slot, string Name, SettlementKind Kind, bool Capital, int Rank, long Persons, PatchId Patch, WorldPoint? Spot, ZoneId Zone,
     RaceLine[] Races, bool Here);

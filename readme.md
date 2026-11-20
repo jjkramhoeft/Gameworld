@@ -44,7 +44,7 @@ The project is in phase 1.
 
 ### Status
 
-The map is generated through all its stages, from the cells to the travel network, with the flora and fauna of every patch. Of the society, the races of each region, their potential population, the factions of each region, the name of each region, the cities and towns of each region with their persons and races, and the person names are generated. The vocations are a list in the Parameter Set and are not drawn yet. Families and persons are defined below but not generated yet, and neither is there a database: the apps compute everything in memory.
+The map is generated through all its stages, from the cells to the travel network, with the flora and fauna of every patch. Of the society, the races of each region, their potential population, the factions of each region, the name of each region, the cities and towns of each region with their names, their persons and their races, and the person names are generated. The vocations are a list in the Parameter Set and are not drawn yet. Families and persons are defined below but not generated yet, and neither is there a database: the apps compute everything in memory.
 
 ## Concepts
 
@@ -117,7 +117,7 @@ A region moves through the stages below, in the order of the table and one stage
 | Outlined | Zones linked, expanded and merged. Sea access | All regions within the link range + 5 rings Sited (7 rings at the defaults) |
 | Detailed | Patch mergers, rivers, lakes. Estimated biomes and resources | All bordering regions Outlined |
 | Elevated | Height map. Final biomes and resources | All bordering regions Detailed |
-| Planned | Factions and Prospects for cities and towns. The races of the region, their potential population and the races of a city or a town on each Prospect. The name of the region | The region Elevated |
+| Planned | Factions and Prospects for cities and towns. The races of the region, their potential population, and the races and the name of a city or a town on each Prospect. The name of the region | The region Elevated |
 | Settled | Travel network. Actual cities and towns, families and important persons | The region and all bordering regions Planned |
 
 Sited is not a state a region is in. It needs only the seed, so it is a pure function that can be calculated for any region at any time, and it is never persisted. Stored regions start at Outlined. The Sited row describes what the function yields.
@@ -295,6 +295,8 @@ The potential population of a region becomes its persons: a share of them lives 
 
 A city or a town holds some of the races of its region: the largest around its Prospect, and a last one that is drawn with the minority races weighted up. Which races a city or a town on a Prospect holds is worked out in the Planned stage, with the Prospects. Its persons are shared between these races by how many of each live around it, so every person of a region has a race and lives in a city, in a town or on the land.
 
+A city or a town has a name: Jarlhavn, Khar Nuur, Qasr Mehret. The name is not authored: it comes from the city and town name generator, as the name of a region comes from its generator. A name is a first part and a place word. One of the races of the place names it, drawn by how many of each race live around it, and the capital is named by the lead race of the ruling faction. The race gives the words, each race from word lists of its own, and the site gives the kind of place word: a harbour, a ford, a hill, a city or a town. The name is worked out in the Planned stage for every Prospect, with its races. So a Prospect has its name before a city or a town stands on it, and no two cities or towns of a region have the same name.
+
 #### Family
 
 A family of NPCs, typically living together in a household. It can include servants or slaves.
@@ -327,6 +329,7 @@ A named colour of cloth, paint and banners: red, indigo, saffron. The colours ar
 | [docs/adding-a-race.md](docs/adding-a-race.md) | The steps to add a race |
 | [docs/races-basis.md](docs/races-basis.md) | The 28 default races: looks, history, way of life, vocations and factions |
 | [docs/tools-basis.md](docs/tools-basis.md) | 146 real tools for the 51 default vocations: a sourced description, lore and the fitting vocations. Material, it binds nothing |
+| [docs/city-and-town-names.md](docs/city-and-town-names.md) | 50 invented city and town names for each of the 28 default races, and what the names of each race are built from. Material: the word lists of the city and town name generator are built from it |
 | [docs/races-and-worldbuilding.md](docs/races-and-worldbuilding.md) | A framework for building a near-human race: origin, anchor traits, culture and the relation to humans |
 | [docs/NameGenerator-Reuse.md](docs/NameGenerator-Reuse.md) | The person-name generator |
 | [docs/RegionNameGenerator-Reuse.md](docs/RegionNameGenerator-Reuse.md) | The region-name generator of an earlier project: the original and the corrected form that names the regions here |
@@ -422,5 +425,7 @@ dotnet run --project src/Gameworld.Demo -c Release
 Then open <http://localhost:5062>. Drag to pan, scroll to zoom, and click the map to see the region, zone and patch at that point. The side panel switches the base map (elevation types, biomes, height, or none) and the layers, among them the four Fields, and it replaces the foundation: a new seed, or an edited Parameter Set under "Parameter Set (json)". Replacing the foundation discards all derived data.
 
 "Under the pointer" has a section for the region, one for the zone and one for the patch, each with groups that fold away. The region section shows the stages the region has reached, with a button to take it to each later stage. A row of a Prospect, a city or a town moves the pointer to it. "Statistics" counts the current view: the land, the biomes and the climate, the heights, the water, the resources, the flora and fauna, and for the regions that are Planned or Settled the Prospects, the potential population, the factions and the cities and towns.
+
+The Prospects layer draws the Prospects on show and writes the name of the city or town of each beside it: the capitals first, then the other cities and the towns as you zoom in.
 
 Regions are generated when they come into view, so the first view of an area takes longer than the next. The Prospects and travel layers take the regions through the Elevated stage first, which builds their height maps.

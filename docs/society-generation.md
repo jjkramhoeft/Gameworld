@@ -8,8 +8,9 @@ the concepts and holds the names, and the names in this document follow the read
 
 Only the first steps are specified and implemented: the races (section 2), the races of a
 region with their potential population (section 3), the factions of a region (section 4)
-and its name (section 4.10), the races of a city or a town (section 5.1) and the cities
-and towns of a region with their persons (section 5.2). The rest of sections 5 to 9 holds
+and its name (section 4.10), the races of a city or a town (section 5.1), the cities
+and towns of a region with their persons (section 5.2) and their names (section 5.3). The
+rest of sections 5 to 9 holds
 what is decided and what is still open. Detailing it is a later task.
 
 Sections 2 and 3 and Appendix A were section 19 and Appendix E of map-generation.md until
@@ -44,7 +45,7 @@ and the travel network are its inputs.
 | The races of a region and its potential population | Planned | Specified and implemented (section 3) |
 | Factions | Planned | Specified and implemented (section 4): a ruling faction, an opposition and lesser factions per region |
 | The name of a region | Planned | Specified and implemented (section 4.10): from the region-name generator |
-| Cities and towns | Settled; their races Planned | Specified and implemented: the races of a city or a town (section 5.1), and which Prospects get one and how many persons live in each (section 5.2). Their names are not specified |
+| Cities and towns | Settled; their races and their names Planned | Specified and implemented: the races of a city or a town (section 5.1), which Prospects get one and how many persons live in each (section 5.2), and the name of each (section 5.3) |
 | Families | Settled | Not specified (section 6) |
 | Persons | Settled for the important persons, later for the rest | The names are implemented, the rest is not specified (section 7) |
 | Vocations | Planned for the countryside, Settled for the cities and towns | The list is in the Parameter Set. The rules are decided in part and not specified (section 8) |
@@ -974,15 +975,14 @@ Open:
 - The name styles of the default races are a first assignment (Appendix A), and there are
   only three models: the seven human races share one.
 - The word lists as lists in the Parameter Set.
-- The names of cities and towns (section 5).
 
 ---
 
 ## 5. Cities and towns
 
 Stage: Settled. The races of a city or a town are worked out in the Planned stage
-(section 5.1). Which Prospects get a city or a town, and how many persons live in each, is
-section 5.2.
+(section 5.1), and so is its name (section 5.3). Which Prospects get a city or a town, and
+how many persons live in each, is section 5.2.
 
 A city or a town is an actual settlement on a Prospect. The Prospects are the map's
 answer to where a settlement can lie, and how good the place is
@@ -991,13 +991,10 @@ for cities. A city or a town stands on every Prospect on show, and on no other.
 
 Open:
 
-- The names of cities and towns. A region has a name (section 4.10). The generator behind
-  it has a stub for city names that was never written
-  ([RegionNameGenerator-Reuse.md](RegionNameGenerator-Reuse.md), "Not covered").
-- What a city or a town holds beside its persons and their races: its families
+- What a city or a town holds beside its name, its persons and their races: its families
   (section 6) and its vocations (section 8).
 - Whether a Prospect that is not on show gets a city or a town later, as play progresses.
-  Its slot is kept free for it (section 5.2).
+  Its slot is kept free for it (section 5.2), and it has its name already (section 5.3).
 
 ### 5.1 The races of a city or a town
 
@@ -1046,8 +1043,8 @@ How many persons a city or a town holds, and how many of each race, follows in s
 ### 5.2 The cities and towns of a region
 
 Stage: Settled. The rule needs the region itself only: its Prospects on show with their
-races (section 5.1), its potential population (section 3.4) and the seat of its ruling
-faction (section 4.4). Nothing is read from another region, and the rule holds no random
+races (section 5.1) and their names (section 5.3), its potential population (section 3.4)
+and the seat of its ruling faction (section 4.4). Nothing is read from another region, and the rule holds no random
 choice. It was adopted on 2026-11-20 as planned in
 [plans/cities-and-towns.md](plans/cities-and-towns.md), which holds what was measured and
 what was weighed.
@@ -1163,6 +1160,7 @@ rural(r) = left(r) after the last city or town
 | Fact | Meaning |
 |---|---|
 | Slot | Its identity is the region and the slot. The slot is the index of its Prospect among the Prospects of the region (map-generation.md section 15.5), so the slot of a Prospect that is not on show stays free |
+| Name | The name of its Prospect (section 5.3). No other city or town of the region has it |
 | Kind | City or town |
 | Capital | Whether it is the capital of the region |
 | Patch | The patch of its Prospect |
@@ -1198,6 +1196,285 @@ the cases, and a quarter of the listed races of all places hold nobody.
 
 With a city share of 0.05 and a town share of 0.2 the same regions hold 5.0 % of all
 persons in cities and 19.9 % in towns.
+
+### 5.3 The name of a city or a town
+
+Stage: Planned. The name is worked out for every Prospect of the region, on show or not,
+as the races of section 5.1 are. So a city or a town takes its name from its Prospect, and
+a Prospect that gets a city or a town later has its name already. The rule needs the region
+itself only: its Prospects, the estimated biome and resources of their patches, the races
+of each Prospect and the factions of the region. It was adopted on 2026-11-20.
+[research/city-and-town-naming.md](research/city-and-town-naming.md) holds the sources and
+the rule it proposed, and [city-and-town-names.md](city-and-town-names.md) what the words
+of each race are built from.
+
+Every Prospect has a **name**: "Jarlhavn", "Khar Nuur", "Qasr Mehret", "Temple Abbey". The
+name is not authored. It comes from the city and town name generator, as the name of a
+region comes from the region-name generator (section 4.10). The code is
+`src/Gameworld.Generation/Names`: `SettlementNameGenerator` draws and joins a name,
+`SettlementNameLexicons` holds the words of each race, and `SettlementNameRules` what a
+Prospect gives the generator.
+
+A name is a **first part** and a **place word**: Jarl + havn, Khar + Nuur, and Qasr +
+Mehret with the place word in front. The place word says what kind of place it is, and the
+first part tells it from the other places of its kind. Two things decide the name:
+
+- The **race** that names the place gives the words: its first parts and its place words.
+- The **site** of the Prospect gives the class of the place word: a harbour, a ford, a
+  hill, a city or a town.
+
+The rule has no parameters in the Parameter Set. Its numbers are constants of the code:
+
+| Constant | Value |
+|---|---|
+| Navigable river | 8 patches drained and up (map-generation.md section 15) |
+| River to ford | 2 patches drained and up, below navigable |
+| Meeting of rivers | The smaller branch drains 4 patches or more |
+| Market | A trade factor of 0.9 or more |
+| Length of a name | 4 to 24 characters |
+| Draws for one Prospect | 20 at most |
+| Longest surname | 8 characters, in 10 draws at most |
+
+**The race that names the place.**
+
+```
+capital:          the lead race of the ruling faction (section 4.4)
+any other place:  one of the races of its Prospect (section 5.1), drawn with weight(r) of section 5.1
+```
+
+- The capital is the Prospect that is the seat of the ruling faction.
+- The races are walked in the order of the list of the Prospect, and the draw falls on the
+  first race where the running sum of the weights passes it. Where no race has a weight
+  the first race of the list names the place.
+- So the largest race around a Prospect names most of its places, and a small race names a
+  few: the names of a region come in layers, as the names of a land with several peoples
+  do.
+- A Prospect without a race is named from the lexicon of the Common name style (see "A
+  race without a lexicon").
+
+**The site classes.** A Prospect holds every class whose condition is true. Its kind adds
+one more: Fort for a city, Farm for a town. The classes read the facts of the Prospect, the
+estimated biome and resources of its patch (as the Prospect itself does, map-generation.md
+section 15), the elevation type of its zone and the factions that sit on it.
+
+| Class | Condition | Weight |
+|---|---|---|
+| Mouth | The largest river mouth on the patch is navigable | 6 |
+| Haven | The patch has a harbour | 5 |
+| Shore | The patch is on the coast and has no harbour | 3 |
+| Landing | The patch holds the head of navigation | 4 |
+| Meeting | A meeting of rivers | 4 |
+| Ford | The largest river on the patch is one to ford | 3 |
+| Bridge | The largest river on the patch is navigable | 3 |
+| Mere | The patch has a lake | 4 |
+| Hill | The zone is Hills or Mountains | 3 |
+| Wood | The biome is Boreal forest, Woodland & shrubland, one of the three temperate forests, one of the two tropical forests or Mangrove | 2 |
+| Field | The biome is Cold steppe, Temperate grassland or Savanna | 2 |
+| Waste | The biome is Ice & snow, Tundra, Cold desert, Hot desert or Thorn scrub | 2 |
+| Salt | Salt is listed on the patch: an amount of 0.25 or more | 4 |
+| Delve | The patch has a listed deposit of iron ore, copper ore, tin, silver and lead, gold, or gems and pearls | 4 |
+| Shrine | A faction of the type Belief sits on the Prospect | 5 |
+| Market | A faction of the type Vocation or Place sits on the Prospect, or its trade factor makes a market | 4 |
+| Fort | The place is a city: the capital, or a Prospect for a city | 4 |
+| Farm | The place is a town | 4 |
+
+- The rarer and the more telling a fact is, the more it weighs. A town with a harbour is
+  named for the harbour in 5 cases of 9, where its race has words for both.
+- Volcano gives none of Wood, Field and Waste.
+
+**The lexicon of a race.** A lexicon is one or more **tongues**: the Dwarves have the
+hold's own name and the gate name, the Orcs orcish, the names of the legion and plain
+names. A tongue holds:
+
+| Part | Meaning |
+|---|---|
+| Weight | How often the tongue is drawn among the tongues of its lexicon |
+| Listed first parts | Words that are written as they stand: "Hrafn", "Temple", "Khar" |
+| Syllables | How a first part is coined: one first syllable, some middle ones (a least and a most) and one last one where the tongue has last syllables. A mirrored tongue writes the syllables, a letter in the middle and the syllables backwards |
+| Coined share | How often the first part is coined, where the tongue has both listed first parts and syllables |
+| Bare share | How often a coined first part is the whole name, without a place word |
+| Worn | Whether the tongue wears its seams down (see the join) |
+| Place words | A list of words for each site class the tongue has words for |
+
+A tongue need not have words for every class. A class it has no word for is never drawn
+for its names, so a race names a place for what it cares about: the Shoalfolk have words
+for the coast and none for a hill. Every tongue with place words has them for Fort and
+Farm, so every site has one.
+
+The form of a place word says where it stands:
+
+| Form | Where | Example |
+|---|---|---|
+| It ends in a space or a hyphen | In front of the first part | "Bir " + Sallah = Bir Sallah, "Ile-" + Kingora = Ile-Kingora |
+| It starts with a space or a hyphen | After the first part, as it stands | Khar + " Nuur" = Khar Nuur, Bobbin + "-under-Oak" |
+| Any other | Joined to the first part | Jarl + "havn" = Jarlhavn |
+
+The default races, with the first parts of their tongues and names the generator gives:
+
+| Race | Its tongues | Names |
+|---|---|---|
+| Northmen | One, worn: 59 listed first parts (animals, founders, trades) and joined place words | Jarlhavn, Skjaldby, Stormaros |
+| Midlanders | One: 99 listed first parts (the land, its powers and its founders), joined place words and a few of their own (Abbey, Cross, Pont, Castel, Chipping) | Priorshythe, Temple Abbey, Pont Aure |
+| Saltroad folk | One, worn: the place word stands in front. Three first parts in four are coined, the others are among 33 listed. 35 % of the coined ones stand alone | Qasr Mehret, Bir Sallah, Ifazelt |
+| Sunlanders | One, worn: every first part is coined, a first syllable and one or two more. 40 % stand alone | Mandasakro, Ile-Kingora, Kibidu |
+| Grass riders | One: 56 listed first parts (colours, animals, numbers) and a place word as a word of its own | Khar Nuur, Doloon Khot |
+| Rainkeepers | One, worn: 57 listed first parts and joined place words | Padmagarh, Shvetasangam |
+| Canal folk | One: every first part is coined, of two syllables, and the kind of place is joined to it. 30 % stand alone | Jiangmingcheng, Mingkaoqiao, Tianhai |
+| Elves | One, worn: every first part is coined, a root and a linking syllable | Melrenne, Valovel |
+| Dwarves | The hold's own name, coined and worn (weight 5). The gate name in the trade tongue, 46 listed first parts (weight 4) | Tholargrund, Morr Dun, Pledgeplate |
+| Halflings | One: 58 listed first parts | Hivesbrook, Pantry Hundred |
+| Gnomes | One: 59 listed first parts | Fennickroot, Bezel Landing |
+| Orcs | Orcish, coined and worn, half of the names bare (weight 5). The names the legion left, 31 listed first parts (weight 3). Plain names of a hard land, 34 listed (weight 3) | Krurnak Wall, Burlgal, Old Garrison, Marrowfort |
+| Hoarkin | Their own tongue, coined, worn and always bare (weight 6). The trade names, 35 listed first parts (weight 4) | Kaalholeesk, Seal Moot |
+| Twofold | Their own tongue, mirrored and always bare: every name reads the same both ways (weight 6). The trade names, 34 listed first parts (weight 4) | Atidita, Pavisivap, Yoke Door |
+| The other fourteen new races | One each, in the trade tongue: 45 to 48 listed first parts, and place words for the 4 to 7 site classes the race cares about | Emberhall, Tall Barrow, Sprucestand, Dryshore, Duskwall, Sunfed, Motherhall, Reefhold, Torchcrown, Marshal's Well, Vialhall, Mint Lodge, Curebank, Roofway |
+
+The words of each race are built from what [city-and-town-names.md](city-and-town-names.md)
+says its names are made of, and the lists themselves are in `SettlementNameLexicons`. The
+50 names of a race in that document are not a list the generator draws from.
+
+**A race without a lexicon.** A lexicon belongs to a race id of the default list. A race
+that is added through a Parameter Set file has none, and takes the lexicon of its name
+style (section 2): the first part is a surname from the surname model of the style, drawn
+again while it is longer than 8 characters and the tenth kept whatever its length, and the
+place words are those of the trade tongue (mouth, haven, ford, bridge, mere, don, ley,
+field, wich, minster, bury, ton and the like). "Goodby", "Tyrport", "Fireton".
+
+**One draw.** A name is drawn in this order:
+
+1. The tongue, by weight among the tongues of the lexicon.
+2. The site class, by weight among the classes of the Prospect that the tongue has words
+   for, walked in the order of the table.
+3. The place word, each word of the class as likely as the others.
+4. Whether the first part is coined: always in a tongue without listed first parts,
+   never in one that cannot coin, else in the coined share of the cases.
+5. The first part: one of the listed ones, each as likely as the others, or a coined one.
+   A coined one draws how many middle syllables it has, then its syllables in order.
+6. Whether the name is bare: a coined first part is the whole name in the bare share of
+   the cases, and so is any first part where the tongue has no place word for the site.
+
+**The join.**
+
+- A place word in front, or one that starts with a space or a hyphen, is written beside
+  the first part as it stands.
+- A first part that ends in an apostrophe, with or without an s, keeps a joined place word
+  as a word of its own with a capital: Marshal's + field = Marshal's Field.
+- Any other place word is joined. In a worn tongue a letter doubled across the seam is
+  written once, and a vowel at the end of a first part of three letters or more falls
+  before a vowel: Ulf + fell = Ulfell, Jala + uppalam = Jaluppalam. The syllables of a
+  coined first part are joined the same way.
+- A tongue that is not worn joins the two as they stand.
+
+**A valid name.** A drawn name is valid when all of this holds:
+
+- It has 4 to 24 characters, and only the letters A to Z, spaces, hyphens and apostrophes.
+  A surname model can give other letters.
+- The first part is not one syllable said twice: no "Yuyu".
+- The first part does not end in the place word: no "Reefreef" and no "Hollow Hollow".
+- In a tongue that is not worn, the first part and a joined place word do not meet in the
+  same letter: no "Rafttown".
+
+**The names of a region.** The Prospects are taken in their order (map-generation.md
+section 15.5), which is the order of the slots:
+
+```
+for each Prospect, in order:
+    rng  = sfc32 seeded with hash4(seed, 0x4c01, I, J)        # (I, J) the root cell of the Prospect's patch
+    race = the race that names the place, with u = rng.next()
+    up to 20 times:
+        name = one draw from rng, with the lexicon of the race and the site classes of the Prospect
+        stop when the name is valid and no Prospect before this one in the order has it
+    the last name drawn is the name of the Prospect
+```
+
+- No two Prospects of a region have the same name. Names are compared without regard to
+  capitals.
+- A name that is drawn again comes from the same generator, so the race stays and the
+  site class, the place word and the first part are all drawn anew.
+- The twentieth name is kept whatever it is. The lexicons give thousands of names each, so
+  this has not happened in any region measured.
+- The rule reads the region only, so a name does not depend on the order the regions are
+  generated in. The purpose 0x4c01 is used by no other draw.
+
+**What is stored.** `ProspectNames` of the Planned region holds the name of every
+Prospect, in the order of the Prospects. The Stub of a city or a town holds the name of its
+Prospect (section 5.2). The race that named the place and the site class of its place word
+are not stored: they can be worked out again from the Planned region.
+
+**What differs from the research note.** The note proposes a rule in its §6.3 and leaves
+eight decisions open in its §7.
+
+- The first part comes from word lists of each race, not from the surname model of its
+  name style. The surname models are British, elven and dark elven, so the seven human
+  races would have shared one sound. The surname model is kept for a race without a
+  lexicon.
+- The place words are those of each race, and a race has words only for the classes it
+  cares about. The note has one list of English place words, and asks in D2 what the other
+  styles should use.
+- The race is drawn by weight among the races of the Prospect. The note recommends the
+  largest race (D3). Measured with the largest race, the four largest human races named
+  92 % of all places and the sixteen new races 0.3 %.
+- The name is derived data (D1) and every Prospect is named (D4), as the note recommends.
+  The stage is Planned, not Settled: the name reads Planned data only, and the Prospects
+  layer of a map can show it.
+- There is no step against the bordering regions (D5, step 7 of the note): see Measured
+  and Open.
+- The surname of the ruling house is not used for the capital (D6): the house has a
+  British, an elven or a dark elven surname, which does not fit the words of most races.
+- There is no Market, Little, Upper, Nether or Great in front of a name. A market is a
+  site class with place words of its own, and a name that is taken is drawn again.
+- The Market class needs a trade factor of 0.9, not 0.7: 43 % of the Prospects on show
+  have 0.7 or more, and 19 % have 0.9 or more.
+- The lists are in the code and the numbers are constants (D8).
+
+**Measured.** The generator on 324 regions (the 9 × 9 regions around (0, 0) of the seeds
+`cellgen`, `gameworld`, `atlas` and `north`), with the default Parameter Set: 6,366
+Prospects, of which 4,156 are on show and so have a city or a town.
+
+- No two Prospects of a region have the same name, in any region.
+- The 6,366 Prospects have 5,929 different names. The 4,156 cities and towns have 3,960:
+  3,772 names stand once, 180 twice and 8 three times.
+- Three pairs of cities or towns in bordering regions have the same name. Six of the 324
+  regions hold one of them. Counted over all Prospects it is nine pairs.
+- Every one of the 28 races names a place. A human race names 87 % of the cities and
+  towns, and the four that name the most, the Canal folk, the Midlanders, the Saltroad
+  folk and the Sunlanders, name 75 %. The sixteen new races name 4 %.
+- A name has 9.7 characters on average. The shortest has 4 and the longest 23 ("Heather
+  Below the Ridge"). 18 % have a space or a hyphen.
+- What the place word of a city or a town says:
+
+| Place word | Share | Place word | Share |
+|---|---|---|---|
+| Farm | 27.2 % | Meeting | 1.9 % |
+| No place word | 17.3 % | Haven | 1.9 % |
+| Bridge | 11.8 % | Mouth | 1.5 % |
+| Wood | 9.9 % | Shore | 1.5 % |
+| Fort | 6.7 % | Hill | 1.3 % |
+| Ford | 4.5 % | Mere | 1.3 % |
+| Market | 3.9 % | Waste | 1.2 % |
+| Landing | 3.0 % | Shrine | 0.5 % |
+| Delve | 2.4 % | Salt | 0.1 % |
+| Field | 2.0 % | | |
+
+Open:
+
+- Two cities or towns in bordering regions can have the same name, and two further apart
+  more often. Telling them apart would read the Planned names of the bordering regions in
+  the Settled stage (step 7 of the research note), which no rule of this section does. A
+  display can add the name of the region.
+- The lexicons as lists in the Parameter Set, with the word lists of the region names
+  (section 4.10). Until then a race that is added through a Parameter Set file has no
+  words of its own.
+- A coined first part can be a word that means something, or something unfortunate: the
+  lists are not filtered.
+- Rivers, lakes, hills and forests have no names, so a town cannot take the name of its
+  river.
+- One name per place. A place that holds several races could have a name in the tongue of
+  each.
+- There is no New and no Old: the world has no history yet.
+- The capital of a region ruled by a house does not carry the surname of the house.
+- The weights of the site classes and the shares of the tongues are first values. They are
+  not measured against a target.
 
 ---
 
@@ -1670,4 +1947,6 @@ when it stands in sections 1 to 9.
 | [tools-basis.md](tools-basis.md) | 146 real tools for the 51 vocations, each with a sourced description, lore and the fitting vocations. Material: no rule reads it | Sections 8, 9 |
 | [research/portrait-components.md](research/portrait-components.md) | Lists of hairstyles, outfits, colours, race markers and accessories for portraits. Written for the 32 races of the first version of races-basis.md and extended for the Catfolk: it still covers the five that were left out | Section 9 |
 | [NameGenerator-Reuse.md](NameGenerator-Reuse.md) | The person-name generator, ported from an earlier project | Section 7 |
+| [city-and-town-names.md](city-and-town-names.md) | 50 invented city and town names for each of the 28 default races, with what the names of each race are built from. Material: no rule reads it, and the word lists of section 5.3 are built from its notes | Section 5.3 |
+| [research/city-and-town-naming.md](research/city-and-town-naming.md) | How settlement names are built in real place-names, in fantasy literature and in generators and games, and the rule it proposed for this generator | Section 5.3 |
 | [RegionNameGenerator-Reuse.md](RegionNameGenerator-Reuse.md) | The region-name generator of the same project: the original, its defects and the corrected form that was ported | Section 4.10 |

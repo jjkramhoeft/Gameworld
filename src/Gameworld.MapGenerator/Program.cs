@@ -41,11 +41,20 @@ Console.WriteLine();
 // Generate.
 var total = Stopwatch.StartNew();
 var regions = new List<Region>();
+// The name of the capital: of the city once the region is Settled, of the Prospect of the seat of the ruling faction before.
+static string CapitalOf(Region region)
+{
+    if (region.Settlement?.Capital is { } capital) return capital.Name;
+    if (region.Plan is not { Ruling.Seat: { } seat } plan) return "-";
+    for (var i = 0; i < plan.Prospects.Count; i++)
+        if (plan.Prospects[i].Patch == seat) return plan.ProspectNames[i];
+    return "-";
+}
 // Cities and towns: how many, and the persons that live in them.
 static string Places(RegionSettlement? s, SettlementKind kind) => s is null
     ? "-"
     : $"{s.Settlements.Count(x => x.Kind == kind)}/{(kind == SettlementKind.City ? s.CityPersons : s.TownPersons)}";
-Console.WriteLine($"{"region",-10} {"stage",-9} {"zones",5} {"sea",5} {"patches",7} {"rivers",6} {"lakes",5} {"prospects",9} {"people",9} {"factions",8} {"cities",8} {"towns",8} {"links",5} {"ms",6}  {"name"}");
+Console.WriteLine($"{"region",-10} {"stage",-9} {"zones",5} {"sea",5} {"patches",7} {"rivers",6} {"lakes",5} {"prospects",9} {"people",9} {"factions",8} {"cities",8} {"towns",8} {"links",5} {"ms",6}  {"name",-30} {"capital"}");
 foreach (var id in RegionStageRules.RegionsWithin(options.Centre, options.Rings))
 {
     var sw = Stopwatch.StartNew();
@@ -57,7 +66,7 @@ foreach (var id in RegionStageRules.RegionsWithin(options.Centre, options.Rings)
         + $"{region.Detail?.Lakes.Count.ToString() ?? "-",5} {region.Plan?.Prospects.Count.ToString() ?? "-",9} "
         + $"{region.Plan?.Population.Total.ToString() ?? "-",9} {region.Plan?.Factions.Count.ToString() ?? "-",8} "
         + $"{Places(region.Settlement, SettlementKind.City),8} {Places(region.Settlement, SettlementKind.Town),8} "
-        + $"{region.Settlement?.Travel.Links.Count.ToString() ?? "-",5} {sw.ElapsedMilliseconds,6}  {region.Plan?.Name ?? "-"}");
+        + $"{region.Settlement?.Travel.Links.Count.ToString() ?? "-",5} {sw.ElapsedMilliseconds,6}  {region.Plan?.Name ?? "-",-30} {CapitalOf(region)}");
 }
 Console.WriteLine($"Generated {regions.Count} regions in {total.Elapsed.TotalSeconds:F1} s ({world.Regions.Count} stored, the rest as far as the stages around them need)");
 
