@@ -4,11 +4,12 @@ namespace Gameworld.Domain;
 // sections 4 and 5, with the biomes of each entry as the note gives them. The codes are those
 // of docs/society-generation.md Appendix A, and Sea stands for the ocean patches. The last
 // number is the Supernatural an arcane plant or a monster needs: 60, 75 or 90 for the tiers
-// S1, S2 and S3 of the note.
+// S1, S2 and S3 of the note. The flora end with one kind the note does not hold, the giant
+// mushrooms.
 
 public sealed partial record FloraParameters
 {
-    /// <summary>The default list: 207 kinds of flora in eleven types, all on.</summary>
+    /// <summary>The default list: 208 kinds of flora in eleven types, all on.</summary>
     public static IReadOnlyList<FloraParameters> Defaults { get; } =
     [
         Make("spruce", "Spruce", FloraType.Tree, "Bor TMx"),
@@ -218,6 +219,8 @@ public sealed partial record FloraParameters
         Make("stormthorn", "Stormthorn", FloraType.Arcane, "CSt TGr Thn Sav", 60),
         Make("lanternMangrove", "Lantern mangrove", FloraType.Arcane, "Mgv", 60),
         Make("snareVine", "Snare vine", FloraType.Arcane, "TDf TRf", 60),
+        // Not an entry of the note: a forest of mushrooms of tree height, in the place of the trees.
+        Make("giantMushrooms", "Giant mushrooms", FloraType.Arcane, "Bor WSh TMx TBl TRn TDf TRf", 60, FloraType.Tree),
     ];
 }
 

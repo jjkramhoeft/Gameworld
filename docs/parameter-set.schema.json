@@ -2597,6 +2597,23 @@
             "type": "number",
             "minimum": 0,
             "maximum": 100
+          },
+          "StandsInFor": {
+            "description": "The type of flora the kind stands in for. A patch that gets the kind gets no kind of that type: the giant mushrooms of the defaults stand in for the trees. Left out means the kind stands in for nothing (§13.4).",
+            "enum": [
+              "Tree",
+              "Shrub",
+              "Flower",
+              "Herb",
+              "Fruit",
+              "Grass",
+              "Vine",
+              "Fungus",
+              "Moss",
+              "Aquatic",
+              "Arcane",
+              null
+            ]
           }
         },
         "required": [

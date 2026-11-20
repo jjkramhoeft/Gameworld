@@ -5097,6 +5097,24 @@
       ],
       "Frequency": 0.25,
       "MinSupernatural": 60
+    },
+    {
+      "Id": "giantMushrooms",
+      "Name": "Giant mushrooms",
+      "Type": "Arcane",
+      "Enabled": true,
+      "Biomes": [
+        "BorealForest",
+        "WoodlandAndShrubland",
+        "TemperateMixedForest",
+        "TemperateBroadleafForest",
+        "TemperateRainForest",
+        "TropicalDryForest",
+        "TropicalRainForest"
+      ],
+      "Frequency": 0.25,
+      "MinSupernatural": 60,
+      "StandsInFor": "Tree"
     }
   ],
   "Fauna": [

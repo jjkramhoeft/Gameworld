@@ -1246,10 +1246,12 @@ An ocean patch has no biome and gets kinds of the sea.
 | `Sea` | Whether the kind lives in the sea. Left out means no |
 | `Frequency` | How frequent the kind is relative to the others (1). 0 or below means never |
 | `MinSupernatural` | The Supernatural (0 to 100) a patch needs for the kind. Left out means 0 |
+| `StandsInFor` | Flora only: the type of flora the kind stands in for (see Stand-in below). Left out means none |
 
-The default lists hold 207 kinds of flora and 167 kinds of fauna: the entries of
+The default lists hold 208 kinds of flora and 167 kinds of fauna: the entries of
 [research/flora-and-fauna.md](research/flora-and-fauna.md) sections 4 and 5, with the
-biomes the note gives each entry. The frequency is 1, except 0.5 for a beast and 0.25 for
+biomes the note gives each entry, and one kind of flora the note does not hold, the giant
+mushrooms at the end of the list. The frequency is 1, except 0.5 for a beast and 0.25 for
 a monster and for an arcane plant. A monster and an arcane plant need a Supernatural of
 60, 75 or 90, by the tiers S1, S2 and S3 of the note. No other kind needs the field. So
 a monster is found on about a tenth of the map at the most (9, 14.1).
@@ -1274,6 +1276,26 @@ order of the Parameter Set. Two equal keys go to the lower `k`. A patch with few
 and `0xfa0000 + k`. Both counts are 3 to 6 by default, and `ln` is the exact one of
 Appendix A.
 
+**Stand-in.** A kind of flora with `StandsInFor` takes the place of the kinds of that
+type in the patches that get it. The kinds that fit are taken in the order of their keys
+until `n` are taken:
+
+- a kind whose type a taken kind stands in for is passed over,
+- when a kind that stands in for a type is taken, the kinds of that type taken before it
+  are left out again, and the taking goes on until `n` are taken,
+- a kind that itself stands in for a type is never passed over and never left out, and a
+  kind that names its own type stands in for nothing.
+
+So such a patch still has `n` kinds when enough fit, and without a stand-in among them the
+rule changes nothing. The default list has one stand-in, the giant mushrooms: an arcane
+plant of the seven biomes with forest or woodland (boreal forest, woodland & shrubland,
+the three temperate forests and the two tropical forests) that needs a Supernatural of 60,
+has the frequency 0.25 and stands in for Tree. A patch that gets it has mushrooms of tree
+height and no trees. It is rare twice: the Supernatural reaches 60 on a tenth of the map,
+and there the giant mushrooms are drawn for 2 to 5 % of the patches of these biomes
+(measured at a Supernatural of 75: 2.4 % in temperate broadleaf and mixed forest, 5.3 % in
+temperate rain forest, 3.3 % over the seven).
+
 The key makes a kind twice as likely to be drawn when its frequency is twice as high. The
 key of a kind depends on the patch and the kind only, not on the biome and not on the
 other kinds. Two things follow:
@@ -1281,7 +1303,8 @@ other kinds. Two things follow:
 - A patch whose estimated and final biome are the same has the same flora and fauna in
   both forms.
 - Switching a kind off, or adding one at the end of its list, leaves the keys of the
-  other kinds as they were.
+  other kinds as they were. The flora of a patch only change where the new kind is taken.
+- The stand-in rule reads the keys and the types only, so both points hold with it.
 
 **Not used yet.** The note gives some entries a condition beyond the biome: a lake or a
 river, mountains, a coast, a tropical highland. It also names the resource variant an

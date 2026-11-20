@@ -68,13 +68,18 @@ public sealed partial record FloraParameters(
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public double MinSupernatural { get; init; }
 
+    [Description("The type of flora the kind stands in for. A patch that gets the kind gets no kind of that type: the giant mushrooms of the defaults stand in for the trees. Left out means the kind stands in for nothing (§13.4).")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public FloraType? StandsInFor { get; init; }
+
     /// <summary>A kind from the biome codes of its entry. An arcane plant is rare beside the ordinary plants.</summary>
-    private static FloraParameters Make(string id, string name, FloraType type, string habitat, double minSupernatural = 0) =>
+    private static FloraParameters Make(string id, string name, FloraType type, string habitat, double minSupernatural = 0, FloraType? standsInFor = null) =>
         new(id, name, type, true, BiomeCodes.Biomes(habitat))
         {
             Sea = BiomeCodes.Sea(habitat),
             Frequency = type == FloraType.Arcane ? 0.25 : 1,
             MinSupernatural = minSupernatural,
+            StandsInFor = standsInFor,
         };
 }
 

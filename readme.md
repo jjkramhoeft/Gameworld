@@ -222,7 +222,7 @@ Ice & snow, Tundra, Cold steppe, Boreal forest, Cold desert, Temperate grassland
 
 The plants and the creatures of a patch. Flora has eleven types: Tree, Shrub, Flower, Herb, Fruit, Grass, Vine, Fungus, Moss, Aquatic and Arcane. Fauna has four: Critter, Animal, Beast and Monster. A kind is one entry of either: the oak, the grey wolf, the griffin.
 
-The flora and the fauna are two lists in the Parameter Set, not fixed sets in the code. Each kind has an id, a name, a type, a toggle, the biomes it lives in (or the sea), a frequency and the Supernatural it needs. The default lists hold 207 kinds of flora and 167 kinds of fauna. Only the arcane plants and the monsters need the Supernatural Field, so they are found where it is high.
+The flora and the fauna are two lists in the Parameter Set, not fixed sets in the code. Each kind has an id, a name, a type, a toggle, the biomes it lives in (or the sea), a frequency and the Supernatural it needs. A kind of flora can also stand in for a type: a patch that gets it gets no kind of that type. The default lists hold 208 kinds of flora and 167 kinds of fauna. Only the arcane plants and the monsters need the Supernatural Field, so they are found where it is high. One arcane plant, the giant mushrooms, stands in for the trees: a rare patch of the forests where the Supernatural is high has mushrooms of tree height and no trees.
 
 A patch gets a few kinds of each (3 to 6 by default), drawn by frequency from the kinds that fit it, when its biome is chosen. The flora and fauna of a patch do not change its resources yet.
 
