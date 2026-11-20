@@ -44,7 +44,7 @@ The project is in phase 1.
 
 ### Status
 
-The map is generated through all its stages, from the cells to the travel network, with the flora and fauna of every patch. Of the society, the races of each region, their potential population, the factions of each region, the name of each region, and the cities and towns of each region with their names, their persons and their races are generated. The persons of a city or a town are a count per race so far. The person-name generator is in place, and for now it gives the surnames of the houses that name a region and some of the first parts of city and town names. The vocations are a list in the Parameter Set and are not drawn yet. Families and individual persons are defined below but not generated yet, and neither is there a database: the apps compute everything in memory.
+The map is generated through all its stages, from the cells to the travel network, with the flora and fauna of every patch. Of the society, the races of each region, their potential population, the factions of each region, the name of each region, and the cities and towns of each region with their names, their persons and their races are generated. The persons of a city or a town are a count per race so far. The person-name generator is in place, and for now it gives the surnames of the houses that name a region and some of the first parts of city and town names. The vocations and their tools are lists in the Parameter Set and are not drawn yet. Families and individual persons are defined below but not generated yet, and neither is there a database: the apps compute everything in memory.
 
 ## Concepts
 
@@ -65,6 +65,7 @@ Foundation = seed + generator version + Parameter Set
       ├─ Region name                    the realm of the ruling faction
       ├─ City and town                  one on every Prospect on show, with a name and races
       ├─ Family, Person                 a person with a vocation and looks
+      ├─ Vocation, Tool                 the work of a person, and the tools of the work
       └─ Colour                         favourite colours of a race, the banner of a faction
 ```
 
@@ -84,7 +85,7 @@ Many foundations can coexist in storage, for one to compare maps side by side in
 
 The set of all map and world parameters. It is referenced by a foundation and is immutable after phase 1, like the foundation. It is a json file, or is exported to and loaded from one.
 
-The Parameter Set also holds the lists that are expected to change: the bedrock types, the races, the vocations, the flora and the fauna. A change to a list after phase 1 is a new Parameter Set, and with it a new foundation. Foundations that exist are not touched.
+The Parameter Set also holds the lists that are expected to change: the bedrock types, the races, the vocations, the tools, the colours, the flora and the fauna. A change to a list after phase 1 is a new Parameter Set, and with it a new foundation. Foundations that exist are not touched.
 
 #### Derived and authored data
 
@@ -247,7 +248,7 @@ Roads, river routes and sea lanes that connect the Prospects on show. The networ
 
 ### The society
 
-The peoples that live on the map. The Stub of every entity in this group is derived data, and its presentation is authored. The rules are in [docs/society-generation.md](docs/society-generation.md). Only the races, the potential population, the factions and the cities and towns are specified there so far. Detailing the rest is a later task.
+The peoples that live on the map. The Stub of every entity in this group is derived data, and its presentation is authored. The rules are in [docs/society-generation.md](docs/society-generation.md). Only the races, the potential population, the factions, the cities and towns and the tools are specified there so far. Detailing the rest is a later task.
 
 #### Race
 
@@ -311,6 +312,12 @@ An NPC in the game. The Stub of a person holds name, age, sex, vocation, role, f
 
 The work a person does: farmer, smith, priest. A person has one vocation and can have a by-work, a second vocation beside it. The vocation is not the role: the role is the position of the person in the household, in the vocation or in a faction. The vocations are a list in the Parameter Set, like the races. Each vocation has an id, a name, a toggle, a sector (one of nine), the lowest tier of place it is found in (countryside, town, city or capital), a starting share of the labour force and its variants: the shepherd is a variant of the herder. The default list holds 51 vocations. How a place and a person get their vocations is not specified yet, so no vocation is generated.
 
+#### Tool
+
+A thing a vocation works with: the anvil of the smith, the sickle of the farmer, the fleam of the healer. The tools are a list in the Parameter Set, like the vocations. Each tool has an id, a name, a toggle, the vocations that work with it (the vocation it belongs to most first) and an emblem weight: how well it serves as the emblem of its vocations on a coat of arms. A tool can serve several vocations, and the tools of a vocation are the tools that list it. The default list holds 146 tools, at least two for each default vocation (docs/society-generation.md section 8.1).
+
+Nothing draws a tool yet. The coats of arms of families, guilds and some cities are to take their charges from the tools of a vocation, as a smiths' guild bears hammers, and a portrait can show what a person holds at work. A tool is not the produced resource group Tools: the group is goods a place makes, a tool of the list is a kind of thing a person works with.
+
 #### Looks
 
 What a portrait of a person must show: the body and the face, the hair, the outfit and the accessories. Looks are not specified yet, apart from the colours.
@@ -330,7 +337,7 @@ A named colour of cloth, paint and banners: red, indigo, saffron. The colours ar
 | [docs/parameter-set.schema.json](docs/parameter-set.schema.json) | The JSON Schema of a Parameter Set file. Generated, do not edit |
 | [docs/adding-a-race.md](docs/adding-a-race.md) | The steps to add a race |
 | [docs/races-basis.md](docs/races-basis.md) | The 28 default races: looks, history, way of life, vocations and factions |
-| [docs/tools-basis.md](docs/tools-basis.md) | 146 real tools for the 51 default vocations: a sourced description, lore and the fitting vocations. Material, it binds nothing |
+| [docs/tools-basis.md](docs/tools-basis.md) | 146 real tools for the 51 default vocations: a sourced description, lore and the fitting vocations. The default tool list is built from it |
 | [docs/city-and-town-names.md](docs/city-and-town-names.md) | 50 invented city and town names for each of the 28 default races, and what the names of each race are built from. Material: the word lists of the city and town name generator are built from it |
 | [docs/races-and-worldbuilding.md](docs/races-and-worldbuilding.md) | A framework for building a near-human race: origin, anchor traits, culture and the relation to humans |
 | [docs/NameGenerator-Reuse.md](docs/NameGenerator-Reuse.md) | The person-name generator |

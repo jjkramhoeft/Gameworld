@@ -5,12 +5,19 @@ equipment, two or more for each of the 51 vocations of the default list. Each to
 a sourced description of the real thing and a short piece of lore that places it in this
 world.
 
-This document is material, like [races-basis.md](races-basis.md). It binds nothing: tools
-are not a concept of the readme, there is no tool list in the Parameter Set, and no
-generation rule reads this file. It is meant as a source for the text and the portrait of a
-person (what a smith holds, what hangs on a healer's belt) and for the produced resource
-group Tools of [map-generation.md](map-generation.md) Appendix G.1, when that group is
-detailed.
+The default tool list of the Parameter Set is built from this document
+([society-generation.md](society-generation.md) section 8.1): one tool per entry, with the
+name of its heading, in the order of the document, and its line "Fitting vocations" as the
+vocations of the tool. A change to a name, the order or the fitting vocations here must be
+made in `src/Gameworld.Domain/Tools.Defaults.cs` and
+[default-parameter-set.json](default-parameter-set.json) too. The emblem weights of the
+list are not in this document: section 8.1 gives them.
+
+The rest is material, like [races-basis.md](races-basis.md): the descriptions and the lore
+bind nothing, and no generation rule reads this file. They are a source for the text and the
+portrait of a person (what a smith holds, what hangs on a healer's belt) and for the produced
+resource group Tools of [map-generation.md](map-generation.md) Appendix G.1, when that group
+is detailed.
 
 Research date: 2026-11-19.
 

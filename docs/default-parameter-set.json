@@ -2676,6 +2676,1362 @@
       ]
     }
   ],
+  "Tools": [
+    {
+      "Id": "heavyPlough",
+      "Name": "Heavy plough",
+      "Enabled": true,
+      "Vocations": [
+        "farmer"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "sickle",
+      "Name": "Sickle",
+      "Enabled": true,
+      "Vocations": [
+        "farmer"
+      ],
+      "EmblemWeight": 3
+    },
+    {
+      "Id": "flail",
+      "Name": "Flail",
+      "Enabled": true,
+      "Vocations": [
+        "farmer"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "scythe",
+      "Name": "Scythe",
+      "Enabled": true,
+      "Vocations": [
+        "farmer",
+        "labourer"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "spadeIron",
+      "Name": "Spade iron",
+      "Enabled": true,
+      "Vocations": [
+        "gardener",
+        "labourer"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "beeSkep",
+      "Name": "Bee skep",
+      "Enabled": true,
+      "Vocations": [
+        "gardener"
+      ],
+      "EmblemWeight": 3
+    },
+    {
+      "Id": "billhook",
+      "Name": "Billhook",
+      "Enabled": true,
+      "Vocations": [
+        "gardener",
+        "forester"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "shepherdsCrook",
+      "Name": "Shepherd\u0027s crook",
+      "Enabled": true,
+      "Vocations": [
+        "herder"
+      ],
+      "EmblemWeight": 3
+    },
+    {
+      "Id": "ironShears",
+      "Name": "Iron shears",
+      "Enabled": true,
+      "Vocations": [
+        "herder",
+        "tailor"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "plungeChurn",
+      "Name": "Plunge churn",
+      "Enabled": true,
+      "Vocations": [
+        "herder"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "seineNet",
+      "Name": "Seine net",
+      "Enabled": true,
+      "Vocations": [
+        "fisher"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "eelTrap",
+      "Name": "Eel trap",
+      "Enabled": true,
+      "Vocations": [
+        "fisher"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "eelSpear",
+      "Name": "Eel spear",
+      "Enabled": true,
+      "Vocations": [
+        "fisher"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "boarSpear",
+      "Name": "Boar spear",
+      "Enabled": true,
+      "Vocations": [
+        "hunter"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "falconsHood",
+      "Name": "Falcon\u0027s hood",
+      "Enabled": true,
+      "Vocations": [
+        "hunter"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "huntingHorn",
+      "Name": "Hunting horn",
+      "Enabled": true,
+      "Vocations": [
+        "hunter"
+      ],
+      "EmblemWeight": 3
+    },
+    {
+      "Id": "longbow",
+      "Name": "Longbow",
+      "Enabled": true,
+      "Vocations": [
+        "hunter",
+        "soldier",
+        "bandit"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "fellingAxe",
+      "Name": "Felling axe",
+      "Enabled": true,
+      "Vocations": [
+        "forester"
+      ],
+      "EmblemWeight": 3
+    },
+    {
+      "Id": "twoManSaw",
+      "Name": "Two-man saw",
+      "Enabled": true,
+      "Vocations": [
+        "forester",
+        "carpenter"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "minersIronAndHammer",
+      "Name": "Miner\u0027s iron and hammer",
+      "Enabled": true,
+      "Vocations": [
+        "miner"
+      ],
+      "EmblemWeight": 3
+    },
+    {
+      "Id": "wedgeCrowbarAndPick",
+      "Name": "Wedge, crowbar and pick",
+      "Enabled": true,
+      "Vocations": [
+        "miner",
+        "quarryman"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "windlass",
+      "Name": "Windlass",
+      "Enabled": true,
+      "Vocations": [
+        "miner"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "diviningRod",
+      "Name": "Divining rod",
+      "Enabled": true,
+      "Vocations": [
+        "miner",
+        "seer"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "quarryWedges",
+      "Name": "Quarry wedges",
+      "Enabled": true,
+      "Vocations": [
+        "quarryman"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "quarryPick",
+      "Name": "Quarry pick",
+      "Enabled": true,
+      "Vocations": [
+        "quarryman"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "crowbarAndSledge",
+      "Name": "Crowbar and sledge",
+      "Enabled": true,
+      "Vocations": [
+        "quarryman"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "leadSaltPan",
+      "Name": "Lead salt pan",
+      "Enabled": true,
+      "Vocations": [
+        "salter"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "saltRakeAndShovel",
+      "Name": "Salt rake and shovel",
+      "Enabled": true,
+      "Vocations": [
+        "salter"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "saltBasket",
+      "Name": "Salt basket",
+      "Enabled": true,
+      "Vocations": [
+        "salter"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "millstones",
+      "Name": "Millstones",
+      "Enabled": true,
+      "Vocations": [
+        "miller"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "millBillAndThrift",
+      "Name": "Mill bill and thrift",
+      "Enabled": true,
+      "Vocations": [
+        "miller"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "rotaryQuern",
+      "Name": "Rotary quern",
+      "Enabled": true,
+      "Vocations": [
+        "miller"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "bakersPeel",
+      "Name": "Baker\u0027s peel",
+      "Enabled": true,
+      "Vocations": [
+        "baker"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "kneadingTrough",
+      "Name": "Kneading trough",
+      "Enabled": true,
+      "Vocations": [
+        "baker"
+      ],
+      "EmblemWeight": 0
+    },
+    {
+      "Id": "mashTunAndMasher",
+      "Name": "Mash tun and masher",
+      "Enabled": true,
+      "Vocations": [
+        "brewer"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "brewingKettle",
+      "Name": "Brewing kettle",
+      "Enabled": true,
+      "Vocations": [
+        "brewer"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "alembicAndCucurbit",
+      "Name": "Alembic and cucurbit",
+      "Enabled": true,
+      "Vocations": [
+        "brewer",
+        "alchemist"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "cleaver",
+      "Name": "Cleaver",
+      "Enabled": true,
+      "Vocations": [
+        "butcher"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "poleAxe",
+      "Name": "Pole axe",
+      "Enabled": true,
+      "Vocations": [
+        "butcher"
+      ],
+      "EmblemWeight": 3
+    },
+    {
+      "Id": "charcoalClamp",
+      "Name": "Charcoal clamp",
+      "Enabled": true,
+      "Vocations": [
+        "charcoalBurner"
+      ],
+      "EmblemWeight": 0
+    },
+    {
+      "Id": "corrackAndLongShovel",
+      "Name": "Corrack and long shovel",
+      "Enabled": true,
+      "Vocations": [
+        "charcoalBurner"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "limeKiln",
+      "Name": "Lime kiln",
+      "Enabled": true,
+      "Vocations": [
+        "charcoalBurner",
+        "mason"
+      ],
+      "EmblemWeight": 0
+    },
+    {
+      "Id": "bloomeryFurnace",
+      "Name": "Bloomery furnace",
+      "Enabled": true,
+      "Vocations": [
+        "smelter"
+      ],
+      "EmblemWeight": 0
+    },
+    {
+      "Id": "bellows",
+      "Name": "Bellows",
+      "Enabled": true,
+      "Vocations": [
+        "smelter",
+        "smith"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "cupel",
+      "Name": "Cupel",
+      "Enabled": true,
+      "Vocations": [
+        "smelter",
+        "jeweller"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "unhairingKnifeAndBeam",
+      "Name": "Unhairing knife and beam",
+      "Enabled": true,
+      "Vocations": [
+        "tanner"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "tanPits",
+      "Name": "Tan pits",
+      "Enabled": true,
+      "Vocations": [
+        "tanner"
+      ],
+      "EmblemWeight": 0
+    },
+    {
+      "Id": "lunellumAndHerse",
+      "Name": "Lunellum and herse",
+      "Enabled": true,
+      "Vocations": [
+        "tanner"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "spindleWhorlAndDistaff",
+      "Name": "Spindle, whorl and distaff",
+      "Enabled": true,
+      "Vocations": [
+        "weaver"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "loom",
+      "Name": "Loom",
+      "Enabled": true,
+      "Vocations": [
+        "weaver"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "croppingShearsAndTeasels",
+      "Name": "Cropping shears and teasels",
+      "Enabled": true,
+      "Vocations": [
+        "weaver"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "anvil",
+      "Name": "Anvil",
+      "Enabled": true,
+      "Vocations": [
+        "smith"
+      ],
+      "EmblemWeight": 3
+    },
+    {
+      "Id": "hammersAndTongs",
+      "Name": "Hammers and tongs",
+      "Enabled": true,
+      "Vocations": [
+        "smith"
+      ],
+      "EmblemWeight": 3
+    },
+    {
+      "Id": "carpentersAxe",
+      "Name": "Carpenter\u0027s axe",
+      "Enabled": true,
+      "Vocations": [
+        "carpenter",
+        "shipwright"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "adze",
+      "Name": "Adze",
+      "Enabled": true,
+      "Vocations": [
+        "carpenter",
+        "shipwright"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "auger",
+      "Name": "Auger",
+      "Enabled": true,
+      "Vocations": [
+        "carpenter"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "plane",
+      "Name": "Plane",
+      "Enabled": true,
+      "Vocations": [
+        "carpenter"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "poleLathe",
+      "Name": "Pole lathe",
+      "Enabled": true,
+      "Vocations": [
+        "carpenter"
+      ],
+      "EmblemWeight": 0
+    },
+    {
+      "Id": "plumbRuleLevelAndSquare",
+      "Name": "Plumb rule, level and square",
+      "Enabled": true,
+      "Vocations": [
+        "carpenter",
+        "mason"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "caulkingIronAndMallet",
+      "Name": "Caulking iron and mallet",
+      "Enabled": true,
+      "Vocations": [
+        "shipwright"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "clenchNailsAndRoves",
+      "Name": "Clench nails and roves",
+      "Enabled": true,
+      "Vocations": [
+        "shipwright"
+      ],
+      "EmblemWeight": 0
+    },
+    {
+      "Id": "malletAndChisels",
+      "Name": "Mallet and chisels",
+      "Enabled": true,
+      "Vocations": [
+        "mason"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "treadwheelCrane",
+      "Name": "Treadwheel crane",
+      "Enabled": true,
+      "Vocations": [
+        "mason"
+      ],
+      "EmblemWeight": 0
+    },
+    {
+      "Id": "lewis",
+      "Name": "Lewis",
+      "Enabled": true,
+      "Vocations": [
+        "mason"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "trowel",
+      "Name": "Trowel",
+      "Enabled": true,
+      "Vocations": [
+        "mason"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "pottersWheel",
+      "Name": "Potter\u0027s wheel",
+      "Enabled": true,
+      "Vocations": [
+        "potter"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "potteryKiln",
+      "Name": "Pottery kiln",
+      "Enabled": true,
+      "Vocations": [
+        "potter"
+      ],
+      "EmblemWeight": 0
+    },
+    {
+      "Id": "stampsAndRoulettes",
+      "Name": "Stamps and roulettes",
+      "Enabled": true,
+      "Vocations": [
+        "potter"
+      ],
+      "EmblemWeight": 0
+    },
+    {
+      "Id": "blowpipe",
+      "Name": "Blowpipe",
+      "Enabled": true,
+      "Vocations": [
+        "glassmaker"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "pontil",
+      "Name": "Pontil",
+      "Enabled": true,
+      "Vocations": [
+        "glassmaker"
+      ],
+      "EmblemWeight": 0
+    },
+    {
+      "Id": "jacksAndShears",
+      "Name": "Jacks and shears",
+      "Enabled": true,
+      "Vocations": [
+        "glassmaker"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "grozingIron",
+      "Name": "Grozing iron",
+      "Enabled": true,
+      "Vocations": [
+        "glassmaker"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "roundKnife",
+      "Name": "Round knife",
+      "Enabled": true,
+      "Vocations": [
+        "leatherworker"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "awl",
+      "Name": "Awl",
+      "Enabled": true,
+      "Vocations": [
+        "leatherworker"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "shoemakersLast",
+      "Name": "Shoemaker\u0027s last",
+      "Enabled": true,
+      "Vocations": [
+        "leatherworker"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "thimbleAndNeedle",
+      "Name": "Thimble and needle",
+      "Enabled": true,
+      "Vocations": [
+        "tailor"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "touchstoneAndTouchNeedles",
+      "Name": "Touchstone and touch needles",
+      "Enabled": true,
+      "Vocations": [
+        "jeweller",
+        "merchant"
+      ],
+      "EmblemWeight": 0
+    },
+    {
+      "Id": "coinDies",
+      "Name": "Coin dies",
+      "Enabled": true,
+      "Vocations": [
+        "jeweller"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "drawPlate",
+      "Name": "Draw plate",
+      "Enabled": true,
+      "Vocations": [
+        "jeweller"
+      ],
+      "EmblemWeight": 0
+    },
+    {
+      "Id": "graver",
+      "Name": "Graver",
+      "Enabled": true,
+      "Vocations": [
+        "jeweller"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "hessianCrucible",
+      "Name": "Hessian crucible",
+      "Enabled": true,
+      "Vocations": [
+        "jeweller",
+        "alchemist"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "grindingSlabAndMuller",
+      "Name": "Grinding slab and muller",
+      "Enabled": true,
+      "Vocations": [
+        "artist"
+      ],
+      "EmblemWeight": 0
+    },
+    {
+      "Id": "mineverAndBristleBrushes",
+      "Name": "Minever and bristle brushes",
+      "Enabled": true,
+      "Vocations": [
+        "artist"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "silverStyle",
+      "Name": "Silver style",
+      "Enabled": true,
+      "Vocations": [
+        "artist"
+      ],
+      "EmblemWeight": 0
+    },
+    {
+      "Id": "turnsAndBow",
+      "Name": "Turns and bow",
+      "Enabled": true,
+      "Vocations": [
+        "artificer"
+      ],
+      "EmblemWeight": 0
+    },
+    {
+      "Id": "screwPlate",
+      "Name": "Screw plate",
+      "Enabled": true,
+      "Vocations": [
+        "artificer"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "coinBalance",
+      "Name": "Coin balance",
+      "Enabled": true,
+      "Vocations": [
+        "merchant",
+        "shopkeeper"
+      ],
+      "EmblemWeight": 3
+    },
+    {
+      "Id": "jettonsAndCountingBoard",
+      "Name": "Jettons and counting board",
+      "Enabled": true,
+      "Vocations": [
+        "merchant",
+        "shopkeeper",
+        "official",
+        "scribe",
+        "scholar"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "tallyStick",
+      "Name": "Tally stick",
+      "Enabled": true,
+      "Vocations": [
+        "merchant",
+        "innkeeper",
+        "official"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "steelyard",
+      "Name": "Steelyard",
+      "Enabled": true,
+      "Vocations": [
+        "merchant",
+        "shopkeeper"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "standardYard",
+      "Name": "Standard yard",
+      "Enabled": true,
+      "Vocations": [
+        "shopkeeper",
+        "official"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "standardBushel",
+      "Name": "Standard bushel",
+      "Enabled": true,
+      "Vocations": [
+        "shopkeeper",
+        "official"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "horseCollar",
+      "Name": "Horse collar",
+      "Enabled": true,
+      "Vocations": [
+        "carter"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "twoWheeledCart",
+      "Name": "Two-wheeled cart",
+      "Enabled": true,
+      "Vocations": [
+        "carter"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "packSaddle",
+      "Name": "Pack saddle",
+      "Enabled": true,
+      "Vocations": [
+        "carter"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "soundingLeadAndLine",
+      "Name": "Sounding lead and line",
+      "Enabled": true,
+      "Vocations": [
+        "sailor"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "marinersCompass",
+      "Name": "Mariner\u0027s compass",
+      "Enabled": true,
+      "Vocations": [
+        "sailor"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "marinersAstrolabe",
+      "Name": "Mariner\u0027s astrolabe",
+      "Enabled": true,
+      "Vocations": [
+        "sailor"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "blackJack",
+      "Name": "Black jack",
+      "Enabled": true,
+      "Vocations": [
+        "innkeeper"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "aleStake",
+      "Name": "Ale-stake",
+      "Enabled": true,
+      "Vocations": [
+        "innkeeper"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "fleamAndBleedingBowl",
+      "Name": "Fleam and bleeding bowl",
+      "Enabled": true,
+      "Vocations": [
+        "healer"
+      ],
+      "EmblemWeight": 3
+    },
+    {
+      "Id": "uroscopyFlask",
+      "Name": "Uroscopy flask",
+      "Enabled": true,
+      "Vocations": [
+        "healer"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "mortarAndPestle",
+      "Name": "Mortar and pestle",
+      "Enabled": true,
+      "Vocations": [
+        "healer",
+        "alchemist"
+      ],
+      "EmblemWeight": 3
+    },
+    {
+      "Id": "foldingAlmanac",
+      "Name": "Folding almanac",
+      "Enabled": true,
+      "Vocations": [
+        "healer",
+        "seer"
+      ],
+      "EmblemWeight": 0
+    },
+    {
+      "Id": "cauldron",
+      "Name": "Cauldron",
+      "Enabled": true,
+      "Vocations": [
+        "servant"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "roastingSpit",
+      "Name": "Roasting spit",
+      "Enabled": true,
+      "Vocations": [
+        "servant"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "boxwoodComb",
+      "Name": "Boxwood comb",
+      "Enabled": true,
+      "Vocations": [
+        "servant",
+        "courtesan"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "harp",
+      "Name": "Harp",
+      "Enabled": true,
+      "Vocations": [
+        "entertainer"
+      ],
+      "EmblemWeight": 3
+    },
+    {
+      "Id": "pipeAndTabor",
+      "Name": "Pipe and tabor",
+      "Enabled": true,
+      "Vocations": [
+        "entertainer"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "hurdyGurdy",
+      "Name": "Hurdy-gurdy",
+      "Enabled": true,
+      "Vocations": [
+        "entertainer",
+        "beggar"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "mirrorInAnIvoryCase",
+      "Name": "Mirror in an ivory case",
+      "Enabled": true,
+      "Vocations": [
+        "courtesan"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "pomander",
+      "Name": "Pomander",
+      "Enabled": true,
+      "Vocations": [
+        "courtesan"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "sealMatrix",
+      "Name": "Seal matrix",
+      "Enabled": true,
+      "Vocations": [
+        "noble",
+        "official"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "knightlySword",
+      "Name": "Knightly sword",
+      "Enabled": true,
+      "Vocations": [
+        "noble",
+        "soldier"
+      ],
+      "EmblemWeight": 3
+    },
+    {
+      "Id": "spurs",
+      "Name": "Spurs",
+      "Enabled": true,
+      "Vocations": [
+        "noble"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "maceOfOffice",
+      "Name": "Mace of office",
+      "Enabled": true,
+      "Vocations": [
+        "official"
+      ],
+      "EmblemWeight": 3
+    },
+    {
+      "Id": "billAndPike",
+      "Name": "Bill and pike",
+      "Enabled": true,
+      "Vocations": [
+        "soldier",
+        "guard"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "mailShirt",
+      "Name": "Mail shirt",
+      "Enabled": true,
+      "Vocations": [
+        "soldier"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "halberd",
+      "Name": "Halberd",
+      "Enabled": true,
+      "Vocations": [
+        "soldier",
+        "guard"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "caltrop",
+      "Name": "Caltrop",
+      "Enabled": true,
+      "Vocations": [
+        "soldier",
+        "bandit"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "watchmansHorn",
+      "Name": "Watchman\u0027s horn",
+      "Enabled": true,
+      "Vocations": [
+        "guard"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "hornLantern",
+      "Name": "Horn lantern",
+      "Enabled": true,
+      "Vocations": [
+        "guard"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "fireHook",
+      "Name": "Fire hook",
+      "Enabled": true,
+      "Vocations": [
+        "guard"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "censerAndIncenseBoat",
+      "Name": "Censer and incense boat",
+      "Enabled": true,
+      "Vocations": [
+        "priest"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "chalice",
+      "Name": "Chalice",
+      "Enabled": true,
+      "Vocations": [
+        "priest"
+      ],
+      "EmblemWeight": 3
+    },
+    {
+      "Id": "shamansDrum",
+      "Name": "Shaman\u0027s drum",
+      "Enabled": true,
+      "Vocations": [
+        "priest"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "quillPenAndPenknife",
+      "Name": "Quill pen and penknife",
+      "Enabled": true,
+      "Vocations": [
+        "scribe"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "waxTabletAndStylus",
+      "Name": "Wax tablet and stylus",
+      "Enabled": true,
+      "Vocations": [
+        "scribe",
+        "scholar"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "pricker",
+      "Name": "Pricker",
+      "Enabled": true,
+      "Vocations": [
+        "scribe"
+      ],
+      "EmblemWeight": 0
+    },
+    {
+      "Id": "astrolabe",
+      "Name": "Astrolabe",
+      "Enabled": true,
+      "Vocations": [
+        "scholar",
+        "seer"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "armillarySphere",
+      "Name": "Armillary sphere",
+      "Enabled": true,
+      "Vocations": [
+        "scholar"
+      ],
+      "EmblemWeight": 3
+    },
+    {
+      "Id": "sealsOfWax",
+      "Name": "Seals of wax",
+      "Enabled": true,
+      "Vocations": [
+        "mage"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "bookOfConjurations",
+      "Name": "Book of conjurations",
+      "Enabled": true,
+      "Vocations": [
+        "mage"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "runeStick",
+      "Name": "Rune stick",
+      "Enabled": true,
+      "Vocations": [
+        "mage"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "athanor",
+      "Name": "Athanor",
+      "Enabled": true,
+      "Vocations": [
+        "alchemist"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "shewStone",
+      "Name": "Shew-stone",
+      "Enabled": true,
+      "Vocations": [
+        "seer"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "geomanticInstrument",
+      "Name": "Geomantic instrument",
+      "Enabled": true,
+      "Vocations": [
+        "seer"
+      ],
+      "EmblemWeight": 0
+    },
+    {
+      "Id": "woodenShovel",
+      "Name": "Wooden shovel",
+      "Enabled": true,
+      "Vocations": [
+        "labourer"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "wheelbarrow",
+      "Name": "Wheelbarrow",
+      "Enabled": true,
+      "Vocations": [
+        "labourer"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "lepersClapper",
+      "Name": "Leper\u0027s clapper",
+      "Enabled": true,
+      "Vocations": [
+        "beggar"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "almsBowl",
+      "Name": "Alms bowl",
+      "Enabled": true,
+      "Vocations": [
+        "beggar"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "pilgrimBadge",
+      "Name": "Pilgrim badge",
+      "Enabled": true,
+      "Vocations": [
+        "beggar"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "falseDice",
+      "Name": "False dice",
+      "Enabled": true,
+      "Vocations": [
+        "thief"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "picklock",
+      "Name": "Picklock",
+      "Enabled": true,
+      "Vocations": [
+        "thief"
+      ],
+      "EmblemWeight": 1
+    },
+    {
+      "Id": "bollockDagger",
+      "Name": "Bollock dagger",
+      "Enabled": true,
+      "Vocations": [
+        "thief",
+        "bandit"
+      ],
+      "EmblemWeight": 2
+    },
+    {
+      "Id": "falchion",
+      "Name": "Falchion",
+      "Enabled": true,
+      "Vocations": [
+        "bandit"
+      ],
+      "EmblemWeight": 2
+    }
+  ],
   "Colours": [
     {
       "Id": "white",

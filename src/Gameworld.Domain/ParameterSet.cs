@@ -47,6 +47,9 @@ public sealed record ParameterSet
     [Description("The vocations: the work a person does, in nine sectors. Add a vocation by adding an entry, and switch one on or off with Enabled. The vocations are not drawn for places or persons yet (society §8). A file that gives this list replaces the whole default list.")]
     public IReadOnlyList<VocationParameters> Vocations { get; init; } = VocationParameters.Defaults;
 
+    [Description("The tools: the things the vocations work with. A tool lists the vocations that work with it by id, and its emblem weight says how well it serves as the emblem of a coat of arms. Tools are not drawn yet; the coats of arms of families, guilds and some cities are to take their charges from them (society §8.1). A file that gives this list replaces the whole default list.")]
+    public IReadOnlyList<ToolParameters> Tools { get; init; } = ToolParameters.Defaults;
+
     [Description("The colours: the named colours of cloth, paint and banners. A race lists its favourite colours by id, and a faction gets a main and a secondary colour from the list (society §4.9 and §9.1). Add a colour by adding an entry. A file that gives this list replaces the whole default list.")]
     public IReadOnlyList<ColourParameters> Colours { get; init; } = ColourParameters.Defaults;
 

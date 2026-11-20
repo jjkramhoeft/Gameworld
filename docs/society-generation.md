@@ -9,8 +9,8 @@ the concepts and holds the names, and the names in this document follow the read
 Only the first steps are specified and implemented: the races (section 2), the races of a
 region with their potential population (section 3), the factions of a region (section 4)
 and its name (section 4.10), the races of a city or a town (section 5.1), the cities
-and towns of a region with their persons (section 5.2) and their names (section 5.3). The
-rest of sections 5 to 9 holds
+and towns of a region with their persons (section 5.2) and their names (section 5.3), and
+the tools of the vocations (section 8.1). The rest of sections 5 to 9 holds
 what is decided and what is still open. Detailing it is a later task.
 
 Sections 2 and 3 and Appendix A were section 19 and Appendix E of map-generation.md until
@@ -49,6 +49,7 @@ and the travel network are its inputs.
 | Families | Settled | Not specified (section 6) |
 | Persons | Settled for the important persons, later for the rest | The names are implemented, the rest is not specified (section 7) |
 | Vocations | Planned for the countryside, Settled for the cities and towns | The list is in the Parameter Set. The rules are decided in part and not specified (section 8) |
+| Tools | none: a list in the Parameter Set | Specified (section 8.1): the tools of each vocation and their emblem weights. Nothing draws a tool yet |
 | Looks | not decided | Not specified (section 9) |
 
 ### 1.1 What holds for every step
@@ -1633,6 +1634,75 @@ its races and factions), maps the resources and the biomes to the vocations, pro
 new resources and holds a design note for the generator. Every entry of
 [races-basis.md](races-basis.md) lists the work the race is known for.
 
+### 8.1 Tools
+
+Stage: none, a list in the Parameter Set. Specified and in the Parameter Set since
+2026-11-21. Nothing draws a tool yet.
+
+A tool is a thing a vocation works with: the anvil of the smith, the sickle of the farmer,
+the fleam of the healer. The tools are a list in the Parameter Set, like the vocations, so
+the code knows no tool by name. A tool of this list is not the produced resource group
+Tools of [map-generation.md](map-generation.md) Appendix G.1: the group is the goods a
+place makes and trades, a tool of the list is a kind of thing a person of a vocation holds.
+
+What the tools are for:
+
+- **Emblems.** The coats of arms of families, guilds and some cities are to take their
+  charges from the tools of a vocation, as the guilds of the record bear the tools of their
+  trade: three hammers for the smiths, three fleams for the barbers
+  ([research/heraldry-coat-of-arms-generation.md](research/heraldry-coat-of-arms-generation.md)
+  sections 4.2 and 4.3). A family named for its work, a guild, and a city or a town known for
+  one trade are the bearers in view. The rule of the coats of arms is not specified.
+- **Portraits.** What a person of a vocation holds or wears at work (section 9).
+
+**In the Parameter Set.** The list is `Tools`. A tool holds:
+
+| Value | Meaning |
+|---|---|
+| `Id` | What the generated data knows the tool by, in camelCase. Unique in the list |
+| `Name` | The name shown |
+| `Enabled` | Whether the tool exists in the world. A tool that is off is no tool of any vocation |
+| `Vocations` | The ids of the vocations that work with the tool, the vocation it belongs to most first. At least one, each a vocation of the `Vocations` list |
+| `EmblemWeight` | How well the tool serves as the emblem of its vocations: its weight when an emblem is drawn among the tools of a vocation. 0 means never. Left out means 1 |
+
+The tools of a vocation are the tools that are on and list it, in the order of the list.
+A vocation that is off has no tools. Its emblems are those of its tools with an emblem
+weight above 0. The relation is many to many: the longbow is a tool of the hunter, the
+soldier and the bandit. It lives on the tool, so a new tool touches one record, and a new
+vocation gets its tools by naming it in their `Vocations`.
+
+A Parameter Set with a vocation or a tool without an id, with the same id twice, with a
+tool that lists no vocation or a vocation that is not in the list, or with an emblem weight
+below 0 is refused when the world is created.
+
+**The default list** holds 146 tools, all on: those of [tools-basis.md](tools-basis.md), in
+its order, with its names. The `Vocations` of a tool are its line "Fitting vocations",
+the vocation it stands under first. Every one of the 51 default vocations has at least two
+tools and at least one with an emblem weight above 0.
+
+The emblem weights of the defaults run from 0 to 3. They are the judgement of this
+section and starting values:
+
+| Weight | Meaning | Count | Examples |
+|---|---|---|---|
+| 0 | Cannot be drawn as one plain figure: a building, a pit, a heap, a set of small parts | 19 | Charcoal clamp, tan pits, bloomery furnace, treadwheel crane, kneading trough |
+| 1 | Can be drawn, but does not say its trade at a glance | 59 | Seine net, windlass, awl, tally stick, rune stick |
+| 2 | A plain figure that says its trade | 51 | Heavy plough, cleaver, trowel, potter's wheel, quill pen and penknife |
+| 3 | The sign of its trade, borne as one in the record or as a common charge | 17 | Sickle, bee skep, shepherd's crook, hunting horn, felling axe, miner's iron and hammer, pole axe, anvil, hammers and tongs, coin balance, fleam and bleeding bowl, mortar and pestle, harp, knightly sword, mace of office, chalice, armillary sphere |
+
+Six vocations have no tool above 1: the salter, the charcoal burner, the tanner, the
+jeweller, the artist and the artificer. For two of them the arms of the record show the
+product rather than a tool: the covered salts of the salters, the covered cup of the
+goldsmiths. Products are not a list yet.
+
+Open:
+
+- The rule of the coats of arms, and with it whether a product of a vocation can be an
+  emblem beside its tools.
+- Whether a tool belongs to some vocations more than to others, beyond the first
+  vocation of its list.
+- Whether a race has tools of its own, or a factor per tool as it is to have per vocation.
+
 ---
 
 ## 9. Looks
@@ -1944,7 +2014,8 @@ when it stands in sections 1 to 9.
 | [plans/cities-and-towns.md](plans/cities-and-towns.md) | The plan behind the cities and towns of a region: what a region knows when they are made, the rule, its measurement on 676 regions and what was weighed | Section 5.2 |
 | [research/settlement-siting.md](research/settlement-siting.md) §2.6, §2.7 and §6.7 | The rank-size rule and the urban shares of medieval Europe. A map note: it uses the names of an earlier prototype | Section 5.2 |
 | [research/vocations.md](research/vocations.md) | 51 vocations with their lore, resources, biomes, races and factions, the proposals for new resources, and a design note | Section 8 |
-| [tools-basis.md](tools-basis.md) | 146 real tools for the 51 vocations, each with a sourced description, lore and the fitting vocations. Material: no rule reads it | Sections 8, 9 |
+| [research/heraldry-coat-of-arms-generation.md](research/heraldry-coat-of-arms-generation.md) | How coats of arms could be generated for factions, cities, towns and families: the parts of a coat, its rules, where the charges come from, and a proposal | Sections 4.9, 8.1 |
+| [tools-basis.md](tools-basis.md) | 146 real tools for the 51 vocations, each with a sourced description, lore and the fitting vocations. The default tool list is built from it: its names, its order and its fitting vocations | Sections 8.1, 9 |
 | [research/portrait-components.md](research/portrait-components.md) | Lists of hairstyles, outfits, colours, race markers and accessories for portraits. Written for the 32 races of the first version of races-basis.md and extended for the Catfolk: it still covers the five that were left out | Section 9 |
 | [NameGenerator-Reuse.md](NameGenerator-Reuse.md) | The person-name generator, ported from an earlier project | Section 7 |
 | [city-and-town-names.md](city-and-town-names.md) | 50 invented city and town names for each of the 28 default races, with what the names of each race are built from. Material: no rule reads it, and the word lists of section 5.3 are built from its notes | Section 5.3 |

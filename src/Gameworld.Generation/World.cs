@@ -8,6 +8,7 @@ using Gameworld.Generation.Races;
 using Gameworld.Generation.Settlements;
 using Gameworld.Generation.Stages;
 using Gameworld.Generation.Travel;
+using Gameworld.Generation.Vocations;
 
 namespace Gameworld.Generation;
 
@@ -45,6 +46,7 @@ public sealed class World
         SettlementNameRules = new SettlementNameRules(foundation.Parameters, foundation.Seed.Value);
         SettlementRules = new SettlementRules(foundation.Parameters, PopulationRules);
         FloraFaunaRules = new FloraFaunaRules(foundation.Parameters);
+        VocationRules = new VocationRules(foundation.Parameters);
         RiverBeds = new RiverBeds(this);
     }
 
@@ -63,6 +65,7 @@ public sealed class World
     public SettlementNameRules SettlementNameRules { get; }
     public SettlementRules SettlementRules { get; }
     public FloraFaunaRules FloraFaunaRules { get; }
+    public VocationRules VocationRules { get; }
 
     /// <summary>
     /// The river bed profiles of the height maps (map-generation.md section 12.2), cached per

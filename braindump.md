@@ -63,6 +63,3 @@ How Could it be generated in the Worldgame for fractions (Guild, Kingdoms, famil
 ## Zone landscape features
 ## Race Symbols
 
-
-add Generator section to readme
-Name generator evaluater

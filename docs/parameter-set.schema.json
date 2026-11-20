@@ -2566,6 +2566,48 @@
         "additionalProperties": false
       }
     },
+    "Tools": {
+      "description": "The tools: the things the vocations work with. A tool lists the vocations that work with it by id, and its emblem weight says how well it serves as the emblem of a coat of arms. Tools are not drawn yet; the coats of arms of families, guilds and some cities are to take their charges from them (society §8.1). A file that gives this list replaces the whole default list.",
+      "type": "array",
+      "items": {
+        "description": "A tool: a thing a vocation works with, and the vocations that work with it. Tools are not drawn yet; they are meant for the coats of arms of families, guilds and some cities (society §8.1).",
+        "type": "object",
+        "properties": {
+          "Id": {
+            "description": "The id the generated data knows the tool by, in camelCase like heavyPlough. Unique in the list; keep it when the name changes.",
+            "type": "string"
+          },
+          "Name": {
+            "description": "The name shown for the tool.",
+            "type": "string"
+          },
+          "Enabled": {
+            "description": "Whether the tool exists in the world. A tool that is off is no tool of any vocation.",
+            "type": "boolean"
+          },
+          "Vocations": {
+            "description": "The ids of the vocations that work with the tool, the vocation it belongs to most first. Every id must be a vocation of the Vocations list, and a tool lists at least one (society §8.1).",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "EmblemWeight": {
+            "description": "How well the tool serves as the emblem of its vocations on a coat of arms, a banner or a sign: the weight it has when an emblem is drawn among the tools of a vocation. 0 means never: a tool that cannot be drawn as one plain figure, such as a kiln or a pit. The defaults run from 0 to 3, and 3 is the tool that is the sign of its trade, such as the anvil of the smith (society §8.1).",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 10
+          }
+        },
+        "required": [
+          "Id",
+          "Name",
+          "Enabled",
+          "Vocations"
+        ],
+        "additionalProperties": false
+      }
+    },
     "Colours": {
       "description": "The colours: the named colours of cloth, paint and banners. A race lists its favourite colours by id, and a faction gets a main and a secondary colour from the list (society §4.9 and §9.1). Add a colour by adding an entry. A file that gives this list replaces the whole default list.",
       "type": "array",
