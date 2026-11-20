@@ -140,6 +140,12 @@ public static partial class MapRenderer
         if (layers.Borders) DrawBorders(canvas, view, cells, info, bw, margin);
 
         // Rivers of a landlocked region can cross its neighbours, so look one ring further.
+        // Travel needs the same ring: a link is drawn from the region that decides it, and its
+        // route can run anywhere on that region's 3 × 3 raster. This is exact, not cheap: the
+        // regions in view include those whose warped land just reaches the view, so a 3 × 3 view
+        // settles about 45 regions, and their neighbours must be Planned. A square-based set
+        // (25) was measured on 2026-11-21 and drops roads that do reach the view on some seeds
+        // (and would cut roads at tile seams in the demo), so it was not taken.
         var around = new HashSet<GridCoord>();
         foreach (var r in regionsInView)
             for (var dj = -1; dj <= 1; dj++)
