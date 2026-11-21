@@ -36,7 +36,7 @@ herring, hval whale, kobbe seal, orm serpent), a founder (Kolbrand, Rognvald, Ke
 or a trade (tjar tar, knarr cargo ship, skip ship, thing assembly, rune).
 
 | 1-10 | 11-20 | 21-30 | 31-40 | 41-50 |
-|---|---|---|---|---|
+| ---- | ----- | ----- | ----- | ----- |
 | Hrafnvik | Ormsey | Varghamn | Skipsnaust | Fellstrond |
 | Skarvholm | Kjolgard | Kobbsvag | Bjarnheim | Stormvik |
 | Sildanes | Ringstav | Runestav | Gyllvik | Valsheim |
@@ -58,7 +58,7 @@ castle, the mill, the heavy plough and its oxen, the fallow year, the guild gate
 market cross.
 
 | 1-10 | 11-20 | 21-30 | 31-40 | 41-50 |
-|---|---|---|---|---|
+| ---- | ----- | ----- | ----- | ----- |
 | Aldermont | Brennwick | Thornbourg | Rookhallow | Mossingham |
 | Castel Varenne | Haverbridge | Halbrechtsau | Norvenne | Torrevelle |
 | Pontaubrey | Corvenna | Vintry Cross | Westry Abbey | Wainscourt |
@@ -80,7 +80,7 @@ fort, sabkhet salt flat, Abu Milha "father of salt", and the Ti-, Ta- and -t of 
 tongue. The highlanders name their rock temples with debre, "mount".
 
 | 1-10 | 11-20 | 21-30 | 31-40 | 41-50 |
-|---|---|---|---|---|
+| ---- | ----- | ----- | ----- | ----- |
 | Qasr Ilmeddin | Ksar Meddoul | Zanafra | Wadi Sefra | Sabkhet Imi |
 | Tin Azawat | Timellouine | Ain Melloul | Ilm Hadar | Tilemsour |
 | Bir Sallah | Debre Ashenti | Imenazren | Bir Annouz | Ouallezaq |
@@ -103,7 +103,7 @@ and praise of the lore: Ile-Irinmo (irin, iron), Iluwura (wura, gold), Ngombezi 
 cattle), Djelikoro (djeli, praise-singer).
 
 | 1-10 | 11-20 | 21-30 | 31-40 | 41-50 |
-|---|---|---|---|---|
+| ---- | ----- | ----- | ----- | ----- |
 | Ile-Odunmare | Ile-Irinmo | Matandeka | Saraboso | Mazangwe |
 | Kumbaradu | Kaduferi | Akwarafo | Okwerebe | Kirikoro |
 | Asankro | Wangarafo | Tumbale | Dagonsari | Ndaru |
@@ -127,7 +127,7 @@ thousand. Ortoo Bulag is a post-relay spring, and Khuraltai an assembly ground. 
 spelling drops the umlauts of the tongue it borrows from.
 
 | 1-10 | 11-20 | 21-30 | 31-40 | 41-50 |
-|---|---|---|---|---|
+| ---- | ----- | ----- | ----- | ----- |
 | Khar Ordu | Kara Yurtu | Mingghan Khot | Uurga Tolgoi | Morin Khot |
 | Tsagaan Balgas | Onggot | Baga Khural | Khadan Bulag | Davaan Bulag |
 | Ulaan Khoton | Burgud Khad | Tolgoit | Elsen Khoshuu | Gurvan Khoshuu |
@@ -151,7 +151,7 @@ Chaturangam (the game of kings), Yugavartam "the turning of the ages", Muktigarh
 release".
 
 | 1-10 | 11-20 | 21-30 | 31-40 | 41-50 |
-|---|---|---|---|---|
+| ---- | ----- | ----- | ----- | ----- |
 | Jaladharapura | Gajasthali | Jalaramba | Vijayasetu | Sahasravapi |
 | Varshakulam | Padmatirtha | Hemasetu | Mallikavanam | Kanakaneri |
 | Meghavati | Kalyanpattu | Annakoshta | Tungapura | Matsyapattinam |
@@ -176,7 +176,7 @@ the wait for the throne (Tianmingzhen "mandate of heaven town", Dailongcheng "ci
 awaits the dragon").
 
 | 1-10 | 11-20 | 21-30 | 31-40 | 41-50 |
-|---|---|---|---|---|
+| ---- | ----- | ----- | ----- | ----- |
 | Shuiding | Zhishui | Longtangkou | Shuyuanzhen | Gongyuanfu |
 | Yuanqiao | Fengdao | Zhibao | Taoxi | Lingcao |
 | Jinbacheng | Yingtang | Ciyaozhen | Xiangdi | Yudao |
@@ -198,7 +198,7 @@ Ysmiriel "hall of leaves". A grown hall takes two centuries to finish, and its n
 chosen when the first seed goes in.
 
 | 1-10 | 11-20 | 21-30 | 31-40 | 41-50 |
-|---|---|---|---|---|
+| ---- | ----- | ----- | ----- | ----- |
 | Aelvanith | Thalvesse | Yssareth | Eswinor | Amarvael |
 | Sorquenna | Silvaresse | Mirvallon | Taelmirren | Thiselquen |
 | Lirethel | Merethquen | Thenquessa | Sennrathel | Ylvaneth |
@@ -220,7 +220,7 @@ compound about the hold's craft, its records and its stores: Sevengrain Gate, Le
 Oathplate, Ironcistern, Silverbore, and Hungergate after the Hungry Gate.
 
 | 1-10 | 11-20 | 21-30 | 31-40 | 41-50 |
-|---|---|---|---|---|
+| ---- | ----- | ----- | ----- | ----- |
 | Durmagrund | Vorgrim Deep | Orrumdeep | Oathplate | Brekkarum |
 | Brambhold | Torbuk | Brazgrund | Bruddenhold | Ulgrind |
 | Thol Varrak | Grindelhold | Feldrak | Kharruk | Gravenhold |
@@ -242,7 +242,7 @@ six a day) and Sevencellars (the seven years in the cellar). Some are inns and l
 the barge rivers: Bargeby, Barleyhythe, Reeve's Rest.
 
 | 1-10 | 11-20 | 21-30 | 31-40 | 41-50 |
-|---|---|---|---|---|
+| ---- | ----- | ----- | ----- | ----- |
 | Applecote | Hedgecorner | Hamhock | Meadhollow | Cloverhythe |
 | Cidersett | Mossbank | Quincefold | Wickerwell | Pigwhistle |
 | Butterbottom | Plumtree Moot | Brambleside | Dumpling Green | Gingerbrook |
@@ -265,7 +265,7 @@ such as Bobbinwick-under-Oak belongs to an old warren whose name has been added 
 centuries.
 
 | 1-10 | 11-20 | 21-30 | 31-40 | 41-50 |
-|---|---|---|---|---|
+| ---- | ----- | ----- | ----- | ----- |
 | Cogglewarren | Gimbalgate | Wimbleworth | Millimere | Tockmire |
 | Lensholme | Tumblers' Burrow | Quibble Hollow | Burrinbeck | Assaybrook |
 | Gearwhistle | Great Escapement | Spindlecrook | Thimblerigg | Filigreen |
@@ -287,7 +287,7 @@ Burzag), or plain names of a hard land: Bonepit, Vulture Hill, Sinew Ford, Leanf
 the Lean Feast, and Bragga's Hearth after a hearth-mother.
 
 | 1-10 | 11-20 | 21-30 | 31-40 | 41-50 |
-|---|---|---|---|---|
+| ---- | ----- | ----- | ----- | ----- |
 | Gharrak | Mukhra | Zhagmar | Blackstandard | Hearthmother's Ring |
 | Castra Uzgul | Gorrash Gate | Durbag | Throkhold | Skarrash |
 | Ninth Standard | Legio Thrask | Hidemarch | Bragga's Hearth | Twelfth Wall |
@@ -309,7 +309,7 @@ resting heart), Long Lying, Seal Breath, Moonwake (they wake once each moon), Fi
 Mother's Floe, Burning's Edge.
 
 | 1-10 | 11-20 | 21-30 | 31-40 | 41-50 |
-|---|---|---|---|---|
+| ---- | ----- | ----- | ----- | ----- |
 | Hoolvaskaan | Teelvasoon | Veeskahuul | Twentybeats | First Mother's Floe |
 | Saameresk | Huulmekaa | Oomalvaan | Coldtable | Sealwait |
 | Vuulnaham | Vaaskonuum | Suunvaleek | Long Lying | Ivory Narrows |
@@ -330,7 +330,7 @@ Hearthless, since the people are the hearth. Some are pass stations kept for a k
 paid in grain: Kindlepass, Thawpass, Avalanche Watch, Grainpact.
 
 | 1-10 | 11-20 | 21-30 | 31-40 | 41-50 |
-|---|---|---|---|---|
+| ---- | ----- | ----- | ----- | ----- |
 | Emberhall | Feastmere | Mealridge | Rationgate | Feastingstone |
 | Lastcoal | Coppercheek | Fevercrag | Brazenhorn | Wakefire |
 | Warmspring | Coalbreath | Bankedcoal | Steamfell | Coalcradle |
@@ -352,7 +352,7 @@ three days out, or Riderspeck. No name speaks of walls, woods or shade except to
 out: Fencefree, Open Sky.
 
 | 1-10 | 11-20 | 21-30 | 31-40 | 41-50 |
-|---|---|---|---|---|
+| ---- | ----- | ----- | ----- | ----- |
 | Farsight Mound | Stripeloom | Unsurprised | Fourwinds Rise | Sunsignal |
 | Highseat | Openrange | Windgrass | Earthring | Stillgrass |
 | Allround | Kestrel Rise | Longlook | Slitwindow | Sentrymound |
@@ -373,7 +373,7 @@ the compact and the wars: Thirtywinters, Mastless, Untapped, Neverbled, Loggers'
 Their fear of fire shows in Firewatch Hollow, Coldstove and Emberless.
 
 | 1-10 | 11-20 | 21-30 | 31-40 | 41-50 |
-|---|---|---|---|---|
+| ---- | ----- | ----- | ----- | ----- |
 | Resinholm | Larchkeep | Woundseal | Shadeholm | Tallgrove |
 | Burlface | Stillroot | Facebark | Hollowbole | Drip Hollow |
 | Amberstand | Goldenseep | Compact Grove | Gumhollow | Rootmoot |
@@ -395,7 +395,7 @@ when the salt is drawn. Onestorey and Seated Barrows keep the law of the bed: bu
 bury the dead sitting.
 
 | 1-10 | 11-20 | 21-30 | 31-40 | 41-50 |
-|---|---|---|---|---|
+| ---- | ----- | ----- | ----- | ----- |
 | Dryharbour | Sodaglass | Lastwave | Shallowmere | Bedkeepers |
 | Saltcake | Lowshore | Saltdish | Saltpurse | Pearlflat |
 | Whitepan | Waitwater | Brinestrand | Driedsea | Brackwater |
@@ -416,7 +416,7 @@ Silent Eye, and Blindnoon is the dazzle of full day. The Ashen Years, which they
 fondly and do not say so, are Kindtime.
 
 | 1-10 | 11-20 | 21-30 | 31-40 | 41-50 |
-|---|---|---|---|---|
+| ---- | ----- | ----- | ----- | ----- |
 | Duskwall | Cellarcliff | Kilnshadow | Afterdusk | Vowstone |
 | Coolseep | Thickwall | Starsand | Hollowrock | Stillpulse |
 | Canyondeep | Twostone | Dimnoon | Duskvault | Redrock Shelf |
@@ -437,7 +437,7 @@ know only by report. Some names recall the estates they walked off: Freewalk, Ma
 Brokenchain.
 
 | 1-10 | 11-20 | 21-30 | 31-40 | 41-50 |
-|---|---|---|---|---|
+| ---- | ----- | ----- | ----- | ----- |
 | Noonyard | Freewalk | Overhead | Waterbowl | Sunward |
 | Highsun | Noonmoot | Shadowless | Graingift | Smoothbrow |
 | Sunfed | Sunbowl | Starwish | Heatshimmer | Guardpact |
@@ -458,7 +458,7 @@ Pastviolet name the colour no one else can see, and Floor-Year and Rootmarket th
 below.
 
 | 1-10 | 11-20 | 21-30 | 31-40 | 41-50 |
-|---|---|---|---|---|
+| ---- | ----- | ----- | ----- | ----- |
 | Highfork | Treemap | Sunbreak | Shootfeast | Featherhue |
 | Vinebridge | Lianahold | Longreach | Eggbough | Upperwind |
 | Ropeway | Ripewatch | Highroad | Wovenroof | Leafhall |
@@ -478,7 +478,7 @@ wrecks give the rest. Several names boast of standing on no ground: Noground, Lo
 Untaxed. Longbreath and Quarterhour recall the held breath that settles a dispute.
 
 | 1-10 | 11-20 | 21-30 | 31-40 | 41-50 |
-|---|---|---|---|---|
+| ---- | ----- | ----- | ----- | ----- |
 | Lowwater | Driftfleet | Coralgate | Shellwalk | Cowriestilts |
 | Stiltholm | Shoalmark | Deepdive | Quarterhour | Seawet |
 | Pearlrow | Spongecove | Barrelbrine | Rafttown | Nacre |
@@ -500,7 +500,7 @@ generation of the Ashen Years, and the vines and olives the province they were m
 refill.
 
 | 1-10 | 11-20 | 21-30 | 31-40 | 41-50 |
-|---|---|---|---|---|
+| ---- | ----- | ----- | ----- | ----- |
 | Quickvine | Sevenyear | Brightday | Nowhill | Breathless |
 | Ringtower | Hurry | Jigstep | Flicker | Whirl |
 | Thirtyyear | Dash | Twoshift | Dayspent | Morrowless |
@@ -521,7 +521,7 @@ Lukewarm, Roundcorner) and of the surgeon's craft (Lancet, Stitchwell, Splintfor
 Cautery). The split over the oath names two towns: Oathkept and Freecamp.
 
 | 1-10 | 11-20 | 21-30 | 31-40 | 41-50 |
-|---|---|---|---|---|
+| ---- | ----- | ----- | ----- | ----- |
 | Lookover | Silvereye | Frostcount | Stitchwell | Gauzeholm |
 | Twosworn | Linehold | Footcheck | Captain's Holding | Shieldwall |
 | Marshal's Field | Dusklog | Cohort Hill | Firstpair | Marchbreak |
@@ -542,7 +542,7 @@ Sealglass, Ledgerlight, and Bellrung, for the bell that rings when a lamp goes d
 Mothersbead and Threevalleys recall the first lamp.
 
 | 1-10 | 11-20 | 21-30 | 31-40 | 41-50 |
-|---|---|---|---|---|
+| ---- | ----- | ----- | ----- | ----- |
 | Glowcap | Glimmerwood | Wormlight | Glassrack | Pearlvein |
 | Vialhall | Beadlight | Lantern Hollow | Lightkeep | Ledgerlight |
 | Deepglow | Underbough | Neverdark | Wanlight | Shine-at-Need |
@@ -564,7 +564,7 @@ rest: Stillhollow, Windless, Unmasked, Facewood. Silence's End and Cindermemory 
 Silence.
 
 | 1-10 | 11-20 | 21-30 | 31-40 | 41-50 |
-|---|---|---|---|---|
+| ---- | ----- | ----- | ----- | ----- |
 | Stillhollow | Fernsmell | Barkscent | Earthsmell | Perfumehall |
 | Pine and Rain | Morningpost | Wet Stone After Rain | Ninescent | Elderbloom |
 | Windless | Silence's End | Facewood | Calm Hollow | Underwind |
@@ -585,7 +585,7 @@ Turninghouse, Goldthroat and Indigo Hall (the two colours of the throat patch),
 Stayingfield, Goingroad, Chainhouse, Twofaces, Bothways.
 
 | 1-10 | 11-20 | 21-30 | 31-40 | 41-50 |
-|---|---|---|---|---|
+| ---- | ----- | ----- | ----- | ----- |
 | Elanale | Otanato | Pavitivap | Turninghouse | Bothways |
 | Tirarit | Imeremi | Oludulo | Goldthroat | Facetoface |
 | Nalilan | Lunabanul | Atinita | Indigo Hall | Strangers' Door |
@@ -606,7 +606,7 @@ the mottled skin give the rest: Cleanglove, Mixing Pool, Drop-a-Day, Bluethroat,
 Yellowmottle.
 
 | 1-10 | 11-20 | 21-30 | 31-40 | 41-50 |
-|---|---|---|---|---|
+| ---- | ----- | ----- | ----- | ----- |
 | Bitterfen | Nightshade Stilts | Puffer Lagoon | Sourmarsh | Miasma |
 | Glovesford | Bluethroat | Arrowdew | Deadgnat | Kissless |
 | Venomwell | Yellowmottle | Sleepdraught | Rashbank | Firstsip |
@@ -627,7 +627,7 @@ Rushfifty, Ambush Rock. Duskmoot, Huntress Hill and First Litter recall the Dusk
 the Small Huntress and the first children with her ears.
 
 | 1-10 | 11-20 | 21-30 | 31-40 | 41-50 |
-|---|---|---|---|---|
+| ---- | ----- | ----- | ----- | ----- |
 | Mousewall | First Litter | Grainguard | Copper Eye | Gingerpelt |
 | Granaryward | Rushfifty | Ledgeholm | Earturn | Smoke and Cream |
 | Duskmoot | Tawny Grass | Pawford | Tallreed | Litterhold |
