@@ -62,6 +62,9 @@ public sealed record ParameterSet
     [Description("The resources: the name, the description and the lore of each of the 27 generated resources and of their variants (§14 and Appendix G.3). The list only holds texts: which resource and which variant a patch gets is decided by the resource rules, and a resource or a variant that is left out has no texts. A file that gives this list replaces the whole default list.")]
     public IReadOnlyList<ResourceParameters> Resources { get; init; } = ResourceParameters.Defaults;
 
+    [Description("The biomes: the name, the description and the lore of each biome (§13). The list only holds texts: which biome a patch gets is decided by the biome rules, and a biome that is left out has no texts. A file that gives this list replaces the whole default list.")]
+    public IReadOnlyList<BiomeTextParameters> Biomes { get; init; } = BiomeTextParameters.Defaults;
+
     public static ParameterSet Default => new();
 
     internal static readonly JsonSerializerOptions JsonOptions = new()

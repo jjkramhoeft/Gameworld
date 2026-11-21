@@ -51,8 +51,8 @@ public sealed partial record VocationParameters(
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool OnWater { get; init; }
 
-    [Description("The names of the variants of the vocation: the smaller trades it covers, such as the shepherd of the herder and the armourer of the smith (society §8).")]
-    public IReadOnlyList<string> Variants { get; init; } = [];
+    [Description("The variants of the vocation: the smaller trades it covers, such as the shepherd of the herder and the armourer of the smith, each with a name, a description and a lore (society §8).")]
+    public IReadOnlyList<VocationVariantParameters> Variants { get; init; } = [];
 
     [Description("What the vocation is: the work a person of it does (society §8). A picture of it is drawn from this text, so an invented one needs it to look the same every time. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.")]
     public string Description { get; init; } = DefaultTexts.Missing;
@@ -68,9 +68,25 @@ public sealed partial record VocationParameters(
         {
             SharePercent = sharePercent,
             OnWater = onWater,
-            Variants = variants,
+            Variants = variants.Select(v =>
+            {
+                var text = DefaultTexts.Of(DefaultTexts.VocationVariants, id + "/" + v);
+                return new VocationVariantParameters(v) { Description = text.Description, Lore = text.Lore };
+            }).ToArray(),
             Description = description,
             Lore = lore,
         };
     }
+}
+
+/// <summary>A variant of a vocation: a smaller trade it covers.</summary>
+[Description("A variant of a vocation: a smaller trade it covers (society §8).")]
+public sealed record VocationVariantParameters(
+    [property: Description("The name of the variant, such as shepherd. Unique among the variants of its vocation.")] string Name)
+{
+    [Description("What the variant is: the work a person of it does, and what tells that person apart from the others of the vocation. A picture of it is drawn from this text. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.")]
+    public string Description { get; init; } = DefaultTexts.Missing;
+
+    [Description("The lore of the variant: its standing, its customs and its quarrels. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.")]
+    public string Lore { get; init; } = DefaultTexts.Missing;
 }

@@ -46,7 +46,7 @@ public class FloraFaunaTests
         Assert.Equal(Enum.GetValues<VocationSector>(), p.Vocations.Select(v => v.Sector).Distinct());
         Assert.Equal(100, p.Vocations.Sum(v => v.SharePercent), 9);
         Assert.Equal(["shipwright", "sailor"], p.Vocations.Where(v => v.OnWater).Select(v => v.Id));
-        Assert.Contains("armourer", p.Vocations.Single(v => v.Id == "smith").Variants);
+        Assert.Contains("armourer", p.Vocations.Single(v => v.Id == "smith").Variants.Select(v => v.Name));
         Assert.Equal(SettlementTier.Capital, p.Vocations.Single(v => v.Id == "mage").LowestTier);
     }
 

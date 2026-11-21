@@ -1751,15 +1751,51 @@
       "LowestTier": "Countryside",
       "SharePercent": 35,
       "Variants": [
-        "ploughman",
-        "peasant",
-        "free farmer",
-        "tenant",
-        "share-cropper",
-        "paddy farmer",
-        "rice farmer",
-        "millet farmer",
-        "yam farmer"
+        {
+          "Name": "ploughman",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "peasant",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "free farmer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "tenant",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "share-cropper",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "paddy farmer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "rice farmer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "millet farmer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "yam farmer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Works arable land: ploughs, sows, weeds, reaps and threshes, and keeps a few animals and a garden beside it. Most farmers feed their own house first and owe the rest to a lord, a temple or the market.",
       "Lore": "The common estate, the measure against which every other standing is set. Bound by custom more than by law: the days owed on the lord's land, the common field, the village assembly. Harvest and sowing rule the year and its feasts. The conflicts are with the lord over dues, with the herder over trampled crops, with the miller over his toll. Fantasy twists: a people that will not plough (the Catfolk), a people that works only by day (the Noonfolk), land whose yield a seer blesses."
@@ -1772,20 +1808,76 @@
       "LowestTier": "Countryside",
       "SharePercent": 3,
       "Variants": [
-        "orchard keeper",
-        "vine dresser",
-        "olive grower",
-        "date gardener",
-        "spice grower",
-        "tea grower",
-        "coffee grower",
-        "tobacco grower",
-        "dye-plant grower",
-        "silk grower",
-        "beekeeper",
-        "mushroom grower",
-        "seedsman",
-        "grafter"
+        {
+          "Name": "orchard keeper",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "vine dresser",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "olive grower",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "date gardener",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "spice grower",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "tea grower",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "coffee grower",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "tobacco grower",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "dye-plant grower",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "silk grower",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "beekeeper",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "mushroom grower",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "seedsman",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "grafter",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Tends trees, vines and gardens: crops that stand for years or need daily care, and that are sold more than eaten at home.",
       "Lore": "Patient work with a long horizon: an olive tree outlives its planter. Orchards and vineyards are wealth that an army can destroy in a day, so gardeners favour peace and strong walls. The luxury crops are regional secrets, guarded by a town or a lineage. Fantasy twists: a grove that only one people can tend, a poison garden, a spice whose source is kept off every map."
@@ -1798,18 +1890,66 @@
       "LowestTier": "Countryside",
       "SharePercent": 8,
       "Variants": [
-        "shepherd",
-        "cowherd",
-        "swineherd",
-        "goatherd",
-        "reindeer herder",
-        "yak herder",
-        "nomad herder",
-        "dairymaid",
-        "cheesemaker",
-        "horse breeder",
-        "horse breaker",
-        "camel breeder"
+        {
+          "Name": "shepherd",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "cowherd",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "swineherd",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "goatherd",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "reindeer herder",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "yak herder",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "nomad herder",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "dairymaid",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "cheesemaker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "horse breeder",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "horse breaker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "camel breeder",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Keeps animals on pasture and moves with them: guards, breeds, milks, shears and drives to market.",
       "Lore": "Lives apart from the village for much of the year, on the summer pasture or the open range, and is thought half wild for it. Wealth is counted in heads. Whole peoples are herders and scorn the plough. The conflicts are over grazing rights, wells, rustling and winter fodder. Fantasy twists: herds of beasts no farmer could keep, mounts bred for one clan only."
@@ -1822,18 +1962,66 @@
       "LowestTier": "Countryside",
       "SharePercent": 2,
       "Variants": [
-        "sea fisher",
-        "river fisher",
-        "eel trapper",
-        "shellfish gatherer",
-        "crab catcher",
-        "shrimp catcher",
-        "whaler",
-        "sealer",
-        "pearl diver",
-        "sponge diver",
-        "coral diver",
-        "fish drier"
+        {
+          "Name": "sea fisher",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "river fisher",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "eel trapper",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "shellfish gatherer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "crab catcher",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "shrimp catcher",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "whaler",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "sealer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "pearl diver",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "sponge diver",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "coral diver",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "fish drier",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Takes food and goods from water: with net, line, trap and spear, from a boat or the shore, and by diving.",
       "Lore": "A hard and uncertain living with its own saints and taboos: words not said at sea, days on which no boat goes out. The catch spoils in a day, so the fisher depends on the salter and the fishmonger. Fishing villages are poor, close and suspicious of the land. Fantasy twists: a people that dives where others drown, things in the net that should not be."
@@ -1846,17 +2034,61 @@
       "LowestTier": "Countryside",
       "SharePercent": 1,
       "Variants": [
-        "hunter",
-        "trapper",
-        "fowler",
-        "falconer",
-        "forager",
-        "honey hunter",
-        "tracker",
-        "guide",
-        "scout",
-        "ratcatcher",
-        "monster hunter"
+        {
+          "Name": "hunter",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "trapper",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "fowler",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "falconer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "forager",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "honey hunter",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "tracker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "guide",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "scout",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "ratcatcher",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "monster hunter",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Lives from the wild land: hunts, traps, gathers, and knows the way through it.",
       "Lore": "Free where the game is free, a poacher where the lord has claimed it. Hunting is the sport of nobles and the bread of the poor, and the two meet in the courts. The hunter is the one who knows the pass, the ford and the safe spring, and is hired for that knowledge by caravans and armies. Fantasy twists: prey that hunts back, a guild that takes contracts on beasts, a people that tracks by scent."
@@ -1869,14 +2101,46 @@
       "LowestTier": "Countryside",
       "SharePercent": 1.5,
       "Variants": [
-        "woodcutter",
-        "lumberjack",
-        "sawyer",
-        "forest warden",
-        "grove warden",
-        "resin tapper",
-        "tree shaper",
-        "firewood seller"
+        {
+          "Name": "woodcutter",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "lumberjack",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "sawyer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "forest warden",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "grove warden",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "resin tapper",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "tree shaper",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "firewood seller",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Fells, hauls and saws timber, cuts firewood, and keeps the wood: plants, coppices and guards it.",
       "Lore": "Two faces. The woodcutter is a poor man with an axe. The forester is the lord's officer who fines him. Forest law is hated law. Old woods have their own rules about which tree may fall. Fantasy twists: woods with a will, elder trees worth a ship each, peoples who judge every felling."
@@ -1889,13 +2153,41 @@
       "LowestTier": "Countryside",
       "SharePercent": 0.7,
       "Variants": [
-        "ore miner",
-        "prospector",
-        "gold washer",
-        "tin streamer",
-        "coal miner",
-        "gem miner",
-        "crystal miner"
+        {
+          "Name": "ore miner",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "prospector",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "gold washer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "tin streamer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "coal miner",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "gem miner",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "crystal miner",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Wins ore, coal and gems from the ground: digs pits and shafts, washes river gravel, follows a vein.",
       "Lore": "Dangerous work, and free where it is rare: miners held their own courts and laws in many lands. A strike makes a town in a year and an empty one in ten. Miners are clannish and proud and carry tales of what knocks in the dark. Fantasy twists: the dwarven hold, things dug up that should have stayed, ore that only one people can smelt."
@@ -1908,13 +2200,41 @@
       "LowestTier": "Countryside",
       "SharePercent": 0.4,
       "Variants": [
-        "quarrier",
-        "stonecutter",
-        "slate splitter",
-        "millstone cutter",
-        "sand digger",
-        "gravel digger",
-        "clay digger"
+        {
+          "Name": "quarrier",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "stonecutter",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "slate splitter",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "millstone cutter",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "sand digger",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "gravel digger",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "clay digger",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Breaks, splits and dresses stone in an open quarry, and digs sand, gravel and clay.",
       "Lore": "Heavy, dusty work for the strong and the unfree: quarries are where convicts and captives are sent. A good quarry is known by name, and a cathedral may be built from one hill. Fantasy twists: stone that holds a charm, quarries worked by giants or by the dead."
@@ -1927,12 +2247,36 @@
       "LowestTier": "Countryside",
       "SharePercent": 0.2,
       "Variants": [
-        "salt boiler",
-        "pan master",
-        "salt raker",
-        "rock-salt miner",
-        "brine worker",
-        "soda burner"
+        {
+          "Name": "salt boiler",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "pan master",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "salt raker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "rock-salt miner",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "brine worker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "soda burner",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Makes salt: boils brine, rakes sea salt from pans, cuts rock salt.",
       "Lore": "Salt is the one thing every house must buy, so rulers tax it and smugglers run it. A salt town is rich, hot and bare, since the pans eat the woods around it. Oaths are sworn on salt. Fantasy twists: a people with salt in the blood, salts that keep the dead from rising."
@@ -1945,12 +2289,36 @@
       "LowestTier": "Countryside",
       "SharePercent": 1,
       "Variants": [
-        "water miller",
-        "windmill keeper",
-        "horse-mill keeper",
-        "oil presser",
-        "fuller",
-        "sawyer"
+        {
+          "Name": "water miller",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "windmill keeper",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "horse-mill keeper",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "oil presser",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "fuller",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "sawyer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Runs a mill: grinds grain to flour and meal, presses oil, and takes a share of what he grinds as toll.",
       "Lore": "Holds the lord's monopoly, since tenants must grind at the lord's mill, and is suspected by all of a heavy thumb on the scale. The mill stands apart, by the water, and draws tales. The miller is the richest commoner of a village and the least loved. Fantasy twists: a mill that grinds at night for other customers."
@@ -1963,12 +2331,36 @@
       "LowestTier": "Town",
       "SharePercent": 0.6,
       "Variants": [
-        "baker",
-        "keeper of the common oven",
-        "pastry cook",
-        "pie maker",
-        "cook",
-        "cookshop keeper"
+        {
+          "Name": "baker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "keeper of the common oven",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "pastry cook",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "pie maker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "cook",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "cookshop keeper",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Turns flour into bread and other cooked food for sale, and bakes the dough that households bring to the common oven.",
       "Lore": "The most watched trade in a town. The weight and price of the loaf are fixed by law, and a baker who cheats is paraded with the loaf round his neck. Up before dawn. Bread riots start at the baker's door."
@@ -1981,13 +2373,41 @@
       "LowestTier": "Countryside",
       "SharePercent": 1.2,
       "Variants": [
-        "brewer",
-        "alewife",
-        "maltster",
-        "wine maker",
-        "cider maker",
-        "mead maker",
-        "distiller"
+        {
+          "Name": "brewer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "alewife",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "maltster",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "wine maker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "cider maker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "mead maker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "distiller",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Makes drink: malts and brews ale and beer, presses and ferments wine and cider, makes mead.",
       "Lore": "In the country brewing is women's by-work in every second house, and the ale-stake over the door is the first inn. In towns it becomes a trade, and in monasteries an art. Drink is safer than water and is wages, medicine and sacrament. Fantasy twists: dwarven beer, halfling cider, a vintage that remembers."
@@ -2000,16 +2420,56 @@
       "LowestTier": "Town",
       "SharePercent": 0.5,
       "Variants": [
-        "butcher",
-        "slaughterer",
-        "poulterer",
-        "tripe seller",
-        "fishmonger",
-        "fish salter",
-        "pickler",
-        "renderer",
-        "tallow chandler",
-        "soap boiler"
+        {
+          "Name": "butcher",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "slaughterer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "poulterer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "tripe seller",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "fishmonger",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "fish salter",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "pickler",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "renderer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "tallow chandler",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "soap boiler",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Slaughters and cuts up animals and sells the meat, and deals with all that an animal or a fish leaves: salts and smokes it, renders the fat.",
       "Lore": "A rich and rough trade, kept to its own street and banned from fouling the river. Butchers are strong, armed with their tools and quick to riot, and town councils fear them. Blood and offal give the trade a taint that money does not wash off."
@@ -2022,12 +2482,36 @@
       "LowestTier": "Countryside",
       "SharePercent": 0.3,
       "Variants": [
-        "collier",
-        "tar burner",
-        "pitch boiler",
-        "ash burner",
-        "varnish maker",
-        "lime burner"
+        {
+          "Name": "collier",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "tar burner",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "pitch boiler",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "ash burner",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "varnish maker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "lime burner",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Turns wood into the fuels and stuffs that industry needs, by slow fire in the forest: charcoal, tar, pitch, potash, and lime from limestone.",
       "Lore": "Lives in the wood by the smoking clamp for weeks, black, poor and seldom seen in the village, and is suspected of dealing with whatever else lives there. Outlaws hide among charcoal burners. Without them no iron is made."
@@ -2040,13 +2524,41 @@
       "LowestTier": "Countryside",
       "SharePercent": 0.2,
       "Variants": [
-        "bloomery man",
-        "iron smelter",
-        "furnace master",
-        "copper smelter",
-        "silver refiner",
-        "steel maker",
-        "bronze founder"
+        {
+          "Name": "bloomery man",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "iron smelter",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "furnace master",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "copper smelter",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "silver refiner",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "steel maker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "bronze founder",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Turns ore into metal: roasts, smelts and refines it in a furnace, and casts or hammers it into bars.",
       "Lore": "A secret art. The smelter knows by the colour of the flame when the bloom is ready, and passes that on to a son only. In many peoples the smelter is a ritual figure, feared and set apart. The works move when the wood is gone."
@@ -2059,12 +2571,36 @@
       "LowestTier": "Town",
       "SharePercent": 0.4,
       "Variants": [
-        "tanner",
-        "tawyer",
-        "currier",
-        "skinner",
-        "furrier",
-        "parchment maker"
+        {
+          "Name": "tanner",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "tawyer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "currier",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "skinner",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "furrier",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "parchment maker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Makes leather, fur and parchment from raw hides and pelts, by months of soaking in lime, bark and worse.",
       "Lore": "The foulest trade in a town, banished downstream and downwind, and its people marry among themselves. Yet leather is in every shoe, saddle, belt and book, and furs are the mark of rank. The furriers are rich where the tanners are shunned."
@@ -2077,17 +2613,61 @@
       "LowestTier": "Countryside",
       "SharePercent": 3.5,
       "Variants": [
-        "spinner",
-        "weaver",
-        "linen weaver",
-        "silk weaver",
-        "fuller",
-        "dyer",
-        "shearman",
-        "felt maker",
-        "carpet weaver",
-        "rope maker",
-        "net maker"
+        {
+          "Name": "spinner",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "weaver",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "linen weaver",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "silk weaver",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "fuller",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "dyer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "shearman",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "felt maker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "carpet weaver",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "rope maker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "net maker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Makes cloth and cordage from fibre and wool: spins, weaves, fulls, dyes and finishes.",
       "Lore": "The first industry, and the first to split master from hand. Spinning is done in every cottage, mostly by women; weaving is a guild trade; the dyers and fullers are its foul end, the cloth merchants its rich one. Weavers' quarters are crowded, radical and quick to strike. Fantasy twists: cloth that hides its wearer, dyes that only one people can see."
@@ -2100,18 +2680,66 @@
       "LowestTier": "Countryside",
       "SharePercent": 1,
       "Variants": [
-        "blacksmith",
-        "farrier",
-        "toolsmith",
-        "nailer",
-        "cutler",
-        "locksmith",
-        "weaponsmith",
-        "armourer",
-        "sword polisher",
-        "bronze founder",
-        "bell caster",
-        "forge hand"
+        {
+          "Name": "blacksmith",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "farrier",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "toolsmith",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "nailer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "cutler",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "locksmith",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "weaponsmith",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "armourer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "sword polisher",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "bronze founder",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "bell caster",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "forge hand",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Works hot metal with hammer and anvil: makes and mends tools, shoes horses, and in a town forges blades, locks, nails and armour.",
       "Lore": "The one craftsman every village must have, and the one most wrapped in tale: fire, iron and a strength that seems more than natural. The smithy is where news is traded. In a city the trade splits into a dozen guilds that quarrel over who may make what. Fantasy twists: the smith who forges under a ban or a blessing, rune blades, a people whose smiths are its priests."
@@ -2124,17 +2752,61 @@
       "LowestTier": "Countryside",
       "SharePercent": 1.5,
       "Variants": [
-        "carpenter",
-        "joiner",
-        "wheelwright",
-        "cartwright",
-        "cooper",
-        "turner",
-        "chest maker",
-        "bowyer",
-        "fletcher",
-        "sled maker",
-        "woodcarver"
+        {
+          "Name": "carpenter",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "joiner",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "wheelwright",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "cartwright",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "cooper",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "turner",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "chest maker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "bowyer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "fletcher",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "sled maker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "woodcarver",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Works wood into buildings, vehicles, vessels and tools.",
       "Lore": "The builder of the common world: house frames, carts, barrels, looms and mills are all his. A master carpenter raises a hall with a crew and a rope. Less secret than the smith and less grand than the mason, and found everywhere. The cooper's barrel is the shipping container of the age."
@@ -2148,12 +2820,36 @@
       "SharePercent": 0.2,
       "OnWater": true,
       "Variants": [
-        "shipwright",
-        "boatbuilder",
-        "caulker",
-        "hull mender",
-        "sail maker",
-        "barge builder"
+        {
+          "Name": "shipwright",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "boatbuilder",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "caulker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "hull mender",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "sail maker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "barge builder",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Builds and repairs boats and ships.",
       "Lore": "A ship is the largest machine the age can build, and the yard that builds it is a town's pride and its debt. The craft is by eye and by inheritance, with no drawings. Launches are blessed, and a ship has a name and a luck. Fantasy twists: keels of elder wood, hulls sung into shape."
@@ -2166,17 +2862,61 @@
       "LowestTier": "Town",
       "SharePercent": 1,
       "Variants": [
-        "stonemason",
-        "bricklayer",
-        "builder",
-        "plasterer",
-        "tiler",
-        "roofer",
-        "thatcher",
-        "steeplejack",
-        "well digger",
-        "bridge builder",
-        "engineer"
+        {
+          "Name": "stonemason",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "bricklayer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "builder",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "plasterer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "tiler",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "roofer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "thatcher",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "steeplejack",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "well digger",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "bridge builder",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "engineer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Builds in stone, brick and earth: cuts and lays stone, burns and lays brick, plasters, tiles and thatches, and plans works such as walls, bridges, wells and canals.",
       "Lore": "The travelling aristocracy of the crafts. Masons go where the great works are, lodge together on the site, and keep their geometry to themselves. A master mason is architect and contractor in one. Fantasy twists: lodges with real secrets, dwarven stonework that needs no mortar, walls with something bound into the foundation."
@@ -2189,11 +2929,31 @@
       "LowestTier": "Town",
       "SharePercent": 0.4,
       "Variants": [
-        "potter",
-        "brickmaker",
-        "tile maker",
-        "kiln master",
-        "maker of fine ware"
+        {
+          "Name": "potter",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "brickmaker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "tile maker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "kiln master",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "maker of fine ware",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Shapes and fires clay: pots, bowls and jars, bricks and roof tiles.",
       "Lore": "A humble and ancient trade that leaves more behind than any other. Potters work at the edge of town, where the clay and the fire risk are. A fine ware (a glaze, a white body) can make a town's name and is a guarded recipe."
@@ -2206,12 +2966,36 @@
       "LowestTier": "City",
       "SharePercent": 0.05,
       "Variants": [
-        "glassblower",
-        "glazier",
-        "bead maker",
-        "mirror maker",
-        "lens grinder",
-        "vial blower"
+        {
+          "Name": "glassblower",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "glazier",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "bead maker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "mirror maker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "lens grinder",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "vial blower",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Melts sand or crystal with a flux and blows, casts or grinds the glass.",
       "Lore": "A prized and jealous art. Glass towns forbid their masters to leave, on pain of death in the tale. Window glass is for temples and the rich; a lens is a wonder. The furnaces never go out. Fantasy twists: glass that holds light, a scrying mirror, vials that keep a living flame."
@@ -2224,15 +3008,51 @@
       "LowestTier": "Town",
       "SharePercent": 1.2,
       "Variants": [
-        "shoemaker",
-        "cobbler",
-        "saddler",
-        "harness maker",
-        "girdler",
-        "glover",
-        "purse maker",
-        "scabbard maker",
-        "bookbinder"
+        {
+          "Name": "shoemaker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "cobbler",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "saddler",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "harness maker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "girdler",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "glover",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "purse maker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "scabbard maker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "bookbinder",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Makes goods of leather: shoes above all, and saddles, harness, belts, gloves, purses, sheaths and bottles.",
       "Lore": "The most numerous craft in any town, since shoes wear out. The shoemaker in his open stall hears and repeats everything, and is the proverbial town philosopher and radical. Shoemakers of new leather and cobblers of old fight over the line between them."
@@ -2245,14 +3065,46 @@
       "LowestTier": "Town",
       "SharePercent": 1.2,
       "Variants": [
-        "tailor",
-        "seamstress",
-        "robe maker",
-        "hosier",
-        "hatter",
-        "embroiderer",
-        "garment furrier",
-        "old-clothes dealer"
+        {
+          "Name": "tailor",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "seamstress",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "robe maker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "hosier",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "hatter",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "embroiderer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "garment furrier",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "old-clothes dealer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Cuts and sews cloth and fur into clothes, makes hats and hose, and deals in used clothes.",
       "Lore": "Dress is rank made visible, and laws say who may wear what, so the tailor knows everyone's true standing and debts. Most people wear clothes second or third hand; the old-clothes dealer is as common as the tailor. A sedentary trade, mocked as unmanly and feared as gossip."
@@ -2265,17 +3117,61 @@
       "LowestTier": "City",
       "SharePercent": 0.15,
       "Variants": [
-        "goldsmith",
-        "silversmith",
-        "gem cutter",
-        "lapidary",
-        "engraver",
-        "enameller",
-        "moneyer",
-        "assayer",
-        "ivory carver",
-        "coral carver",
-        "amber worker"
+        {
+          "Name": "goldsmith",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "silversmith",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "gem cutter",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "lapidary",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "engraver",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "enameller",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "moneyer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "assayer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "ivory carver",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "coral carver",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "amber worker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Works precious metal, stones and ivory: makes plate, rings and reliquaries, cuts gems, strikes coin, and tests the fineness of metal.",
       "Lore": "The richest of the crafts and the nearest to banking: the goldsmith keeps other people's treasure and strikes the ruler's coin. Trusted with wealth, so bound by the hardest oaths and the longest terms of office. Fantasy twists: gems that hold a spell, coin that cannot be clipped, a people that reads a stone's flaws at a glance."
@@ -2288,15 +3184,51 @@
       "LowestTier": "City",
       "SharePercent": 0.1,
       "Variants": [
-        "painter",
-        "sculptor",
-        "image carver",
-        "illuminator",
-        "glass painter",
-        "temple sculptor",
-        "mosaic maker",
-        "map engraver",
-        "instrument maker"
+        {
+          "Name": "painter",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "sculptor",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "image carver",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "illuminator",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "glass painter",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "temple sculptor",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "mosaic maker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "map engraver",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "instrument maker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Makes images and ornaments: paints, carves and gilds for temples, courts and rich houses.",
       "Lore": "A craftsman, not a genius: the painter belongs to a guild, often the saddlers' or the apothecaries', and is paid by the foot. Work is to order, for a patron who sets the subject. Only at a court does an artist gain a name. Fantasy twists: portraits that age for the sitter, statues that watch."
@@ -2309,14 +3241,46 @@
       "LowestTier": "Capital",
       "SharePercent": 0.02,
       "Variants": [
-        "clockmaker",
-        "fine locksmith",
-        "instrument maker",
-        "lens grinder",
-        "tinker",
-        "automaton maker",
-        "siege engineer",
-        "object enchanter"
+        {
+          "Name": "clockmaker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "fine locksmith",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "instrument maker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "lens grinder",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "tinker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "automaton maker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "siege engineer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "object enchanter",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Makes mechanisms and instruments, and in a world with magic, devices that hold it.",
       "Lore": "The fantasy vocation with the thinnest historical root: the makers of clocks, scales and locks, who were few and admired. In a fantasy world the artificer stands between the smith and the mage, and is distrusted by both guilds. Patents and secrets are the trade's whole capital. Typical conflicts: a device that puts a craft out of work, a commission from a ruler that cannot be refused."
@@ -2329,17 +3293,61 @@
       "LowestTier": "City",
       "SharePercent": 0.5,
       "Variants": [
-        "long-distance merchant",
-        "wholesaler",
-        "draper",
-        "mercer",
-        "spicer",
-        "grain factor",
-        "broker",
-        "moneychanger",
-        "banker",
-        "moneylender",
-        "insurer"
+        {
+          "Name": "long-distance merchant",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "wholesaler",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "draper",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "mercer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "spicer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "grain factor",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "broker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "moneychanger",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "banker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "moneylender",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "insurer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Buys in one place and sells in another, in bulk and over distance, and lends, changes and insures money.",
       "Lore": "The estate that fits no estate: neither fights, prays nor ploughs, and grows richer than those who do. Merchants rule the towns through their guild and buy their way into the nobility within three generations. Usury is a sin they pay the temple to forgive. Fantasy twists: houses that trade between peoples who cannot meet, contracts witnessed by something that enforces them."
@@ -2352,12 +3360,36 @@
       "LowestTier": "Town",
       "SharePercent": 1.5,
       "Variants": [
-        "retailer",
-        "stallholder",
-        "huckster",
-        "pedlar",
-        "chapman",
-        "market trader"
+        {
+          "Name": "retailer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "stallholder",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "huckster",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "pedlar",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "chapman",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "market trader",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Sells small quantities to those who live near: from a stall, a shop or a pack.",
       "Lore": "The small end of trade, mostly poor and often a woman. Hucksters buy at dawn and sell dearer by noon, and are fined for it every week. The pedlar carries needles, ribbons and news to places no merchant visits, and is welcome and suspected in equal parts."
@@ -2370,17 +3402,61 @@
       "LowestTier": "Town",
       "SharePercent": 1.2,
       "Variants": [
-        "carter",
-        "teamster",
-        "muleteer",
-        "caravan driver",
-        "caravan master",
-        "drover",
-        "porter",
-        "water carrier",
-        "courier",
-        "post rider",
-        "elephant driver"
+        {
+          "Name": "carter",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "teamster",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "muleteer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "caravan driver",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "caravan master",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "drover",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "porter",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "water carrier",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "courier",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "post rider",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "elephant driver",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Moves goods and messages by land: with cart, pack animal or his own back.",
       "Lore": "Rough men of the road who know every inn, toll and ford. Caravan masters are trusted with fortunes; porters are the poorest free men in a town. The road has its own law, and its own tolls, bandits and guides. Fantasy twists: beasts of burden no stable could hold, roads that are only open at certain hours."
@@ -2394,15 +3470,51 @@
       "SharePercent": 1.2,
       "OnWater": true,
       "Variants": [
-        "seaman",
-        "ship's master",
-        "pilot",
-        "rigger",
-        "bargeman",
-        "boatman",
-        "ferryman",
-        "raftsman",
-        "ship's lookout"
+        {
+          "Name": "seaman",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "ship's master",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "pilot",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "rigger",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "bargeman",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "boatman",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "ferryman",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "raftsman",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "ship's lookout",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Works a vessel: on the sea, on a river, on a lake or a canal.",
       "Lore": "A people apart, with their own speech, pay by share and long absences. Half of every port is waiting for a ship. Pilots are licensed and guard their knowledge of the bar and the channel. The ferryman owns his crossing by right and is paid by all. Fantasy twists: winds that are bought, a people that sees the reef through the water."
@@ -2415,13 +3527,41 @@
       "LowestTier": "Town",
       "SharePercent": 0.8,
       "Variants": [
-        "innkeeper",
-        "taverner",
-        "hosteller",
-        "alehouse keeper",
-        "cookshop keeper",
-        "bathhouse keeper",
-        "stable keeper"
+        {
+          "Name": "innkeeper",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "taverner",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "hosteller",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "alehouse keeper",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "cookshop keeper",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "bathhouse keeper",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "stable keeper",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Keeps a house where strangers eat, drink, sleep, wash and stable their animals.",
       "Lore": "The host knows who came, with what and with whom, and is by turns informer, banker, broker and fence. An inn is where a stranger must lodge by law, and where a deal is witnessed. The tavern is the common room of the poor; the bathhouse has a worse name."
@@ -2434,15 +3574,51 @@
       "LowestTier": "Countryside",
       "SharePercent": 0.5,
       "Variants": [
-        "physician",
-        "surgeon",
-        "barber-surgeon",
-        "barber",
-        "bonesetter",
-        "tooth puller",
-        "midwife",
-        "nurse",
-        "herbalist"
+        {
+          "Name": "physician",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "surgeon",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "barber-surgeon",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "barber",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "bonesetter",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "tooth puller",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "midwife",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "nurse",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "herbalist",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Treats the sick, the wounded and women in childbed: with herbs, the knife, the hand and advice.",
       "Lore": "Three ranks that despise each other. The learned physician reads and prescribes and never cuts. The barber-surgeon cuts, bleeds and shaves. The village healer and the midwife know herbs and are one accusation away from being called witches. Plague makes and breaks them all. Fantasy twists: healing that works, and its price."
@@ -2455,17 +3631,61 @@
       "LowestTier": "Countryside",
       "SharePercent": 7.9,
       "Variants": [
-        "maid",
-        "manservant",
-        "cook",
-        "groom",
-        "nurse",
-        "wet nurse",
-        "laundress",
-        "valet",
-        "page",
-        "taster",
-        "household steward"
+        {
+          "Name": "maid",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "manservant",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "cook",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "groom",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "nurse",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "wet nurse",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "laundress",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "valet",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "page",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "taster",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "household steward",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Works in another's household for board, lodging and a small wage: in the house, the kitchen, the stable and the yard.",
       "Lore": "Service is a stage of life as much as a class: the young of the poor, and of the not so poor, serve in another house until they marry. A great household is a small court with its own ranks. The servant sees everything and is seen by no one, which makes the vocation the natural spy."
@@ -2478,20 +3698,76 @@
       "LowestTier": "Town",
       "SharePercent": 0.2,
       "Variants": [
-        "minstrel",
-        "bard",
-        "harper",
-        "singer",
-        "drummer",
-        "praise-singer",
-        "storyteller",
-        "poet",
-        "actor",
-        "acrobat",
-        "rope dancer",
-        "dancer",
-        "jester",
-        "wrestler"
+        {
+          "Name": "minstrel",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "bard",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "harper",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "singer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "drummer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "praise-singer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "storyteller",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "poet",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "actor",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "acrobat",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "rope dancer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "dancer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "jester",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "wrestler",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Performs for pay: sings, plays, tells, acts, tumbles, dances or wrestles.",
       "Lore": "Masterless and on the road, so classed with vagabonds; yet the same person at a court is a poet with a pension. Entertainers carry news and reputations between courts, and a mocking song can do a lord more harm than a raid. Fantasy twists: songs that bind, a people that lives a whole career in seven years."
@@ -2504,12 +3780,36 @@
       "LowestTier": "Town",
       "SharePercent": 0.1,
       "Variants": [
-        "courtesan",
-        "companion",
-        "kept mistress",
-        "prostitute",
-        "bathhouse attendant",
-        "brothel keeper"
+        {
+          "Name": "courtesan",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "companion",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "kept mistress",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "prostitute",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "bathhouse attendant",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "brothel keeper",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Sells company and the bed: from the woman or man of a town's public house to the kept companion of a court, who is paid as much for wit, music and discretion as for anything else.",
       "Lore": "Tolerated, taxed and despised at once. A town licenses a public house or a street and makes the trade wear a mark; a preacher closes the house and the next council opens it again. At the top the courtesan keeps a salon, reads, plays and is painted, and hears what a minister says when he is off guard, so the vocation is a natural keeper of secrets, beside the servant. Most enter through poverty or are sold into it, and few leave rich. The conflicts are with the church, with the wives of the town and with the keeper who holds the debts. Fantasy twists: a people that changes sex in mid-life, a charm that is more than charm."
@@ -2522,16 +3822,56 @@
       "LowestTier": "Countryside",
       "SharePercent": 1,
       "Variants": [
-        "lord",
-        "lady",
-        "knight",
-        "squire",
-        "landholder",
-        "chief",
-        "jarl",
-        "khan",
-        "title-holder",
-        "head of a great house"
+        {
+          "Name": "lord",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "lady",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "knight",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "squire",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "landholder",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "chief",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "jarl",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "khan",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "title-holder",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "head of a great house",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Holds land and people by right of birth or grant: rules, judges, leads in war and lives from rents and dues.",
       "Lore": "Those who fight, in the old division of society into those who pray, fight and work. Honour, lineage and land are the whole of life, and each is defended with the sword and the lawsuit. A noble who works with his hands loses the rank. Younger sons go to the temple, to war or to the bad. Fantasy twists: houses of another race, bloodlines with a gift or a curse."
@@ -2544,24 +3884,96 @@
       "LowestTier": "Countryside",
       "SharePercent": 0.8,
       "Variants": [
-        "steward",
-        "bailiff",
-        "reeve",
-        "hayward",
-        "magistrate",
-        "judge",
-        "tax collector",
-        "toll keeper",
-        "customs searcher",
-        "weigh-master",
-        "sworn measurer",
-        "surveyor",
-        "mayor",
-        "herald",
-        "town crier",
-        "envoy",
-        "treasurer",
-        "gaoler"
+        {
+          "Name": "steward",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "bailiff",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "reeve",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "hayward",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "magistrate",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "judge",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "tax collector",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "toll keeper",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "customs searcher",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "weigh-master",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "sworn measurer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "surveyor",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "mayor",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "herald",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "town crier",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "envoy",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "treasurer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "gaoler",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Carries out the orders of a ruler, a lord, a town or a temple: collects, counts, judges, inspects and announces.",
       "Lore": "The reeve was \"the pivot man of the manorial system\": a peasant, chosen each year, who answered with his own goods for the lord's harvest. Above him the bailiff and the steward ride between manors and audit the rolls. Officials are hated for the tax and needed for the peace, and every one of them is assumed to take a cut. Fantasy twists: an office that passes by examination, a judge who can tell a lie when he hears one."
@@ -2574,18 +3986,66 @@
       "LowestTier": "Town",
       "SharePercent": 1,
       "Variants": [
-        "man-at-arms",
-        "archer",
-        "crossbowman",
-        "spearman",
-        "mounted archer",
-        "cavalryman",
-        "sergeant",
-        "captain",
-        "mercenary",
-        "drill master",
-        "marine",
-        "champion"
+        {
+          "Name": "man-at-arms",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "archer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "crossbowman",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "spearman",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "mounted archer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "cavalryman",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "sergeant",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "captain",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "mercenary",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "drill master",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "marine",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "champion",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Fights for pay, for a lord or for an oath: in the field, on the wall and at sea.",
       "Lore": "A trade like another, hired by the season and paid late. In peace the soldier is a guard, a bully or a bandit; in war a looter. Companies have their own law, share out plunder by rank and sell themselves to the higher bidder. Veterans come home with scars, a little money and no craft. Fantasy twists: a people that feels no pain, companies of another race for hire."
@@ -2598,19 +4058,71 @@
       "LowestTier": "Town",
       "SharePercent": 0.6,
       "Variants": [
-        "watchman",
-        "town guard",
-        "gate guard",
-        "night watch",
-        "bodyguard",
-        "caravan guard",
-        "road warden",
-        "pass warden",
-        "lookout",
-        "beacon keeper",
-        "granary warden",
-        "vault keeper",
-        "firefighter"
+        {
+          "Name": "watchman",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "town guard",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "gate guard",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "night watch",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "bodyguard",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "caravan guard",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "road warden",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "pass warden",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "lookout",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "beacon keeper",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "granary warden",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "vault keeper",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "firefighter",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Keeps watch and order in one place: a gate, a wall, a road, a store, a person.",
       "Lore": "The watch is a duty of every householder that the rich pay others to do, so the guard is a poor man with a lantern and a staff. He knows every face in his ward and can be bought for a drink. A bodyguard or a vault keeper is another matter: chosen for loyalty and paid for it."
@@ -2623,16 +4135,56 @@
       "LowestTier": "Countryside",
       "SharePercent": 2.5,
       "Variants": [
-        "village priest",
-        "temple priest",
-        "chaplain",
-        "shaman",
-        "monk",
-        "nun",
-        "friar",
-        "hermit",
-        "ascetic",
-        "sexton"
+        {
+          "Name": "village priest",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "temple priest",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "chaplain",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "shaman",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "monk",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "nun",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "friar",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "hermit",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "ascetic",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "sexton",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Serves a god or the spirits for a community: leads the rites, marks birth, marriage and death, teaches, and keeps the holy place. Includes those who live under a rule apart from the world.",
       "Lore": "Those who pray. The village priest is a farmer's son with a little learning and a field of his own; the high priest is a lord. A monastery is a great estate with a rule: the cellarer feeds it, the sacrist keeps the church, the infirmarian nurses, the precentor leads the singing, the guest-master receives travellers. The clergy are judged by their own courts and pay no lay tax. Fantasy twists: gods that answer, rites that hold something back."
@@ -2645,17 +4197,61 @@
       "LowestTier": "Town",
       "SharePercent": 0.4,
       "Variants": [
-        "clerk",
-        "copyist",
-        "notary",
-        "bookkeeper",
-        "secretary",
-        "advocate",
-        "records clerk",
-        "printer",
-        "bookbinder",
-        "bookseller",
-        "witness for hire"
+        {
+          "Name": "clerk",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "copyist",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "notary",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "bookkeeper",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "secretary",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "advocate",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "records clerk",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "printer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "bookbinder",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "bookseller",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "witness for hire",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Writes for others: letters, deeds, accounts, court rolls and copies of books; and knows the forms that make a writing valid.",
       "Lore": "Literacy is a trade. The clerk is often in minor orders and half a priest; the notary's sign makes a contract stand in any court; the advocate is rich and unloved. Scribes serve whoever pays, know every secret that was ever put in writing, and can forge it. Fantasy twists: a people whose word is physically binding, script that only some eyes can read."
@@ -2668,17 +4264,61 @@
       "LowestTier": "City",
       "SharePercent": 0.15,
       "Variants": [
-        "teacher",
-        "schoolmaster",
-        "tutor",
-        "professor",
-        "sage",
-        "astronomer",
-        "mathematician",
-        "lore keeper",
-        "chronicler",
-        "librarian",
-        "keeper of genealogies"
+        {
+          "Name": "teacher",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "schoolmaster",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "tutor",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "professor",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "sage",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "astronomer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "mathematician",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "lore keeper",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "chronicler",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "librarian",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "keeper of genealogies",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Studies and teaches: letters, law, the stars, numbers, the past.",
       "Lore": "Learning is slow, costly and mostly in the hands of the temple. A school teaches boys their letters; a college of masters and students is a rare and privileged body that answers to no town court. Scholars are poor until a patron finds them. Fantasy twists: lore older than the kingdoms, an examination that makes or breaks a house."
@@ -2691,13 +4331,41 @@
       "LowestTier": "Capital",
       "SharePercent": 0.03,
       "Variants": [
-        "wizard",
-        "sorcerer",
-        "enchanter",
-        "court mage",
-        "battle mage",
-        "hedge wizard",
-        "rune carver"
+        {
+          "Name": "wizard",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "sorcerer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "enchanter",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "court mage",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "battle mage",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "hedge wizard",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "rune carver",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Works magic by learning or by gift: casts, wards, enchants and advises.",
       "Lore": "The learned mage is a scholar with a dangerous subject: trained for years in a college or by a single master, bound by the college's oath, and watched by temple and crown. The born mage is a child that a village fears and a college claims. Mages serve courts as advisers and weapons, and are the first blamed when a harvest fails. Typical conflicts: college against cabal, mage against witch hunter."
@@ -2710,14 +4378,46 @@
       "LowestTier": "City",
       "SharePercent": 0.05,
       "Variants": [
-        "apothecary",
-        "alchemist",
-        "potion maker",
-        "antidote maker",
-        "poisoner",
-        "perfumer",
-        "embalmer",
-        "maker of insect smoke"
+        {
+          "Name": "apothecary",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "alchemist",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "potion maker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "antidote maker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "poisoner",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "perfumer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "embalmer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "maker of insect smoke",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Prepares substances: medicines, poisons, perfumes, acids, pigments and, by repute, gold.",
       "Lore": "The respectable end is the apothecary, a guild shopkeeper who sells spices, drugs and sweets alike. The other end works at night with a furnace and a patron's money, promising gold. Both are licensed, taxed and suspected. An alchemist's shop is where a healer buys, a mage orders and a murderer asks no questions. Fantasy twists: potions that work, a people immune to their own poisons."
@@ -2730,18 +4430,66 @@
       "LowestTier": "Countryside",
       "SharePercent": 0.2,
       "Variants": [
-        "diviner",
-        "astrologer",
-        "geomancer",
-        "soothsayer",
-        "oracle",
-        "medium",
-        "dowser",
-        "well-finder",
-        "weather watcher",
-        "wise woman",
-        "hedge witch",
-        "cunning man"
+        {
+          "Name": "diviner",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "astrologer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "geomancer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "soothsayer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "oracle",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "medium",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "dowser",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "well-finder",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "weather watcher",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "wise woman",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "hedge witch",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "cunning man",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Knows what others do not: reads signs, finds water and lost things, speaks with spirits, lifts and lays curses.",
       "Lore": "The village's own magic, cheap, unlicensed and older than the temple. The seer is consulted for a lost cow, a sick child, a good day to sow, and is the first accused when things go wrong. At a court the same art is the astrologer's, well paid and politically deadly. The line between seer, healer and priest is thin, and the temple polices it. Typical conflicts: seer against priest, and the inquisition against anyone unlicensed."
@@ -2754,17 +4502,61 @@
       "LowestTier": "Countryside",
       "SharePercent": 11,
       "Variants": [
-        "day labourer",
-        "field hand",
-        "harvest hand",
-        "builder's labourer",
-        "digger",
-        "ditcher",
-        "dock hand",
-        "quarry hand",
-        "peat cutter",
-        "ice cutter",
-        "gravedigger"
+        {
+          "Name": "day labourer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "field hand",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "harvest hand",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "builder's labourer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "digger",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "ditcher",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "dock hand",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "quarry hand",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "peat cutter",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "ice cutter",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "gravedigger",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Sells the strength of the body by the day: digs, carries, loads, mows, threshes and cleans, wherever hands are wanted.",
       "Lore": "The landless and the toolless. In the country the labourer has a cottage and a garden and works other men's fields; in the town he waits at the hiring place each dawn. Wages are set by law after a plague and paid above it. The labourer is the reserve of every other vocation and the first to go hungry."
@@ -2777,14 +4569,46 @@
       "LowestTier": "Town",
       "SharePercent": 1.5,
       "Variants": [
-        "beggar",
-        "pauper",
-        "vagrant",
-        "almsman",
-        "cripple",
-        "pilgrim",
-        "refugee",
-        "street orphan"
+        {
+          "Name": "beggar",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "pauper",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "vagrant",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "almsman",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "cripple",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "pilgrim",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "refugee",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "street orphan",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Lives on alms: too old, sick, maimed or unlucky to work, or unwilling.",
       "Lore": "The deserving poor have a place: at the temple door, on the almoner's list, in the hospital. The sturdy beggar is whipped out of town. Beggars see and hear everything in a street and sell it. Fantasy twists: a beggars' king, a curse that passes with the coin."
@@ -2797,17 +4621,61 @@
       "LowestTier": "Town",
       "SharePercent": 0.3,
       "Variants": [
-        "cutpurse",
-        "pickpocket",
-        "burglar",
-        "fence",
-        "smuggler",
-        "forger",
-        "swindler",
-        "blackmailer",
-        "enforcer",
-        "poisoner",
-        "hired killer"
+        {
+          "Name": "cutpurse",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "pickpocket",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "burglar",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "fence",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "smuggler",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "forger",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "swindler",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "blackmailer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "enforcer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "poisoner",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "hired killer",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Takes by stealth or deceit, in a town: cuts purses, breaks houses, receives, smuggles, forges, and kills for pay.",
       "Lore": "Crime in a town is organised like a craft: with masters, territories, dues and a peace of its own. The fence is a shopkeeper by day; the smuggler is a sailor or a carter who carries one more bale. The law hangs the poor thief and fines the rich one."
@@ -2820,15 +4688,51 @@
       "LowestTier": "Countryside",
       "SharePercent": 0.25,
       "Variants": [
-        "highwayman",
-        "robber",
-        "raider",
-        "rustler",
-        "poacher",
-        "outlaw",
-        "pirate",
-        "wrecker",
-        "rebel"
+        {
+          "Name": "highwayman",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "robber",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "raider",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "rustler",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "poacher",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "outlaw",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "pirate",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "wrecker",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        },
+        {
+          "Name": "rebel",
+          "Description": "**missing description**",
+          "Lore": "**missing description**"
+        }
       ],
       "Description": "Takes by force, outside the towns: robs on the road, raids, rustles, poaches, and at sea takes ships.",
       "Lore": "Most bandits were something else first: a soldier without pay, a peasant without land, a herder in a hungry year. The outlaw is outside the law's protection and may be killed by anyone. Some bands are a lord's deniable arm, some a people's resistance, some only hungry. Raiding is a season's work for whole peoples, with no shame in it."
@@ -11636,6 +13540,110 @@
           "Lore": "**missing description**"
         }
       ]
+    }
+  ],
+  "Biomes": [
+    {
+      "Biome": "IceAndSnow",
+      "Name": "Ice & snow",
+      "Description": "Ice caps and polar barrens: the high Arctic, Greenland, the Antarctic coast.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Biome": "Tundra",
+      "Name": "Tundra",
+      "Description": "Arctic tundra, and alpine tundra above the tree line.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Biome": "ColdSteppe",
+      "Name": "Cold steppe",
+      "Description": "The Mongolian and Kazakh steppe, the high plateau steppe, Patagonia.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Biome": "BorealForest",
+      "Name": "Boreal forest",
+      "Description": "The taiga of Siberia, Scandinavia and Canada.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Biome": "ColdDesert",
+      "Name": "Cold desert",
+      "Description": "The Gobi, the Taklamakan, the Great Basin.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Biome": "TemperateGrassland",
+      "Name": "Temperate grassland",
+      "Description": "Prairie, the Pontic steppe, the pampas. Most of it is farmland where people live.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Biome": "WoodlandAndShrubland",
+      "Name": "Woodland & shrubland",
+      "Description": "Mediterranean woodland and scrub, chaparral. At its cool end an open oak, pine and juniper woodland.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Biome": "TemperateMixedForest",
+      "Name": "Temperate mixed forest",
+      "Description": "The conifer and hardwood forests of the Baltic, New England and Manchuria.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Biome": "TemperateBroadleafForest",
+      "Name": "Temperate broadleaf forest",
+      "Description": "The oak and beech forests of western Europe, and the broadleaf forests of eastern China and Japan.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Biome": "TemperateRainForest",
+      "Name": "Temperate rain forest",
+      "Description": "The Pacific Northwest, Valdivia, New Zealand, the Atlantic oakwoods.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Biome": "HotDesert",
+      "Name": "Hot desert",
+      "Description": "The Sahara, Arabia, the Sonoran desert.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Biome": "ThornScrub",
+      "Name": "Thorn scrub",
+      "Description": "The Sahel, the Horn of Africa, the Caatinga, the Chaco, the Indian thorn forest.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Biome": "Savanna",
+      "Name": "Savanna",
+      "Description": "The African and Indian savannas.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Biome": "TropicalDryForest",
+      "Name": "Tropical dry forest",
+      "Description": "The monsoon forests of India and Indochina (teak and sal), the dry forests of Central America.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Biome": "TropicalRainForest",
+      "Name": "Tropical rain forest",
+      "Description": "The Amazon, the Congo, the Malay archipelago.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Biome": "Mangrove",
+      "Name": "Mangrove",
+      "Description": "The Sundarbans and other mangrove coasts.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Biome": "Volcano",
+      "Name": "Volcano",
+      "Description": "**missing description**",
+      "Lore": "**missing description**"
     }
   ]
 }

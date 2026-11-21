@@ -1150,6 +1150,17 @@ the patch's site and the patch's height. The estimated biome uses the typical he
 the elevation type, and the final biome uses the height from the height map (13.1).
 With its biome a patch gets a few kinds of flora and fauna (13.4).
 
+**The texts.** The Parameter Set has a list `Biomes`: one entry for each of the 17 biomes,
+with its `Biome`, its `Name`, a `Description` and a `Lore`. The list holds texts only: no
+rule reads it, and which biome a patch gets is decided by the rules below alone. The
+description is what a picture of the land is drawn from. The default description of a
+biome is the real land it stands for, from the column "Stands for" of
+[research/flora-and-fauna.md](research/flora-and-fauna.md) section 2: the taiga of
+Siberia, Scandinavia and Canada for the Boreal forest. It names places and does not yet
+say what the land looks like. The Volcano has no description and no biome has a lore:
+they are `**missing description**`, the text that marks one that is not written yet. The
+defaults are in `src/Gameworld.Domain/Biomes.Defaults.cs`.
+
 ### 13.1 Inputs
 
 ```

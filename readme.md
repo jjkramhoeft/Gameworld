@@ -44,7 +44,7 @@ The project is in phase 1.
 
 ### Status
 
-The map is generated through all its stages, from the cells to the travel network, with the flora and fauna of every patch. Of the society, the races of each region, their potential population, the factions of each region, the name of each region, and the cities and towns of each region with their names, their persons and their races are generated. The persons of a city or a town are a count per race so far. The person-name generator is in place, and for now it gives the surnames of the houses that name a region and some of the first parts of city and town names. The vocations and their tools are lists in the Parameter Set and are not drawn yet. The races, the vocations, the tools, the flora, the fauna and the resources carry a description and a lore in the Parameter Set, for the pictures to come; those of the resources and of most of their variants are not written yet. Families and individual persons are defined below but not generated yet, and neither is there a database: the apps compute everything in memory.
+The map is generated through all its stages, from the cells to the travel network, with the flora and fauna of every patch. Of the society, the races of each region, their potential population, the factions of each region, the name of each region, and the cities and towns of each region with their names, their persons and their races are generated. The persons of a city or a town are a count per race so far. The person-name generator is in place, and for now it gives the surnames of the houses that name a region and some of the first parts of city and town names. The vocations and their tools are lists in the Parameter Set and are not drawn yet. The races, the vocations, the tools, the flora, the fauna and the resources carry a description and a lore in the Parameter Set, for the pictures to come, and so do the biomes and the variants of the vocations; those of the resources, of most of their variants and of the variants of the vocations are not written yet. Families and individual persons are defined below but not generated yet, and neither is there a database: the apps compute everything in memory.
 
 ## Concepts
 
@@ -85,7 +85,7 @@ Many foundations can coexist in storage, for one to compare maps side by side in
 
 The set of all map and world parameters. It is referenced by a foundation and is immutable after phase 1, like the foundation. It is a json file, or is exported to and loaded from one.
 
-The Parameter Set also holds the lists that are expected to change: the bedrock types, the races, the vocations, the tools, the colours, the flora, the fauna and the texts of the resources. A race, a vocation, a tool, a kind of flora or fauna, a resource and a variant of a resource each have a description and a lore: the texts a picture of it is to be drawn from, so that an invented thing looks the same every time. No generation rule reads them. A text that is not written yet is `**missing description**`. A change to a list after phase 1 is a new Parameter Set, and with it a new foundation. Foundations that exist are not touched.
+The Parameter Set also holds the lists that are expected to change: the bedrock types, the races, the vocations, the tools, the colours, the flora, the fauna and the texts of the resources and of the biomes. A race, a vocation and each of its variants, a tool, a kind of flora or fauna, a resource and each of its variants, and a biome each have a description and a lore: the texts a picture of it is to be drawn from, so that an invented thing looks the same every time. No generation rule reads them. A text that is not written yet is `**missing description**`. A change to a list after phase 1 is a new Parameter Set, and with it a new foundation. Foundations that exist are not touched.
 
 #### Derived and authored data
 
@@ -218,6 +218,8 @@ The actual height of the land of a region. It is calculated in the Elevated stag
 
 The kind of nature of a land patch. It comes from the temperature of the patch (the Initial Temperature field cooled by the height) and its aridity (the precipitation relative to what the temperature demands). Mangrove is an override on warm, wet and low coasts. Volcano is an override on rare patches of the mountains, whatever their climate: about one region in nine has one.
 
+The Parameter Set holds a name, a description and a lore for every biome. The description is the real land the biome stands for; the lore is not written yet.
+
 Biomes will eventually be a fixed set of 10-20 predetermined biomes. The current set, not binding yet, is 15 land biomes and the two overrides, Mangrove and Volcano:
 
 Ice & snow, Tundra, Cold steppe, Boreal forest, Cold desert, Temperate grassland, Woodland & shrubland, Temperate mixed forest, Temperate broadleaf forest, Temperate rain forest, Hot desert, Thorn scrub, Savanna, Tropical dry forest, Tropical rain forest, Mangrove, Volcano
@@ -310,7 +312,7 @@ An NPC in the game. The Stub of a person holds name, age, sex, vocation, role, f
 
 #### Vocation
 
-The work a person does: farmer, smith, priest. A person has one vocation and can have a by-work, a second vocation beside it. The vocation is not the role: the role is the position of the person in the household, in the vocation or in a faction. The vocations are a list in the Parameter Set, like the races. Each vocation has an id, a name, a toggle, a sector (one of nine), the lowest tier of place it is found in (countryside, town, city or capital), a starting share of the labour force, its variants (the shepherd is a variant of the herder), a description and a lore. The default list holds 51 vocations. How a place and a person get their vocations is not specified yet, so no vocation is generated.
+The work a person does: farmer, smith, priest. A person has one vocation and can have a by-work, a second vocation beside it. The vocation is not the role: the role is the position of the person in the household, in the vocation or in a faction. The vocations are a list in the Parameter Set, like the races. Each vocation has an id, a name, a toggle, a sector (one of nine), the lowest tier of place it is found in (countryside, town, city or capital), a starting share of the labour force, its variants (the shepherd is a variant of the herder), a description and a lore. A variant has a name, a description and a lore of its own. The default list holds 51 vocations. How a place and a person get their vocations is not specified yet, so no vocation is generated.
 
 #### Tool
 

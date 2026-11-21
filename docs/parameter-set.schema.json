@@ -2557,10 +2557,29 @@
             "type": "boolean"
           },
           "Variants": {
-            "description": "The names of the variants of the vocation: the smaller trades it covers, such as the shepherd of the herder and the armourer of the smith (society §8).",
+            "description": "The variants of the vocation: the smaller trades it covers, such as the shepherd of the herder and the armourer of the smith, each with a name, a description and a lore (society §8).",
             "type": "array",
             "items": {
-              "type": "string"
+              "description": "A variant of a vocation: a smaller trade it covers (society §8).",
+              "type": "object",
+              "properties": {
+                "Name": {
+                  "description": "The name of the variant, such as shepherd. Unique among the variants of its vocation.",
+                  "type": "string"
+                },
+                "Description": {
+                  "description": "What the variant is: the work a person of it does, and what tells that person apart from the others of the vocation. A picture of it is drawn from this text. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.",
+                  "type": "string"
+                },
+                "Lore": {
+                  "description": "The lore of the variant: its standing, its customs and its quarrels. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "Name"
+              ],
+              "additionalProperties": false
             }
           },
           "Description": {
@@ -2936,6 +2955,55 @@
         },
         "required": [
           "Resource",
+          "Name"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "Biomes": {
+      "description": "The biomes: the name, the description and the lore of each biome (§13). The list only holds texts: which biome a patch gets is decided by the biome rules, and a biome that is left out has no texts. A file that gives this list replaces the whole default list.",
+      "type": "array",
+      "items": {
+        "description": "The texts of one biome (§13).",
+        "type": "object",
+        "properties": {
+          "Biome": {
+            "description": "The biome the texts belong to.",
+            "enum": [
+              "IceAndSnow",
+              "Tundra",
+              "ColdSteppe",
+              "BorealForest",
+              "ColdDesert",
+              "TemperateGrassland",
+              "WoodlandAndShrubland",
+              "TemperateMixedForest",
+              "TemperateBroadleafForest",
+              "TemperateRainForest",
+              "HotDesert",
+              "ThornScrub",
+              "Savanna",
+              "TropicalDryForest",
+              "TropicalRainForest",
+              "Mangrove",
+              "Volcano"
+            ]
+          },
+          "Name": {
+            "description": "The name shown for the biome.",
+            "type": "string"
+          },
+          "Description": {
+            "description": "What the land of the biome looks like: its ground, its plant cover and its light. A picture of it is drawn from this text. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.",
+            "type": "string"
+          },
+          "Lore": {
+            "description": "The lore of the biome: what the peoples of the world make of it and tell about it. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "Biome",
           "Name"
         ],
         "additionalProperties": false

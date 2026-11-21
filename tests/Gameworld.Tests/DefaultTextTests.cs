@@ -92,4 +92,36 @@ public class DefaultTextTests
         Assert.Null(arcane.Variant("no such thing"));
         Assert.Null(arcane.Variant(null));
     }
+
+    [Fact]
+    public void The_default_biomes_are_the_17_biomes_in_order_and_all_but_the_volcano_are_described()
+    {
+        var biomes = ParameterSet.Default.Biomes;
+        Assert.Equal(Enum.GetValues<Biome>(), biomes.Select(b => b.Biome));
+        Assert.Equal("Ice & snow", biomes[0].Name);
+        foreach (var biome in biomes)
+        {
+            Assert.Equal(biome.Biome == Biome.Volcano, DefaultTexts.IsMissing(biome.Description));
+            Assert.Equal(DefaultTexts.Missing, biome.Lore); // no biome has a lore yet
+        }
+    }
+
+    [Fact]
+    public void A_vocation_variant_has_a_name_a_description_and_a_lore()
+    {
+        var p = ParameterSet.Default;
+        Assert.Equal(476, p.Vocations.Sum(v => v.Variants.Count));
+        var shepherd = p.Vocations.Single(v => v.Id == "herder").Variants.Single(v => v.Name == "shepherd");
+        Assert.Equal(DefaultTexts.Missing, shepherd.Description); // no variant is described yet
+        Assert.Equal(DefaultTexts.Missing, shepherd.Lore);
+
+        var set = ParameterSet.FromJson("""
+            { "Vocations": [ { "Id": "herder", "Name": "Herder", "Enabled": true, "Sector": "LandAndWater", "LowestTier": "Countryside",
+              "Variants": [ { "Name": "shepherd", "Description": "Carries a crook." }, { "Name": "cowherd" } ] } ] }
+            """);
+        var variants = set.Vocations[0].Variants;
+        Assert.Equal("Carries a crook.", variants[0].Description);
+        Assert.Equal(DefaultTexts.Missing, variants[0].Lore);
+        Assert.Equal(DefaultTexts.Missing, variants[1].Description);
+    }
 }

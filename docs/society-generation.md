@@ -1582,13 +1582,19 @@ the guide of Hunter, the dyer of Weaver, the boatman of Sailor and the banker of
 | `LowestTier` | Countryside, Town, City or Capital |
 | `SharePercent` | The starting share of the labour force of a whole region, in per cent |
 | `OnWater` | The vocation is only found in a place on water: the shipwright and the sailor. Left out means no |
-| `Variants` | The names of the smaller trades the vocation covers |
+| `Variants` | The smaller trades the vocation covers. Each has a `Name`, a `Description` and a `Lore` |
 | `Description` | What the vocation is: the work a person of it does. Left out means `**missing description**` |
 | `Lore` | The standing, the customs and the quarrels of the vocation. Left out means `**missing description**` |
 
 The default `Description` and `Lore` are the opening paragraph and the line "Lore" of the
 entry of the vocation in [research/vocations.md](research/vocations.md) section 3, without
 the citations (`src/Gameworld.Domain/DefaultTexts.Vocations.cs`). No rule reads them.
+A variant has the same two texts, so that a shepherd is not drawn as any herder. No doc
+describes a variant yet, so all 476 default variants have `**missing description**` for
+both; they are listed in `src/Gameworld.Domain/DefaultTexts.VocationVariants.cs`, keyed by
+"vocation id/variant name", to be written there. In a Parameter Set file a variant is an
+object with a `Name`; until 2026-11-21 it was a plain name, and a file from before that
+must be changed to load.
 The defaults of `LowestTier`, `SharePercent`, `OnWater` and `Variants` are those of
 [research/vocations.md](research/vocations.md) section 3: the index table and the
 "Covers" line of each vocation. The shares sum to 100. They are starting values and are
