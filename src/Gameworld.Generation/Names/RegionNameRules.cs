@@ -58,14 +58,22 @@ public sealed class RegionNameRules
     /// the style of the lead race of the house. A surname of more than
     /// <see cref="HouseNameMaxLength"/> characters is drawn again from the same stream.
     /// </summary>
-    public string RulingHouse(GridCoord region, NameStyle style)
+    public string RulingHouse(GridCoord region, NameStyle style) =>
+        Surname(style, new Sfc32(Hashing.Hash4(_seed, HousePurpose, region.I, region.J)));
+
+    /// <summary>
+    /// A surname from the surname model of a name style. A surname of more than
+    /// <see cref="HouseNameMaxLength"/> characters, or one that is <paramref name="taken"/>, is
+    /// drawn again from the same stream, <see cref="HouseNameAttempts"/> times at most: the last
+    /// one is kept whatever it is.
+    /// </summary>
+    public static string Surname(NameStyle style, Sfc32 rng, Func<string, bool>? taken = null)
     {
-        var rng = new Sfc32(Hashing.Hash4(_seed, HousePurpose, region.I, region.J));
         var name = "";
         for (var attempt = 0; attempt < HouseNameAttempts; attempt++)
         {
             name = NameGenerator.Default.Generate(style, NameKind.Surname, rng);
-            if (name.Length <= HouseNameMaxLength) break;
+            if (name.Length <= HouseNameMaxLength && taken?.Invoke(name) != true) break;
         }
         return name;
     }

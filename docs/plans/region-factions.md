@@ -7,6 +7,11 @@ keeps the proposal, the test behind it and what was weighed. "Implemented" below
 changed on the way into the generator and what the generator measures. Where the two
 differ, society-generation.md holds.
 
+The numbers in persons below are those of the density of the time, 0.06 persons per km².
+The default is 0.3 since 2026-11-21, and the limits in persons were raised five times with
+it: 400 persons for an opposition, 750 for each lesser faction, 800 to 3,000 for the index
+people and 300 to 1,300 for the index small. The factions of a region did not change.
+
 ## What was asked
 
 - Every region has factions: at least one ruling faction.

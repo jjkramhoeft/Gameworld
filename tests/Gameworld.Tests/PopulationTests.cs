@@ -305,13 +305,13 @@ public class PopulationTests
     public void The_capacity_of_a_patch_follows_its_area_food_and_prosperity()
     {
         var rules = new PopulationRules(ParameterSet.Default);
-        Assert.Equal(64 * 0.06 * 0.5, rules.Capacity(64, Resources(0.5), 0.5), 9);
+        Assert.Equal(64 * 0.3 * 0.5, rules.Capacity(64, Resources(0.5), 0.5), 9);
         Assert.Equal(2 * rules.Capacity(64, Resources(0.5), 0.5), rules.Capacity(128, Resources(0.5), 0.5), 9);
         Assert.Equal(0, rules.Capacity(64, Resources(0), 0.5));
 
         // Prosperity: from half at the lowest to one and a half at the highest.
-        Assert.Equal(64 * 0.06 * 0.5 * 0.5, rules.Capacity(64, Resources(0.5), 0), 9);
-        Assert.Equal(64 * 0.06 * 0.5 * 1.5, rules.Capacity(64, Resources(0.5), 1), 9);
+        Assert.Equal(64 * 0.3 * 0.5 * 0.5, rules.Capacity(64, Resources(0.5), 0), 9);
+        Assert.Equal(64 * 0.3 * 0.5 * 1.5, rules.Capacity(64, Resources(0.5), 1), 9);
 
         // Fish adds a fifth of its amount to the food supply, which never passes 1.
         Assert.Equal(0.5, PopulationRules.FoodSupply(Resources(0.5)), 12);
@@ -647,8 +647,8 @@ public class PopulationTests
 
             people += population.Total;
         }
-        // Nine regions of the default world: a few hundred persons each.
-        Assert.InRange(people / 9, 100, 1_000);
+        // Nine regions of the default world: about two thousand persons each.
+        Assert.InRange(people / 9, 500, 5_000);
     }
 
     [Fact]

@@ -680,7 +680,8 @@ public sealed class FactionRules
 
     private static bool OnHarbour(Prospect p) => p.Facts.Harbour || p.Facts.Mouth >= NavigableMouth;
 
-    private static bool OnWater(Prospect p) => OnHarbour(p) || p.Facts.River >= NavigableMouth;
+    /// <summary>The Prospect is on water: a harbour, a river mouth or a navigable river.</summary>
+    internal static bool OnWater(Prospect p) => OnHarbour(p) || p.Facts.River >= NavigableMouth;
 
     private static double City(FactionReading r) => r.HasCity ? 1 : 0.4;
 

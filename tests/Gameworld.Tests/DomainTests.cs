@@ -129,6 +129,8 @@ public class DomainTests
         Assert.Equal(new StageNeed(RegionStage.Detailed, 1), RegionStageRules.NeedOf(RegionStage.Elevated, p));
         Assert.Equal(new StageNeed(RegionStage.Elevated, 0), RegionStageRules.NeedOf(RegionStage.Planned, p));
         Assert.Equal(new StageNeed(RegionStage.Planned, 1), RegionStageRules.NeedOf(RegionStage.Settled, p));
+        Assert.Equal(new StageNeed(RegionStage.Settled, 0), RegionStageRules.NeedOf(RegionStage.Housed, p));
+        Assert.Equal(new StageNeed(RegionStage.Housed, 0), RegionStageRules.NeedOf(RegionStage.Peopled, p));
 
         var wider = p with { Outline = p.Outline with { OceanLinkRangeRegions = 3 } };
         Assert.Equal(8, RegionStageRules.NeedOf(RegionStage.Outlined, wider)!.Value.Rings);
@@ -155,8 +157,14 @@ public class DomainTests
         // Elevated → Planned needs the region itself only.
         Assert.True(RegionStageRules.CanAdvance(region, RegionStage.Elevated, StageOf, p));
 
-        // Settled is the last stage.
-        Assert.False(RegionStageRules.CanAdvance(region, RegionStage.Settled, StageOf, p));
+        // Settled → Housed and Housed → Peopled need the region itself only.
+        Assert.True(RegionStageRules.CanAdvance(region, RegionStage.Settled, StageOf, p));
+        Assert.True(RegionStageRules.CanAdvance(region, RegionStage.Housed, StageOf, p));
+
+        // Peopled is the last stage.
+        Assert.Equal(RegionStage.Peopled, RegionStageRules.Last);
+        Assert.Null(RegionStageRules.Next(RegionStage.Peopled));
+        Assert.False(RegionStageRules.CanAdvance(region, RegionStage.Peopled, StageOf, p));
         Assert.Equal(8, RegionStageRules.Bordering(region).Count());
     }
 
@@ -190,6 +198,35 @@ public class DomainTests
         Assert.Equal(DomainJson.Serialize(settlement), DomainJson.Serialize(restored.Settlement));
         Assert.Equal(new SlotId<RegionId>(region.Id, 0), restored.Settlement!.Capital!.IdIn(region.Id));
         Assert.Equal((120, 0, 1080), (restored.Settlement.CityPersons, restored.Settlement.TownPersons, restored.Settlement.RuralPersons));
+
+        // The households come after the cities and towns, and the persons after the households.
+        var people = new RegionPeople(
+        [
+            new Person(0, 0, "Edric", "Alder", "midlanders", Sex.Male, 41, HouseholdRole.Head, "noble", Spouse: 1),
+            new Person(0, 1, "Maud", "Alder", "midlanders", Sex.Female, 38, HouseholdRole.Spouse, null, Spouse: 0),
+            new Person(0, 2, "Wat", "Reed", "midlanders", Sex.Male, 19, HouseholdRole.Servant, "servant"),
+        ]);
+        Assert.Throws<InvalidOperationException>(() => region.Advance(people));
+        var households = new RegionHouseholds(
+        [
+            new Household(0, 0, 0, "midlanders", WealthLevel.Rich, "Alder", Sex.Male, 41, 2, [new RacePersons("midlanders", 1)]),
+        ]);
+        region.Advance(households);
+        Assert.Equal(RegionStage.Housed, region.Stage);
+        region.Advance(people);
+        Assert.Equal(RegionStage.Peopled, region.Stage);
+
+        var peopled = Region.FromSnapshot(DomainJson.Deserialize<RegionSnapshot>(DomainJson.Serialize(region.ToSnapshot())));
+        Assert.Equal(RegionStage.Peopled, peopled.Stage);
+        Assert.Equal(DomainJson.Serialize(households), DomainJson.Serialize(peopled.Households));
+        Assert.Equal(DomainJson.Serialize(people), DomainJson.Serialize(peopled.People));
+
+        // A household is its region and its slot, a person its household and its slot in it.
+        var household = peopled.Households!.Households[0];
+        Assert.Equal(new SlotId<RegionId>(region.Id, 0), household.IdIn(region.Id));
+        Assert.Equal((2, 1L, 3L), (household.Family, household.ServantCount, household.Persons));
+        Assert.Equal(new SlotId<SlotId<RegionId>>(new SlotId<RegionId>(region.Id, 0), 2), peopled.People!.Persons[2].IdIn(region.Id));
+        Assert.Equal("Edric Alder", peopled.People.Persons[0].Name);
     }
 
     [Fact]

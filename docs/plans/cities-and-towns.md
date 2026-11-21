@@ -6,6 +6,10 @@ concept under "City and town". This document keeps what was asked, what a region
 its cities and towns are made, the decisions, the measurement and what was weighed. Where
 the two differ, society-generation.md holds.
 
+The numbers in persons below are those of the density of the time, 0.06 persons per km².
+The default is 0.3 since 2026-11-21, so a region, a city and a town hold five times the
+persons, and section 5.2 has the numbers measured since.
+
 ## What was asked
 
 - Plan the step from the Prospects of a region to its final cities and smaller urban

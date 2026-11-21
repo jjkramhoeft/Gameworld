@@ -86,7 +86,7 @@
            border-top: 4px solid transparent; border-bottom: 4px solid transparent; transition: transform .12s; }
   details.sec[open] > summary::before, details.grp[open] > summary::before { transform: rotate(90deg); }
 
-  .stages { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 8px; }
+  .stages { display: grid; grid-template-columns: repeat(auto-fit, minmax(62px, 1fr)); gap: 4px; margin-bottom: 8px; }
   .stages button { padding: 3px 0; font-size: 11.5px; border-radius: 999px; white-space: nowrap; }
   .stages button.reached { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; cursor: default; }
   .stages button:not(.reached) { border-style: dashed; color: var(--muted); }
@@ -154,6 +154,15 @@
            border-top: 1px solid var(--line); font-size: 13px; }
   .faction:first-child { border-top: 0; padding-top: 0; }
   .faction small { display: block; color: var(--muted); font-size: 12px; }
+  .household { padding: 6px 0; border-top: 1px solid var(--line); }
+  .household small { display: block; color: var(--muted); font-size: 12px; }
+  .household .tbl { margin-top: 3px; table-layout: fixed; }
+  .household .tbl td { border-top: 0; padding-top: 1px; padding-bottom: 1px; overflow: hidden; text-overflow: ellipsis; }
+  .household .tbl td:nth-child(1) { width: 36%; }
+  .household .tbl td:nth-child(2) { width: 17%; }
+  .household .tbl td:nth-child(3) { width: 13%; }
+  .household .tbl td:nth-child(4) { width: 8%; }
+  .household .tbl td.wide { width: auto; }
   .banner { width: 18px; height: 22px; margin-top: 2px; border: 4px solid var(--line); border-radius: 2px 2px 7px 7px; background: var(--field); }
   .grip { display: grid; grid-template-columns: 1fr 28px; gap: 6px; align-items: center; margin-top: 5px; font-size: 12.5px;
            font-variant-numeric: tabular-nums; text-align: right; }
@@ -800,13 +809,15 @@ $('layers').addEventListener('change', () => { showLegends(); draw(); });
 $('statistics').addEventListener('toggle', statistics);
 
 // Under the pointer: the region, the zone and the patch at the pinned point, a section each.
-const stageNames = ['Outlined', 'Detailed', 'Elevated', 'Planned', 'Settled'];
+const stageNames = ['Outlined', 'Detailed', 'Elevated', 'Planned', 'Settled', 'Housed', 'Peopled'];
 const stageAdds = {
   Outlined: 'zones linked, expanded and merged, and sea access',
   Detailed: 'patch mergers, rivers, lakes, estimated biomes and resources',
   Elevated: 'the height map, final biomes and resources',
   Planned: 'Prospects, the potential population and the factions',
   Settled: 'the travel network, cities and towns',
+  Housed: 'the households of the cities and towns, those of the factions first',
+  Peopled: 'the persons of every household: name, sex, age, vocation and family',
 };
 const prospectColour = name => legendData?.Prospects.find(c => c.Class === name)?.Colour;
 const kindOf = p => p.ForCity ? '◆ City' : '● Town';
@@ -872,11 +883,36 @@ const nameSites = { Mouth: 'a river mouth', Haven: 'a harbour', Shore: 'the coas
 const namedHow = p => [p.NamedBy ? `named by the ${esc(p.NamedBy)}` : null,
   p.NameSite ? `for ${nameSites[p.NameSite] ?? esc(words(p.NameSite).toLowerCase())}` : 'no place word'].filter(Boolean).join(' ');
 function placeTable(places) {
-  return `<table class="tbl"><thead><tr><th class="r">Rank</th><th>Name</th><th>Place</th><th class="r">Persons</th><th>Zone</th><th>Races</th></tr></thead><tbody>` +
+  const housed = places.some(s => s.Households != null);
+  return `<table class="tbl"><thead><tr><th class="r">Rank</th><th>Name</th><th>Place</th><th class="r">Persons</th>${housed ? '<th class="r" title="Households">Hh.</th>' : ''}<th>Zone</th><th>Races</th></tr></thead><tbody>` +
     places.map(s =>
       `<tr class="${s.Here ? 'here' : ''}"${s.Spot ? ` data-go="${s.Spot[0]},${s.Spot[1]}" tabindex="0" title="Patch ${coord(s.Patch)} · click to look at it"` : ''}>` +
-      `<td class="r">${s.Rank}</td><td>${esc(s.Name)}</td><td>${placeKind(s)}</td><td class="r">${big(s.Persons)}</td><td>${coord(s.Zone)}</td>` +
+      `<td class="r">${s.Rank}</td><td>${esc(s.Name)}</td><td>${placeKind(s)}</td><td class="r">${big(s.Persons)}</td>${housed ? `<td class="r">${big(s.Households)}</td>` : ''}<td>${coord(s.Zone)}</td>` +
       `<td class="wide">${s.Races.filter(r => r.Persons > 0).map(r => `${esc(r.Name)} ${big(r.Persons)}`).join(', ') || '–'}</td></tr>`).join('') + '</tbody></table>';
+}
+
+// One household of a city or a town: its surname, what it is, and its persons once the region is Peopled.
+const kinWords = { Head: ['head', 'head'], Spouse: ['husband', 'wife'], Child: ['son', 'daughter'], Parent: ['father', 'mother'],
+  Sibling: ['brother', 'sister'], Servant: ['servant', 'servant'] };
+const kinWord = (role, sex) => kinWords[role]?.[sex === 'Male' ? 0 : 1] ?? esc(words(role).toLowerCase());
+function householdCard(h) {
+  const notes = [];
+  if (h.Faction) notes.push(`<b>${h.Faction.Role}</b> · ${esc(words(h.Faction.What))}`);
+  notes.push(esc(h.Race), words(h.Wealth).toLowerCase(), `family of ${h.Family}` + (h.Servants ? ` and ${count(h.Servants, 'servant', 'servants')}` : ''));
+  if (h.Kin) notes.push(`its head is a ${kinWord(h.Kin.Relation, h.HeadSex)} of the head of household ${h.Kin.Household}${h.Kin.Place ? ' in ' + esc(h.Kin.Place) : ''}`);
+  const persons = h.Persons
+    ? `<table class="tbl"><tbody>` + h.Persons.map(q =>
+        `<tr><td>${esc(q.GivenName)} ${esc(q.Surname)}</td><td>${kinWord(q.Role, q.Sex)}</td><td>${q.Sex === 'Male' ? 'male' : 'female'}</td><td class="r">${q.Age}</td>` +
+        `<td class="wide">${q.Vocation ? esc(q.Vocation) : '–'}${q.Race !== h.Race ? ` · ${esc(q.Race)}` : ''}</td></tr>`).join('') + '</tbody></table>'
+    : `<small>its head is a ${h.HeadSex === 'Male' ? 'man' : 'woman'} of ${h.HeadAge}</small>`;
+  return `<div class="household"><div><b>${esc(h.Surname)}</b> <span class="muted">· household ${h.Slot}</span><small>${notes.join(' · ')}</small></div>${persons}</div>`;
+}
+function householdList(list) {
+  if (!list) return note('Households come with the Housed stage and their persons with the Peopled stage: the stage buttons of the region above.', 'after');
+  if (!list.length) return '';
+  const peopled = list.some(h => h.Persons);
+  return sub(`${count(list.length, 'household', 'households')}${peopled ? ', each with its persons: name, position, sex, age and vocation' : ' · their persons come with the Peopled stage'}`) +
+    list.map(householdCard).join('');
 }
 
 // One faction of a region: its banner, its role, what it is, its lead race and what the rule says about it.
@@ -945,9 +981,11 @@ function regionSection(d) {
     (t ? group('r-settled', 'Cities & towns', `${count(t.Cities, 'city', 'cities')} · ${count(t.Towns, 'town', 'towns')}`,
       personsStack(t.CityPersons, t.TownPersons, t.RuralPersons) +
       sub('Travel links the region decides') + kv([['Roads', t.Roads], ['River routes', t.RiverRoutes], ['Sea lanes', t.SeaLanes]]) +
+      (t.Households != null ? sub('In the cities and towns') + kv([['Households', big(t.Households)], ['Persons', t.Persons == null ? '<span class="muted">Peopled stage</span>' : big(t.Persons)]]) : '') +
       (t.Places.length ? `<div style="margin-top:8px">${placeTable(t.Places)}</div>` : note('The region has no city or town.', 'after')), false) : '') +
     (!p ? note('Prospects, the potential population and the factions come with the Planned stage, cities and towns with the Settled stage. Take the region there with the stage buttons above, or with the Prospects and Travel network layers.', 'after')
-      : !t ? note('Cities and towns come with the Settled stage: the Settled button above, or the Travel network layer.', 'after') : '');
+      : !t ? note('Cities and towns come with the Settled stage: the Settled button above, or the Travel network layer.', 'after')
+      : t.Households == null ? note('Households come with the Housed stage and their persons with the Peopled stage: the buttons above. They are listed under the city or town of a patch.', 'after') : '');
   return section('sec-region', 0, 'Region', coord(r.Id), tag, body);
 }
 
@@ -1030,7 +1068,8 @@ function patchSection(d) {
     (town ? group('p-settled', town.Capital ? 'Capital' : town.Kind, `${esc(town.Name)} · ${big(town.Persons)} persons · rank ${town.Rank}`,
       kv([['Name', `<b>${esc(town.Name)}</b>${pr ? ` <span class="muted">· ${namedHow(pr)}</span>` : ''}`]], 'one') +
       kv([['Place', placeKind(town)], ['Rank', `${town.Rank} in the region`], ['Persons', big(town.Persons)], ['Slot', town.Slot]]) +
-      (town.Races.some(r => r.Persons > 0) ? sub('By race, in the order of the races of its Prospect') + raceMeters(town.Races, town.Persons) : '')) : '') +
+      (town.Races.some(r => r.Persons > 0) ? sub('By race, in the order of the races of its Prospect') + raceMeters(town.Races, town.Persons) : '') +
+      householdList(p.Households)) : '') +
     (s ? group('p-score', pr ? 'Prospect & score' : 'Score', pr
         ? `${pr.Class} · for a ${pr.ForCity ? 'city' : 'town'} · ${pr.OnShow ? 'on show' : 'not on show'}` : `${num(s.Score, 1)} · rank ${s.Rank} of ${s.Of}`,
       (pr ? kv([

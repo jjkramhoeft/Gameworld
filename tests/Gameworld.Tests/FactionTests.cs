@@ -25,7 +25,7 @@ public class FactionTests
     }
 
     /// <summary>
-    /// A Parameter Set with the given races, at 6 persons per km²: a patch cell of 64 km² feeds 384
+    /// A Parameter Set with the given races, at 30 persons per km²: a patch cell of 64 km² feeds 1,920
     /// persons at a food supply of 1. Every race of the region is a main race.
     /// </summary>
     private static ParameterSet With(FactionParameters? factions, params RaceParameters[] races) => ParameterSet.Default with
@@ -33,7 +33,7 @@ public class FactionTests
         Races = races,
         Planning = ParameterSet.Default.Planning with
         {
-            Population = new PopulationParameters { PersonsPerKm2 = 6, ProsperityEffect = 0, MinorityRacesPerRegion = 0 },
+            Population = new PopulationParameters { PersonsPerKm2 = 30, ProsperityEffect = 0, MinorityRacesPerRegion = 0 },
             Factions = factions ?? new FactionParameters(),
         },
     };
@@ -194,22 +194,22 @@ public class FactionTests
     public void The_land_moves_the_fits()
     {
         var rules = new FactionRules(With(null, Race("a", 1, Only(FactionType.Family))), 1);
-        // One patch of the given kind, as large as it takes to feed the persons at 6 per km².
+        // One patch of the given kind, as large as it takes to feed the persons at 30 per km².
         FactionReading Reading(FactionPatch patch, int persons)
         {
             var population = new PopulationRules(With(null, Race("a", 1, Only(FactionType.Family))), 1);
-            FactionPatch[] land = [patch with { AreaKm2 = persons / 6.0 }];
+            FactionPatch[] land = [patch with { AreaKm2 = persons / 30.0 }];
             var races = population.Share(default, land.Select(x => new PopulationPatch(x.Biome, 100, x.AreaKm2, x.Resources, 0.5)).ToArray());
             Assert.Equal(persons, races.Persons.Sum(), 6);
             return rules.Read(land, races, []);
         }
 
-        var grain = rules.Fits(Reading(GrainLand(), 700));
+        var grain = rules.Fits(Reading(GrainLand(), 3500));
         var steppe = rules.Fits(Reading(
-            new(64, Biome.ColdSteppe, ElevationType.FlatLand, Resources(1, (Resource.Livestock, 0.8), (Resource.HorsesAndPackAnimals, 0.6)), 0), 300));
-        var peaks = rules.Fits(Reading(new(64, Biome.BorealForest, ElevationType.Mountains, Resources(1), 0), 300));
-        var haunted = rules.Fits(Reading(new(64, Biome.TemperateMixedForest, ElevationType.Lowland, Resources(1), 100), 300));
-        var tiny = rules.Fits(Reading(GrainLand(), 40));
+            new(64, Biome.ColdSteppe, ElevationType.FlatLand, Resources(1, (Resource.Livestock, 0.8), (Resource.HorsesAndPackAnimals, 0.6)), 0), 1500));
+        var peaks = rules.Fits(Reading(new(64, Biome.BorealForest, ElevationType.Mountains, Resources(1), 0), 1500));
+        var haunted = rules.Fits(Reading(new(64, Biome.TemperateMixedForest, ElevationType.Lowland, Resources(1), 100), 1500));
+        var tiny = rules.Fits(Reading(GrainLand(), 200));
 
         // Grain land with many persons suits a house best, and better than any other land does.
         Assert.Equal(1, grain[(int)FactionType.Family], 6);
@@ -384,13 +384,13 @@ public class FactionTests
     public void Lesser_factions_follow_the_persons_and_the_fit()
     {
         RaceParameters[] races = [Race("a", 3, new(3, 1, 2, 2, 1, 2)), Race("b", 1, new(1, 3, 3, 1, 1, 1))];
-        // Three patch cells of full land feed 1,152 persons.
+        // Three patch cells of full land feed 5,760 persons.
         FactionPatch[] land = [GrainLand(), GrainLand(), new(64, Biome.TemperateGrassland, ElevationType.FlatLand, Resources(1, (Resource.Salt, 0.5)), 0)];
 
         var open = With(new FactionParameters { LesserFit = 0, LesserJitter = 0, OppositionTension = 5 }, races);
         var two = With(new FactionParameters { LesserFit = 0, LesserJitter = 0, OppositionTension = 5, MaxLesserFactions = 2 }, races);
         var none = With(new FactionParameters { LesserFit = 0, MaxLesserFactions = 0, OppositionTension = 5 }, races);
-        var sparse = With(new FactionParameters { LesserFit = 0, PersonsPerLesserFaction = 400, OppositionTension = 5 }, races);
+        var sparse = With(new FactionParameters { LesserFit = 0, PersonsPerLesserFaction = 2000, OppositionTension = 5 }, races);
         var strict = With(new FactionParameters { LesserFit = 1.5 }, races);
         for (var i = 0; i < 30; i++)
         {
@@ -419,7 +419,7 @@ public class FactionTests
 
             Assert.Equal(2, Build(two, land, region).Factions.Count(f => f.Role == FactionRole.Lesser));
             Assert.Single(Build(none, land, region).Factions);
-            // 1,152 persons at 400 persons for each: two.
+            // 5,760 persons at 2,000 persons for each: two.
             Assert.Equal(2, Build(sparse, land, region).Factions.Count(f => f.Role == FactionRole.Lesser));
             Assert.DoesNotContain(Build(strict, land, region).Factions, f => f.Role == FactionRole.Lesser);
         }

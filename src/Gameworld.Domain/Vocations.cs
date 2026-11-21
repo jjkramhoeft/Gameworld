@@ -32,10 +32,11 @@ public enum SettlementTier
 
 /// <summary>
 /// A vocation: the work a person does. The vocations are a list in the Parameter Set, like the
-/// races, so the code knows no vocation by name. How the vocations of a place and of a person
-/// are drawn is not specified yet (society-generation.md section 8).
+/// races. A person of a city or a town gets its vocation in the Peopled stage
+/// (society-generation.md section 7); how the vocations of a place follow from its land is not
+/// specified yet (section 8).
 /// </summary>
-[Description("A vocation: the work a person does. The vocations are not drawn for places or persons yet (society §8).")]
+[Description("A vocation: the work a person does. The persons of the cities and towns get one (society §7); the vocations of the countryside are not drawn yet (society §8).")]
 public sealed partial record VocationParameters(
     [property: Description("The id the generated data knows the vocation by. Unique in the list; keep it when the name changes.")] string Id,
     [property: Description("The name shown for the vocation.")] string Name,
@@ -46,6 +47,9 @@ public sealed partial record VocationParameters(
     [Description("The starting share of the labour force of a whole region that holds the vocation, in per cent. The shares of the defaults sum to 100. They are starting values, not tuned (society §8).")]
     [Range(0, 100)]
     public double SharePercent { get; init; }
+
+    [Description("The social standing of the vocation, as a range on a scale of six: 1 outcast, 2 poor, 3 common, 4 middling, 5 wealthy, 6 ruling. The head of a household gets a vocation whose standing fits the wealth of the household: Destitute 1, Poor 2, Common 3, Comfortable 4, Rich 5 and 6 (society §7 and §8).")]
+    public IntRange Standing { get; init; } = new(3, 3);
 
     [Description("Whether the vocation is only found in a place on water: the shipwright and the sailor (society §8).")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
@@ -61,12 +65,14 @@ public sealed partial record VocationParameters(
     public string Lore { get; init; } = DefaultTexts.Missing;
 
     private static VocationParameters Make(
-        string id, string name, VocationSector sector, SettlementTier lowestTier, double sharePercent, bool onWater, string[] variants)
+        string id, string name, VocationSector sector, SettlementTier lowestTier, double sharePercent,
+        int lowestStanding, int highestStanding, bool onWater, string[] variants)
     {
         var (description, lore) = DefaultTexts.Of(DefaultTexts.Vocations, id);
         return new(id, name, true, sector, lowestTier)
         {
             SharePercent = sharePercent,
+            Standing = new IntRange(lowestStanding, highestStanding),
             OnWater = onWater,
             Variants = variants.Select(v =>
             {

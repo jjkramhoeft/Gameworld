@@ -1,7 +1,7 @@
 namespace Gameworld.Domain;
 
 /// <summary>
-/// The generation state of a city, faction, family or person. It is independent of the region
+/// The generation state of a city, faction, household or person. It is independent of the region
 /// stage: Stub → Pending → Realised.
 /// </summary>
 public enum GenerationState

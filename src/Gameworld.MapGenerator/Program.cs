@@ -5,7 +5,8 @@ using Gameworld.Generation;
 using Gameworld.Generation.Rendering;
 
 // The map generation app: generates a block of regions of one foundation up to a stage and
-// writes maps (png), the foundation and the stored regions (json) to a folder.
+// writes maps (png), the foundation and the stored regions (json) to a folder. A region that is
+// Housed holds its households in its json, and one that is Peopled their persons.
 
 CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
@@ -54,7 +55,7 @@ static string CapitalOf(Region region)
 static string Places(RegionSettlement? s, SettlementKind kind) => s is null
     ? "-"
     : $"{s.Settlements.Count(x => x.Kind == kind)}/{(kind == SettlementKind.City ? s.CityPersons : s.TownPersons)}";
-Console.WriteLine($"{"region",-10} {"stage",-9} {"zones",5} {"sea",5} {"patches",7} {"rivers",6} {"lakes",5} {"prospects",9} {"people",9} {"factions",8} {"cities",8} {"towns",8} {"links",5} {"ms",6}  {"name",-30} {"capital"}");
+Console.WriteLine($"{"region",-10} {"stage",-9} {"zones",5} {"sea",5} {"patches",7} {"rivers",6} {"lakes",5} {"prospects",9} {"people",9} {"factions",8} {"cities",8} {"towns",8} {"links",5} {"households",10} {"persons",7} {"ms",6}  {"name",-30} {"capital"}");
 foreach (var id in RegionStageRules.RegionsWithin(options.Centre, options.Rings))
 {
     var sw = Stopwatch.StartNew();
@@ -66,7 +67,8 @@ foreach (var id in RegionStageRules.RegionsWithin(options.Centre, options.Rings)
         + $"{region.Detail?.Lakes.Count.ToString() ?? "-",5} {region.Plan?.Prospects.Count.ToString() ?? "-",9} "
         + $"{region.Plan?.Population.Total.ToString() ?? "-",9} {region.Plan?.Factions.Count.ToString() ?? "-",8} "
         + $"{Places(region.Settlement, SettlementKind.City),8} {Places(region.Settlement, SettlementKind.Town),8} "
-        + $"{region.Settlement?.Travel.Links.Count.ToString() ?? "-",5} {sw.ElapsedMilliseconds,6}  {region.Plan?.Name ?? "-",-30} {CapitalOf(region)}");
+        + $"{region.Settlement?.Travel.Links.Count.ToString() ?? "-",5} {region.Households?.Households.Count.ToString() ?? "-",10} "
+        + $"{region.People?.Persons.Count.ToString() ?? "-",7} {sw.ElapsedMilliseconds,6}  {region.Plan?.Name ?? "-",-30} {CapitalOf(region)}");
 }
 Console.WriteLine($"Generated {regions.Count} regions in {total.Elapsed.TotalSeconds:F1} s ({world.Regions.Count} stored, the rest as far as the stages around them need)");
 
@@ -120,7 +122,7 @@ internal sealed record Options
     public string? ParametersPath { get; init; }
     public RegionId Centre { get; init; } = new(0, 0);
     public int Rings { get; init; } = 1;
-    public RegionStage Stage { get; init; } = RegionStage.Settled;
+    public RegionStage Stage { get; init; } = RegionStageRules.Last;
     public string OutDir { get; init; } = "out";
     public double MetresPerPixel { get; init; } = 250;
     public MapMode[] Modes { get; init; } = [MapMode.Map, MapMode.Biomes, MapMode.Height];
@@ -182,7 +184,8 @@ internal sealed record Options
           --parameters <file.json>    the Parameter Set (default: the built-in defaults)
           --region <i,j>              the centre region (default 0,0)
           --rings <n>                 rings of regions around the centre (default 1: 3 × 3 regions)
-          --stage <stage>             Outlined, Detailed, Elevated, Planned or Settled (default Settled)
+          --stage <stage>             Outlined, Detailed, Elevated, Planned, Settled, Housed or Peopled
+                                      (default Peopled)
           --out <folder>              where to write (default "out")
           --scale <m/px>              metres per pixel of the maps (default 250)
           --modes <list>              map,biomes,height,none (default the first three)

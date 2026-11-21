@@ -219,14 +219,14 @@ public class RegionNameTests
     {
         var rules = new RegionNameRules(ParameterSet.Default, 20261120);
         var names = ParameterSet.Default.Planning.Names;
-        Assert.Equal(250, names.SmallRegionPersons);
-        Assert.Equal(500, names.LargeRegionPersons);
+        Assert.Equal(1250, names.SmallRegionPersons);
+        Assert.Equal(2500, names.LargeRegionPersons);
 
         // The size: small below the small limit, large above the large limit.
-        Assert.Equal(RegionNameSize.Small, rules.SizeOf(249));
-        Assert.Equal(RegionNameSize.Middling, rules.SizeOf(250));
-        Assert.Equal(RegionNameSize.Middling, rules.SizeOf(500));
-        Assert.Equal(RegionNameSize.Large, rules.SizeOf(501));
+        Assert.Equal(RegionNameSize.Small, rules.SizeOf(1249));
+        Assert.Equal(RegionNameSize.Middling, rules.SizeOf(1250));
+        Assert.Equal(RegionNameSize.Middling, rules.SizeOf(2500));
+        Assert.Equal(RegionNameSize.Large, rules.SizeOf(2501));
 
         // A region without a ruling faction has no name.
         Assert.Null(rules.Name(new GridCoord(0, 0), null, 0));
@@ -236,9 +236,9 @@ public class RegionNameTests
             var region = new GridCoord(i, -i);
 
             // A house: its surname from the name model of its lead race.
-            var human = rules.Name(region, Ruling(FactionType.Family, "midlanders"), 300)!;
-            var elven = rules.Name(region, Ruling(FactionType.Family, "elf"), 300)!;
-            var orcish = rules.Name(region, Ruling(FactionType.Family, "orc"), 300)!;
+            var human = rules.Name(region, Ruling(FactionType.Family, "midlanders"), 1500)!;
+            var elven = rules.Name(region, Ruling(FactionType.Family, "elf"), 1500)!;
+            var orcish = rules.Name(region, Ruling(FactionType.Family, "orc"), 1500)!;
             Assert.True(human.Human);
             Assert.False(elven.Human);
             Assert.False(orcish.Human);
@@ -257,7 +257,7 @@ public class RegionNameTests
                     Races = ParameterSet.Default.Races.Select(r => r.Id == "midlanders" ? r with { NameStyle = NameStyle.Dark } : r).ToArray(),
                 },
                 20261120);
-            var darkHuman = dark.Name(region, Ruling(FactionType.Family, "midlanders"), 300)!;
+            var darkHuman = dark.Name(region, Ruling(FactionType.Family, "midlanders"), 1500)!;
             Assert.True(darkHuman.Human);
             Assert.Equal(orcish.RulingHouse, darkHuman.RulingHouse);
 
@@ -268,7 +268,7 @@ public class RegionNameTests
                 human.Name);
 
             // Any other ruler is no house, and a race that is not in the Parameter Set is not human and has the common style.
-            var guilds = rules.Name(region, Ruling(FactionType.Vocation, "nobody"), 900)!;
+            var guilds = rules.Name(region, Ruling(FactionType.Vocation, "nobody"), 4500)!;
             Assert.Null(guilds.RulingHouse);
             Assert.False(guilds.Human);
             Assert.Equal(NameStyle.Common, rules.StyleOf("nobody"));
@@ -278,8 +278,8 @@ public class RegionNameTests
         // Another seed gives other names.
         var other = new RegionNameRules(ParameterSet.Default, 7);
         Assert.Contains(Enumerable.Range(0, 20), i =>
-            rules.Name(new GridCoord(i, 0), Ruling(FactionType.Race, "orc"), 300)
-            != other.Name(new GridCoord(i, 0), Ruling(FactionType.Race, "orc"), 300));
+            rules.Name(new GridCoord(i, 0), Ruling(FactionType.Race, "orc"), 1500)
+            != other.Name(new GridCoord(i, 0), Ruling(FactionType.Race, "orc"), 1500));
     }
 
     [Fact]

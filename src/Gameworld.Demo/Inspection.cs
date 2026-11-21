@@ -38,6 +38,8 @@ internal sealed class Inspection
     private readonly ElevationWork? _elevation;
     private readonly PlanWork? _plan;
     private readonly SettlementWork? _settled;
+    private readonly RegionHouseholds? _households;
+    private readonly RegionPeople? _people;
     private readonly double _patchKm2;
     /// <summary>The place of a land patch among the Elevated patches of the region, which is the order the persons of the patches are in.</summary>
     private readonly Dictionary<long, int> _finalIndex = new();
@@ -55,6 +57,8 @@ internal sealed class Inspection
         _elevation = world.FindElevation(_regionId);
         _plan = world.FindPlan(_regionId);
         _settled = world.FindSettlement(_regionId);
+        _households = world.FindHouseholds(_regionId);
+        _people = world.FindPeople(_regionId);
         var km = _cells.PatchSize / 1000;
         _patchKm2 = km * km;
         if (_elevation != null)
@@ -236,14 +240,34 @@ internal sealed class Inspection
             places.Settlements.Select(PlaceLine).ToArray(),
             _settled.Links.Count(l => l.Kind == TravelLinkKind.Road),
             _settled.Links.Count(l => l.Kind == TravelLinkKind.RiverRoute),
-            _settled.Links.Count(l => l.Kind == TravelLinkKind.SeaLane));
+            _settled.Links.Count(l => l.Kind == TravelLinkKind.SeaLane),
+            _households?.Households.Count,
+            _people?.Persons.Count);
     }
 
     private PlaceLine PlaceLine(Settlement s) => new(
         s.Slot, s.Name, s.Kind, s.Capital, s.Rank, s.Persons, s.Patch, SpotOf(s.Patch),
         new ZoneId(new ZoneCellId(ZoneOf(s.Patch))),
         s.Races.Select(r => new RaceLine(RaceName(r.Race), r.Persons, RaceStanding.Main)).ToArray(),
-        s.Patch.Coord == _info.Patch);
+        s.Patch.Coord == _info.Patch,
+        _households?.In(s).Count());
+
+    /// <summary>The households of a city or a town, with their persons once the region is Peopled. Null until the region is Housed.</summary>
+    private HouseholdInfo[]? HouseholdsOf(Settlement place) => _households?.In(place).Select(h =>
+    {
+        var faction = h.Faction is { } slot ? _plan?.Factions.Factions.FirstOrDefault(f => f.Slot == slot) : null;
+        var first = h.Kin is { } kin ? _households.Households[kin.Household] : null;
+        return new HouseholdInfo(
+            h.Slot, h.Surname, RaceName(h.Race), h.Wealth,
+            faction is null ? null : new HouseholdFaction(
+                faction.Slot, faction.Role, faction.Kind is null ? faction.Form.ToString() : FactionRules.KindName(faction.Kind)),
+            h.Family, h.ServantCount, h.HeadSex, h.HeadAge,
+            first is null ? null : new HouseholdKinInfo(
+                first.Slot, h.Kin!.Relation, _settled?.Places.Settlements.FirstOrDefault(s => s.Slot == first.Settlement)?.Name),
+            _people?.Of(h).Select(p => new PersonLine(
+                p.Slot, p.GivenName, p.Surname, RaceName(p.Race), p.Sex, p.Age, p.Role,
+                p.Vocation is null ? null : VocationName(p.Vocation))).ToArray());
+    }).ToArray();
 
     // ───────────────────────── Zone ─────────────────────────
 
@@ -349,7 +373,8 @@ internal sealed class Inspection
                     1 + _plan!.Scores.Count(s => s.Score > score.Score), _plan.Scores.Length),
             slot < 0 ? null : ProspectLine(slot),
             place is null ? null : PlaceLine(place),
-            shape.Ocean ? null : PopulationOf([patch]));
+            shape.Ocean ? null : PopulationOf([patch]),
+            place is null ? null : HouseholdsOf(place));
     }
 
     // ───────────────────────── A set of patches ─────────────────────────
@@ -531,6 +556,7 @@ public sealed record ZoneInfo(
 /// <param name="Prospect">Null when the patch has no Prospect.</param>
 /// <param name="Settlement">The city or town on the Prospect of the patch. Null when it has none, and until the region is Settled.</param>
 /// <param name="Population">The potential population on the patch. Null for an ocean patch and until the region is Planned.</param>
+/// <param name="Households">The households of the city or town on the patch. Null when it has none, and until the region is Housed.</param>
 public sealed record PatchInfo(
     PatchId Id,
     int Cells,
@@ -555,7 +581,8 @@ public sealed record PatchInfo(
     PatchScoreInfo? Score,
     ProspectLine? Prospect,
     PlaceLine? Settlement,
-    PopulationInfo? Population);
+    PopulationInfo? Population,
+    HouseholdInfo[]? Households);
 
 /// <summary>What a set of patches holds together, by area.</summary>
 /// <param name="CoastalPatches">The land patches with a patch cell on the coast.</param>
@@ -654,15 +681,43 @@ public sealed record FactionReadingInfo(
     double Tension, NamedValue[] Terms, NamedValue[] Fits, NamedValue[] Indices, int Harbours, double BestTradeFactor, bool HasCity);
 
 /// <summary>The cities and towns of a Settled region, the persons in them and on the land, and the travel links the region decides.</summary>
+/// <param name="Households">The households of its cities and towns. Null until the region is Housed.</param>
+/// <param name="Persons">The persons of those households. Null until the region is Peopled.</param>
 public sealed record SettledInfo(
     int Cities, long CityPersons, int Towns, long TownPersons, long RuralPersons, PlaceLine[] Places,
-    int Roads, int RiverRoutes, int SeaLanes);
+    int Roads, int RiverRoutes, int SeaLanes, int? Households, int? Persons);
 
 /// <summary>A city or a town.</summary>
 /// <param name="Rank">Its rank among the cities and towns of its region, from 1.</param>
 /// <param name="Spot">Where its Prospect is placed.</param>
 /// <param name="Races">The persons of each of its races, in the order of the races of its Prospect.</param>
 /// <param name="Here">It stands on the patch under the pointer.</param>
+/// <param name="Households">How many households it holds. Null until the region is Housed.</param>
 public sealed record PlaceLine(
     int Slot, string Name, SettlementKind Kind, bool Capital, int Rank, long Persons, PatchId Patch, WorldPoint? Spot, ZoneId Zone,
-    RaceLine[] Races, bool Here);
+    RaceLine[] Races, bool Here, int? Households);
+
+/// <summary>A household of a city or a town (society-generation.md section 6).</summary>
+/// <param name="Race">The name of the race of the family.</param>
+/// <param name="Faction">The faction the household belongs to. Null for a household of no faction.</param>
+/// <param name="Family">How many persons the family holds, the head included.</param>
+/// <param name="Kin">The household is a branch of a house: how its head is kin of the head of the first household. Null otherwise.</param>
+/// <param name="Persons">The persons of the household, the head first. Null until the region is Peopled.</param>
+public sealed record HouseholdInfo(
+    int Slot, string Surname, string Race, WealthLevel Wealth, HouseholdFaction? Faction, int Family, long Servants,
+    Sex HeadSex, int HeadAge, HouseholdKinInfo? Kin, PersonLine[]? Persons);
+
+/// <summary>The faction of a household: its slot, its role and what it is.</summary>
+public sealed record HouseholdFaction(int Slot, FactionRole Role, string What);
+
+/// <summary>How the head of a branch household is kin of the head of the first household of its house.</summary>
+/// <param name="Household">The slot of the first household of the house.</param>
+/// <param name="Relation">Child or Sibling.</param>
+/// <param name="Place">The name of the city or town of the first household.</param>
+public sealed record HouseholdKinInfo(int Household, HouseholdRole Relation, string? Place);
+
+/// <summary>A person of a household (society-generation.md section 7).</summary>
+/// <param name="Race">The name of the race of the person.</param>
+/// <param name="Vocation">The name of the vocation. Null for a child and where no vocation fits.</param>
+public sealed record PersonLine(
+    int Slot, string GivenName, string Surname, string Race, Sex Sex, int Age, HouseholdRole Role, string? Vocation);

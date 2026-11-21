@@ -1,13 +1,13 @@
 # Gameworld
 
-Gameworld generates a map-based fantasy world on demand: an unbounded map of regions with seas, rivers, heights, biomes and resources, and a society of races, factions, cities, families and persons that lives on it. It is a sandbox, prototype and research repo for a larger PC game.
+Gameworld generates a map-based fantasy world on demand: an unbounded map of regions with seas, rivers, heights, biomes and resources, and a society of races, factions, cities, households and persons that lives on it. It is a sandbox, prototype and research repo for a larger PC game.
 
 This readme defines the concepts of the world and is the source of every name. The rules of the generation are in two documents:
 
 | Subject | Document | Covers |
 | --- | --- | --- |
 | The map | [docs/map-generation.md](docs/map-generation.md) | Geography, climate, biomes, resources, Prospects and the travel network |
-| The society | [docs/society-generation.md](docs/society-generation.md) | Races, the potential population, factions, cities and towns, families, persons, vocations and looks |
+| The society | [docs/society-generation.md](docs/society-generation.md) | Races, the potential population, factions, cities and towns, households, persons, vocations and looks |
 
 Contents: [Overview](#overview) · [Concepts](#concepts) · [Documentation](#documentation) · [Build and run](#build-and-run)
 
@@ -21,7 +21,7 @@ Gameworld explores new gameplay and generation algorithms for map-based generate
 
 * The game world should be larger than any player reasonably can explore, even if playing multiple hours per day for half a year.
 * There should be a very large number of people in the game world known to an active player.
-* The geography, map, cities, factions, families and people should be procedurally generated.
+* The geography, map, cities, factions, households and people should be procedurally generated.
 * A fine balance between believability and wonder.
 * Variation, exploration and progression that foster continued play and replayability.
 
@@ -38,13 +38,13 @@ The project is in phase 1.
 ### What drives the design
 
 * **Parameters must be easy to change and test.** Phase 1 consists of changing map and world parameters and evaluating the resulting maps and worlds.
-* **Storage.** At game start a big area of the game world and map is calculated, to facilitate the populating with cities, factions, families and persons. To avoid repeating that calculation, significant data is persisted in a database.
+* **Storage.** At game start a big area of the game world and map is calculated, to facilitate the populating with cities, factions, households and persons. To avoid repeating that calculation, significant data is persisted in a database.
 * **Generation on demand.** The game supports a large number of persons, towns and cities, but only a small and relevant set is precalculated. Persons and locations depend on LLMs for text and diffusion models for pictures. As play progresses, more persons and locations are calculated.
 * **Data transfer** between the backend and the frontend clients.
 
 ### Status
 
-The map is generated through all its stages, from the cells to the travel network, with the flora and fauna of every patch. Of the society, the races of each region, their potential population, the factions of each region, the name of each region, and the cities and towns of each region with their names, their persons and their races are generated. The persons of a city or a town are a count per race so far. The person-name generator is in place, and for now it gives the surnames of the houses that name a region and some of the first parts of city and town names. The vocations and their tools are lists in the Parameter Set and are not drawn yet. The races, the vocations, the tools, the flora, the fauna and the resources carry a description and a lore in the Parameter Set, for the pictures to come, and so do the biomes and the variants of the vocations; every one of the default texts is written. Families and individual persons are defined below but not generated yet, and neither is there a database: the apps compute everything in memory.
+The map is generated through all its stages, from the cells to the travel network, with the flora and fauna of every patch. Of the society, the races of each region, their potential population, the factions of each region, the name of each region, and the cities and towns of each region with their names, their persons and their races are generated. The households of every city and town are generated, those of the factions first, and so are the persons of every household: each with a name, a sex, an age, a position in the household, family links and a vocation. The persons on the land are still a count per race. The person-name generator gives the names of the persons, the surnames of the households and some of the first parts of city and town names. The vocations of the countryside, the variant of a vocation and the tools are not drawn yet. The races, the vocations, the tools, the flora, the fauna and the resources carry a description and a lore in the Parameter Set, for the pictures to come, and so do the biomes and the variants of the vocations; every one of the default texts is written. Nothing is authored yet: no description, history or portrait of a person. There is no database either: the apps compute everything in memory.
 
 ## Concepts
 
@@ -64,7 +64,7 @@ Foundation = seed + generator version + Parameter Set
       ├─ Faction                        a ruling faction per region, an opposition, lesser factions
       ├─ Region name                    the realm of the ruling faction
       ├─ City and town                  one on every Prospect on show, with a name and races
-      ├─ Family, Person                 a person with a vocation and looks
+      ├─ Household, Person              a family and its servants; a person with a vocation and looks
       ├─ Vocation, Tool                 the work of a person, and the tools of the work
       └─ Colour                         favourite colours of a race, the banner of a faction
 ```
@@ -106,7 +106,7 @@ All structural identities are deterministic. No database generated ids appear in
 
 * Region, zone cell and patch cell = coordinate in the grid of its level
 * Zone and patch = the identity of its root cell (see Zone)
-* City, faction, family and person = parent + slot index. The parent of a faction, a city and a town is its region
+* City, faction, household and person = parent + slot index. The parent of a faction, a city, a town and a household is its region. The parent of a person is its household
 
 This lets player state and authored data point at derived data that may be evicted and recomputed, and it makes a Stub addressable before it is Realised.
 
@@ -121,7 +121,9 @@ A region moves through the stages below, in the order of the table and one stage
 | Detailed | Patch mergers, rivers, lakes. Estimated biomes and resources | All bordering regions Outlined |
 | Elevated | Height map. Final biomes and resources | All bordering regions Detailed |
 | Planned | Factions and Prospects for cities and towns. The races of the region, their potential population, and the races and the name of a city or a town on each Prospect. The name of the region | The region Elevated |
-| Settled | Travel network. Actual cities and towns, families and important persons | The region and all bordering regions Planned |
+| Settled | Travel network. Actual cities and towns | The region and all bordering regions Planned |
+| Housed | The households of the cities and towns: those of the factions, then the others of the cities, then those of the towns | The region Settled |
+| Peopled | The persons of every household: name, sex, age, vocation and family relations | The region Housed |
 
 Sited is not a state a region is in. It needs only the seed, so it is a pure function that can be calculated for any region at any time, and it is never persisted. Stored regions start at Outlined. The Sited row describes what the function yields.
 
@@ -131,7 +133,7 @@ The policy for when a region advances (Detailed within some distance of the play
 
 #### Entity generation state
 
-Cities, factions, families and persons each have their own generation state, independent of the region generation stage: Stub → Pending → Realised.
+Cities, factions, households and persons each have their own generation state, independent of the region generation stage: Stub → Pending → Realised.
 
 A Stub holds every gameplay-relevant fact and is derived data. Pending means the authoring by LLM or diffusion model is in flight, and on failure the entity returns to Stub. Realised adds the authored presentation only, which must not contradict the Stub. Text and portrait are tracked separately. See [docs/society-generation.md](docs/society-generation.md) section 1.2.
 
@@ -250,13 +252,13 @@ Roads, river routes and sea lanes that connect the Prospects on show. The networ
 
 ### The society
 
-The peoples that live on the map. The Stub of every entity in this group is derived data, and its presentation is authored. The rules are in [docs/society-generation.md](docs/society-generation.md). Only the races, the potential population, the factions, the cities and towns and the tools are specified there so far. Detailing the rest is a later task.
+The peoples that live on the map. The Stub of every entity in this group is derived data, and its presentation is authored. The rules are in [docs/society-generation.md](docs/society-generation.md). The races, the potential population, the factions, the cities and towns, the households, the persons and the tools are specified there so far. Detailing the rest is a later task.
 
 #### Race
 
-A people that can live in the world: Northmen, Elves, Dwarves and so on. Races are needed to generate factions, families and persons. Race is the only level: a race has no sub-races, and each human people is a race of its own, so there is no plain human race.
+A people that can live in the world: Northmen, Elves, Dwarves and so on. Races are needed to generate factions, households and persons. Race is the only level: a race has no sub-races, and each human people is a race of its own, so there is no plain human race.
 
-The races are a list in the Parameter Set, not a fixed set in the code. Each race has an id, a name, a toggle (on or off), a mark for a human race, a name style (which of the three name models its names come from), a frequency for each biome, a height modifier, a leaning to each type of faction, two lists of other races (the races it appreciates and the races it hates), a list of favourite colours, a description (what a person of the race looks like) and a lore. The default list holds 28 races, all on: seven human races (Northmen, Midlanders, Saltroad folk, Sunlanders, Grass riders, Rainkeepers, Canal folk), five classic races (Elves, Dwarves, Halflings, Gnomes, Orcs) and sixteen new near-human races (docs/society-generation.md Appendix A). A faction has a lead race. How a family or a person gets its race is not decided yet.
+The races are a list in the Parameter Set, not a fixed set in the code. Each race has an id, a name, a toggle (on or off), a mark for a human race, a name style (which of the three name models its names come from), a frequency for each biome, a height modifier, a leaning to each type of faction, two lists of other races (the races it appreciates and the races it hates), a list of favourite colours, a description (what a person of the race looks like) and a lore. The default list holds 28 races, all on: seven human races (Northmen, Midlanders, Saltroad folk, Sunlanders, Grass riders, Rainkeepers, Canal folk), five classic races (Elves, Dwarves, Halflings, Gnomes, Orcs) and sixteen new near-human races (docs/society-generation.md Appendix A). A faction has a lead race. A household has the race of its family, one of the races of its city or town, and a person of the family has that race. A servant can be of another race of the place.
 
 #### Main race and minority race
 
@@ -264,7 +266,7 @@ A region does not hold every race. It holds up to six: four main races and two m
 
 #### Potential population
 
-An estimate of how many persons the land of a region can feed, for each race of the region. It is not a count of people that exist: cities, families and persons come in the Settled stage, where the potential population becomes the persons of the cities, the towns and the land.
+An estimate of how many persons the land of a region can feed, for each race of the region. It is not a count of people that exist: cities and towns come in the Settled stage, where the potential population becomes the persons of the cities, the towns and the land. The persons of the cities and towns then get their households and become individual persons in the Housed and Peopled stages.
 
 Every land patch has a capacity that comes from its area, its food resources and the Prosperity field. The races of the region share it by their frequency in the biome of the patch and their height modifier at its height. So the races compete for the same land, and toggling a race off leaves its share to the others. A minority race is lifted towards a twentieth of the region, so that it is large enough to be met. A patch where no race of the region lives holds nobody. The potential population is calculated in the Planned stage.
 
@@ -277,6 +279,8 @@ The type of a faction is what binds its members. There are six: Family (a house 
 A faction has a lead race, the race of its leaders. A faction of the type Race holds that race only. Any other faction is open to the races of its seat. The seat is the Prospect the faction sits on, and the seat of the ruling faction is the capital of the region.
 
 A faction has a main colour and a secondary colour: the field and the device of its banner. They are drawn mostly from the favourite colours of its lead race, and the secondary colour is one that stands out against the main one.
+
+A faction has households: those of its leaders. See Household.
 
 #### Ruling faction, opposition and lesser faction
 
@@ -302,23 +306,35 @@ A city or a town holds some of the races of its region: the largest around its P
 
 A city or a town has a name: Jarlhavn, Khar Nuur, Qasr Mehret. The name is not authored: it comes from the city and town name generator, as the name of a region comes from its generator. A name is a first part and a place word. One of the races of the place names it, drawn by how many of each race live around it, and the capital is named by the lead race of the ruling faction. The race gives the words, each race from word lists of its own, and the site gives the kind of place word: a harbour, a ford, a hill, a city or a town. The name is worked out in the Planned stage for every Prospect, with its races. So a Prospect has its name before a city or a town stands on it, and no two cities or towns of a region have the same name.
 
-#### Family
+#### Household
 
-A family of NPCs, typically living together in a household. It can include servants or slaves.
+A family and its servants, living together in one city or town. Households belong to the Housed stage, and the identity of a household is its region and a slot. A household shares two things: its wealth and its faction. The wealth is one of five levels: Destitute, Poor, Common, Comfortable and Rich. A household has the race of its family and a surname, and its servants can be of another race.
+
+The households of a city or a town hold exactly its persons, race by race, so every person of a city or a town lives in one household. The households of the factions are made first. A faction gets two households where the cities and towns of its region hold persons for them: of its lead race where a city or town holds one, and at its seat before any other place. A faction whose region has too few such persons has one household or none. The other households of the cities follow, and then those of the towns. The households of the land are not generated yet.
+
+#### Family and house
+
+The family is the kin in a household: the head, its husband or wife, its children, its parents and its siblings. The servants belong to the household and not to the family.
+
+A house is the households of one faction of the type Family. They are one family in several households: they share a surname and a race, and the head of a later household is a child or a sibling of the head of the first. The house that rules a region has the surname that can stand in the name of the region.
 
 #### Person
 
-An NPC in the game. The Stub of a person holds name, age, sex, vocation, role, family links, faction membership and home. The name is not authored: it comes from the name generator, so a person has a name already as a Stub. The textual description, the history and the portrait are authored.
+An NPC in the game. Persons belong to the Peopled stage, and the identity of a person is its household and a slot in it. Every person of a household is generated as a Stub, so every person of a city or a town is an individual. The persons of the land are still a count per race.
+
+The Stub of a person holds name, sex, age, race, vocation, role, family links and its household. The household gives the person its home, its wealth and its faction. The role is the position in the household for now: head, spouse, child, parent, sibling or servant. The family links are the husband or wife, the father and the mother, where they live in the same household. The name is not authored: it comes from the name generator in the name style of the race, so a person has a name already as a Stub. The textual description, the history and the portrait are authored.
 
 #### Vocation
 
-The work a person does: farmer, smith, priest. A person has one vocation and can have a by-work, a second vocation beside it. The vocation is not the role: the role is the position of the person in the household, in the vocation or in a faction. The vocations are a list in the Parameter Set, like the races. Each vocation has an id, a name, a toggle, a sector (one of nine), the lowest tier of place it is found in (countryside, town, city or capital), a starting share of the labour force, its variants (the shepherd is a variant of the herder), a description and a lore. A variant has a name, a description and a lore of its own. The default list holds 51 vocations. How a place and a person get their vocations is not specified yet, so no vocation is generated.
+The work a person does: farmer, smith, priest. A person has one vocation and can have a by-work, a second vocation beside it. The vocation is not the role: the role is the position of the person in the household, in the vocation or in a faction. The vocations are a list in the Parameter Set, like the races. Each vocation has an id, a name, a toggle, a sector (one of nine), the lowest tier of place it is found in (countryside, town, city or capital), a starting share of the labour force, a standing (a range on a scale of six, from outcast to ruling), its variants (the shepherd is a variant of the herder), a description and a lore. A variant has a name, a description and a lore of its own. The default list holds 51 vocations.
+
+A person of a city or a town gets its vocation in the Peopled stage. The head of a household of a faction holds a vocation of the faction. Any other head holds a vocation that is found in the place and whose standing fits the wealth of the household. The others of the family hold the vocation of the head or one of their own, a child holds none, and a servant is a servant. The variant, the by-work and the vocations of the countryside are not generated yet.
 
 #### Tool
 
 A thing a vocation works with: the anvil of the smith, the sickle of the farmer, the fleam of the healer. The tools are a list in the Parameter Set, like the vocations. Each tool has an id, a name, a toggle, the vocations that work with it (the vocation it belongs to most first) an emblem weight (how well it serves as the emblem of its vocations on a coat of arms), a description and a lore. A tool can serve several vocations, and the tools of a vocation are the tools that list it. The default list holds 146 tools, at least two for each default vocation (docs/society-generation.md section 8.1).
 
-Nothing draws a tool yet. The coats of arms of families, guilds and some cities are to take their charges from the tools of a vocation, as a smiths' guild bears hammers, and a portrait can show what a person holds at work. A tool is not the produced resource group Tools: the group is goods a place makes, a tool of the list is a kind of thing a person works with.
+Nothing draws a tool yet. The coats of arms of houses, guilds and some cities are to take their charges from the tools of a vocation, as a smiths' guild bears hammers, and a portrait can show what a person holds at work. A tool is not the produced resource group Tools: the group is goods a place makes, a tool of the list is a kind of thing a person works with.
 
 #### Looks
 
@@ -380,7 +396,7 @@ Generates a block of regions of one foundation up to a stage and writes the resu
 dotnet run --project src/Gameworld.MapGenerator -c Release
 ```
 
-Without options it takes the 3 × 3 regions around region (0, 0) of the seed `cellgen` to the Settled stage with the default Parameter Set, and writes to `out/`. It prints a line per region: its stage, the counts of zones, patches, rivers, lakes, Prospects, persons, factions, cities, towns and travel links, the time it took, the name of the region and the name of its capital. Options go after `--`:
+Without options it takes the 3 × 3 regions around region (0, 0) of the seed `cellgen` to the Peopled stage with the default Parameter Set, and writes to `out/`. It prints a line per region: its stage, the counts of zones, patches, rivers, lakes, Prospects, persons, factions, cities, towns, travel links, households and the persons in them, the time it took, the name of the region and the name of its capital. The json of a region holds its households and their persons. Options go after `--`:
 
 ```bash
 dotnet run --project src/Gameworld.MapGenerator -c Release -- --seed atlas --region 2,2 --rings 2 --out out/atlas
@@ -392,7 +408,7 @@ dotnet run --project src/Gameworld.MapGenerator -c Release -- --seed atlas --reg
 | `--parameters <file.json>` | The Parameter Set | the built-in defaults |
 | `--region <i,j>` | The centre region | `0,0` |
 | `--rings <n>` | Rings of regions around the centre (1 gives 3 × 3 regions) | `1` |
-| `--stage <stage>` | Outlined, Detailed, Elevated, Planned or Settled | `Settled` |
+| `--stage <stage>` | Outlined, Detailed, Elevated, Planned, Settled, Housed or Peopled | `Peopled` |
 | `--out <folder>` | Where to write | `out` |
 | `--scale <m/px>` | Metres per pixel of the maps | `250` |
 | `--modes <list>` | Which maps to draw: `map`, `biomes`, `height` | all three |
@@ -435,7 +451,7 @@ dotnet run --project src/Gameworld.Demo -c Release
 
 Then open <http://localhost:5062>. Drag to pan, scroll to zoom, and click the map to see the region, zone and patch at that point. The side panel switches the base map (elevation types, biomes, height, or none) and the layers, among them the four Fields, and it replaces the foundation: a new seed, or an edited Parameter Set under "Parameter Set (json)". Replacing the foundation discards all derived data.
 
-"Under the pointer" has a section for the region, one for the zone and one for the patch, each with groups that fold away. The region section shows the stages the region has reached, with a button to take it to each later stage. A row of a Prospect, a city or a town moves the pointer to it. A Prospect, a city or a town shows its name, the race that named it and what the place word says about its site. "Statistics" counts the current view: the land, the biomes and the climate, the heights, the water, the resources, the flora and fauna, and for the regions that are Planned or Settled the Prospects, the potential population, the factions and the cities and towns.
+"Under the pointer" has a section for the region, one for the zone and one for the patch, each with groups that fold away. The region section shows the stages the region has reached, with a button to take it to each later stage. A row of a Prospect, a city or a town moves the pointer to it. A Prospect, a city or a town shows its name, the race that named it and what the place word says about its site. The patch of a city or a town lists its households once the region is Housed, and the persons of each once it is Peopled: take the region there with the stage buttons. "Statistics" counts the current view: the land, the biomes and the climate, the heights, the water, the resources, the flora and fauna, and for the regions that are Planned or Settled the Prospects, the potential population, the factions and the cities and towns.
 
 The borders are two layers: Main borders (the region borders and the coast) and Other borders (the zone and patch borders). The Prospects layer draws the Prospects on show. City names and Town names write the name of the city or town of each beside it: the capitals first, then the other cities and the towns as you zoom in. Leading faction name and Leading faction type write the name of the realm of the ruling faction of a region, and the type of that faction, above its capital.
 

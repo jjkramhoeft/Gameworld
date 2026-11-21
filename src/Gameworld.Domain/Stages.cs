@@ -21,8 +21,12 @@ public enum RegionStage
     Elevated,
     /// <summary>Factions and Prospects for cities and towns.</summary>
     Planned,
-    /// <summary>Travel network. Actual cities and towns, families and important persons.</summary>
+    /// <summary>Travel network. Actual cities and towns.</summary>
     Settled,
+    /// <summary>The households of the cities and towns: those of the factions first, then the others.</summary>
+    Housed,
+    /// <summary>The persons of every household: name, sex, age, vocation and family relations.</summary>
+    Peopled,
 }
 
 /// <summary>
@@ -47,9 +51,12 @@ public static class RegionStageRules
     /// </summary>
     public const int BorderingRings = 1;
 
-    /// <summary>The stage that follows, or null after Settled.</summary>
+    /// <summary>The last stage: a region that has reached it advances no further.</summary>
+    public const RegionStage Last = RegionStage.Peopled;
+
+    /// <summary>The stage that follows, or null after the last stage.</summary>
     public static RegionStage? Next(RegionStage stage) =>
-        stage == RegionStage.Settled ? null : stage + 1;
+        stage >= Last ? null : stage + 1;
 
     /// <summary>What must hold around a region before it can be at <paramref name="stage"/>.</summary>
     public static StageNeed? NeedOf(RegionStage stage, ParameterSet parameters) => stage switch
@@ -68,6 +75,10 @@ public static class RegionStageRules
         RegionStage.Planned => new StageNeed(RegionStage.Elevated, 0),
         // The region and all bordering regions Planned.
         RegionStage.Settled => new StageNeed(RegionStage.Planned, BorderingRings),
+        // The region Settled: the households read its own factions, cities and towns only.
+        RegionStage.Housed => new StageNeed(RegionStage.Settled, 0),
+        // The region Housed: the persons read its own households only.
+        RegionStage.Peopled => new StageNeed(RegionStage.Housed, 0),
         _ => throw new ArgumentOutOfRangeException(nameof(stage)),
     };
 

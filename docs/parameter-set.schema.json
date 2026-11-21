@@ -694,7 +694,7 @@
               "description": "Persons per km² on land with a food supply of 1 at a middling Prosperity. The potential population of a patch is its area × this × its food supply × its Prosperity factor (society §3.1).",
               "type": "number",
               "minimum": 0,
-              "default": 0.06
+              "default": 0.3
             },
             "ProsperityEffect": {
               "description": "How much the Prosperity field moves the potential population of a patch: the factor runs from 1 − this at the lowest Prosperity to 1 + this at the highest. 0 turns the effect of Prosperity off (society §3.1).",
@@ -731,7 +731,7 @@
               "description": "How many persons of a race the land of a region must feed by the plain shares for the race to take a minority place there (society §3.3).",
               "type": "number",
               "minimum": 0,
-              "default": 0.1
+              "default": 0.5
             },
             "MinorityShare": {
               "description": "The share of the potential population of a region that a minority race is lifted towards, 0 to 0.9. A minority race that already holds more keeps its share, and one that lives on a few patches only stays below it. 0 turns the lift off (society §3.4).",
@@ -870,7 +870,7 @@
               "description": "The persons a region needs to hold an opposition (society §4.5).",
               "type": "number",
               "minimum": 0,
-              "default": 80
+              "default": 400
             },
             "Cleavage": {
               "description": "Which type opposes which ruler: for each type of the ruling faction, the weight of each type as its opposition. A crown is opposed by a rival house first, a people by another people, a guild by a rival guild, a faith by a sect or by the mages, a free town by a lord who wants it (society §4.6).",
@@ -1366,7 +1366,7 @@
               "description": "The persons a region needs for each lesser faction: a region holds at most its persons divided by this, rounded down (society §4.7).",
               "type": "number",
               "minimum": 1,
-              "default": 150
+              "default": 750
             },
             "MaxLesserFactions": {
               "description": "The most lesser factions a region holds (society §4.7).",
@@ -1760,12 +1760,12 @@
                     "Low": {
                       "description": "The value at and below which the index is 0.",
                       "type": "number",
-                      "default": 160
+                      "default": 800
                     },
                     "High": {
                       "description": "The value at and above which the index is 1.",
                       "type": "number",
-                      "default": 600
+                      "default": 3000
                     }
                   },
                   "required": [
@@ -1781,12 +1781,12 @@
                     "Low": {
                       "description": "The value at and below which the index is 0.",
                       "type": "number",
-                      "default": 60
+                      "default": 300
                     },
                     "High": {
                       "description": "The value at and above which the index is 1.",
                       "type": "number",
-                      "default": 260
+                      "default": 1300
                     }
                   },
                   "required": [
@@ -1872,13 +1872,13 @@
               "description": "A region with fewer persons than this is small. When the lead race of its ruling faction is human, its name can end in Duchy, Province, Len or County. With the defaults about 1 region in 4 is small (society §4.10).",
               "type": "number",
               "minimum": 0,
-              "default": 250
+              "default": 1250
             },
             "LargeRegionPersons": {
               "description": "A region with more persons than this is large. When the lead race of its ruling faction is human, its name can start with Gran, Grand or Great. With the defaults about 1 region in 5 is large (society §4.10).",
               "type": "number",
               "minimum": 0,
-              "default": 500
+              "default": 2500
             }
           },
           "additionalProperties": false
@@ -1909,6 +1909,353 @@
           "type": "number",
           "minimum": 0,
           "default": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "Housing": {
+      "description": "Housed stage: the households of the cities and towns of a region, those of the factions first (society §6).",
+      "type": "object",
+      "properties": {
+        "FactionHouseholds": {
+          "description": "How many households a faction gets where the cities and towns of its region hold persons for them: at its seat first, then in the other cities and towns by rank. A faction has fewer where no fitting person is left (society §6).",
+          "type": "integer",
+          "minimum": 0,
+          "default": 2
+        },
+        "FamilySizeWeights": {
+          "description": "The relative weight of each family size: the first number is for a family of 1 person, the second for 2 and so on. A family is never larger than the persons of its race that are left in its city or town (society §6).",
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "default": [
+            2,
+            3,
+            3,
+            3,
+            2,
+            1,
+            0.5,
+            0.25
+          ]
+        },
+        "TownWealth": {
+          "description": "The relative weight of each wealth level for a household of no faction in a town (society §6).",
+          "type": "object",
+          "properties": {
+            "Destitute": {
+              "description": "Value for a Destitute household: it lives on alms or outside the law.",
+              "type": "number",
+              "default": 1
+            },
+            "Poor": {
+              "description": "Value for a Poor household: unskilled labour.",
+              "type": "number",
+              "default": 3
+            },
+            "Common": {
+              "description": "Value for a Common household: land or a simple trade.",
+              "type": "number",
+              "default": 4
+            },
+            "Comfortable": {
+              "description": "Value for a Comfortable household: a skilled trade, a shop or a small office.",
+              "type": "number",
+              "default": 2
+            },
+            "Rich": {
+              "description": "Value for a Rich household: capital, learning, high office or rule.",
+              "type": "number",
+              "default": 0.3
+            }
+          },
+          "required": [
+            "Destitute",
+            "Poor",
+            "Common",
+            "Comfortable",
+            "Rich"
+          ],
+          "additionalProperties": false
+        },
+        "CityWealth": {
+          "description": "The relative weight of each wealth level for a household of no faction in a city (society §6).",
+          "type": "object",
+          "properties": {
+            "Destitute": {
+              "description": "Value for a Destitute household: it lives on alms or outside the law.",
+              "type": "number",
+              "default": 1.5
+            },
+            "Poor": {
+              "description": "Value for a Poor household: unskilled labour.",
+              "type": "number",
+              "default": 3
+            },
+            "Common": {
+              "description": "Value for a Common household: land or a simple trade.",
+              "type": "number",
+              "default": 3.5
+            },
+            "Comfortable": {
+              "description": "Value for a Comfortable household: a skilled trade, a shop or a small office.",
+              "type": "number",
+              "default": 2.5
+            },
+            "Rich": {
+              "description": "Value for a Rich household: capital, learning, high office or rule.",
+              "type": "number",
+              "default": 0.8
+            }
+          },
+          "required": [
+            "Destitute",
+            "Poor",
+            "Common",
+            "Comfortable",
+            "Rich"
+          ],
+          "additionalProperties": false
+        },
+        "FactionWealth": {
+          "description": "The relative weight of each wealth level for a household of a faction. The first household of the ruling faction is always Rich (society §6).",
+          "type": "object",
+          "properties": {
+            "Destitute": {
+              "description": "Value for a Destitute household: it lives on alms or outside the law.",
+              "type": "number",
+              "default": 0
+            },
+            "Poor": {
+              "description": "Value for a Poor household: unskilled labour.",
+              "type": "number",
+              "default": 0
+            },
+            "Common": {
+              "description": "Value for a Common household: land or a simple trade.",
+              "type": "number",
+              "default": 1
+            },
+            "Comfortable": {
+              "description": "Value for a Comfortable household: a skilled trade, a shop or a small office.",
+              "type": "number",
+              "default": 3
+            },
+            "Rich": {
+              "description": "Value for a Rich household: capital, learning, high office or rule.",
+              "type": "number",
+              "default": 2
+            }
+          },
+          "required": [
+            "Destitute",
+            "Poor",
+            "Common",
+            "Comfortable",
+            "Rich"
+          ],
+          "additionalProperties": false
+        },
+        "Servants": {
+          "description": "How many servants a household of each wealth level wants. It gets fewer where its city or town has too few persons left (society §6).",
+          "type": "object",
+          "properties": {
+            "Destitute": {
+              "description": "Value for a Destitute household: it lives on alms or outside the law.",
+              "type": [
+                "object",
+                "null"
+              ],
+              "properties": {
+                "Min": {
+                  "description": "Smallest count, inclusive.",
+                  "type": "integer",
+                  "default": 0
+                },
+                "Max": {
+                  "description": "Largest count, inclusive.",
+                  "type": "integer",
+                  "default": 0
+                }
+              },
+              "required": [
+                "Min",
+                "Max"
+              ],
+              "additionalProperties": false
+            },
+            "Poor": {
+              "description": "Value for a Poor household: unskilled labour.",
+              "type": [
+                "object",
+                "null"
+              ],
+              "properties": {
+                "Min": {
+                  "description": "Smallest count, inclusive.",
+                  "type": "integer",
+                  "default": 0
+                },
+                "Max": {
+                  "description": "Largest count, inclusive.",
+                  "type": "integer",
+                  "default": 0
+                }
+              },
+              "required": [
+                "Min",
+                "Max"
+              ],
+              "additionalProperties": false
+            },
+            "Common": {
+              "description": "Value for a Common household: land or a simple trade.",
+              "type": [
+                "object",
+                "null"
+              ],
+              "properties": {
+                "Min": {
+                  "description": "Smallest count, inclusive.",
+                  "type": "integer",
+                  "default": 0
+                },
+                "Max": {
+                  "description": "Largest count, inclusive.",
+                  "type": "integer",
+                  "default": 0
+                }
+              },
+              "required": [
+                "Min",
+                "Max"
+              ],
+              "additionalProperties": false
+            },
+            "Comfortable": {
+              "description": "Value for a Comfortable household: a skilled trade, a shop or a small office.",
+              "type": [
+                "object",
+                "null"
+              ],
+              "properties": {
+                "Min": {
+                  "description": "Smallest count, inclusive.",
+                  "type": "integer",
+                  "default": 0
+                },
+                "Max": {
+                  "description": "Largest count, inclusive.",
+                  "type": "integer",
+                  "default": 1
+                }
+              },
+              "required": [
+                "Min",
+                "Max"
+              ],
+              "additionalProperties": false
+            },
+            "Rich": {
+              "description": "Value for a Rich household: capital, learning, high office or rule.",
+              "type": [
+                "object",
+                "null"
+              ],
+              "properties": {
+                "Min": {
+                  "description": "Smallest count, inclusive.",
+                  "type": "integer",
+                  "default": 1
+                },
+                "Max": {
+                  "description": "Largest count, inclusive.",
+                  "type": "integer",
+                  "default": 3
+                }
+              },
+              "required": [
+                "Min",
+                "Max"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "Destitute",
+            "Poor",
+            "Common",
+            "Comfortable",
+            "Rich"
+          ],
+          "additionalProperties": false
+        },
+        "HeadAge": {
+          "description": "The age of the head of a household, in years: drawn evenly from this range (society §6).",
+          "type": "object",
+          "properties": {
+            "Min": {
+              "description": "Smallest count, inclusive.",
+              "type": "integer",
+              "default": 20
+            },
+            "Max": {
+              "description": "Largest count, inclusive.",
+              "type": "integer",
+              "default": 65
+            }
+          },
+          "required": [
+            "Min",
+            "Max"
+          ],
+          "additionalProperties": false
+        },
+        "MaleHeadChance": {
+          "description": "The chance that the head of a family of two or more persons is a man, 0 to 1. A person who is alone in its family is a man or a woman with even chance (society §6).",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8
+        }
+      },
+      "additionalProperties": false
+    },
+    "People": {
+      "description": "Peopled stage: the persons of every household, with their family relations and their vocations (society §7).",
+      "type": "object",
+      "properties": {
+        "SpouseChance": {
+          "description": "The chance that the head of a family of two or more persons has a husband or a wife in the household, 0 to 1 (society §7).",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.75
+        },
+        "WorkingAge": {
+          "description": "The age from which a person holds a vocation, in years. A younger person has none (society §7).",
+          "type": "integer",
+          "minimum": 0,
+          "default": 14
+        },
+        "LandWorkFactor": {
+          "description": "The factor on the share of a vocation of the sector Land and water inside a city or a town: farmers, herders and fishers mostly live on the land. 1 gives them their full share, 0 keeps them out (society §7).",
+          "type": "number",
+          "minimum": 0,
+          "default": 0.1
+        },
+        "SameVocationChance": {
+          "description": "The chance that a person of the family other than the head holds the vocation of the head, 0 to 1. Otherwise the person gets a vocation of its own that fits the wealth of the household (society §7).",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.6
+        },
+        "ServantVocation": {
+          "description": "The id of the vocation of a servant of a household. A servant has no vocation when the list of vocations has no such vocation or it is off (society §7).",
+          "type": "string",
+          "default": "servant"
         }
       },
       "additionalProperties": false
@@ -2513,10 +2860,10 @@
       }
     },
     "Vocations": {
-      "description": "The vocations: the work a person does, in nine sectors. Add a vocation by adding an entry, and switch one on or off with Enabled. The vocations are not drawn for places or persons yet (society §8). A file that gives this list replaces the whole default list.",
+      "description": "The vocations: the work a person does, in nine sectors. Add a vocation by adding an entry, and switch one on or off with Enabled. The persons of the cities and towns get one (society §7); the vocations of the countryside are not drawn yet (society §8). A file that gives this list replaces the whole default list.",
       "type": "array",
       "items": {
-        "description": "A vocation: the work a person does. The vocations are not drawn for places or persons yet (society §8).",
+        "description": "A vocation: the work a person does. The persons of the cities and towns get one (society §7); the vocations of the countryside are not drawn yet (society §8).",
         "type": "object",
         "properties": {
           "Id": {
@@ -2559,6 +2906,25 @@
             "type": "number",
             "minimum": 0,
             "maximum": 100
+          },
+          "Standing": {
+            "description": "The social standing of the vocation, as a range on a scale of six: 1 outcast, 2 poor, 3 common, 4 middling, 5 wealthy, 6 ruling. The head of a household gets a vocation whose standing fits the wealth of the household: Destitute 1, Poor 2, Common 3, Comfortable 4, Rich 5 and 6 (society §7 and §8).",
+            "type": "object",
+            "properties": {
+              "Min": {
+                "description": "Smallest count, inclusive.",
+                "type": "integer"
+              },
+              "Max": {
+                "description": "Largest count, inclusive.",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "Min",
+              "Max"
+            ],
+            "additionalProperties": false
           },
           "OnWater": {
             "description": "Whether the vocation is only found in a place on water: the shipwright and the sailor (society §8).",

@@ -70,18 +70,18 @@ public enum EntityKind
 {
     City,
     Faction,
-    Family,
+    Household,
     Person,
 }
 
 /// <summary>
-/// City, Faction, Family and Person = parent + slot index. The identity is deterministic, so a
-/// Stub is addressable before it is Realised.
+/// City, Faction, Household and Person = parent + slot index. The identity is deterministic, so
+/// a Stub is addressable before it is Realised.
 /// </summary>
 /// <remarks>
-/// The parent of a faction, a city and a town is its region (<see cref="Faction.IdIn"/>,
-/// <see cref="Settlement.IdIn"/>). The readme does not yet decide the parent of a family and a
-/// person, so the parent is a type parameter here.
+/// The parent of a faction, a city, a town and a household is its region
+/// (<see cref="Faction.IdIn"/>, <see cref="Settlement.IdIn"/>, <see cref="Household.IdIn"/>).
+/// The parent of a person is its household (<see cref="Person.IdIn"/>).
 /// </remarks>
 public readonly record struct SlotId<TParent>(TParent Parent, int Slot)
     where TParent : struct

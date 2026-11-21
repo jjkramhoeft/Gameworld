@@ -166,13 +166,13 @@
     "RichScore": 75,
     "PoorScore": 62,
     "Population": {
-      "PersonsPerKm2": 0.06,
+      "PersonsPerKm2": 0.3,
       "ProsperityEffect": 0.5,
       "RacesPerRegion": 6,
       "MinorityRacesPerRegion": 2,
       "RacesPerCity": 5,
       "RacesPerTown": 4,
-      "MinorityMinPersons": 0.1,
+      "MinorityMinPersons": 0.5,
       "MinorityShare": 0.05,
       "MinorityBoost": 5,
       "HinterlandShare": 0.02
@@ -197,7 +197,7 @@
       },
       "OppositionTension": 0.5,
       "TensionJitter": 0.2,
-      "OppositionMinPersons": 80,
+      "OppositionMinPersons": 400,
       "Cleavage": {
         "Family": {
           "Family": 3,
@@ -282,7 +282,7 @@
           "Place": 2
         }
       },
-      "PersonsPerLesserFaction": 150,
+      "PersonsPerLesserFaction": 750,
       "MaxLesserFactions": 4,
       "LesserFit": 0.75,
       "LesserJitter": 0.1,
@@ -356,12 +356,12 @@
           "High": 0.032
         },
         "Persons": {
-          "Low": 160,
-          "High": 600
+          "Low": 800,
+          "High": 3000
         },
         "SmallRegion": {
-          "Low": 60,
-          "High": 260
+          "Low": 300,
+          "High": 1300
         },
         "LargestRace": {
           "Low": 0.24,
@@ -378,14 +378,82 @@
       }
     },
     "Names": {
-      "SmallRegionPersons": 250,
-      "LargeRegionPersons": 500
+      "SmallRegionPersons": 1250,
+      "LargeRegionPersons": 2500
     }
   },
   "Settlement": {
     "CityShare": 0.1,
     "TownShare": 0.1,
     "RankExponent": 1
+  },
+  "Housing": {
+    "FactionHouseholds": 2,
+    "FamilySizeWeights": [
+      2,
+      3,
+      3,
+      3,
+      2,
+      1,
+      0.5,
+      0.25
+    ],
+    "TownWealth": {
+      "Destitute": 1,
+      "Poor": 3,
+      "Common": 4,
+      "Comfortable": 2,
+      "Rich": 0.3
+    },
+    "CityWealth": {
+      "Destitute": 1.5,
+      "Poor": 3,
+      "Common": 3.5,
+      "Comfortable": 2.5,
+      "Rich": 0.8
+    },
+    "FactionWealth": {
+      "Destitute": 0,
+      "Poor": 0,
+      "Common": 1,
+      "Comfortable": 3,
+      "Rich": 2
+    },
+    "Servants": {
+      "Destitute": {
+        "Min": 0,
+        "Max": 0
+      },
+      "Poor": {
+        "Min": 0,
+        "Max": 0
+      },
+      "Common": {
+        "Min": 0,
+        "Max": 0
+      },
+      "Comfortable": {
+        "Min": 0,
+        "Max": 1
+      },
+      "Rich": {
+        "Min": 1,
+        "Max": 3
+      }
+    },
+    "HeadAge": {
+      "Min": 20,
+      "Max": 65
+    },
+    "MaleHeadChance": 0.8
+  },
+  "People": {
+    "SpouseChance": 0.75,
+    "WorkingAge": 14,
+    "LandWorkFactor": 0.1,
+    "SameVocationChance": 0.6,
+    "ServantVocation": "servant"
   },
   "Fields": {
     "Precipitation": {
@@ -1768,6 +1836,10 @@
       "Sector": "LandAndWater",
       "LowestTier": "Countryside",
       "SharePercent": 35,
+      "Standing": {
+        "Min": 3,
+        "Max": 3
+      },
       "Variants": [
         {
           "Name": "ploughman",
@@ -1825,6 +1897,10 @@
       "Sector": "LandAndWater",
       "LowestTier": "Countryside",
       "SharePercent": 3,
+      "Standing": {
+        "Min": 3,
+        "Max": 3
+      },
       "Variants": [
         {
           "Name": "orchard keeper",
@@ -1907,6 +1983,10 @@
       "Sector": "LandAndWater",
       "LowestTier": "Countryside",
       "SharePercent": 8,
+      "Standing": {
+        "Min": 3,
+        "Max": 3
+      },
       "Variants": [
         {
           "Name": "shepherd",
@@ -1979,6 +2059,10 @@
       "Sector": "LandAndWater",
       "LowestTier": "Countryside",
       "SharePercent": 2,
+      "Standing": {
+        "Min": 3,
+        "Max": 3
+      },
       "Variants": [
         {
           "Name": "sea fisher",
@@ -2051,6 +2135,10 @@
       "Sector": "LandAndWater",
       "LowestTier": "Countryside",
       "SharePercent": 1,
+      "Standing": {
+        "Min": 3,
+        "Max": 3
+      },
       "Variants": [
         {
           "Name": "hunter",
@@ -2118,6 +2206,10 @@
       "Sector": "LandAndWater",
       "LowestTier": "Countryside",
       "SharePercent": 1.5,
+      "Standing": {
+        "Min": 3,
+        "Max": 3
+      },
       "Variants": [
         {
           "Name": "woodcutter",
@@ -2170,6 +2262,10 @@
       "Sector": "LandAndWater",
       "LowestTier": "Countryside",
       "SharePercent": 0.7,
+      "Standing": {
+        "Min": 3,
+        "Max": 3
+      },
       "Variants": [
         {
           "Name": "ore miner",
@@ -2217,6 +2313,10 @@
       "Sector": "LandAndWater",
       "LowestTier": "Countryside",
       "SharePercent": 0.4,
+      "Standing": {
+        "Min": 2,
+        "Max": 3
+      },
       "Variants": [
         {
           "Name": "quarrier",
@@ -2264,6 +2364,10 @@
       "Sector": "LandAndWater",
       "LowestTier": "Countryside",
       "SharePercent": 0.2,
+      "Standing": {
+        "Min": 3,
+        "Max": 3
+      },
       "Variants": [
         {
           "Name": "salt boiler",
@@ -2306,6 +2410,10 @@
       "Sector": "Processing",
       "LowestTier": "Countryside",
       "SharePercent": 1,
+      "Standing": {
+        "Min": 4,
+        "Max": 4
+      },
       "Variants": [
         {
           "Name": "water miller",
@@ -2348,6 +2456,10 @@
       "Sector": "Processing",
       "LowestTier": "Town",
       "SharePercent": 0.6,
+      "Standing": {
+        "Min": 4,
+        "Max": 4
+      },
       "Variants": [
         {
           "Name": "baker",
@@ -2390,6 +2502,10 @@
       "Sector": "Processing",
       "LowestTier": "Countryside",
       "SharePercent": 1.2,
+      "Standing": {
+        "Min": 3,
+        "Max": 4
+      },
       "Variants": [
         {
           "Name": "brewer",
@@ -2437,6 +2553,10 @@
       "Sector": "Processing",
       "LowestTier": "Town",
       "SharePercent": 0.5,
+      "Standing": {
+        "Min": 4,
+        "Max": 4
+      },
       "Variants": [
         {
           "Name": "butcher",
@@ -2499,6 +2619,10 @@
       "Sector": "Processing",
       "LowestTier": "Countryside",
       "SharePercent": 0.3,
+      "Standing": {
+        "Min": 2,
+        "Max": 2
+      },
       "Variants": [
         {
           "Name": "collier",
@@ -2541,6 +2665,10 @@
       "Sector": "Processing",
       "LowestTier": "Countryside",
       "SharePercent": 0.2,
+      "Standing": {
+        "Min": 3,
+        "Max": 4
+      },
       "Variants": [
         {
           "Name": "bloomery man",
@@ -2588,6 +2716,10 @@
       "Sector": "Processing",
       "LowestTier": "Town",
       "SharePercent": 0.4,
+      "Standing": {
+        "Min": 3,
+        "Max": 3
+      },
       "Variants": [
         {
           "Name": "tanner",
@@ -2630,6 +2762,10 @@
       "Sector": "Processing",
       "LowestTier": "Countryside",
       "SharePercent": 3.5,
+      "Standing": {
+        "Min": 3,
+        "Max": 3
+      },
       "Variants": [
         {
           "Name": "spinner",
@@ -2697,6 +2833,10 @@
       "Sector": "Craft",
       "LowestTier": "Countryside",
       "SharePercent": 1,
+      "Standing": {
+        "Min": 4,
+        "Max": 4
+      },
       "Variants": [
         {
           "Name": "blacksmith",
@@ -2769,6 +2909,10 @@
       "Sector": "Craft",
       "LowestTier": "Countryside",
       "SharePercent": 1.5,
+      "Standing": {
+        "Min": 4,
+        "Max": 4
+      },
       "Variants": [
         {
           "Name": "carpenter",
@@ -2836,6 +2980,10 @@
       "Sector": "Craft",
       "LowestTier": "Town",
       "SharePercent": 0.2,
+      "Standing": {
+        "Min": 4,
+        "Max": 4
+      },
       "OnWater": true,
       "Variants": [
         {
@@ -2879,6 +3027,10 @@
       "Sector": "Craft",
       "LowestTier": "Town",
       "SharePercent": 1,
+      "Standing": {
+        "Min": 4,
+        "Max": 4
+      },
       "Variants": [
         {
           "Name": "stonemason",
@@ -2946,6 +3098,10 @@
       "Sector": "Craft",
       "LowestTier": "Town",
       "SharePercent": 0.4,
+      "Standing": {
+        "Min": 3,
+        "Max": 3
+      },
       "Variants": [
         {
           "Name": "potter",
@@ -2983,6 +3139,10 @@
       "Sector": "Craft",
       "LowestTier": "City",
       "SharePercent": 0.05,
+      "Standing": {
+        "Min": 4,
+        "Max": 5
+      },
       "Variants": [
         {
           "Name": "glassblower",
@@ -3025,6 +3185,10 @@
       "Sector": "Craft",
       "LowestTier": "Town",
       "SharePercent": 1.2,
+      "Standing": {
+        "Min": 4,
+        "Max": 4
+      },
       "Variants": [
         {
           "Name": "shoemaker",
@@ -3082,6 +3246,10 @@
       "Sector": "Craft",
       "LowestTier": "Town",
       "SharePercent": 1.2,
+      "Standing": {
+        "Min": 4,
+        "Max": 4
+      },
       "Variants": [
         {
           "Name": "tailor",
@@ -3134,6 +3302,10 @@
       "Sector": "Craft",
       "LowestTier": "City",
       "SharePercent": 0.15,
+      "Standing": {
+        "Min": 5,
+        "Max": 5
+      },
       "Variants": [
         {
           "Name": "goldsmith",
@@ -3201,6 +3373,10 @@
       "Sector": "Craft",
       "LowestTier": "City",
       "SharePercent": 0.1,
+      "Standing": {
+        "Min": 4,
+        "Max": 4
+      },
       "Variants": [
         {
           "Name": "painter",
@@ -3258,6 +3434,10 @@
       "Sector": "Craft",
       "LowestTier": "Capital",
       "SharePercent": 0.02,
+      "Standing": {
+        "Min": 5,
+        "Max": 5
+      },
       "Variants": [
         {
           "Name": "clockmaker",
@@ -3310,6 +3490,10 @@
       "Sector": "TradeAndTransport",
       "LowestTier": "City",
       "SharePercent": 0.5,
+      "Standing": {
+        "Min": 5,
+        "Max": 5
+      },
       "Variants": [
         {
           "Name": "long-distance merchant",
@@ -3377,6 +3561,10 @@
       "Sector": "TradeAndTransport",
       "LowestTier": "Town",
       "SharePercent": 1.5,
+      "Standing": {
+        "Min": 3,
+        "Max": 3
+      },
       "Variants": [
         {
           "Name": "retailer",
@@ -3419,6 +3607,10 @@
       "Sector": "TradeAndTransport",
       "LowestTier": "Town",
       "SharePercent": 1.2,
+      "Standing": {
+        "Min": 3,
+        "Max": 3
+      },
       "Variants": [
         {
           "Name": "carter",
@@ -3486,6 +3678,10 @@
       "Sector": "TradeAndTransport",
       "LowestTier": "Town",
       "SharePercent": 1.2,
+      "Standing": {
+        "Min": 3,
+        "Max": 3
+      },
       "OnWater": true,
       "Variants": [
         {
@@ -3544,6 +3740,10 @@
       "Sector": "TradeAndTransport",
       "LowestTier": "Town",
       "SharePercent": 0.8,
+      "Standing": {
+        "Min": 4,
+        "Max": 4
+      },
       "Variants": [
         {
           "Name": "innkeeper",
@@ -3591,6 +3791,10 @@
       "Sector": "Service",
       "LowestTier": "Countryside",
       "SharePercent": 0.5,
+      "Standing": {
+        "Min": 3,
+        "Max": 5
+      },
       "Variants": [
         {
           "Name": "physician",
@@ -3648,6 +3852,10 @@
       "Sector": "Service",
       "LowestTier": "Countryside",
       "SharePercent": 7.9,
+      "Standing": {
+        "Min": 2,
+        "Max": 2
+      },
       "Variants": [
         {
           "Name": "maid",
@@ -3715,6 +3923,10 @@
       "Sector": "Service",
       "LowestTier": "Town",
       "SharePercent": 0.2,
+      "Standing": {
+        "Min": 2,
+        "Max": 4
+      },
       "Variants": [
         {
           "Name": "minstrel",
@@ -3797,6 +4009,10 @@
       "Sector": "Service",
       "LowestTier": "Town",
       "SharePercent": 0.1,
+      "Standing": {
+        "Min": 1,
+        "Max": 5
+      },
       "Variants": [
         {
           "Name": "courtesan",
@@ -3839,6 +4055,10 @@
       "Sector": "GovernanceAndWar",
       "LowestTier": "Countryside",
       "SharePercent": 1,
+      "Standing": {
+        "Min": 6,
+        "Max": 6
+      },
       "Variants": [
         {
           "Name": "lord",
@@ -3901,6 +4121,10 @@
       "Sector": "GovernanceAndWar",
       "LowestTier": "Countryside",
       "SharePercent": 0.8,
+      "Standing": {
+        "Min": 4,
+        "Max": 5
+      },
       "Variants": [
         {
           "Name": "steward",
@@ -4003,6 +4227,10 @@
       "Sector": "GovernanceAndWar",
       "LowestTier": "Town",
       "SharePercent": 1,
+      "Standing": {
+        "Min": 3,
+        "Max": 4
+      },
       "Variants": [
         {
           "Name": "man-at-arms",
@@ -4075,6 +4303,10 @@
       "Sector": "GovernanceAndWar",
       "LowestTier": "Town",
       "SharePercent": 0.6,
+      "Standing": {
+        "Min": 3,
+        "Max": 3
+      },
       "Variants": [
         {
           "Name": "watchman",
@@ -4152,6 +4384,10 @@
       "Sector": "FaithAndLearning",
       "LowestTier": "Countryside",
       "SharePercent": 2.5,
+      "Standing": {
+        "Min": 4,
+        "Max": 5
+      },
       "Variants": [
         {
           "Name": "village priest",
@@ -4214,6 +4450,10 @@
       "Sector": "FaithAndLearning",
       "LowestTier": "Town",
       "SharePercent": 0.4,
+      "Standing": {
+        "Min": 4,
+        "Max": 5
+      },
       "Variants": [
         {
           "Name": "clerk",
@@ -4281,6 +4521,10 @@
       "Sector": "FaithAndLearning",
       "LowestTier": "City",
       "SharePercent": 0.15,
+      "Standing": {
+        "Min": 5,
+        "Max": 5
+      },
       "Variants": [
         {
           "Name": "teacher",
@@ -4348,6 +4592,10 @@
       "Sector": "Supernatural",
       "LowestTier": "Capital",
       "SharePercent": 0.03,
+      "Standing": {
+        "Min": 5,
+        "Max": 5
+      },
       "Variants": [
         {
           "Name": "wizard",
@@ -4395,6 +4643,10 @@
       "Sector": "Supernatural",
       "LowestTier": "City",
       "SharePercent": 0.05,
+      "Standing": {
+        "Min": 4,
+        "Max": 5
+      },
       "Variants": [
         {
           "Name": "apothecary",
@@ -4447,6 +4699,10 @@
       "Sector": "Supernatural",
       "LowestTier": "Countryside",
       "SharePercent": 0.2,
+      "Standing": {
+        "Min": 2,
+        "Max": 4
+      },
       "Variants": [
         {
           "Name": "diviner",
@@ -4519,6 +4775,10 @@
       "Sector": "Margins",
       "LowestTier": "Countryside",
       "SharePercent": 11,
+      "Standing": {
+        "Min": 2,
+        "Max": 2
+      },
       "Variants": [
         {
           "Name": "day labourer",
@@ -4586,6 +4846,10 @@
       "Sector": "Margins",
       "LowestTier": "Town",
       "SharePercent": 1.5,
+      "Standing": {
+        "Min": 1,
+        "Max": 1
+      },
       "Variants": [
         {
           "Name": "beggar",
@@ -4638,6 +4902,10 @@
       "Sector": "Margins",
       "LowestTier": "Town",
       "SharePercent": 0.3,
+      "Standing": {
+        "Min": 1,
+        "Max": 1
+      },
       "Variants": [
         {
           "Name": "cutpurse",
@@ -4705,6 +4973,10 @@
       "Sector": "Margins",
       "LowestTier": "Countryside",
       "SharePercent": 0.25,
+      "Standing": {
+        "Min": 1,
+        "Max": 1
+      },
       "Variants": [
         {
           "Name": "highwayman",

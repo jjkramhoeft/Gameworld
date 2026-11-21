@@ -3,7 +3,9 @@ using Gameworld.Generation.Biomes;
 using Gameworld.Generation.Cells;
 using Gameworld.Generation.Factions;
 using Gameworld.Generation.Heights;
+using Gameworld.Generation.Households;
 using Gameworld.Generation.Names;
+using Gameworld.Generation.People;
 using Gameworld.Generation.Races;
 using Gameworld.Generation.Settlements;
 using Gameworld.Generation.Stages;
@@ -27,6 +29,8 @@ public sealed class World
     private readonly Dictionary<RegionId, ElevationWork> _elevation = new();
     private readonly Dictionary<RegionId, PlanWork> _plan = new();
     private readonly Dictionary<RegionId, SettlementWork> _settlement = new();
+    private readonly Dictionary<RegionId, RegionHouseholds> _households = new();
+    private readonly Dictionary<RegionId, RegionPeople> _people = new();
     private readonly Dictionary<RegionId, CostGrid> _costGrids = new();
     private readonly Dictionary<long, bool> _riverPoor = new();
 
@@ -45,6 +49,8 @@ public sealed class World
         RegionNameRules = new RegionNameRules(foundation.Parameters, foundation.Seed.Value);
         SettlementNameRules = new SettlementNameRules(foundation.Parameters, foundation.Seed.Value);
         SettlementRules = new SettlementRules(foundation.Parameters, PopulationRules);
+        HouseholdRules = new HouseholdRules(foundation.Parameters, foundation.Seed.Value);
+        PersonRules = new PersonRules(foundation.Parameters, foundation.Seed.Value);
         FloraFaunaRules = new FloraFaunaRules(foundation.Parameters);
         VocationRules = new VocationRules(foundation.Parameters);
         RiverBeds = new RiverBeds(this);
@@ -64,6 +70,8 @@ public sealed class World
     public RegionNameRules RegionNameRules { get; }
     public SettlementNameRules SettlementNameRules { get; }
     public SettlementRules SettlementRules { get; }
+    public HouseholdRules HouseholdRules { get; }
+    public PersonRules PersonRules { get; }
     public FloraFaunaRules FloraFaunaRules { get; }
     public VocationRules VocationRules { get; }
 
@@ -177,8 +185,28 @@ public sealed class World
         return _settlement[id];
     }
 
-    /// <summary>The Settled working data of a region if the region is Settled; null otherwise.</summary>
+    /// <summary>The Settled working data of a region if the region is Settled or later; null otherwise.</summary>
     public SettlementWork? FindSettlement(RegionId id) => _settlement.GetValueOrDefault(id);
+
+    /// <summary>The households of a region. The region is taken to the Housed stage first, through Settled.</summary>
+    public RegionHouseholds HouseholdsOf(RegionId id)
+    {
+        Advance(id, RegionStage.Housed);
+        return _households[id];
+    }
+
+    /// <summary>The households of a region if the region is Housed or later; null otherwise.</summary>
+    public RegionHouseholds? FindHouseholds(RegionId id) => _households.GetValueOrDefault(id);
+
+    /// <summary>The persons of the households of a region. The region is taken to the Peopled stage first, through Housed.</summary>
+    public RegionPeople PeopleOf(RegionId id)
+    {
+        Advance(id, RegionStage.Peopled);
+        return _people[id];
+    }
+
+    /// <summary>The persons of the households of a region if the region is Peopled; null otherwise.</summary>
+    public RegionPeople? FindPeople(RegionId id) => _people.GetValueOrDefault(id);
 
     /// <summary>The travel cost grid of a region. It reads the region's Detailed data only.</summary>
     internal CostGrid CostGridOf(RegionId id)
@@ -247,6 +275,16 @@ public sealed class World
                 var settlement = TravelBuilder.Build(this, id.Coord, places);
                 _settlement[id] = settlement;
                 region.Advance(settlement.ToDomain());
+                break;
+            case RegionStage.Housed:
+                var households = HouseholdBuilder.Build(this, _plan[id], _settlement[id].Places.Settlements);
+                _households[id] = households;
+                region.Advance(households);
+                break;
+            case RegionStage.Peopled:
+                var people = PeopleBuilder.Build(this, _plan[id], _settlement[id].Places.Settlements, _households[id]);
+                _people[id] = people;
+                region.Advance(people);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(next), next, null);

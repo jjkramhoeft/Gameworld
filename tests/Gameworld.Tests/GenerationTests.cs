@@ -413,19 +413,22 @@ public class WorldTests
         var target = new RegionId(2, 2);
 
         var first = World.Create("cellgen");
-        var a = first.Advance(target, RegionStage.Settled).ToSnapshot();
+        var a = first.Advance(target, RegionStage.Peopled).ToSnapshot();
 
         var second = World.Create("cellgen");
         // Approach from the other side, through other regions and stages first.
-        second.Advance(new RegionId(4, 3), RegionStage.Settled);
+        second.Advance(new RegionId(4, 3), RegionStage.Peopled);
         second.Advance(new RegionId(1, 1), RegionStage.Elevated);
         second.Advance(new RegionId(2, 3), RegionStage.Planned);
-        var b = second.Advance(target, RegionStage.Settled).ToSnapshot();
+        second.Advance(new RegionId(3, 2), RegionStage.Housed);
+        var b = second.Advance(target, RegionStage.Peopled).ToSnapshot();
 
         Assert.Equal(DomainJson.Serialize(a.Outline), DomainJson.Serialize(b.Outline));
         Assert.Equal(DomainJson.Serialize(a.Detail), DomainJson.Serialize(b.Detail));
         Assert.Equal(DomainJson.Serialize(a.Plan), DomainJson.Serialize(b.Plan));
         Assert.Equal(DomainJson.Serialize(a.Settlement), DomainJson.Serialize(b.Settlement));
+        Assert.Equal(DomainJson.Serialize(a.Households), DomainJson.Serialize(b.Households));
+        Assert.Equal(DomainJson.Serialize(a.People), DomainJson.Serialize(b.People));
         Assert.Equal(a.Elevation!.HeightMap.Heights, b.Elevation!.HeightMap.Heights);
         Assert.Equal(DomainJson.Serialize(a.Elevation.Patches), DomainJson.Serialize(b.Elevation.Patches));
     }

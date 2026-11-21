@@ -152,7 +152,7 @@ public sealed record Settlement(
 /// </summary>
 /// <param name="Settlements">The cities and towns of the region, by rank: one on every Prospect on show.</param>
 /// <param name="Rural">The persons on the land, outside the cities and towns: one entry for every race that is on, in the order of the Parameter Set.</param>
-/// <remarks>Families and important persons belong to this stage too and are not modelled yet.</remarks>
+/// <remarks>The households of the cities and towns come in the Housed stage and their persons in the Peopled stage.</remarks>
 public sealed record RegionSettlement(
     TravelNetwork Travel,
     IReadOnlyList<Settlement> Settlements,
@@ -182,7 +182,9 @@ public sealed record RegionSnapshot(
     RegionDetail? Detail,
     RegionElevation? Elevation,
     RegionPlan? Plan,
-    RegionSettlement? Settlement);
+    RegionSettlement? Settlement,
+    RegionHouseholds? Households = null,
+    RegionPeople? People = null);
 
 /// <summary>
 /// A stored region: the generation unit of the map. A region moves through the stages and only
@@ -205,9 +207,11 @@ public sealed class Region
     public RegionElevation? Elevation { get; private set; }
     public RegionPlan? Plan { get; private set; }
     public RegionSettlement? Settlement { get; private set; }
+    public RegionHouseholds? Households { get; private set; }
+    public RegionPeople? People { get; private set; }
 
     /// <summary>The region as it is stored.</summary>
-    public RegionSnapshot ToSnapshot() => new(Id, Stage, Outline, Detail, Elevation, Plan, Settlement);
+    public RegionSnapshot ToSnapshot() => new(Id, Stage, Outline, Detail, Elevation, Plan, Settlement, Households, People);
 
     /// <summary>A region read back from storage. The snapshot must hold what every stage up to its own added.</summary>
     public static Region FromSnapshot(RegionSnapshot snapshot)
@@ -217,6 +221,8 @@ public sealed class Region
         if (snapshot.Stage >= RegionStage.Elevated) region.Advance(snapshot.Elevation ?? throw Missing(snapshot, RegionStage.Elevated));
         if (snapshot.Stage >= RegionStage.Planned) region.Advance(snapshot.Plan ?? throw Missing(snapshot, RegionStage.Planned));
         if (snapshot.Stage >= RegionStage.Settled) region.Advance(snapshot.Settlement ?? throw Missing(snapshot, RegionStage.Settled));
+        if (snapshot.Stage >= RegionStage.Housed) region.Advance(snapshot.Households ?? throw Missing(snapshot, RegionStage.Housed));
+        if (snapshot.Stage >= RegionStage.Peopled) region.Advance(snapshot.People ?? throw Missing(snapshot, RegionStage.Peopled));
         return region;
     }
 
@@ -253,6 +259,22 @@ public sealed class Region
         Require(RegionStage.Planned);
         Settlement = settlement;
         Stage = RegionStage.Settled;
+    }
+
+    /// <summary>Settled → Housed.</summary>
+    public void Advance(RegionHouseholds households)
+    {
+        Require(RegionStage.Settled);
+        Households = households;
+        Stage = RegionStage.Housed;
+    }
+
+    /// <summary>Housed → Peopled.</summary>
+    public void Advance(RegionPeople people)
+    {
+        Require(RegionStage.Housed);
+        People = people;
+        Stage = RegionStage.Peopled;
     }
 
     private void Require(RegionStage stage)

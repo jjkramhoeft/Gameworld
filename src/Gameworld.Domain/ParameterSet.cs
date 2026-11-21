@@ -35,6 +35,12 @@ public sealed record ParameterSet
     [Description("Settled stage: the cities and towns of a region, and how many of its persons live in them (society §5.2). The travel network of this stage has no parameters of its own: it connects the Prospects on show (§16).")]
     public SettlementParameters Settlement { get; init; } = new();
 
+    [Description("Housed stage: the households of the cities and towns of a region, those of the factions first (society §6).")]
+    public HousingParameters Housing { get; init; } = new();
+
+    [Description("Peopled stage: the persons of every household, with their family relations and their vocations (society §7).")]
+    public PeopleParameters People { get; init; } = new();
+
     [Description("The four Fields: noise maps that drive climate, biomes and resources. They have no stage (§9).")]
     public FieldsParameters Fields { get; init; } = new();
 
@@ -44,7 +50,7 @@ public sealed record ParameterSet
     [Description("The races: the peoples that can live in the world. Add a race by adding an entry, and switch a race on or off with Enabled. The potential population of a region is shared between the races that are on, by their frequency in the biome of each patch and their height modifier at its height (society §2 and §3.2). A file that gives this list replaces the whole default list.")]
     public IReadOnlyList<RaceParameters> Races { get; init; } = RaceParameters.Defaults;
 
-    [Description("The vocations: the work a person does, in nine sectors. Add a vocation by adding an entry, and switch one on or off with Enabled. The vocations are not drawn for places or persons yet (society §8). A file that gives this list replaces the whole default list.")]
+    [Description("The vocations: the work a person does, in nine sectors. Add a vocation by adding an entry, and switch one on or off with Enabled. The persons of the cities and towns get one (society §7); the vocations of the countryside are not drawn yet (society §8). A file that gives this list replaces the whole default list.")]
     public IReadOnlyList<VocationParameters> Vocations { get; init; } = VocationParameters.Defaults;
 
     [Description("The tools: the things the vocations work with. A tool lists the vocations that work with it by id, and its emblem weight says how well it serves as the emblem of a coat of arms. Tools are not drawn yet; the coats of arms of families, guilds and some cities are to take their charges from them (society §8.1). A file that gives this list replaces the whole default list.")]
@@ -504,7 +510,7 @@ public sealed record PopulationParameters
 {
     [Description("Persons per km² on land with a food supply of 1 at a middling Prosperity. The potential population of a patch is its area × this × its food supply × its Prosperity factor (society §3.1).")]
     [Range(0, double.PositiveInfinity)]
-    public double PersonsPerKm2 { get; init; } = 0.06;
+    public double PersonsPerKm2 { get; init; } = 0.3;
 
     [Description("How much the Prosperity field moves the potential population of a patch: the factor runs from 1 − this at the lowest Prosperity to 1 + this at the highest. 0 turns the effect of Prosperity off (society §3.1).")]
     [Range(0, 1)]
@@ -528,7 +534,7 @@ public sealed record PopulationParameters
 
     [Description("How many persons of a race the land of a region must feed by the plain shares for the race to take a minority place there (society §3.3).")]
     [Range(0, double.PositiveInfinity)]
-    public double MinorityMinPersons { get; init; } = 0.1;
+    public double MinorityMinPersons { get; init; } = 0.5;
 
     [Description("The share of the potential population of a region that a minority race is lifted towards, 0 to 0.9. A minority race that already holds more keeps its share, and one that lives on a few patches only stays below it. 0 turns the lift off (society §3.4).")]
     [Range(0, 0.9)]
@@ -548,11 +554,11 @@ public sealed record RegionNameParameters
 {
     [Description("A region with fewer persons than this is small. When the lead race of its ruling faction is human, its name can end in Duchy, Province, Len or County. With the defaults about 1 region in 4 is small (society §4.10).")]
     [Range(0, double.PositiveInfinity)]
-    public double SmallRegionPersons { get; init; } = 250;
+    public double SmallRegionPersons { get; init; } = 1250;
 
     [Description("A region with more persons than this is large. When the lead race of its ruling faction is human, its name can start with Gran, Grand or Great. With the defaults about 1 region in 5 is large (society §4.10).")]
     [Range(0, double.PositiveInfinity)]
-    public double LargeRegionPersons { get; init; } = 500;
+    public double LargeRegionPersons { get; init; } = 2500;
 }
 
 /// <summary>Parameters of the Settled stage: the cities and towns of a region (society-generation.md section 5.2).</summary>
@@ -569,6 +575,59 @@ public sealed record SettlementParameters
     [Description("How unequal the cities and towns of a region are: the weight of a city or a town is its rank in the region raised to minus this. The capital has rank 1, then come the other cities, then the towns. With 1 the second city holds half the persons of the capital and the third a third; 0 gives all cities the same size and all towns the same size (society §5.2).")]
     [Range(0, double.PositiveInfinity)]
     public double RankExponent { get; init; } = 1;
+}
+
+/// <summary>Parameters of the Housed stage: the households of the cities and towns of a region (society-generation.md section 6).</summary>
+public sealed record HousingParameters
+{
+    [Description("How many households a faction gets where the cities and towns of its region hold persons for them: at its seat first, then in the other cities and towns by rank. A faction has fewer where no fitting person is left (society §6).")]
+    [Range(0, int.MaxValue)]
+    public int FactionHouseholds { get; init; } = 2;
+
+    [Description("The relative weight of each family size: the first number is for a family of 1 person, the second for 2 and so on. A family is never larger than the persons of its race that are left in its city or town (society §6).")]
+    public IReadOnlyList<double> FamilySizeWeights { get; init; } = [2, 3, 3, 3, 2, 1, 0.5, 0.25];
+
+    [Description("The relative weight of each wealth level for a household of no faction in a town (society §6).")]
+    public PerWealthLevel<double> TownWealth { get; init; } = new(1, 3, 4, 2, 0.3);
+
+    [Description("The relative weight of each wealth level for a household of no faction in a city (society §6).")]
+    public PerWealthLevel<double> CityWealth { get; init; } = new(1.5, 3, 3.5, 2.5, 0.8);
+
+    [Description("The relative weight of each wealth level for a household of a faction. The first household of the ruling faction is always Rich (society §6).")]
+    public PerWealthLevel<double> FactionWealth { get; init; } = new(0, 0, 1, 3, 2);
+
+    [Description("How many servants a household of each wealth level wants. It gets fewer where its city or town has too few persons left (society §6).")]
+    public PerWealthLevel<IntRange> Servants { get; init; } = new(new(0, 0), new(0, 0), new(0, 0), new(0, 1), new(1, 3));
+
+    [Description("The age of the head of a household, in years: drawn evenly from this range (society §6).")]
+    public IntRange HeadAge { get; init; } = new(20, 65);
+
+    [Description("The chance that the head of a family of two or more persons is a man, 0 to 1. A person who is alone in its family is a man or a woman with even chance (society §6).")]
+    [Range(0, 1)]
+    public double MaleHeadChance { get; init; } = 0.8;
+}
+
+/// <summary>Parameters of the Peopled stage: the persons of the households of a region (society-generation.md section 7).</summary>
+public sealed record PeopleParameters
+{
+    [Description("The chance that the head of a family of two or more persons has a husband or a wife in the household, 0 to 1 (society §7).")]
+    [Range(0, 1)]
+    public double SpouseChance { get; init; } = 0.75;
+
+    [Description("The age from which a person holds a vocation, in years. A younger person has none (society §7).")]
+    [Range(0, int.MaxValue)]
+    public int WorkingAge { get; init; } = 14;
+
+    [Description("The factor on the share of a vocation of the sector Land and water inside a city or a town: farmers, herders and fishers mostly live on the land. 1 gives them their full share, 0 keeps them out (society §7).")]
+    [Range(0, double.PositiveInfinity)]
+    public double LandWorkFactor { get; init; } = 0.1;
+
+    [Description("The chance that a person of the family other than the head holds the vocation of the head, 0 to 1. Otherwise the person gets a vocation of its own that fits the wealth of the household (society §7).")]
+    [Range(0, 1)]
+    public double SameVocationChance { get; init; } = 0.6;
+
+    [Description("The id of the vocation of a servant of a household. A servant has no vocation when the list of vocations has no such vocation or it is off (society §7).")]
+    public string ServantVocation { get; init; } = "servant";
 }
 
 /// <summary>Parameters of the factions of a region (society-generation.md section 4).</summary>
@@ -598,7 +657,7 @@ public sealed record FactionParameters
 
     [Description("The persons a region needs to hold an opposition (society §4.5).")]
     [Range(0, double.PositiveInfinity)]
-    public double OppositionMinPersons { get; init; } = 80;
+    public double OppositionMinPersons { get; init; } = 400;
 
     [Description("Which type opposes which ruler: for each type of the ruling faction, the weight of each type as its opposition. A crown is opposed by a rival house first, a people by another people, a guild by a rival guild, a faith by a sect or by the mages, a free town by a lord who wants it (society §4.6).")]
     public PerFactionType<PerFactionType<double>> Cleavage { get; init; } = new(
@@ -614,7 +673,7 @@ public sealed record FactionParameters
 
     [Description("The persons a region needs for each lesser faction: a region holds at most its persons divided by this, rounded down (society §4.7).")]
     [Range(1, double.PositiveInfinity)]
-    public double PersonsPerLesserFaction { get; init; } = 150;
+    public double PersonsPerLesserFaction { get; init; } = 750;
 
     [Description("The most lesser factions a region holds (society §4.7).")]
     [Range(0, int.MaxValue)]
@@ -742,10 +801,10 @@ public sealed record FactionIndexRanges
     public IndexRange Supernatural { get; init; } = new(0.014, 0.032);
 
     [Description("People: the persons of the region (society §4.3).")]
-    public IndexRange Persons { get; init; } = new(160, 600);
+    public IndexRange Persons { get; init; } = new(800, 3000);
 
     [Description("Small: the persons of the region, read the other way round: the index is 1 at Low and below and 0 at High and above (society §4.3).")]
-    public IndexRange SmallRegion { get; init; } = new(60, 260);
+    public IndexRange SmallRegion { get; init; } = new(300, 1300);
 
     [Description("Mixed: the share of the largest race in the persons of the region, read the other way round: the index is 1 at Low and below and 0 at High and above (society §4.3).")]
     public IndexRange LargestRace { get; init; } = new(0.24, 0.32);

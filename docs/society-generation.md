@@ -1,17 +1,18 @@
 # How the society is generated
 
 This document describes how the map is populated: the races, the potential population, the
-factions, the cities and towns, the families and the persons, with their vocations and
+factions, the cities and towns, the households and the persons, with their vocations and
 their looks. It is the specification of the society generation, as
 [map-generation.md](map-generation.md) is of the map. The [readme](../readme.md) defines
 the concepts and holds the names, and the names in this document follow the readme.
 
-Only the first steps are specified and implemented: the races (section 2), the races of a
+These steps are specified and implemented: the races (section 2), the races of a
 region with their potential population (section 3), the factions of a region (section 4)
 and its name (section 4.10), the races of a city or a town (section 5.1), the cities
-and towns of a region with their persons (section 5.2) and their names (section 5.3), and
-the tools of the vocations (section 8.1). The rest of sections 5 to 9 holds
-what is decided and what is still open. Detailing it is a later task.
+and towns of a region with their persons (section 5.2) and their names (section 5.3), the
+households of the cities and towns (section 6), the persons of the households (section 7)
+and the tools of the vocations (section 8.1). Sections 8 and 9 hold what is decided and
+what is still open. Detailing it is a later task.
 
 Sections 2 and 3 and Appendix A were section 19 and Appendix E of map-generation.md until
 2026-11-15. The research notes cite them under those numbers.
@@ -23,7 +24,7 @@ Sections 2 and 3 and Appendix A were section 19 and Appendix E of map-generation
 3. [Potential population](#3-potential-population)
 4. [Factions](#4-factions)
 5. [Cities and towns](#5-cities-and-towns)
-6. [Families](#6-families)
+6. [Households](#6-households)
 7. [Persons](#7-persons)
 8. [Vocations](#8-vocations)
 9. [Looks](#9-looks)
@@ -46,9 +47,9 @@ and the travel network are its inputs.
 | Factions | Planned | Specified and implemented (section 4): a ruling faction, an opposition and lesser factions per region |
 | The name of a region | Planned | Specified and implemented (section 4.10): from the region-name generator |
 | Cities and towns | Settled; their races and their names Planned | Specified and implemented: the races of a city or a town (section 5.1), which Prospects get one and how many persons live in each (section 5.2), and the name of each (section 5.3) |
-| Families | Settled | Not specified (section 6) |
-| Persons | Settled for the important persons, later for the rest | The names are implemented, the rest is not specified (section 7) |
-| Vocations | Planned for the countryside, Settled for the cities and towns | The list is in the Parameter Set. The rules are decided in part and not specified (section 8) |
+| Households | Housed | Specified and implemented (section 6): the households of the factions, then the others of the cities and the towns. The households of the land are not specified |
+| Persons | Peopled | Specified and implemented (section 7): the persons of every household, with name, sex, age, family relations and vocation. The persons of the land are not specified |
+| Vocations | Peopled for the persons of the cities and towns; not decided for the countryside | The list is in the Parameter Set. A person of a city or a town gets a vocation (section 7). The rules of a place are decided in part and not specified (section 8) |
 | Tools | none: a list in the Parameter Set | Specified (section 8.1): the tools of each vocation and their emblem weights. Nothing draws a tool yet |
 | Looks | not decided | Not specified (section 9) |
 
@@ -56,25 +57,28 @@ and the travel network are its inputs.
 
 These rules come from the readme and are decided.
 
-- **Stubs are derived data.** Every gameplay-relevant fact of a city, a faction, a family
+- **Stubs are derived data.** Every gameplay-relevant fact of a city, a faction, a household
   or a person is a pure function of the foundation. The rules of the map hold here too:
   every random choice comes from a hash of (foundation seed, entity identity, purpose),
   and no result depends on the order the regions are generated in.
 - **Presentation is authored data.** Descriptions, histories and portraits come from an
   LLM or a diffusion model. They cost to produce, so they are stored as the source of
   truth and are never regenerated or evicted. Authored data must not contradict the Stub.
-- **Identity is deterministic.** A city, a faction, a family or a person is its parent
+- **Identity is deterministic.** A city, a faction, a household or a person is its parent
   plus a slot index. So a Stub is addressable before it is Realised, and player state and
   authored data can point at it. The parent of a faction is its region (section 4.2), and
-  so is the parent of a city or a town (section 5.2). The parent of a family and a person
-  has not been decided.
+  so is the parent of a city or a town (section 5.2) and of a household (section 6). The
+  parent of a person is its household (section 7).
 - **Only a small and relevant set is precalculated.** The game supports a very large
   number of persons, cities and towns. Only a small and relevant set of them is generated
-  at game start, and more are generated as play progresses.
+  at game start, and more are generated as play progresses. A region is the unit: the
+  households and the persons of its cities and towns are made when the region is taken to
+  the Housed and the Peopled stage, as Stubs. With the default density that is about 370
+  persons a region.
 
 ### 1.2 Entity generation states
 
-Cities, factions, families and persons each have their own generation state. It is
+Cities, factions, households and persons each have their own generation state. It is
 independent of the region generation stage:
 
 ```
@@ -97,7 +101,7 @@ any individual in it is authored.
 ## 2. Races
 
 A race is a people that can live in the world: Northmen, Elves, Dwarves and so on. Races
-are needed to generate factions, families and persons.
+are needed to generate factions, households and persons.
 
 The races are a list in the Parameter Set, not a fixed set in the code. The list is
 expected to change late in phase 2, so a race is added or changed by editing the list
@@ -112,7 +116,8 @@ expected to change late in phase 2, so a race is added or changed by editing the
 - A **name style**: which name model the names of the race are drawn from. There are
   three: Common (British given names and surnames), Exotic (elven) and Dark (dark elven).
   The surname of a house that rules a region comes from the model of its lead race
-  (section 4.10), and the names of the persons of the race are meant to (section 7). A
+  (section 4.10), and so do the surname of a household (section 6) and the names of the
+  persons of the race (section 7). A
   race that does not say so has the style Common.
 - A **frequency for each of the 17 biomes**: how frequent the race is in that biome,
   relative to the other races. 0 means the race does not live there.
@@ -185,8 +190,8 @@ own in the list.
 
 Open:
 
-- How a family or a person gets its race, and whether a family can be mixed. A faction
-  has a lead race (section 4.2).
+- Whether a family can be mixed. A family has one race today, and only its servants can
+  be of another (section 6).
 - What a race can ask for beyond the biome and the height: coast, river, elevation type,
   bedrock, the Supernatural and Prosperity fields, a town, another race to live among
   (collected in races-basis.md, "What the entries ask for that a race cannot say yet").
@@ -203,8 +208,9 @@ Open:
 Stage: Planned.
 
 The potential population is an estimate of how many persons the land of a region can
-feed, for each race of the region. It is not a count of people that exist: cities, families
-and persons come in the Settled stage.
+feed, for each race of the region. It is not a count of people that exist: cities and
+towns come in the Settled stage, and their households and persons in the Housed and
+Peopled stages.
 
 A region does not hold every race that is on. It holds its **main races**, the largest by
 the plain shares of section 3.2, and its **minority races**, which get their place by turn
@@ -212,11 +218,11 @@ the plain shares of section 3.2, and its **minority races**, which get their pla
 
 | Parameter | Default |
 |---|---|
-| Persons per km² at a food supply of 1 and a middling Prosperity | 0.06 |
+| Persons per km² at a food supply of 1 and a middling Prosperity | 0.3 |
 | Prosperity effect | 0.5 |
 | Races per region | 6 |
 | Minority races per region | 2 |
-| Persons a race needs in a region to take a minority place | 0.1 |
+| Persons a race needs in a region to take a minority place | 0.5 |
 | Share of the region a minority race is lifted towards | 0.05 |
 
 Races per region 28 with no minority races gives every race that is on its plain share.
@@ -321,8 +327,8 @@ minority place z = 0 … b−1 of region (i, j):
 - **The main races** follow the frequencies and the height modifiers alone: they are the
   races the land of the region suits best.
 - **The turn** is how an under-represented race is boosted: it takes the place by its
-  turn, not by its size. It only needs the land of the region to feed 0.1 of it by the
-  plain shares, so it takes no place where it has next to no land.
+  turn, not by its size. It only needs the land of the region to feed half a person of it
+  by the plain shares, so it takes no place where it has next to no land.
 - **The turn pattern.** The regions where one race has its turn form a lattice: the
   regions with the same `(i + W·j) mod M`. `W` is the number in 1 … M−1 for which the
   shortest step between two such regions is the longest, and the lowest such number. With
@@ -370,13 +376,28 @@ population(r)    = round(Σ capacity(patch) · share(r, patch))   over the regio
 The land patches of a region are the patches of its zones (map-generation.md section
 6.2), so every land patch counts in exactly one region.
 
-With the defaults the median region has a potential population of about 364 and the
-range is 7 to 1,188 (measured on 1,079 regions of four seeds at the earlier density of 6
-persons per km², and divided by 100). Every one of them holds
+With the defaults the median region has a potential population of about 1,820 and the
+range is 35 to 5,940 (measured on 1,079 regions of four seeds at the earlier density of 6
+persons per km², and divided by 20). Every one of them holds
 six races. The largest race of a region holds 27 % of it in the median region and 19 to
 43 % over all regions, so no race has a majority anywhere. A minority race holds 4.9 % of
-its region in the median case, and about 20 persons. 0.9 % of the capacity lies on patches
+its region in the median case, and about 100 persons. 0.9 % of the capacity lies on patches
 that hold nobody.
+
+The density was 0.06 persons per km² until 2026-11-21 and is five times that since. The
+parameters that are counted in persons were raised five times with it: the persons a race
+needs for a minority place, the persons an opposition needs and the persons per lesser
+faction (section 4), the two ranges of the indices people and small (section 4.3) and the
+two limits of the name of a region (section 4.10). So the races, the factions and the
+names of a region are what they were, and every region holds five times the persons.
+Measured on 676 regions, each against itself at the earlier density: the persons of every
+race of every region are five times what they were before they are rounded, so the
+potential population of each of the 674 regions with persons is exactly five times the
+earlier one. In whole persons the regions hold 1,264,947 for 252,980, and a region
+differs from five times its earlier whole persons by 10 at most, because the earlier
+count rounded each race first. Every region has the same races and the same factions, the
+cities and towns the same names, and one region another name: its rounded persons crossed
+a limit.
 
 Of all persons 83.5 % are of the seven human races, 10.4 % of the five classic races and
 6.1 % of the sixteen new races. By the plain shares it would be 58.7 %, 20.2 % and 21.1 %:
@@ -414,8 +435,8 @@ what was weighed. Its fits, weights and tables are starting values for phase 1.
 | Tension weights: contest, rough land, rival seat, precious finds, poor land | 0.25, 0.20, 0.20, 0.15, 0.20 |
 | Tension an opposition needs | 0.50 |
 | Tension jitter | 0.2 |
-| Persons an opposition needs | 80 |
-| Persons per lesser faction | 150 |
+| Persons an opposition needs | 400 |
+| Persons per lesser faction | 750 |
 | Most lesser factions | 4 |
 | Lowest fit of a lesser faction | 0.75 |
 | Lesser jitter | 0.1 |
@@ -540,8 +561,8 @@ harbour, or with a river mouth of 8 or more.
 | ore | ramp of listed(Iron ore) + listed(Copper ore) + listed(Tin) + listed(Silver & lead) + listed(Gold) + listed(Gems & pearls) + listed(Salt) | 0.03 | 0.18 |
 | precious | ramp of listed(Silver & lead) + listed(Gold) + listed(Gems & pearls) | 0 | 0.06 |
 | arcane | ramp of the area-weighted mean of clamp((Supernatural − 60) / 40, 0, 1) over the land patches, with the Supernatural field at the site of each patch | 0.014 | 0.032 |
-| people | ramp of persons | 160 | 600 |
-| small | 1 − ramp of persons | 60 | 260 |
+| people | ramp of persons | 800 | 3,000 |
+| small | 1 − ramp of persons | 300 | 1,300 |
 | mixed | 1 − ramp of the largest share(r) | 0.24 | 0.32 |
 | poor | ramp of the Poor Prospects on show / the Prospects on show; 0 without one on show | 0 | 0.5 |
 | uneven | ramp of the highest − the lowest Prosperity factor of the Prospects on show; 0 with fewer than two | 0.1 | 0.5 |
@@ -802,7 +823,8 @@ Open:
 - Outlaws away from the Prospects: bandits, pirates and cults.
 - The kinds of lesser faction as a list in the Parameter Set, and their fits from the
   vocations of the cities and towns (section 8).
-- How a person gets its faction membership (section 7).
+- A faction has the households of its leaders (section 6). Who else is a member of a
+  faction is open.
 
 Material: [research/factions.md](research/factions.md) holds 48 faction archetypes, the
 axes that tell them apart and their relations.
@@ -881,8 +903,8 @@ region gives it.
 
 | Parameter | Default |
 |---|---|
-| Small region | Fewer than 250 persons |
-| Large region | More than 500 persons |
+| Small region | Fewer than 1,250 persons |
+| Large region | More than 2,500 persons |
 | Human | A flag on each race: the seven human races (Appendix A) |
 | Name style | One per race (Appendix A) |
 
@@ -962,7 +984,7 @@ The rules, in the order they are applied:
 - Rule 2 is new. The original knows nothing about the ruler.
 - The surname is used only where a house rules. In the original every region has a ruling
   family.
-- The limits are 250 and 500 persons for 10,000 and 100,000: a region of this world holds
+- The limits are 1,250 and 2,500 persons for 10,000 and 100,000: a region of this world holds
   far fewer persons.
 - Ten misspelled words are corrected: Southen, Greath, Bazil, Brazillian, Ethioian, Italin,
   Portugese, Selecuid and Xiognu, and Gran, which had no space after it. Portuguese,
@@ -995,8 +1017,8 @@ Open:
   is not always a Republic.
 - Two regions can get the same name. Telling them apart would read another region, which
   no rule of section 4 does.
-- The surname of the ruling house is not a fact of the Stub of the faction. The families
-  (section 6) must give the house that rules a region this surname.
+- The surname of the ruling house is not a fact of the Stub of the faction. The households
+  of the house carry it (section 6).
 - The name styles of the default races are a first assignment (Appendix A), and there are
   only three models: the seven human races share one.
 - The word lists as lists in the Parameter Set.
@@ -1016,8 +1038,8 @@ for cities. A city or a town stands on every Prospect on show, and on no other.
 
 Open:
 
-- What a city or a town holds beside its name, its persons and their races: its families
-  (section 6) and its vocations (section 8).
+- What a city or a town holds beside its name, its persons and their races. Its
+  households are those of section 6. Its vocations as a place are open (section 8).
 - Whether a Prospect that is not on show gets a city or a town later, as play progresses.
   Its slot is kept free for it (section 5.2), and it has its name already (section 5.3).
 
@@ -1201,23 +1223,23 @@ A rural person belongs to a patch (section 8). The share of a patch is that of s
 3.4: `rural(r) · the persons of r on the patch / population(r)`. This is not rounded.
 Whole persons per patch are open, with the vocations of the countryside.
 
-With the defaults 10.0 % of all persons live in cities, 9.9 % in towns and 80.0 % on the
-land (measured on 676 regions of four seeds with 252,980 persons). A region has 3.1 cities
+With the defaults 10.0 % of all persons live in cities, 9.9 % in towns and 80.1 % on the
+land (measured on 676 regions of four seeds with 1,264,947 persons). A region has 3.0 cities
 and 9.8 towns on average. Every region with persons has a capital, and 1 in 28 has no
 town. No city or town stands empty, and no pool is lifted. The share of one region lies
-within a person of a tenth: 9.8 to 10.3 % in cities for nine regions in ten.
+within a person of a tenth: 10.0 % in cities for nine regions in ten.
 
 | Persons | Lowest | 5 % | Median | 95 % | Highest |
 |---|---|---|---|---|---|
-| The capital | 1 | 8 | 20 | 34 | 57 |
-| Another city | 2 | 4 | 8 | 15 | 29 |
-| A town | 1 | 2 | 3 | 8 | 20 |
+| The capital | 4 | 39 | 100 | 169 | 285 |
+| Another city | 10 | 18 | 39 | 75 | 143 |
+| A town | 3 | 8 | 17 | 38 | 100 |
 
 The capital holds 5.4 % of its region in the median region, and the whole city share
-where it is the only city. In 55 % of the regions the largest town is larger than the
-smallest city, mostly by a person or two: with equal shares ten towns hold as many persons
-as three cities. A minority race has a person in a city or a town of its region in 80 % of
-the cases, and a quarter of the listed races of all places hold nobody.
+where it is the only city. In 61 % of the regions the largest town is larger than the
+smallest city: with equal shares ten towns hold as many persons as three cities. A
+minority race has a person in a city or a town of its region in 94 % of the cases, and
+3.5 % of the listed races of all places hold nobody.
 
 With a city share of 0.05 and a town share of 0.2 the same regions hold 5.0 % of all
 persons in cities and 19.9 % in towns.
@@ -1503,58 +1525,399 @@ Open:
 
 ---
 
-## 6. Families
+## 6. Households
 
-Stage: Settled. Not specified yet.
+Stage: Housed, the stage after Settled. The rule needs the region itself only: its
+factions (section 4), the surname of its ruling house (section 4.10) and its cities and
+towns with their persons per race (section 5.2). Nothing is read from another region. It
+was adopted on 2026-11-21 as planned in
+[plans/households-and-persons.md](plans/households-and-persons.md), which holds what was
+measured and what was weighed.
 
-A family is a family of NPCs, typically living together in a household. It can include
-servants or slaves.
+A household is a family and its servants, living together in one city or town. A
+household shares its wealth and its faction. The family is the kin in the household. The
+households of one faction of the type Family are a house: one family in several
+households.
+
+| Parameter | Default |
+|---|---|
+| Households per faction | 2 |
+| Family size weights, for a family of 1 to 8 persons | 2, 3, 3, 3, 2, 1, 0.5, 0.25 |
+| Wealth weights in a town: Destitute, Poor, Common, Comfortable, Rich | 1, 3, 4, 2, 0.3 |
+| Wealth weights in a city | 1.5, 3, 3.5, 2.5, 0.8 |
+| Wealth weights of a household of a faction | 0, 0, 1, 3, 2 |
+| Servants by wealth | 0, 0, 0, 0 to 1, 1 to 3 |
+| Head age | 20 to 65 |
+| Male head chance | 0.8 |
+
+The parameters are `Housing` in the Parameter Set.
+
+The draws use the hash purposes 0x4d01 (a household of a faction), 0x4d02 (the other
+households of a city or a town) and 0x4d03 (the surname of a household). A thing inside a
+region has no grid coordinate of its own, so its draws are keyed in two steps:
+
+```
+key(purpose, a, b) = hash(hash(seed, purpose, region i, region j), purpose, a, b)
+```
+
+`hash` is the hash of map-generation.md section 2.2. A household of a faction takes its
+numbers from the stream of `key(0x4d01, faction slot, round)`, and a surname from the
+stream of `key(0x4d03, household slot, 0)`. The other households of a city or a town take
+theirs from one stream, `hash(seed, 0x4d02, i, j)` of the root cell of the patch of its
+Prospect, as its name does (section 5.3).
+
+**The pool.** Every household takes its persons from the persons of its city or town:
+
+```
+left(s, r) = the persons of race r in the city or town s        # section 5.2
+```
+
+A household never takes more than is left, and the rule ends when nothing is left. So the
+households of a city or a town hold exactly its persons, race by race.
+
+**Step 1: the households of the factions.** First every household of a faction gets its
+head, one person:
+
+```
+for pass in (seat, lead race), (other places, lead race), (seat, any race), (other places, any race):
+    for round = 0 … households per faction − 1:
+        for each faction, by slot, that has exactly `round` households:
+            kept   = the race of its first household         if round > 0 and the faction is of the type Family
+            wanted = kept, or else its lead race
+            in a pass for any race: a faction of the type Race is skipped, and so is a faction with a kept race
+            places = the city or town on its seat            in a seat pass
+                     the other cities and towns, by rank     otherwise
+            the first of the places with a fitting person left gives the head:
+                race = wanted                                                    in a pass for the lead race
+                       the race with the most persons left there, the first in the list of equals    in a pass for any race
+                left(place, race) = left(place, race) − 1
+```
+
+- **The lead race comes before the seat.** The leaders of a faction are of its lead race
+  (section 4.2) wherever a city or a town of the region holds a person of it. Only then
+  does the seat decide. So a household of a faction can sit in another place than the
+  seat.
+- **Every faction gets its first head before any gets a second** in the same pass. Three
+  factions on one seat of four persons get two, one and one household.
+- **A faction of the type Race holds its race only**, so it has no household where no city
+  or town holds its race.
+- **A house keeps its race.** A later household of a house is of the race of the first.
+- **A faction can have fewer households.** It has one, or none, where no fitting person
+  is left. A region without a city or a town has no household at all.
+
+Then the households of the factions are filled, by faction slot and round. Each takes
+seven numbers from its stream: wealth, family, servants, sex, age, kin, kin age.
+
+```
+wealth = Rich                                    the first household of the ruling faction
+         by the wealth weights of a faction      any other
+family = 1 + min(size − 1, left(place, race))    # size by the family size weights; the head is taken already
+servants, head sex, head age and surname: below
+```
+
+**A house.** A household of a faction of the type Family after the first is a branch of
+the house:
+
+```
+surname = the surname of the first household
+kin     = Child      if the head age of the first household − 18 ≥ the lowest head age, and the kin number < 0.5
+                     head age = even in [the lowest head age, the head age of the first household − 18]
+          Sibling    otherwise
+                     head age = the head age of the first household + even in [−10, 10], within the head age range
+```
+
+- The first household of the house that rules the region takes the surname of the ruling
+  house (section 4.10): the one that can stand in the name of the region. The first
+  household of any other house draws a surname as below.
+- The kin of a branch is between the two heads only: the head of the branch is a child or
+  a sibling of the head of the first household.
+
+**Steps 2 and 3: the other households.** City by city and then town by town, by rank
+(section 5.2). Each household takes six numbers from the stream of its place: race,
+wealth, family, servants, sex, age.
+
+```
+while a person is left in s:
+    race   = by the weights left(s, r)
+    family = min(size, left(s, race))            # size by the family size weights
+    wealth = by the wealth weights of a city or of a town      # the capital is a city
+```
+
+**What every household draws the same way.**
+
+```
+servants = even in the range of its wealth, and no more than the place has left
+           each servant is of the race with the most persons left in the place, the first in the list of equals
+           a household of a faction of the type Race takes servants of its own race only
+head sex = a man with the male head chance        in a family of two or more
+           a man or a woman with even chance      a person who is alone in its family
+head age = even in the head age range             # the range never starts below 16
+surname  = from the surname model of the name style of the race of the family (section 7)
+           one of more than 12 characters, or one that an earlier household of the region has, is drawn again
+           from the same stream, 10 times at most: the last one is kept
+```
+
+**The Stub** of a household holds:
+
+| Fact | Meaning |
+|---|---|
+| Slot | Its identity is the region and the slot. The households of the factions come first, by faction slot and round, then the others by the rank of their city or town, in the order they are drawn |
+| Settlement | The slot of the city or town it lives in |
+| Faction | The slot of its faction. None for a household of no faction |
+| Race | The race of the family |
+| Wealth | Destitute, Poor, Common, Comfortable or Rich |
+| Surname | The surname of the family. A house shares it |
+| Head sex, head age | The sex and the age of the head. They are in the Stub so that the kin of a house is consistent before the persons are made |
+| Family | How many persons the family holds, the head included |
+| Servants | How many servants it holds, per race |
+| Kin | For a branch of a house: the slot of the first household, and Child or Sibling |
+
+**Measured** on 676 regions: the 13 × 13 regions around (0, 0) of the seeds `cellgen`,
+`atlas`, `ember` and `tide`, default Parameter Set. 674 of them have a city or a town.
+Their 8,674 cities and towns hold 252,203 persons in 85,775 households.
+
+| | Lowest | 5 % | 25 % | Median | 75 % | 95 % | Highest |
+|---|---|---|---|---|---|---|---|
+| Households of a region | 0 | 37 | 87 | 124 | 166 | 227 | 356 |
+| Households of a capital | 2 | 12 | 21 | 28 | 36 | 46 | 75 |
+| Households of another city | 3 | 7 | 10 | 13 | 17 | 23 | 42 |
+| Households of a town | 1 | 4 | 5 | 7 | 9 | 13 | 35 |
+
+| Fact | Value |
+|---|---|
+| Factions with two households, with one, with none | 99.8 %, 0.1 %, 0.1 % of 1,934: two factions with one and two with none, all four of the type Race |
+| The first household of a faction is at its seat | 99.1 % |
+| The first household of a faction is of its lead race | 99.8 % |
+| The second household is at the seat, is of the lead race | 95.5 %, 99.5 % |
+| Households of a faction | 4.5 % of the households, with 6.1 % of the persons |
+| Houses with two households | all 393. The head of the branch is a child in 125 and a sibling in 268 |
+| Two households of no faction with the same surname in one region | none |
+| Wealth of a household of no faction | Destitute 11.3 %, Poor 28.0 %, Common 35.4 %, Comfortable 20.6 %, Rich 4.8 % |
+| Wealth of a household of a faction | Common 14.5 %, Comfortable 40.5 %, Rich 45.0 % |
+| Persons in a household | 2.94 on average. One person 22.2 %, two 24.6 %, three 20.2 %, four 15.8 %, five or more 17.2 % |
+| Persons in a family | 2.72 on average, where the weights alone give 3.4 |
+
+**A family is cut to what its race has left in the place.** A city or a town holds 29
+persons on average, of 4.1 races. So the last family of a race in a place is often smaller
+than drawn, and a race with one person in a place is a household of one person: 4.7 % of
+all households. That is why the mean family is 2.7 persons and not 3.4.
+
+**The density decides the size of the households.** Until 2026-11-21 the density was a
+fifth of this (section 3.4). A city or a town then held 5.8 persons of 3.1 races, 58 % of
+the households held one person and the mean household 1.7.
 
 Open:
 
-- What a family holds as a Stub, and what the parent of its identity is.
-- How families follow from the population of a city or a town.
-- The race of a family, and how family links between persons are drawn.
+- The households of the land. Four persons in five live outside the cities and towns and
+  have no household. The user named villages on 2026-11-21 as places of households that
+  come later, and section 8 says there are no villages: a rural person belongs to a patch.
+  One of the two must give way first.
+- The person who is alone of its race in a place: whether it joins another household.
+- What the wealth of a household reads. It reads the kind of its place and its faction
+  only: not the Prosperity field, the wealth of the region (section 4.3) or the resources
+  of its patch.
+- Kin between the households of no faction, and marriages between houses.
+- Slaves (section 8), lodgers and apprentices in a household.
+- Who but its leaders belongs to a faction (section 4.8).
+- The defaults are first values. Only the count of households per faction is measured
+  against what was asked.
 
 ---
 
 ## 7. Persons
 
-Stage: Settled for the important persons of a region. Other persons are generated later,
-as play progresses. Not specified yet, apart from the names.
+Stage: Peopled, the stage after Housed. The rule needs the region itself only: its
+households (section 6), its factions (section 4) and, of each city or town, what kind of
+place it is and whether its Prospect is on water. Nothing is read from another region. It
+was adopted on 2026-11-21 with the households, as planned in
+[plans/households-and-persons.md](plans/households-and-persons.md).
 
-A person is an NPC in the game. The Stub of a person holds name, age, sex, vocation, role,
-family links, faction membership and home. The vocation can have a by-work beside it
-(section 8). The textual description, the history and the portrait are authored
-(section 1.2).
+A person is an NPC in the game. Every person of a household is generated as a Stub, so
+every person of a city or a town is an individual: about 360 persons in the median region.
+The persons of the land are a count per race (section 5.2). The Stub of a person holds
+name, sex, age, race, vocation, role, family links and its household. The household gives
+the home, the wealth and the faction. The role is the position in the household for now.
+The textual description, the history and the portrait are authored (section 1.2).
 
-**Names.** The name of a person is not authored. It comes from the name generator, so a
+| Parameter | Default |
+|---|---|
+| Spouse chance | 0.75 |
+| Working age | 14 |
+| Land work factor | 0.1 |
+| Same vocation chance | 0.6 |
+| Servant vocation | `servant` |
+
+The parameters are `People` in the Parameter Set. The rule has fixed numbers too:
+
+| Fixed number | Value |
+|---|---|
+| A parent is older than its child by at least | 16 years |
+| A mother is older than her child by at most | 45 years |
+| A father of the head is older than the eldest of the head and its siblings by at most | 35 years |
+| The age of a husband minus that of his wife | −3 to 10 years |
+| A husband or a wife is at least | 16 |
+| A sibling of the head is older or younger than the head by at most | 10 years, and is at least 14 |
+| Nobody is older than | 90 |
+| A servant is | 12 to 50 |
+| The weights of a child, a parent and a sibling of the head | 6, 1, 1 |
+
+The draws use the hash purposes 0x4e01 (the persons of a household: who they are, their
+ages and their vocations) and 0x4e02 (the name of a person), keyed as in section 6:
+`key(0x4e01, household slot, 0)` gives the stream of a household and
+`key(0x4e02, household slot, person slot)` the stream of the name of one person. So a
+household is drawn from a stream of its own, and no household depends on another.
+
+**The head** has slot 0. Its sex and its age are those of the Stub of the household.
+
+**The husband or the wife of the head.**
+
+```
+if family ≥ 2 and a number < spouse chance:
+    gap    = even in [−3, 10]                     # the age of the husband minus that of the wife
+    spouse = of the other sex than the head
+             age = head age − gap  (the head is the husband)  or  head age + gap  (the head is the wife), within 16 to 90
+```
+
+**The rest of the family**, until the family is as large as the Stub says. Each person
+takes five numbers: role, sex, age, same vocation, vocation.
+
+```
+mother, father   = the woman and the man of the head and its spouse
+eldest, youngest = the highest and the lowest age of the head and its siblings so far
+
+Child    weight 6    if low ≤ high:   low  = max(0, age of the mother − 45), or 0 without a mother
+                                      high = the lower age of the head and its spouse − 16
+                     sex even, age even in [low, high]. Its father and mother are the head and its spouse
+Parent   weight 1    if the household is not a branch of a house, the head lacks a father or a mother in the
+                     household, and eldest + 16 ≤ 90
+                     sex = the one that is missing; even where both are
+                     a mother: age even in [eldest + 16, min(90, youngest + 45)]
+                     a father: age even in [eldest + 16, min(90, eldest + 35)]
+Sibling  weight 1    always
+                     sex even, age even in [low, high]:
+                     low  = max(14, head age − 10, age of the mother of the head − 45)
+                     high = min(head age + 10, age of each parent of the head − 16)
+```
+
+- The parents of the head are the parents of its siblings too, and husband and wife.
+- A branch of a house has no parent of the head in it: that parent is the head of the
+  first household of the house, or lives there.
+- A person who is alone with a family of two or more has no spouse. A child of such a head
+  has one parent in the household.
+- The bounds hold in every household: a father and a mother are at least 16 years older
+  than each of their children in the household, and a mother at most 45.
+
+**The servants** follow the family, race by race as the Stub of the household lists them.
+Each takes two numbers: sex even, age even in 12 to 50.
+
+**The vocation.**
+
+```
+tier(place)      = Capital for the capital, City for another city, Town for a town
+weight(v, place) = 0                                   if v is off, its lowest tier is above tier(place),
+                                                       or v is on water and the place is not
+                   share(v) · land work factor         if v is of the sector Land and water
+                   share(v)                            otherwise
+fits(v, wealth)  = the standing of v meets the standing of the wealth:
+                   Destitute 1, Poor 2, Common 3, Comfortable 4, Rich 5 to 6
+fitting(wealth)  = by weight(v, place) among the vocations that fit the wealth
+                   where none has a weight: the nearest lower wealth that has one, then the nearest higher
+                   none when no vocation has a weight in the place
+
+the head of a household of a faction:
+    one of the vocations the faction gathers (section 4.7), by share      if it gathers one that is on
+    the vocation of those who lead a faction of its type, if it is on:
+        Family noble · Race noble · Vocation merchant · Belief priest · Magic mage · Place official
+    fitting(wealth of the household)                                      otherwise
+any other head:                  fitting(wealth of the household)
+another person of the family:    none below the working age
+                                 the vocation of the head     with the same vocation chance
+                                 fitting(wealth of the household)     otherwise
+a servant:                       the servant vocation, if it is on
+```
+
+- A place is on water when its Prospect has a harbour, a river mouth of 8 patches or more,
+  or a river of 8 patches or more: the same test as for a seat on water (section 4.7).
+- The tier and the water do not bind the head of a household of a faction: the mages of a
+  town that is the seat of a circle are mages.
+- A vocation is the id of one of the list. No variant and no by-work is drawn (section 8).
+- The work of the land has a small weight inside a city or a town: the farmers, the herders
+  and the fishers are mostly the persons of the land.
+
+**The name.** The name of a person is not authored. It comes from the name generator, so a
 person has a name already as a Stub. The generator is a character-level Markov chain with
 nine pregenerated models: a male, a female and a surname model for each of the three name
 styles. The code is `src/Gameworld.Generation/Names`, and
 [NameGenerator-Reuse.md](NameGenerator-Reuse.md) describes it. A race has a name style
-(section 2), and the names of a person are meant to come from the models of the style of
-its race. No person is generated yet, so only the surname of the house that rules a region
-is drawn this way (section 4.10).
+(section 2), and the names of a person come from the models of the style of its race.
+
+```
+given name = from the male or the female model, from the stream key(0x4e02, household slot, person slot)
+             one that a person of the household has already is drawn again, 5 times at most
+surname    = the surname of the household                      a person of the family
+             from the surname model, from the same stream      a servant
+```
+
+**The Stub** of a person holds:
+
+| Fact | Meaning |
+|---|---|
+| Household | The slot of its household. Its identity is the household and the slot |
+| Slot | The slot in the household: 0 the head, then the family in the order drawn, then the servants |
+| Given name, surname | From the name generator |
+| Race | The race of the family, or the race of the servant |
+| Sex, age | |
+| Role | Head, Spouse, Child, Parent, Sibling or Servant: the position in the household |
+| Vocation | The id of its vocation. None for a child, and where no vocation has a weight |
+| Spouse, father, mother | The slots of the husband or wife, the father and the mother, where they live in the household |
+
+The home of a person is the city or town of its household, and its faction and its wealth
+are those of its household.
+
+**Measured** on the same 676 regions, 252,203 persons:
+
+| Fact | Value |
+|---|---|
+| Persons in households, per region | median 356, 102 to 704 for nine regions in ten, at most 1,188 |
+| Head, spouse, child, parent, sibling, servant | 34.0 %, 18.9 %, 29.8 %, 4.9 %, 5.0 %, 7.4 % |
+| Heads of a family of two or more with a husband or a wife | 74.8 % |
+| Men | 51.9 % |
+| Under 14 | 17.7 %. The mean age is 34 |
+| Without a vocation | 17.3 %: the children under the working age |
+| The most held vocations, of the persons with one | Servant 18.7 %, Labourer 13.6 %, Beggar 7.0 %, Weaver 6.4 %, Farmer 6.1 %, Priest 5.2 %, Brewer 3.6 %, Soldier 3.0 %, Shopkeeper 2.9 %, Carter 2.3 %, Noble 2.0 % |
+
+Every default vocation is held by somebody.
 
 Open:
 
-- Which persons of a region are important, and how many there are.
-- How age, sex, vocation, role, family links, faction membership and home are drawn.
-- How a person gets its race, and with it its name style.
+- The persons of the land, and which persons are important enough to be authored first.
+- The role of a person in its vocation (apprentice, master) and in a faction, and the
+  list of roles (section 8).
+- The variant of a vocation, the by-work, the share by sex, the factors of the races and
+  the Supernatural Field (section 8). A woman holds a vocation like a man today.
+- The ages of the races. Every race ages as the human races do, and no race has a lifespan
+  in the Parameter Set. [races-basis.md](races-basis.md) gives each race one: about 60
+  years for the Northmen, 500 to 600 for the Elves.
+- Family links between households. Only the heads of the households of a house are kin
+  (section 6).
 - More name models. The seven human races share the common one, which is British.
+- The fixed numbers are first values.
 
 ---
 
 ## 8. Vocations
 
-Stage: Planned for the countryside, Settled for the cities and towns. Not specified yet.
+Stage: Peopled for the persons of the cities and towns (section 7). Not decided for the
+countryside, and not specified as a rule of a place.
 
 A vocation is the work a person does: farmer, smith, priest, guard and so on.
 
 The rules below were decided on 2026-11-15. The list of vocations is in the Parameter Set
-since 2026-11-19 (see "In the Parameter Set" below). No other rule is specified in detail
-or implemented, and no vocation is drawn for a place or a person.
+since 2026-11-19 (see "In the Parameter Set" below). Since 2026-11-21 a person of a city
+or a town gets a vocation from the list, by the rule of section 7: the wealth of its
+household and the standing of the vocation decide. No other rule below is specified in
+detail or implemented: no place has a mix of vocations, and no person has a variant or a
+by-work.
 
 **Vocation and role are two facts.** The vocation is the work, one of the list, with a
 variant (a herder who is a shepherd). The role is the position of the person: in the
@@ -1594,6 +1957,7 @@ the guide of Hunter, the dyer of Weaver, the boatman of Sailor and the banker of
 | `Sector` | One of the nine sectors |
 | `LowestTier` | Countryside, Town, City or Capital |
 | `SharePercent` | The starting share of the labour force of a whole region, in per cent |
+| `Standing` | The social standing, as a range `Min` to `Max` on a scale of six: 1 outcast, 2 poor, 3 common, 4 middling, 5 wealthy, 6 ruling. The wealth of a household picks among the vocations whose standing fits it (section 7) |
 | `OnWater` | The vocation is only found in a place on water: the shipwright and the sailor. Left out means no |
 | `Variants` | The smaller trades the vocation covers. Each has a `Name`, a `Description` and a `Lore` |
 | `Description` | What the vocation is: the work a person of it does. Left out means `**missing description**` |
@@ -1613,11 +1977,13 @@ the work. A variant that a Parameter Set file gives no text has
 `**missing description**`. In a Parameter Set file a variant is an
 object with a `Name`; until 2026-11-21 it was a plain name, and a file from before that
 must be changed to load.
-The defaults of `LowestTier`, `SharePercent`, `OnWater` and `Variants` are those of
-[research/vocations.md](research/vocations.md) section 3: the index table and the
-"Covers" line of each vocation. The shares sum to 100. They are starting values and are
-not tuned against generated regions. A vocation does not yet hold its inputs and outputs,
-its by-works or its share by sex.
+The defaults of `LowestTier`, `SharePercent`, `Standing`, `OnWater` and `Variants` are
+those of [research/vocations.md](research/vocations.md) section 3: the index table and the
+"Covers" line of each vocation. The scale of the standing is that of its section 2.4, and
+13 of the 51 vocations have a range: a healer stands from 3 to 5, a courtesan from 1 to 5.
+The shares sum to 100. They are starting values and are not tuned against generated
+regions. A vocation does not yet hold its inputs and outputs, its by-works or its share
+by sex.
 
 **Products are names only.** A vocation lists what it consumes and what it produces by id.
 The ids are the resources of the map and the products made from them: iron, cloth, flour,
@@ -1628,7 +1994,9 @@ or can send out (smiths without a smelter in reach bring in iron).
 
 **A rural person belongs to a patch.** There are no villages. The vocations of the
 countryside are worked out per land patch, from its resources and its potential
-population. The vocations of a city or a town are worked out per city or town.
+population. The vocations of a city or a town are worked out per city or town. Until that
+rule exists, a person of a city or a town draws its vocation by itself (section 7), and
+nothing reads the resources of the place.
 
 **The tiers are relative.** A vocation has a lowest tier in which it is found:
 countryside, town, city or capital. The tier of a place follows from what the place is,
@@ -1662,7 +2030,11 @@ Open:
 - The rule that gives the vocations of a place from its resources, its size, its races and
   the fields, and the purpose numbers of its draws.
 - The list of roles, and which roles fit which vocations.
-- The age at which a person gets a vocation, and what a child and an old person hold.
+- What a child and an old person hold. A person holds a vocation from the working age
+  (section 7), a child holds none and an old person keeps its vocation.
+- Villages. On 2026-11-21 the user named villages as places of households, to be added
+  later. The rule above says there are none and puts a rural person on a patch. One of the
+  two must give way before the households of the land are specified (section 6).
 - The factors per race, which races keep slaves, and which races other than the Twofold
   switch the division by sex off.
 - The capital of a region is the seat of its ruling faction (section 4.4), and it is a
@@ -1687,7 +2059,7 @@ place makes and trades, a tool of the list is a kind of thing a person of a voca
 
 What the tools are for:
 
-- **Emblems.** The coats of arms of families, guilds and some cities are to take their
+- **Emblems.** The coats of arms of houses, guilds and some cities are to take their
   charges from the tools of a vocation, as the guilds of the record bear the tools of their
   trade: three hammers for the smiths, three fleams for the barbers
   ([research/heraldry-coat-of-arms-generation.md](research/heraldry-coat-of-arms-generation.md)

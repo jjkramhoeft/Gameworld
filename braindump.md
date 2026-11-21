@@ -9,6 +9,8 @@ This doocument contains unstructured parts of prompts for futurer work
 * Temple
 * Shrine
 * Alter
+* Faith
+* Belief
 
 ### Not OK
 
@@ -16,19 +18,15 @@ Current and historic names should be avoided
 
 * Church
 * Religion
+* Islam
+* Hindu
+* Thor, Athena, Zeus etc.
 
 ## War and Strife
 
 ## Race Symbols
 
 ## Resource Symbols / Icons
-
-## Extend LAYERS in the left panel
-
-* Checkbox for City names
-* Checkbox for Town names
-* Checkbox for Leading faction name
-* Checkbox for Leading faction type
 
 ## Biomes
 
