@@ -137,6 +137,17 @@ expected to change late in phase 2, so a race is added or changed by editing the
   colours of a faction are drawn mostly from the favourite colours of its lead race
   (section 4.9). An id that is not a colour of the Parameter Set is refused when the world
   is created. A race without the list has no favourite colour.
+- A **description** and a **lore**. The description says what a person of the race looks
+  like: build, skin, hair, eyes, dress and the marks that tell the race apart. The lore
+  says where the race comes from and what it tells about itself. A portrait is drawn from
+  the description, so that a race that exists nowhere else looks the same every time. No
+  rule reads the two texts. Those of the default races are the parts "Appearance" and
+  "History and lore" of [races-basis.md](races-basis.md)
+  (`src/Gameworld.Domain/DefaultTexts.Races.cs`): change them together. A race without
+  them has the text `**missing description**` for each, which marks a text that is not
+  written yet. The vocations, the tools, the flora, the fauna and the resources carry the
+  same two texts (section 8, section 8.1 and
+  [map-generation.md](map-generation.md) sections 13.4 and 14).
 
 In a Parameter Set file a race lists only the biomes it lives in. A biome that is left out
 has the frequency 0, and a frequency of 0 is not written to the file. A race without a
@@ -1572,7 +1583,12 @@ the guide of Hunter, the dyer of Weaver, the boatman of Sailor and the banker of
 | `SharePercent` | The starting share of the labour force of a whole region, in per cent |
 | `OnWater` | The vocation is only found in a place on water: the shipwright and the sailor. Left out means no |
 | `Variants` | The names of the smaller trades the vocation covers |
+| `Description` | What the vocation is: the work a person of it does. Left out means `**missing description**` |
+| `Lore` | The standing, the customs and the quarrels of the vocation. Left out means `**missing description**` |
 
+The default `Description` and `Lore` are the opening paragraph and the line "Lore" of the
+entry of the vocation in [research/vocations.md](research/vocations.md) section 3, without
+the citations (`src/Gameworld.Domain/DefaultTexts.Vocations.cs`). No rule reads them.
 The defaults of `LowestTier`, `SharePercent`, `OnWater` and `Variants` are those of
 [research/vocations.md](research/vocations.md) section 3: the index table and the
 "Covers" line of each vocation. The shares sum to 100. They are starting values and are
@@ -1664,6 +1680,13 @@ What the tools are for:
 | `Enabled` | Whether the tool exists in the world. A tool that is off is no tool of any vocation |
 | `Vocations` | The ids of the vocations that work with the tool, the vocation it belongs to most first. At least one, each a vocation of the `Vocations` list |
 | `EmblemWeight` | How well the tool serves as the emblem of its vocations: its weight when an emblem is drawn among the tools of a vocation. 0 means never. Left out means 1 |
+| `Description` | What it is and looks like: the text a picture of it is drawn from. Left out means `**missing description**` |
+| `Lore` | What the peoples of the world make of it and tell about it. Left out means `**missing description**` |
+
+The description and the lore of a default tool are those of its entry in
+[tools-basis.md](tools-basis.md), the description without its source. They are in
+`src/Gameworld.Domain/DefaultTexts.Tools.cs`. No rule reads them: they are what a picture
+of the tool is drawn from.
 
 The tools of a vocation are the tools that are on and list it, in the order of the list.
 A vocation that is off has no tools. Its emblems are those of its tools with an emblem

@@ -1,3 +1,5 @@
+using System.ComponentModel;
+
 namespace Gameworld.Domain;
 
 /// <summary>Resources are split in groups to make trade and needs calculation more manageable.</summary>
@@ -126,6 +128,51 @@ public static class ResourceCatalog
         Resource.ArcaneMaterials => "ArM",
         _ => throw new ArgumentOutOfRangeException(nameof(resource)),
     };
+}
+
+/// <summary>
+/// The texts of one generated resource and of its variants. The resources are fixed (the
+/// <see cref="Resource"/> enum), so the list of the Parameter Set adds nothing to the rules: it
+/// holds what a picture or a text of a resource is made from.
+/// </summary>
+[Description("The texts of one generated resource and of its variants (§14 and Appendix G.3).")]
+public sealed partial record ResourceParameters(
+    [property: Description("The resource the texts belong to: one of the 27 generated resources.")] Resource Resource,
+    [property: Description("The name shown for the resource.")] string Name)
+{
+    [Description("What the resource is: what it looks like as a good, raw and as it is traded (§14). A picture of it is drawn from this text, so an invented one needs it to look the same every time. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.")]
+    public string Description { get; init; } = DefaultTexts.Missing;
+
+    [Description("The lore of the resource: what the peoples of the world make of it and tell about it (§14). No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.")]
+    public string Lore { get; init; } = DefaultTexts.Missing;
+
+    [Description("The variants of the resource, by the name the resource rules give them, such as rye for grain and star metal for the arcane materials (Appendices B and D).")]
+    public IReadOnlyList<ResourceVariantParameters> Variants { get; init; } = [];
+
+    /// <summary>The texts of a variant, or null when the list has none for that name.</summary>
+    public ResourceVariantParameters? Variant(string? name) =>
+        name is null ? null : Variants.FirstOrDefault(v => v.Name == name);
+
+    private static ResourceParameters R(Resource resource, string name, ResourceVariantParameters[] variants, string description = DefaultTexts.Missing, string lore = DefaultTexts.Missing) =>
+        new(resource, name) { Description = description, Lore = lore, Variants = variants };
+
+    private static ResourceVariantParameters V(string name, string description = DefaultTexts.Missing, string lore = DefaultTexts.Missing) =>
+        new(name) { Description = description, Lore = lore };
+
+    /// <summary>A variant that is a kind of the default flora: it takes the texts of that kind.</summary>
+    private static ResourceVariantParameters F(string name, string floraId) =>
+        V(name, DefaultTexts.Of(DefaultTexts.Flora, floraId).Description, DefaultTexts.Of(DefaultTexts.Flora, floraId).Lore);
+}
+
+[Description("The texts of one variant of a resource.")]
+public sealed record ResourceVariantParameters(
+    [property: Description("The name of the variant, exactly as the resource rules give it: the texts are found by it.")] string Name)
+{
+    [Description("What the variant is: what it looks like, raw and as it is traded (§14). A picture of it is drawn from this text, so an invented one needs it to look the same every time. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.")]
+    public string Description { get; init; } = DefaultTexts.Missing;
+
+    [Description("The lore of the variant: what the peoples of the world make of it and tell about it (§14). No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.")]
+    public string Lore { get; init; } = DefaultTexts.Missing;
 }
 
 /// <summary>The amount of one resource in a patch, in [0, 1], with its variant ("grain: rye").</summary>

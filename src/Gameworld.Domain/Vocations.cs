@@ -54,12 +54,23 @@ public sealed partial record VocationParameters(
     [Description("The names of the variants of the vocation: the smaller trades it covers, such as the shepherd of the herder and the armourer of the smith (society §8).")]
     public IReadOnlyList<string> Variants { get; init; } = [];
 
+    [Description("What the vocation is: the work a person of it does (society §8). A picture of it is drawn from this text, so an invented one needs it to look the same every time. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.")]
+    public string Description { get; init; } = DefaultTexts.Missing;
+
+    [Description("The lore of the vocation: its standing, its customs and its quarrels (society §8). No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.")]
+    public string Lore { get; init; } = DefaultTexts.Missing;
+
     private static VocationParameters Make(
-        string id, string name, VocationSector sector, SettlementTier lowestTier, double sharePercent, bool onWater, string[] variants) =>
-        new(id, name, true, sector, lowestTier)
+        string id, string name, VocationSector sector, SettlementTier lowestTier, double sharePercent, bool onWater, string[] variants)
+    {
+        var (description, lore) = DefaultTexts.Of(DefaultTexts.Vocations, id);
+        return new(id, name, true, sector, lowestTier)
         {
             SharePercent = sharePercent,
             OnWater = onWater,
             Variants = variants,
+            Description = description,
+            Lore = lore,
         };
+    }
 }

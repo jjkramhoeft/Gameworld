@@ -17,7 +17,7 @@ that exist are not touched.
 
 ## 1. Decide what the race is
 
-A race is eleven things:
+A race is thirteen things:
 
 | Field | What to decide |
 |---|---|
@@ -32,6 +32,8 @@ A race is eleven things:
 | `AppreciatedRaces` | Optional. The ids of the other races the race appreciates. |
 | `HatedRaces` | Optional. The ids of the other races the race hates. |
 | `FavouriteColours` | Optional. The ids of the favourite colours of the race, the dearest first. |
+| `Description` | Optional. What a person of the race looks like: build, skin, hair, eyes, dress and the marks that tell the race apart. A portrait is drawn from it, so write what a picture must show. Leave it out and the race has `**missing description**`. |
+| `Lore` | Optional. Where the race comes from and what it tells about itself. Leave it out and the race has `**missing description**`. |
 
 **The frequencies.** By the plain shares, the races that are on share a patch in proportion
 to their frequency in its biome. Only the proportions between the races within one biome
@@ -206,7 +208,9 @@ minority place once in every 29 regions.
      "FactionLeaning": { "Family": 1, "Race": 3, "Vocation": 1, "Belief": 2, "Magic": 2, "Place": 1 },
      "AppreciatedRaces": ["elf", "stillfaces"],
      "HatedRaces": ["orc"],
-     "FavouriteColours": ["silver", "indigo", "white"]
+     "FavouriteColours": ["silver", "indigo", "white"],
+     "Description": "Slight and pale, with hair the white of hoarfrost and grey eyes. They dress in undyed wool and wear a silver ring in the left ear.",
+     "Lore": "They say the first of them walked out of a winter that did not end, and that the frost followed."
    }
    ```
 
@@ -250,6 +254,7 @@ Do step 2 first and look at the numbers. Then change these together:
 | Where | What |
 |---|---|
 | [src/Gameworld.Domain/ParameterSet.cs](../src/Gameworld.Domain/ParameterSet.cs) | Add a `Make(...)` line to `RaceParameters.Defaults`: id, name, `common`, then the 16 habitat weights in the order of the column header. The Volcano has no column: a seventeenth weight is the one on a Volcano, and without it the race has the frequency 0 there. Only the Dwarves have one. Every race of the default list is on. Add `with { HeightModifier = ... }` for a height modifier; `OnlyFrom` and `OnlyBelow` make the two steps. Add the race to `DefaultLeanings` in the same record: its leaning to the six types of faction. Add it to `DefaultRelations` too: the races it appreciates and hates, and add its id to the lists of the races that appreciate or hate it. Add it to `DefaultFavouriteColours`: its favourite colours. Add it to `DefaultNameStyles`: its name style. A default race without an entry in any of the four fails when the list is built. Add a human race to `DefaultHumanRaces` too. |
+| [src/Gameworld.Domain/DefaultTexts.Races.cs](../src/Gameworld.Domain/DefaultTexts.Races.cs) | Add the description and the lore of the race under its id: the parts "Appearance" and "History and lore" of its entry in races-basis.md, each paragraph on one line. Without an entry the race has `**missing description**` for both. |
 | [default-parameter-set.json](default-parameter-set.json) | Add the same entry to `Races`, at the same place in the list, with the frequencies multiplied out. A test checks that this file equals `ParameterSet.Default`. |
 | [src/Gameworld.Generation/Names/SettlementNameLexicons.cs](../src/Gameworld.Generation/Names/SettlementNameLexicons.cs) | Add the lexicon of the race under its id: its first parts and its place words for the names of its cities and towns (society-generation.md section 5.3). A test checks that every default race has one, that every tongue has place words for a city and for a town, and that no first part or place word stands twice in a list. Adding a lexicon does not change the names the other races give. |
 | [city-and-town-names.md](city-and-town-names.md) | Add the section of the race: what its names are built from, and 50 names. Update the counts at the top. |

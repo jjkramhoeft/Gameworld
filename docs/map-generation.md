@@ -1267,13 +1267,20 @@ An ocean patch has no biome and gets kinds of the sea.
 | `Frequency` | How frequent the kind is relative to the others (1). 0 or below means never |
 | `MinSupernatural` | The Supernatural (0 to 100) a patch needs for the kind. Left out means 0 |
 | `StandsInFor` | Flora only: the type of flora the kind stands in for (see Stand-in below). Left out means none |
+| `Description` | What it is and looks like: the text a picture of it is drawn from. Left out means `**missing description**` |
+| `Lore` | What the peoples of the world make of it and tell about it. Left out means `**missing description**` |
 
 The default lists hold 208 kinds of flora and 167 kinds of fauna: the entries of
 [research/flora-and-fauna.md](research/flora-and-fauna.md) sections 4 and 5, with the
 biomes the note gives each entry, and one kind of flora the note does not hold, the giant
 mushrooms at the end of the list. The frequency is 1, except 0.5 for a beast and 0.25 for
 a monster and for an arcane plant. A monster and an arcane plant need a Supernatural of
-60, 75 or 90, by the tiers S1, S2 and S3 of the note. No other kind needs the field. So
+60, 75 or 90, by the tiers S1, S2 and S3 of the note. No other kind needs the field. The
+description and the lore of a kind are those of its entry in the note, without the
+citations: they are in `src/Gameworld.Domain/DefaultTexts.Flora.cs` and
+`DefaultTexts.Fauna.cs`. The giant mushrooms have neither yet. No rule reads the two
+texts: they are what a picture of the kind is drawn from, so that an invented kind looks
+the same every time. So
 a monster is found on about a tenth of the map at the most (9, 14.1).
 
 The note knows no Volcano. Seventeen of its kinds live there too in the default lists:
@@ -1353,6 +1360,20 @@ timber, stone, clay, crystal, fibre, reagents, herbs (materials); fuel; salt; ir
 copper ore, tin, silver & lead, gold (metals); gems & pearls, spices, stimulants & sugar,
 furs & ivory, dyes, arcane materials (luxuries); horses & pack animals. Each has a
 three-letter abbreviation (Appendix G.3).
+
+**The texts.** The Parameter Set has a list `Resources`: one entry for each of the 27
+resources, with its `Resource`, its `Name`, a `Description`, a `Lore` and its `Variants`.
+A variant has a `Name`, a `Description` and a `Lore`, and its name is the one the rules
+below give it. The list holds texts only: no rule reads it, and which resource and which
+variant a patch gets is decided by the rules alone. The texts are what a picture of a
+resource is drawn from, so that an invented one such as star metal looks the same every
+time. The default list holds every variant the rules can give (a test checks it): the
+crops of Appendix B in table order, then the variants of Appendix D in the order of the
+rules. Only five variants have texts so far, the arcane materials that are a kind of the
+default flora: frost-lotus, glowcap fungi, elderwood, sap of Elanor and dreamleaf take
+the texts of that kind. Every other description and lore, of a resource or a variant, is
+`**missing description**`: the text that marks one that is not written yet. A new variant
+in the rules needs an entry in `src/Gameworld.Domain/Resources.Defaults.cs`.
 
 Reagents, herbs and arcane materials were added on 2026-11-15, for the vocations of
 [society-generation.md](society-generation.md) section 8. They are last in the resource

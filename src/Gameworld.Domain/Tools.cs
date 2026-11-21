@@ -22,6 +22,15 @@ public sealed partial record ToolParameters(
     [Range(0, 10)]
     public double EmblemWeight { get; init; } = 1;
 
-    private static ToolParameters Make(string id, string name, double emblemWeight, string[] vocations) =>
-        new(id, name, true, vocations) { EmblemWeight = emblemWeight };
+    [Description("What the tool is: its form, what it is made of and how it is used (society §8.1). A picture of it is drawn from this text, so an invented one needs it to look the same every time. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.")]
+    public string Description { get; init; } = DefaultTexts.Missing;
+
+    [Description("The lore of the tool: what the peoples of the world make of it and tell about it (society §8.1). No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.")]
+    public string Lore { get; init; } = DefaultTexts.Missing;
+
+    private static ToolParameters Make(string id, string name, double emblemWeight, string[] vocations)
+    {
+        var (description, lore) = DefaultTexts.Of(DefaultTexts.Tools, id);
+        return new(id, name, true, vocations) { EmblemWeight = emblemWeight, Description = description, Lore = lore };
+    }
 }

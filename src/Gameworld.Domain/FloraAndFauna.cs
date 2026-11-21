@@ -72,6 +72,12 @@ public sealed partial record FloraParameters(
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public FloraType? StandsInFor { get; init; }
 
+    [Description("What the kind is: its form, its size, where it grows and what it is used for (§13.4). A picture of it is drawn from this text, so an invented one needs it to look the same every time. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.")]
+    public string Description { get; init; } = DefaultTexts.Missing;
+
+    [Description("The lore of the kind: what the peoples of the world make of it and tell about it (§13.4). No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.")]
+    public string Lore { get; init; } = DefaultTexts.Missing;
+
     /// <summary>A kind from the biome codes of its entry. An arcane plant is rare beside the ordinary plants.</summary>
     private static FloraParameters Make(string id, string name, FloraType type, string habitat, double minSupernatural = 0, FloraType? standsInFor = null) =>
         new(id, name, type, true, BiomeCodes.Biomes(habitat))
@@ -80,6 +86,8 @@ public sealed partial record FloraParameters(
             Frequency = type == FloraType.Arcane ? 0.25 : 1,
             MinSupernatural = minSupernatural,
             StandsInFor = standsInFor,
+            Description = DefaultTexts.Of(DefaultTexts.Flora, id).Description,
+            Lore = DefaultTexts.Of(DefaultTexts.Flora, id).Lore,
         };
 }
 
@@ -107,6 +115,12 @@ public sealed partial record FaunaParameters(
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public double MinSupernatural { get; init; }
 
+    [Description("What the kind is: its form, its size, where it lives and how it behaves (§13.4). A picture of it is drawn from this text, so an invented one needs it to look the same every time. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.")]
+    public string Description { get; init; } = DefaultTexts.Missing;
+
+    [Description("The lore of the kind: what the peoples of the world make of it and tell about it (§13.4). No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.")]
+    public string Lore { get; init; } = DefaultTexts.Missing;
+
     /// <summary>A kind from the biome codes of its entry. A beast is less frequent than the smaller animals, and a monster is rare.</summary>
     private static FaunaParameters Make(string id, string name, FaunaType type, string habitat, double minSupernatural = 0) =>
         new(id, name, type, true, BiomeCodes.Biomes(habitat))
@@ -119,6 +133,8 @@ public sealed partial record FaunaParameters(
                 _ => 1,
             },
             MinSupernatural = minSupernatural,
+            Description = DefaultTexts.Of(DefaultTexts.Fauna, id).Description,
+            Lore = DefaultTexts.Of(DefaultTexts.Fauna, id).Lore,
         };
 }
 

@@ -59,6 +59,9 @@ public sealed record ParameterSet
     [Description("The fauna: the creatures that can live in the world. Every patch gets a few of the kinds that fit its biome (§13.4). A file that gives this list replaces the whole default list.")]
     public IReadOnlyList<FaunaParameters> Fauna { get; init; } = FaunaParameters.Defaults;
 
+    [Description("The resources: the name, the description and the lore of each of the 27 generated resources and of their variants (§14 and Appendix G.3). The list only holds texts: which resource and which variant a patch gets is decided by the resource rules, and a resource or a variant that is left out has no texts. A file that gives this list replaces the whole default list.")]
+    public IReadOnlyList<ResourceParameters> Resources { get; init; } = ResourceParameters.Defaults;
+
     public static ParameterSet Default => new();
 
     internal static readonly JsonSerializerOptions JsonOptions = new()
@@ -68,6 +71,8 @@ public sealed record ParameterSet
         NewLine = "\n",
         ReadCommentHandling = JsonCommentHandling.Skip,
         AllowTrailingCommas = true,
+        // Write ', & and § as they are: the descriptions and the lore are read and written by people.
+        Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         Converters = { new JsonStringEnumConverter() },
     };
 
@@ -77,7 +82,9 @@ public sealed record ParameterSet
         JsonSerializer.Deserialize<ParameterSet>(json, JsonOptions)
         ?? throw new JsonException("The parameter set json is empty.");
 
-    public void Save(string path) => File.WriteAllText(path, ToJson() + "\n");
+    /// <summary>Writes the set to a file that points at its schema, so an editor shows help for it.</summary>
+    public void Save(string path) =>
+        File.WriteAllText(path, "{\n  \"$schema\": \"./" + ParameterSetSchema.FileName + "\"," + ToJson()[1..] + "\n");
 
     public static ParameterSet Load(string path) => FromJson(File.ReadAllText(path));
 }
@@ -863,6 +870,12 @@ public sealed record RaceParameters(
     [Description("The ids of the favourite colours of the race, the dearest first: the colours of its dress, its banners and its goods. Every id must be a colour of the Colours list. The main and the secondary colour of a faction are drawn mostly from the favourite colours of its lead race, the first ones most often. Left out, the race has no favourite colour and its factions draw from every colour alike (society §2 and §4.9).")]
     public IReadOnlyList<string> FavouriteColours { get; init; } = [];
 
+    [Description("What a person of the race looks like: build, skin, hair, eyes, dress and the marks that tell the race apart (society §2). A picture of it is drawn from this text, so an invented one needs it to look the same every time. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.")]
+    public string Description { get; init; } = DefaultTexts.Missing;
+
+    [Description("The lore of the race: where it comes from and what it tells about itself (society §2). No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.")]
+    public string Lore { get; init; } = DefaultTexts.Missing;
+
     /// <summary>
     /// The leaning of each default race to each type of faction (society-generation.md
     /// Appendix A), from the "Factions" line of its entry in races-basis.md.
@@ -1081,6 +1094,8 @@ public sealed record RaceParameters(
                 AppreciatedRaces = DefaultRelations[id].Appreciated,
                 HatedRaces = DefaultRelations[id].Hated,
                 FavouriteColours = DefaultFavouriteColours[id],
+                Description = DefaultTexts.Of(DefaultTexts.Races, id).Description,
+                Lore = DefaultTexts.Of(DefaultTexts.Races, id).Lore,
             };
     }
 }

@@ -13,8 +13,12 @@ made in `src/Gameworld.Domain/Tools.Defaults.cs` and
 [default-parameter-set.json](default-parameter-set.json) too. The emblem weights of the
 list are not in this document: section 8.1 gives them.
 
-The rest is material, like [races-basis.md](races-basis.md): the descriptions and the lore
-bind nothing, and no generation rule reads this file. They are a source for the text and the
+The descriptions and the lore are in the Parameter Set too: the `Description` of a default
+tool is the description of its entry here without the source and the note in italics, and
+its `Lore` is the lore of the entry (`src/Gameworld.Domain/DefaultTexts.Tools.cs`). A change
+to either here must be made there and in default-parameter-set.json too. They bind
+nothing, like those of [races-basis.md](races-basis.md): no generation rule reads them.
+They are what a picture of a tool is drawn from, and a source for the text and the
 portrait of a person (what a smith holds, what hangs on a healer's belt) and for the produced
 resource group Tools of [map-generation.md](map-generation.md) Appendix G.1, when that group
 is detailed.

@@ -236,6 +236,32 @@ public class ResourceRulesTests
     }
 
     [Fact]
+    public void EveryVariantTheRulesGiveHasTextsInTheDefaultResourceList()
+    {
+        var texts = ParameterSet.Default.Resources;
+        void Check(PatchResources result)
+        {
+            foreach (var resource in ResourceCatalog.All)
+                if (result[resource].Variant is { } variant)
+                    Assert.True(texts[(int)resource].Variant(variant) is not null, $"{resource} has no variant \"{variant}\" in the default resource list.");
+        }
+
+        var water = new WaterSite(9, 3, 6e6, true, 0.5, 0.5);
+        foreach (var climate in Climates)
+        foreach (var type in LandTypes)
+        foreach (var bedrock in Bedrocks)
+        foreach (var patch in Coords(40))
+        foreach (var wet in new[] { false, true })
+            Check(ResourceRules.Land(Land(Record(climate.Biome), type, bedrock,
+                coastal: wet, riverPoor: !wet, water: wet ? water : default, prosperity: wet ? 0.9 : 0.2, patch: patch, zone: patch, supernatural: 100)));
+
+        foreach (var patch in Coords(300))
+        foreach (var onShelf in new[] { false, true })
+        foreach (var t0 in new[] { 1.0, 5, 9, 14, 19, 24 })
+            Check(ResourceRules.Ocean(new OceanResourceInput(Seed, patch, onShelf, t0, 1)));
+    }
+
+    [Fact]
     public void Land_TemperateHumidLowlandOnAFloodplain()
     {
         // T = 12, T₀ = 13, P = 800: m = 800 / 380 = 2.1, a broadleaf forest. tg = 12 + 5.5 = 17.5, season = 1.
