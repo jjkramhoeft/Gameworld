@@ -17,7 +17,7 @@ that exist are not touched.
 
 ## 1. Decide what the race is
 
-A race is thirteen things:
+A race is sixteen things:
 
 | Field | What to decide |
 |---|---|
@@ -32,6 +32,9 @@ A race is thirteen things:
 | `AppreciatedRaces` | Optional. The ids of the other races the race appreciates. |
 | `HatedRaces` | Optional. The ids of the other races the race hates. |
 | `FavouriteColours` | Optional. The ids of the favourite colours of the race, the dearest first. |
+| `SkinColours` | Optional. The ids of the skin colours a person of the race can have, the commonest first: entries of the `SkinColours` list of the Parameter Set. Leave it out and the looks of its persons hold no skin colour. |
+| `EyeColours` | Optional. The same for the eyes: entries of the `EyeColours` list. |
+| `HairColours` | Optional. The same for the hair before it greys: entries of the `HairColours` list. Leave it out for a race without hair. |
 | `Description` | Optional. What a person of the race looks like: build, skin, hair, eyes, dress and the marks that tell the race apart. A portrait is drawn from it, so write what a picture must show. Leave it out and the race has `**missing description**`. |
 | `Lore` | Optional. Where the race comes from and what it tells about itself. Leave it out and the race has `**missing description**`. |
 
@@ -160,6 +163,19 @@ banners and the goods of the race. Three or four is enough. The main and the sec
 colour of a faction are drawn mostly from the favourite colours of its lead race, the first
 ones most often (section 4.9). A colour the list lacks is added to `Colours` first.
 
+**The looks.** A race names the skin colours, the eye colours and the hair colours of its
+persons: ids from the `SkinColours`, `EyeColours` and `HairColours` lists of the Parameter
+Set, the commonest first (society-generation.md section 9.2). A colour the lists lack is
+added to its list first, with a description of what a picture shows. A race without hair
+leaves `HairColours` out.
+
+What the race wears is not on the race. A hairstyle, an outfit and an accessory each name
+the races that wear them, in `WornBy.Races` (section 9.3). So a new race gets its dress by
+being named there: in entries that exist, or in new entries of the `Hairstyles`, `Outfits`
+and `Accessories` lists written for it. A race that is named nowhere wears only the entries
+that name no race, and the default lists have none of those. No rule draws the looks of a
+person yet, so nothing shows of this in a world so far.
+
 **What a new race does to the world.** Adding a race, or toggling one on, does not change
 how many persons the land could feed. It changes how the land is shared: the new race takes
 its share from the races already there. The one exception is land where nobody lived before.
@@ -209,6 +225,9 @@ minority place once in every 29 regions.
      "AppreciatedRaces": ["elf", "stillfaces"],
      "HatedRaces": ["orc"],
      "FavouriteColours": ["silver", "indigo", "white"],
+     "SkinColours": ["frostPale", "veryFairCool"],
+     "EyeColours": ["grey", "rimmedPaleGrey"],
+     "HairColours": ["snowWhite", "ashGrey"],
      "Description": "Slight and pale, with hair the white of hoarfrost and grey eyes. They dress in undyed wool and wear a silver ring in the left ear.",
      "Lore": "They say the first of them walked out of a winter that did not end, and that the frost followed."
    }
@@ -253,13 +272,15 @@ Do step 2 first and look at the numbers. Then change these together:
 
 | Where | What |
 |---|---|
-| [src/Gameworld.Domain/ParameterSet.cs](../src/Gameworld.Domain/ParameterSet.cs) | Add a `Make(...)` line to `RaceParameters.Defaults`: id, name, `common`, then the 16 habitat weights in the order of the column header. The Volcano has no column: a seventeenth weight is the one on a Volcano, and without it the race has the frequency 0 there. Only the Dwarves have one. Every race of the default list is on. Add `with { HeightModifier = ... }` for a height modifier; `OnlyFrom` and `OnlyBelow` make the two steps. Add the race to `DefaultLeanings` in the same record: its leaning to the six types of faction. Add it to `DefaultRelations` too: the races it appreciates and hates, and add its id to the lists of the races that appreciate or hate it. Add it to `DefaultFavouriteColours`: its favourite colours. Add it to `DefaultNameStyles`: its name style. A default race without an entry in any of the four fails when the list is built. Add a human race to `DefaultHumanRaces` too. |
+| [src/Gameworld.Domain/ParameterSet.cs](../src/Gameworld.Domain/ParameterSet.cs) | Add a `Make(...)` line to `RaceParameters.Defaults`: id, name, `common`, then the 16 habitat weights in the order of the column header. The Volcano has no column: a seventeenth weight is the one on a Volcano, and without it the race has the frequency 0 there. Only the Dwarves have one. Every race of the default list is on. Add `with { HeightModifier = ... }` for a height modifier; `OnlyFrom` and `OnlyBelow` make the two steps. Add the race to `DefaultLeanings` in the same record: its leaning to the six types of faction. Add it to `DefaultRelations` too: the races it appreciates and hates, and add its id to the lists of the races that appreciate or hate it. Add it to `DefaultFavouriteColours`: its favourite colours. Add it to `DefaultLooks`: its skin, eye and hair colours. Add it to `DefaultNameStyles`: its name style. A default race without an entry in any of the four fails when the list is built. Add a human race to `DefaultHumanRaces` too. |
 | [src/Gameworld.Domain/DefaultTexts.Races.cs](../src/Gameworld.Domain/DefaultTexts.Races.cs) | Add the description and the lore of the race under its id: the parts "Appearance" and "History and lore" of its entry in races-basis.md, each paragraph on one line. Without an entry the race has `**missing description**` for both. |
-| [default-parameter-set.json](default-parameter-set.json) | Add the same entry to `Races`, at the same place in the list, with the frequencies multiplied out. A test checks that this file equals `ParameterSet.Default`. |
+| [src/Gameworld.Domain/Looks.Defaults.cs](../src/Gameworld.Domain/Looks.Defaults.cs) | Name the race in the hairstyles, the outfits and the accessories it wears, or add entries for it, with their texts in `DefaultTexts.Hairstyles.cs`, `DefaultTexts.Outfits.cs` and `DefaultTexts.Accessories.cs`. A test checks that every default race has a hairstyle and an outfit for each sex at each wealth. A new entry is a row of [research/portrait-components.md](research/portrait-components.md) first: another test holds the names and the order of the lists against the tables of that note. |
+| [default-parameter-set.json](default-parameter-set.json) | Add the same entry to `Races`, at the same place in the list, with the frequencies multiplied out, and what changed in the lists of the portrait components. The easy way is to export the file (see CLAUDE.md). A test checks that this file equals `ParameterSet.Default`. |
 | [src/Gameworld.Generation/Names/SettlementNameLexicons.cs](../src/Gameworld.Generation/Names/SettlementNameLexicons.cs) | Add the lexicon of the race under its id: its first parts and its place words for the names of its cities and towns (society-generation.md section 5.3). A test checks that every default race has one, that every tongue has place words for a city and for a town, and that no first part or place word stands twice in a list. Adding a lexicon does not change the names the other races give. |
 | [city-and-town-names.md](city-and-town-names.md) | Add the section of the race: what its names are built from, and 50 names. Update the counts at the top. |
 | [society-generation.md](society-generation.md) section 2 | Update the count in the parameter table ("28, all on") and the list of names below it. |
 | [society-generation.md](society-generation.md) section 5.3 | Add the row of the race to the table of lexicons, and update the count of 28. |
+| [society-generation.md](society-generation.md) sections 9.2 and 9.6 | Add the row of the race to the table of colours and to the table of what each race wears, and update the counts of the lists that grew. |
 | [society-generation.md](society-generation.md) Appendix A | Add the row to the table. Update the height modifier table and the note below it ("The other 23 races have none"). Add the row to the table of leanings and to the table of appreciated and hated races, and the name to the rows of the races that list it. Add the row to the table of favourite colours, and the name to its row in the table of name styles. Update the counts of the name styles in section 2. |
 | [races-basis.md](races-basis.md) | Add the entry of the race, its row in the list and in the habitat table, and the counts at the top. |
 | [readme.md](../readme.md), Race | Update the count ("The default list holds 28 races") and the groups. |
@@ -267,7 +288,7 @@ Do step 2 first and look at the numbers. Then change these together:
 | [tests/Gameworld.Tests/PopulationTests.cs](../tests/Gameworld.Tests/PopulationTests.cs) | `DefaultRaces` lists the ids in order, and the count 28 is asserted in several tests. |
 
 The JSON Schema ([parameter-set.schema.json](parameter-set.schema.json)) does not hold the
-race list, so it is not regenerated.
+race list or the lists of the portrait components, so it is not regenerated.
 
 Every race of the default list is on, so more changes with it:
 

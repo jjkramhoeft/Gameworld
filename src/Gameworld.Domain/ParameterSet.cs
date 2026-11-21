@@ -59,6 +59,24 @@ public sealed record ParameterSet
     [Description("The colours: the named colours of cloth, paint and banners. A race lists its favourite colours by id, and a faction gets a main and a secondary colour from the list (society §4.9 and §9.1). Add a colour by adding an entry. A file that gives this list replaces the whole default list.")]
     public IReadOnlyList<ColourParameters> Colours { get; init; } = ColourParameters.Defaults;
 
+    [Description("The skin colours: the tones of skin a person can have. A race lists the skin colours of its persons by id. Nothing draws one yet: they are for the looks of a person (society §9.2). Add a skin colour by adding an entry. A file that gives this list replaces the whole default list.")]
+    public IReadOnlyList<SkinColourParameters> SkinColours { get; init; } = SkinColourParameters.Defaults;
+
+    [Description("The eye colours: the colours of the eyes a person can have, with the pupil where it is the mark of a race. A race lists the eye colours of its persons by id. Nothing draws one yet: they are for the looks of a person (society §9.2). A file that gives this list replaces the whole default list.")]
+    public IReadOnlyList<EyeColourParameters> EyeColours { get; init; } = EyeColourParameters.Defaults;
+
+    [Description("The hair colours: the colours of the hair a person can have, and the colour each turns into as the person greys. A race lists the hair colours of its persons by id. Nothing draws one yet: they are for the looks of a person (society §9.2). A file that gives this list replaces the whole default list.")]
+    public IReadOnlyList<HairColourParameters> HairColours { get; init; } = HairColourParameters.Defaults;
+
+    [Description("The hairstyles: how a person wears the hair, and who wears each: the sex, the races, the wealth, the vocations, the ages and whether married. Nothing draws one yet: they are for the looks of a person (society §9.3). A file that gives this list replaces the whole default list.")]
+    public IReadOnlyList<HairstyleParameters> Hairstyles { get; init; } = HairstyleParameters.Defaults;
+
+    [Description("The outfits: what a person wears, and who wears each. The outfit of a person has a main and an accent colour of the Colours list, which an outfit can decide. Nothing draws one yet: they are for the looks of a person (society §9.4). A file that gives this list replaces the whole default list.")]
+    public IReadOnlyList<OutfitParameters> Outfits { get; init; } = OutfitParameters.Defaults;
+
+    [Description("The accessories: the jewellery a person wears on the body or in the hair, of eight kinds, and who wears each. A person can have none, one or several. Nothing draws one yet: they are for the looks of a person (society §9.5). A file that gives this list replaces the whole default list.")]
+    public IReadOnlyList<AccessoryParameters> Accessories { get; init; } = AccessoryParameters.Defaults;
+
     [Description("The flora: the plants that can grow in the world. Every patch gets a few of the kinds that fit its biome (§13.4). A file that gives this list replaces the whole default list.")]
     public IReadOnlyList<FloraParameters> Flora { get; init; } = FloraParameters.Defaults;
 
@@ -954,6 +972,15 @@ public sealed record RaceParameters(
     [Description("The ids of the favourite colours of the race, the dearest first: the colours of its dress, its banners and its goods. Every id must be a colour of the Colours list. The main and the secondary colour of a faction are drawn mostly from the favourite colours of its lead race, the first ones most often. Left out, the race has no favourite colour and its factions draw from every colour alike (society §2 and §4.9).")]
     public IReadOnlyList<string> FavouriteColours { get; init; } = [];
 
+    [Description("The ids of the skin colours a person of the race can have, the commonest first. Every id must be a skin colour of the SkinColours list. Left out, the looks of a person of the race hold no skin colour. No generation rule reads it yet; it is meant for the looks of a person (society §9.2).")]
+    public IReadOnlyList<string> SkinColours { get; init; } = [];
+
+    [Description("The ids of the eye colours a person of the race can have, the commonest first. Every id must be an eye colour of the EyeColours list. Left out, the looks of a person of the race hold no eye colour. No generation rule reads it yet; it is meant for the looks of a person (society §9.2).")]
+    public IReadOnlyList<string> EyeColours { get; init; } = [];
+
+    [Description("The ids of the hair colours a person of the race can have before the hair greys, the commonest first. Every id must be a hair colour of the HairColours list. Left out, the looks of a person of the race hold no hair colour: a race without hair. No generation rule reads it yet; it is meant for the looks of a person (society §9.2).")]
+    public IReadOnlyList<string> HairColours { get; init; } = [];
+
     [Description("What a person of the race looks like: build, skin, hair, eyes, dress and the marks that tell the race apart (society §2). A picture of it is drawn from this text, so an invented one needs it to look the same every time. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.")]
     public string Description { get; init; } = DefaultTexts.Missing;
 
@@ -1070,6 +1097,54 @@ public sealed record RaceParameters(
         ["catfolk"] = ["tan", "russet", "cream", "gold"],
     };
 
+    /// <summary>
+    /// The skin, eye and hair colours of each default race, the commonest first
+    /// (society-generation.md section 9.2), from the "Appearance" part of its entry in
+    /// races-basis.md. Where that part names no colour, the colours are a first assignment.
+    /// </summary>
+    private static readonly Dictionary<string, (string[] Skin, string[] Eyes, string[] Hair)> DefaultLooks = new()
+    {
+        ["northmen"] = (["fairNeutral", "ruddyFair", "veryFairCool"], ["blue", "grey", "green"], ["flaxen", "goldenBlond", "sandy", "lightBrown", "copperRed", "auburn"]),
+        ["midlanders"] = (
+            ["fairNeutral", "lightBeigeWarm", "ruddyFair", "olive", "veryFairCool"],
+            ["earthBrown", "clearBrown", "blue", "grey", "hazelGreen", "green", "amber", "jet"],
+            ["darkBrown", "lightBrown", "chestnut", "sandy", "black", "goldenBlond", "softBlack", "auburn", "copperRed", "flaxen"]),
+        ["saltroadFolk"] = (["redBrown", "lightBrownGolden", "deepRedBrown"], ["earthBrown", "green", "amber"], ["black", "softBlack", "darkBrown"]),
+        ["sunlanders"] = (["darkBrownWarm", "deepBrownCool"], ["earthBrown", "jet"], ["black"]),
+        ["grassRiders"] = (["weatheredBronze", "goldenTan"], ["earthBrown", "jet"], ["black"]),
+        ["rainkeepers"] = (["mediumBrownNeutral", "lightBrownGolden", "darkBrownWarm"], ["earthBrown", "jet"], ["black", "softBlack"]),
+        ["canalFolk"] = (["goldenTan", "lightBeigeWarm"], ["earthBrown", "jet"], ["black"]),
+        ["elf"] = (["fairNeutral", "veryFairCool", "mediumBrownNeutral", "darkBrownWarm"], ["green", "gold", "grey"], ["darkBrown", "chestnut", "silverWhite", "black"]),
+        ["dwarf"] = (["seamedRuddy", "seamedBrown"], ["earthBrown", "clearBrown", "grey"], ["darkBrown", "black", "auburn", "copperRed", "chestnut"]),
+        ["halfling"] = (["fairNeutral", "ruddyFair", "lightBeigeWarm"], ["clearBrown", "hazelGreen", "blue"], ["darkBrown", "lightBrown", "sandy"]),
+        ["gnome"] = (["fairNeutral", "lightBeigeWarm"], ["grey", "clearBrown"], ["snowWhite"]),
+        ["orc"] = (["greyGreen", "deepOlive", "dunBrown"], ["yellow", "rustBrown"], ["black"]),
+        ["hoarkin"] = (["frostPale"], ["rimmedPaleGrey"], ["snowWhite", "ashGrey"]),
+        ["hearthbloods"] = (["flushedCopper"], ["emberDark"], ["black", "darkRed"]),
+        ["widegaze"] = (["tawny"], ["barPupilGold"], ["sandy", "lightBrown", "darkBrown"]),
+        ["amberbloods"] = (["resinFreckledGold"], ["beadAmber"], ["chestnut", "copperRed", "barkBrown"]),
+        ["brinefolk"] = (["shellGreyWhite"], ["veryLightGrey", "veryLightGreen"], ["saltPale"]),
+        ["duskreaders"] = (["deepBrownGrey"], ["allBlack"], ["black"]),
+        // The Noonfolk have no hair at all.
+        ["noonfolk"] = (["copperBrownGreenVeined", "deepOliveGreenVeined"], ["green", "gold"], []),
+        ["boughwalkers"] = (["darkBrownWarm", "deepRedBrown"], ["hazelGreen"], ["black"]),
+        ["shoalfolk"] = (["greyCastBrown", "greenCastBrown"], ["earthBrown", "jet"], ["black"]),
+        ["swiftborn"] = (["olive", "mediumBrownNeutral", "deepOlive"], ["earthBrown", "clearBrown", "hazelGreen"], ["ringedDarkAndPale"]),
+        // Bred from prisoners of many peoples: skin and hair of every human kind, and always the same eyes.
+        ["flinchless"] = (
+            ["fairNeutral", "lightBeigeWarm", "olive", "lightBrownGolden", "mediumBrownNeutral", "veryFairCool", "ruddyFair", "goldenTan", "weatheredBronze", "redBrown", "darkBrownWarm", "deepBrownCool"],
+            ["silverGrey"],
+            ["darkBrown", "black", "lightBrown", "chestnut", "softBlack", "sandy", "goldenBlond", "flaxen", "copperRed", "auburn"]),
+        ["lanternkin"] = (["clearPale"], ["lightGreyBlue"], ["ashGrey"]),
+        ["stillfaces"] = (["tawnyGrey"], ["earthBrown", "jet"], ["brindledBrownGrey"]),
+        ["twofold"] = (["mediumBrownNeutral", "darkBrownWarm"], ["earthBrown", "jet"], ["black"]),
+        ["bitterbloods"] = (["oliveBrownBrightPatched"], ["yellowRingedDark"], ["black"]),
+        ["catfolk"] = (
+            ["lightBeigeWarm", "tawny", "fairNeutral", "redBrown", "lightBrownGolden", "darkBrownWarm", "smokeGrey", "deepBrownCool"],
+            ["slitPupilAmber", "slitPupilGold", "slitPupilGreen", "slitPupilCopper", "slitPupilPaleBlue", "oddSlitPupilEyes"],
+            ["black", "darkBrown", "sandy", "copperRed", "patchedTwoColour", "ashGrey", "snowWhite"]),
+    };
+
     /// <summary>The human races of the default list (society-generation.md Appendix A): its first seven.</summary>
     private static readonly HashSet<string> DefaultHumanRaces =
         ["northmen", "midlanders", "saltroadFolk", "sunlanders", "grassRiders", "rainkeepers", "canalFolk"];
@@ -1178,6 +1253,9 @@ public sealed record RaceParameters(
                 AppreciatedRaces = DefaultRelations[id].Appreciated,
                 HatedRaces = DefaultRelations[id].Hated,
                 FavouriteColours = DefaultFavouriteColours[id],
+                SkinColours = DefaultLooks[id].Skin,
+                EyeColours = DefaultLooks[id].Eyes,
+                HairColours = DefaultLooks[id].Hair,
                 Description = DefaultTexts.Of(DefaultTexts.Races, id).Description,
                 Lore = DefaultTexts.Of(DefaultTexts.Races, id).Lore,
             };

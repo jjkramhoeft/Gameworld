@@ -11,8 +11,10 @@ region with their potential population (section 3), the factions of a region (se
 and its name (section 4.10), the races of a city or a town (section 5.1), the cities
 and towns of a region with their persons (section 5.2) and their names (section 5.3), the
 households of the cities and towns (section 6), the persons of the households (section 7)
-and the tools of the vocations (section 8.1). Sections 8 and 9 hold what is decided and
-what is still open. Detailing it is a later task.
+and the tools of the vocations (section 8.1). The portrait components of section 9 are
+specified and in the Parameter Set: the lists the looks of a person are picked from, and
+what the looks hold. No rule draws them yet. The rest of sections 8 and 9 holds what is
+decided and what is still open. Detailing it is a later task.
 
 Sections 2 and 3 and Appendix A were section 19 and Appendix E of map-generation.md until
 2026-11-15. The research notes cite them under those numbers.
@@ -142,6 +144,10 @@ expected to change late in phase 2, so a race is added or changed by editing the
   colours of a faction are drawn mostly from the favourite colours of its lead race
   (section 4.9). An id that is not a colour of the Parameter Set is refused when the world
   is created. A race without the list has no favourite colour.
+- Three lists of the **colours of its persons**: the ids of the skin colours, the eye
+  colours and the hair colours a person of the race can have, the commonest first
+  (section 9.2). A race that lists none of a kind has persons without that component: the
+  Noonfolk list no hair colour, since they have no hair. No rule reads the lists yet.
 - A **description** and a **lore**. The description says what a person of the race looks
   like: build, skin, hair, eyes, dress and the marks that tell the race apart. The lore
   says where the race comes from and what it tells about itself. A portrait is drawn from
@@ -1737,7 +1743,8 @@ every person of a city or a town is an individual: about 360 persons in the medi
 The persons of the land are a count per race (section 5.2). The Stub of a person holds
 name, sex, age, race, vocation, role, family links and its household. The household gives
 the home, the wealth and the faction. The role is the position in the household for now.
-The textual description, the history and the portrait are authored (section 1.2).
+The Stub also has a place for the looks of the person (section 9), which no rule fills
+yet. The textual description, the history and the portrait are authored (section 1.2).
 
 | Parameter | Default |
 |---|---|
@@ -2126,25 +2133,76 @@ Open:
 
 ## 9. Looks
 
-Not specified yet, apart from the colour list of section 9.1.
+Stage: none yet. The lists and what the looks of a person hold are specified and in the
+Parameter Set since 2026-11-21. No rule draws the looks of a person yet.
 
-The looks of a person are what a portrait must show: the body and the face, the hair, the
-outfit and the accessories. The portrait itself is authored by a diffusion model.
+The looks of a person are what a portrait must show beyond the race: the skin, the eyes,
+the hair, the outfit and the accessories. The portrait itself is authored by a diffusion
+model. The looks are not: they are derived data and part of the Stub of the person, drawn
+by the person generator like the name and the vocation, so that a person has its looks
+before any picture is made and every picture of the person repeats them.
 
-Open:
+**Portrait components.** The looks are built from portrait components. A component is one
+fixed piece of the description of a person, picked from a list and then repeated word for
+word in every picture of that person. That is what the makers of the image models ask for:
+write the description of a character once, in concrete visual terms, and repeat it in full
+in every prompt ([research/portrait-components.md](research/portrait-components.md)
+section 10). There are six lists of components, all in the Parameter Set, so the code knows
+no component by name:
 
-- Which looks are facts of the Stub and which are left to the authoring.
-- How the looks follow from the race, the sex, the age, the vocation and the climate of
-  the home.
-- The lists to draw from, and where they live.
-- Whether the outfits get a list per vocation or per sector of vocations. This waits for
-  the vocation list of section 8 to be specified.
+| List | Entries | What an entry is | Section |
+|---|---|---|---|
+| `SkinColours` | 32 | A tone of skin, with the marking of the skin where that is the mark of a race | 9.2 |
+| `EyeColours` | 27 | A colour of the eyes, with the pupil where that is the mark of a race | 9.2 |
+| `HairColours` | 23 | A colour of the hair, and the colour it turns into with age | 9.2 |
+| `Hairstyles` | 46 | How the hair is worn, with the beard or the head covering where that is the point | 9.3 |
+| `Outfits` | 72 | What is worn, from the head covering to the shoes | 9.4 |
+| `Accessories` | 51 | A piece of jewellery, of one of eight kinds | 9.5 |
 
-Material: the Appearance part of every entry of [races-basis.md](races-basis.md) says what
-a portrait of the race must show. [research/portrait-components.md](research/portrait-components.md)
-holds lists of hairstyles, outfits, hair, skin and eye colours, race markers and
-accessories, a fit to races and climates, and what the image-model vendors say about
-keeping a person consistent between pictures.
+The colours of an outfit are not a list of their own: they are two colours of the
+`Colours` list of section 9.1.
+
+**The looks of a person.** `Looks` on the Stub of a person holds the id of one entry of
+each list, and the two colours of the outfit:
+
+| Value | Meaning |
+|---|---|
+| `SkinColour` | The id of a skin colour. None when the race of the person lists none |
+| `EyeColour` | The id of an eye colour. None when the race lists none |
+| `HairColour` | The id of a hair colour. None when the race lists none: a race without hair |
+| `Hairstyle` | The id of a hairstyle. None when no hairstyle fits the person |
+| `Outfit` | The id of an outfit. None when no outfit fits the person |
+| `OutfitMainColour` | The id of a colour of the `Colours` list: the body of the outfit. None without an outfit |
+| `OutfitAccentColour` | The id of a colour of the `Colours` list: the trim, the sash or the lining. None without an outfit |
+| `Accessories` | The ids of the accessories the person wears: none, one or several, at most one of a kind |
+
+A person has no looks until they are drawn, and no rule draws them yet: `Looks` is empty on
+every generated person.
+
+**What a portrait is drawn from.** The description of the race (section 2) says what every
+person of the race looks like: the build, the face and the marks that tell the race apart,
+such as the tusks of an Orc or the ears of a Catfolk. The components say what differs
+from person to person. A prompt is to hold both: the age and the sex of the Stub, the
+description of the race, and the description of each component of the looks.
+
+**Texts.** Every hairstyle, outfit and accessory has a `Description` and a `Lore`, like a
+tool (section 8.1). A skin, eye or hair colour has a `Description` and no lore: it is a
+colour. The description of a colour is a part of a sentence, such as "golden-tan skin with
+a warm yellow-gold undertone", so that the descriptions of a person can be set one after
+the other. No rule reads the texts. The default texts are in
+`src/Gameworld.Domain/DefaultTexts.Hairstyles.cs`, `DefaultTexts.Outfits.cs` and
+`DefaultTexts.Accessories.cs`, and those of the colours in `Looks.Defaults.cs`.
+
+A Parameter Set with a component without an id or with the same id twice in a list is
+refused when the world is created, and so is one that breaks a rule of sections 9.2 to
+9.5.
+
+Material: [research/portrait-components.md](research/portrait-components.md) holds the
+lists the defaults are built from, with the sources of each entry, the fit to races and
+climates, and what the makers of the image models say about keeping a person the same
+between pictures. Section 9.6 says what the defaults take from it and what they leave. The
+Appearance part of every entry of [races-basis.md](races-basis.md) says what a portrait of
+the race must show.
 
 ### 9.1 Colours
 
@@ -2160,9 +2218,10 @@ colour has:
 A Parameter Set with a colour without an id, with the same id twice or with a value that
 is not `#RRGGBB` is refused when the world is created.
 
-Two things point at the list so far: the favourite colours of a race (section 2) and the
-main and the secondary colour of a faction (section 4.9). The list holds the colours of
-things that are made: the colours of hair, skin and eyes are not in it.
+Four things point at the list: the favourite colours of a race (section 2), the main and
+the secondary colour of a faction (section 4.9), the colours an outfit decides and the two
+colours of the outfit of a person (section 9.4). The list holds the colours of things that
+are made: the colours of skin, eyes and hair are three lists of their own (section 9.2).
 
 The default list holds 24 colours, from undyed cloth to the costly dyes. The values are
 starting values.
@@ -2196,10 +2255,308 @@ starting values.
 
 Open:
 
-- Whether the outfit of a person takes its colours from the favourite colours of the race,
-  from the faction the person belongs to, or from both.
 - A cost per colour, so that crimson and purple are the colours of the rich.
-- Whether hair, skin and eye colours become lists of the same kind.
+
+### 9.2 Skin, eye and hair colours
+
+Stage: none, three lists in the Parameter Set. Nothing draws a colour yet.
+
+The colour of the skin, the eyes and the hair of a person is one of the colours of its
+race. The three lists are `SkinColours`, `EyeColours` and `HairColours`. A colour holds:
+
+| Value | Meaning |
+|---|---|
+| `Id` | What the generated data knows the colour by, in camelCase. Unique in its list |
+| `Name` | The name shown |
+| `Description` | What a picture shows, as a part of a sentence: "pale grey eyes with a dark rim around the iris" |
+| `Greying` | Hair colours only. The id of the hair colour this one turns into as the person greys. Left out, the colour does not change with age |
+
+A colour is more than a hue where the mark of a race lies in the skin, the eye or the hair
+itself: the blue-grey lips of the Hoarkin are in their skin colour, the bar pupil of the
+Widegaze and the slit pupil of the Catfolk in their eye colours, and the rings of the hair
+of the Swiftborn in their hair colour. So a colour has no value as `#RRGGBB`, and the
+three lists are not the `Colours` list of section 9.1.
+
+**The colours of a race.** A race lists the ids of its colours in `SkinColours`,
+`EyeColours` and `HairColours`, the commonest first (section 2). The lists live on the
+race, because the colours of a people are a fact of the people, and a new race names its
+colours in its own entry. A race that lists none of a kind has persons without that
+component.
+
+**Greying.** A race lists the colours of the hair before it greys. `Greying` chains them to
+the colours of age: black turns to greying dark, greying dark to iron grey, iron grey to
+white, and the fair and the red colours to greying fair and then to white. The colours
+that are the mark of a race and not of an age, such as the silver-white of the Elves of
+the cold woods, do not grey. At what age the hair of a person turns is not specified.
+
+A Parameter Set is refused when a race lists a colour that is not in its list, when a hair
+colour greys into a colour that is not in the list, and when a chain of greying does not
+end.
+
+**The default lists** hold 32 skin colours, 27 eye colours and 23 hair colours. Twelve of
+the skin colours, eight of the eye colours and ten of the hair colours are those of human
+peoples, four hair colours are those of age, and the rest belong to one or two races each.
+Every default race has at least one skin colour and one eye colour, and every race but the
+Noonfolk a hair colour:
+
+| Race | Skin colours | Eye colours | Hair colours |
+|---|---|---|---|
+| Northmen | `fairNeutral`, `ruddyFair`, `veryFairCool` | `blue`, `grey`, `green` | `flaxen`, `goldenBlond`, `sandy`, `lightBrown`, `copperRed`, `auburn` |
+| Midlanders | `fairNeutral`, `lightBeigeWarm`, `ruddyFair`, `olive`, `veryFairCool` | `earthBrown`, `clearBrown`, `blue`, `grey`, `hazelGreen`, `green`, `amber`, `jet` | `darkBrown`, `lightBrown`, `chestnut`, `sandy`, `black`, `goldenBlond`, `softBlack`, `auburn`, `copperRed`, `flaxen` |
+| Saltroad folk | `redBrown`, `lightBrownGolden`, `deepRedBrown` | `earthBrown`, `green`, `amber` | `black`, `softBlack`, `darkBrown` |
+| Sunlanders | `darkBrownWarm`, `deepBrownCool` | `earthBrown`, `jet` | `black` |
+| Grass riders | `weatheredBronze`, `goldenTan` | `earthBrown`, `jet` | `black` |
+| Rainkeepers | `mediumBrownNeutral`, `lightBrownGolden`, `darkBrownWarm` | `earthBrown`, `jet` | `black`, `softBlack` |
+| Canal folk | `goldenTan`, `lightBeigeWarm` | `earthBrown`, `jet` | `black` |
+| Elves | `fairNeutral`, `veryFairCool`, `mediumBrownNeutral`, `darkBrownWarm` | `green`, `gold`, `grey` | `darkBrown`, `chestnut`, `silverWhite`, `black` |
+| Dwarves | `seamedRuddy`, `seamedBrown` | `earthBrown`, `clearBrown`, `grey` | `darkBrown`, `black`, `auburn`, `copperRed`, `chestnut` |
+| Halflings | `fairNeutral`, `ruddyFair`, `lightBeigeWarm` | `clearBrown`, `hazelGreen`, `blue` | `darkBrown`, `lightBrown`, `sandy` |
+| Gnomes | `fairNeutral`, `lightBeigeWarm` | `grey`, `clearBrown` | `snowWhite` |
+| Orcs | `greyGreen`, `deepOlive`, `dunBrown` | `yellow`, `rustBrown` | `black` |
+| Hoarkin | `frostPale` | `rimmedPaleGrey` | `snowWhite`, `ashGrey` |
+| Hearthbloods | `flushedCopper` | `emberDark` | `black`, `darkRed` |
+| Widegaze | `tawny` | `barPupilGold` | `sandy`, `lightBrown`, `darkBrown` |
+| Amberbloods | `resinFreckledGold` | `beadAmber` | `chestnut`, `copperRed`, `barkBrown` |
+| Brinefolk | `shellGreyWhite` | `veryLightGrey`, `veryLightGreen` | `saltPale` |
+| Duskreaders | `deepBrownGrey` | `allBlack` | `black` |
+| Noonfolk | `copperBrownGreenVeined`, `deepOliveGreenVeined` | `green`, `gold` | None |
+| Boughwalkers | `darkBrownWarm`, `deepRedBrown` | `hazelGreen` | `black` |
+| Shoalfolk | `greyCastBrown`, `greenCastBrown` | `earthBrown`, `jet` | `black` |
+| Swiftborn | `olive`, `mediumBrownNeutral`, `deepOlive` | `earthBrown`, `clearBrown`, `hazelGreen` | `ringedDarkAndPale` |
+| Flinchless | `fairNeutral`, `lightBeigeWarm`, `olive`, `lightBrownGolden`, `mediumBrownNeutral`, `veryFairCool`, `ruddyFair`, `goldenTan`, `weatheredBronze`, `redBrown`, `darkBrownWarm`, `deepBrownCool` | `silverGrey` | `darkBrown`, `black`, `lightBrown`, `chestnut`, `softBlack`, `sandy`, `goldenBlond`, `flaxen`, `copperRed`, `auburn` |
+| Lanternkin | `clearPale` | `lightGreyBlue` | `ashGrey` |
+| Stillfaces | `tawnyGrey` | `earthBrown`, `jet` | `brindledBrownGrey` |
+| Twofold | `mediumBrownNeutral`, `darkBrownWarm` | `earthBrown`, `jet` | `black` |
+| Bitterbloods | `oliveBrownBrightPatched` | `yellowRingedDark` | `black` |
+| Catfolk | `lightBeigeWarm`, `tawny`, `fairNeutral`, `redBrown`, `lightBrownGolden`, `darkBrownWarm`, `smokeGrey`, `deepBrownCool` | `slitPupilAmber`, `slitPupilGold`, `slitPupilGreen`, `slitPupilCopper`, `slitPupilPaleBlue`, `oddSlitPupilEyes` | `black`, `darkBrown`, `sandy`, `copperRed`, `patchedTwoColour`, `ashGrey`, `snowWhite` |
+
+The Appearance part of races-basis.md names no skin for the Halflings and the Gnomes, no
+eyes for the Sunlanders, the Dwarves, the Halflings, the Swiftborn, the Twofold and the
+Elves of the cold woods, and no hair colour for the Dwarves and the Duskreaders. Their
+colours in the table are a first assignment of this section.
+
+### 9.3 Hairstyles, and who wears what
+
+Stage: none, a list in the Parameter Set. Nothing draws a hairstyle yet.
+
+A hairstyle is how a person wears the hair. It carries the beard where the beard is the
+point (the ringed beard braids of the Dwarves) and the head covering where the hair is
+hidden under one (the veil and wimple of a Midlander wife). It names no hair colour. The
+list is `Hairstyles`. A hairstyle holds:
+
+| Value | Meaning |
+|---|---|
+| `Id` | What the generated data knows the hairstyle by, in camelCase. Unique in the list |
+| `Name` | The name shown |
+| `Enabled` | Whether the hairstyle exists in the world. One that is off is worn by nobody |
+| `WornBy` | Who wears it: see below. Left out, everybody can |
+| `Description` | What it looks like: the text a picture is drawn from. Left out means `**missing description**` |
+| `Lore` | Who wears it, what it says of the wearer and what is told about it. Left out means `**missing description**` |
+
+**Who wears what.** A hairstyle, an outfit and an accessory each say who wears them in
+`WornBy`. It holds six limits, and a person can wear the thing only when every one of them
+holds for the person. A limit that is left out limits nothing.
+
+| Value | Limit | Left out |
+|---|---|---|
+| `Sex` | The sex it is worn by | Both sexes |
+| `Races` | The ids of the races that wear it | Every race |
+| `LowestWealth`, `HighestWealth` | The wealth of the household (section 6), from the lowest level to the highest | Destitute to Rich |
+| `Vocations` | The ids of the vocations it is the dress or the mark of. Only a person with one of them wears it | The vocation does not matter |
+| `LowestAge`, `HighestAge` | The ages it is worn at, in years | Any age |
+| `Married` | `true`: only the married. `false`: only the unmarried. Married is a person whose husband or wife lives in the household (section 7) | Both |
+
+The limits read facts the Stub already holds: the race, the sex, the age, the vocation and
+the husband or wife of the person, and the wealth of its household. They are the columns
+"Worn by" of the note made into data: hair and dress mark age and marriage more often than
+rank, and rank shows as wealth.
+
+The relation to the races and the vocations lives on the thing that is worn, as the
+vocations of a tool live on the tool (section 8.1). A new outfit touches one record, and a
+new race gets its dress by being named in the `Races` of what it wears.
+
+What a person can wear is every entry that is on and whose limits hold. Which of them the
+person gets is the draw that is not specified yet.
+
+A Parameter Set is refused when a `WornBy` names a race or a vocation that is not in its
+list, when its lowest wealth is above its highest, and when its ages are below 0 or run
+backwards.
+
+**The default list** holds 46 hairstyles, all on: 18 worn by women only, 11 by men only
+and 17 by both sexes. Every default race has a hairstyle for each sex, at each wealth,
+married or not. The limits of the defaults are the judgement of this
+section and starting values.
+
+### 9.4 Outfits
+
+Stage: none, a list in the Parameter Set. Nothing draws an outfit yet.
+
+An outfit is what a person wears, from the head covering to the shoes. The list is
+`Outfits`. An outfit holds what a hairstyle holds, and its colours:
+
+| Value | Meaning |
+|---|---|
+| `Id`, `Name`, `Enabled`, `WornBy`, `Lore` | As for a hairstyle (section 9.3) |
+| `MainColour` | The id of the main colour, where the outfit decides it. A colour of the `Colours` list. Left out, the colour is picked for the person |
+| `AccentColour` | The id of the accent colour, where the outfit decides it. Left out, the colour is picked for the person |
+| `Description` | What it looks like. What a head-and-shoulders picture shows comes first, and the rest after "Below:". The marks `{main}` and `{accent}` stand for the two colours |
+
+**The two colours.** The outfit of a person has a main colour and an accent colour, both
+colours of the `Colours` list of section 9.1. The main colour is that of the body of the
+outfit: the gown, the coat, the wrap. The accent colour is that of what is set against it:
+the trim, the sash, the lining, the border or the second garment.
+
+An outfit either decides a colour or leaves it to the person:
+
+- **Decided.** The habit of a nun is black and white, the gown of a peasant undyed grey,
+  the robe of a desert clansman indigo. Such an outfit names the colour in `MainColour` or
+  `AccentColour`, and its description writes the colour out.
+- **Left to the person.** A dyed coat can be any colour. Such an outfit leaves the value
+  out, and its description holds the mark `{main}` or `{accent}` where the colour stands:
+  "Long coat of wool or cotton in {main}, ..., bound at the waist with a broad {accent}
+  silk sash". The colour is then a fact of the person, in `OutfitMainColour` and
+  `OutfitAccentColour` of its looks.
+
+A picture is drawn from the description with the names of the two colours in the place of
+the marks, in small letters: "in sky blue". The colour an outfit decides is used before
+the colour of the person, so `OutfitMainColour` of a person in a habit is black. An outfit
+can decide one colour and leave the other, and it can leave the accent colour unused.
+
+How the colours that are left to the person are picked is not specified: from the
+favourite colours of the race, from the colours of the faction of the household, or from
+both.
+
+A Parameter Set is refused when an outfit names a colour that is not in the `Colours` list.
+
+**The default list** holds 72 outfits, all on: 19 worn by women only, 16 by men only and
+37 by both sexes. 33 of them decide their main colour and 39 leave it to the person. Every
+default race has an outfit for each sex at each of the five levels of wealth. Twenty
+outfits are the dress of a vocation, among them the apron of the smith, the habit of the
+priest and the mail of the soldier.
+
+### 9.5 Accessories
+
+Stage: none, a list in the Parameter Set. Nothing draws an accessory yet.
+
+An accessory is a piece of jewellery worn on the body or in the hair. It differs from the
+other components in one way: a person can have none, one or several. The list is
+`Accessories`. An accessory holds what a hairstyle holds, and a kind:
+
+| Value | Meaning |
+|---|---|
+| `Id`, `Name`, `Enabled`, `WornBy`, `Description`, `Lore` | As for a hairstyle (section 9.3) |
+| `Kind` | Where the piece sits: one of the eight kinds below |
+
+| Kind | What it is | Defaults |
+|---|---|---|
+| `Necklace` | Worn around the neck or at the throat: a string of beads, a pendant, a neck ring, a collar | 13 |
+| `Earrings` | Worn in or on the ears | 4 |
+| `Bracelet` | Worn on the wrist or the upper arm: bracelets, bangles and arm bands | 6 |
+| `Ring` | Worn on a finger or a thumb | 7 |
+| `Brooch` | Pinned to the dress: brooches, badges and plaques | 7 |
+| `Crown` | Worn on the head: crowns, circlets, diadems and wreaths | 5 |
+| `BodyJewellery` | Worn anywhere else: on the nose, the ankle, a tusk or the brow, or hung from the belt | 5 |
+| `HairJewellery` | Worn in the hair | 4 |
+
+A person wears at most one accessory of a kind, so that no two pieces sit in the same
+place. How many a person wears is not specified. The note suggests none or one for most
+persons and two or three for the rich.
+
+The description writes one material into each piece, so that the text stays fixed. Where
+the same piece is made cheaper or dearer, the lore says so.
+
+**The default list** holds 51 accessories, all on: 44 drawn from history and 7 written for
+single races. Three races have none, since their dress leaves no place for one: the
+Duskreaders, the Boughwalkers and the Twofold.
+
+### 9.6 The defaults and the note
+
+The default lists are built from
+[research/portrait-components.md](research/portrait-components.md): its entries, in its
+order, with its names in sentence case and its descriptions without the sources. A test
+holds the names against the tables of the note. What differs:
+
+- **Entries that are left out.** The note was written for 32 races, and five of them are
+  not in the default list (Tinefolk, Hushfolk, Longsleepers, Eyrie folk and Lineminds).
+  The entries written for them alone are left out: three skin colours, two hair colours,
+  four eye colours, one hairstyle, four outfits and two accessories. So are one outfit and
+  one accessory of the high valleys, the pinned mountain dress and the gold ear spools,
+  which no race of the list wears. The lore of one accessory lost a sentence about the
+  Hushfolk.
+- **The race markers are not a list.** The note has 26 race markers: antlers, tusks, a
+  salt crust. A marker is fixed for the race and not picked for the person, so it stays in
+  the description of the race (section 2).
+- **One list for both sexes.** The note has a list for women, one for men and one for the
+  races. Here each kind is one list, and the sex is a limit of `WornBy`.
+- **The colours of the outfits.** The descriptions of the note name the colours of a dyed
+  outfit. Here they hold the marks `{main}` and `{accent}`, or the one colour the outfit
+  decides (section 9.4).
+- **Who wears what is data.** The columns "Worn by" and the tables by race of the note are
+  free text and a suggestion. `WornBy` and the colours of each race are their reading as
+  data. Where the note gives a people no race, the reading is of this section: the warm
+  coast dress goes to the Swiftborn, the fur parka and the herder tunic to the Northmen,
+  the breast cloth and sarong to the Rainkeepers. The Flinchless, the Stillfaces and the
+  Amberbloods, whose entry in races-basis.md names no dress, dress as the Midlanders do.
+- **The lore.** The note has lore for the accessories only. The lore of the hairstyles and
+  the outfits is written in the default text files, from the columns "Worn by" of the note
+  and from races-basis.md.
+
+What each default race wears:
+
+| Race | Hairstyles | Outfits | Accessories |
+|---|---|---|---|
+| Northmen | Single back braid, Crown braid, Knotted tail, Long and loose, Combed long with braided beard | Strap dress and brooches, Nun's habit, Fur parka, Banded herder tunic, Healer's gown and satchel, Hunter's hood and jerkin, Sorceress robe, Padded coat and mail shirt, Beggar's rags, Player's motley, Smith's leather apron, Miner's hood and seat leather, Monk's habit, Padded jack and kettle hat, Shoulder-pinned cloak and tunic, Wizard's robe and pointed hat | Amber and glass bead string, Hammer amulet, Twisted neck ring, Penannular cloak brooch |
+| Midlanders | Loose with circlet, Single back braid, Twin long plaits, Crown braid, Veil and wimple, Netted side coils, Half-up side braids, Short crop, Bowl crop, Chin-length bob, Tonsure, Long and loose | Kirtle and apron, Sideless surcoat, High-belted gown, Queen's mantle, Nun's habit, Healer's gown and satchel, Hunter's hood and jerkin, Sorceress robe, Padded coat and mail shirt, Beggar's rags, Player's motley, Field tunic and hood, Smith's leather apron, Miner's hood and seat leather, Furred gown and wound hood, Doublet and hose, King's mantle and crown, Monk's habit, Mail and surcoat, Padded jack and kettle hat, Wizard's robe and pointed hat, Guild-cut town dress | Twisted neck ring, Chain of office, Gold signet ring, Bronze seal ring, Clasped-hands ring, Cabochon stone ring, Bow fibula, Ring brooch, Garnet disc brooch, Pilgrim badge, Plain brow circlet, Oak-leaf wreath, Temple rings |
+| Saltroad folk | Nape knot, Tiered curls, Blunt braided wig, Shaved head, Short crop, Bare scalp, Oiled ringlets | Jewelled court collar, Linen sheath and broad collar, Desert body wrap, Court kaftan, Beggar's rags, Linen kilt and broad collar, Veil-turban and robe, Wide-sleeved grand robe | Blue glazed bead string, Silver amulet case, Plain hoop earrings, Pearl drop earrings, Single ear ring, Stacked glass bangles, Beast-head bangle, Serpent armlet, Gold signet ring, Scarab swivel ring, Chained triangle brooches, White cloth diadem, Gold nose ring, Belled anklets |
+| Sunlanders | Beaded cornrows, Ochre plaits, Shaved head, Tall headwrap, Bare scalp, Warrior braids, Pattern-shaved scalp, Clay and bead crown | Wrapper and blouse, Strip-woven royal cloth, Red herder cloth, Beggar's rags, Wide-sleeved grand robe, Indigo wrapped cotton | Tooth and bone string, Cowrie shell string, Red coral bead collar, Plain hoop earrings, Bronze upper-arm band, Open brass bangle, Beaded fringe crown |
+| Grass riders | Single back braid, Winged horns, Shaved crown with side braids | Wrapped riding coat, Beggar's rags, Lamellar coat | Twisted neck ring, Plain hoop earrings, Single ear ring, Archer's thumb ring, Gold stag plaque |
+| Rainkeepers | Single back braid, Flowered braid, Oiled long hair | Draped sari, Breast cloth and sarong, Beggar's rags, Waist cloth and shoulder cloth | Marriage thread, Plain hoop earrings, Filigree flower earrings, Bronze upper-arm band, Stacked glass bangles, Gold signet ring, Gold nose ring, Belled anklets, Forehead pendant |
+| Canal folk | Pinned high knot, Trailing court hair, Topknot | Jacket and high skirt, Layered court robes, Field jacket and straw hat, Beggar's rags, Lamellar coat, Official's badge robe, Crossed robe and sash | Archer's thumb ring, Phoenix crown, Jade belt pendant, Carved hair comb |
+| Elves | Loose with circlet, Half-up side braids, Long and swept back | Woodland greys and greens | Plain brow circlet |
+| Dwarves | Ringed beard braids | Smith's leather apron, Miner's hood and seat leather, Thick wool and tool belt | Bronze upper-arm band, Gold signet ring, Bronze seal ring, Cabochon stone ring |
+| Halflings | Curly mop | Beggar's rags, Bright waistcoat and wide hat | Gold signet ring, Bronze seal ring, Clasped-hands ring, Cabochon stone ring, Ring brooch |
+| Gnomes | White tufts, Pointed cap | Beggar's rags, Many-pocketed coat | Gold signet ring, Bronze seal ring, Cabochon stone ring |
+| Orcs | Coarse crest, Rough knot | Beggar's rags, Hide and won armour | Twisted neck ring, Tooth and bone string, Bronze upper-arm band, Banded tusks |
+| Hoarkin | Dense close crop | Single sealskin | Tooth and bone string, Ivory amulet string |
+| Hearthbloods | Cropped short, Short crop | Kilt and open vest | Twisted neck ring, Bronze upper-arm band |
+| Widegaze | Hard tie-back | Plain long coat and cut-away hat | Twisted neck ring, Penannular cloak brooch, Garnet disc brooch, Signal mirror disc |
+| Amberbloods | Single back braid, Nape knot, Short crop, Long and loose | Kirtle and apron, Sideless surcoat, High-belted gown, Queen's mantle, Nun's habit, Healer's gown and satchel, Hunter's hood and jerkin, Sorceress robe, Padded coat and mail shirt, Beggar's rags, Player's motley, Field tunic and hood, Smith's leather apron, Miner's hood and seat leather, Furred gown and wound hood, Doublet and hose, King's mantle and crown, Monk's habit, Mail and surcoat, Padded jack and kettle hat, Wizard's robe and pointed hat, Guild-cut town dress | Tooth and bone string |
+| Brinefolk | Single back braid, Nape knot, Short crop, Long and loose | Pale wrapped linen | Plain hoop earrings, Beast-head bangle, Gold signet ring, Shaped salt crust |
+| Duskreaders | Single back braid, Nape knot, Short crop, Long and loose | Quilted robe and cloth mask, Quilted robe and horn visor | None |
+| Noonfolk | Hairless | Hip wrap, bare back | Plain hoop earrings, Open brass bangle |
+| Boughwalkers | Flat skull braids | Short wraps and pouch belts | None |
+| Shoalfolk | Beaded cornrows, Cropped short, Short crop | Loincloth and dive belt | Cowrie shell string, Shell braid beads |
+| Swiftborn | Single back braid, Long and loose | Nun's habit, Pinned tunic and wrap, Priestess whites, Healer's gown and satchel, Hunter's hood and jerkin, Sorceress robe, Padded coat and mail shirt, Beggar's rags, Player's motley, Smith's leather apron, Miner's hood and seat leather, Monk's habit, Padded jack and kettle hat, Citizen's toga, One-shoulder work tunic, Wizard's robe and pointed hat | Plain hoop earrings, Grooved relay ring |
+| Flinchless | Loose with circlet, Single back braid, Twin long plaits, Crown braid, Veil and wimple, Netted side coils, Nape knot, Cropped short, Short crop, Bowl crop, Chin-length bob, Tonsure, Long and loose | Kirtle and apron, Sideless surcoat, High-belted gown, Queen's mantle, Nun's habit, Healer's gown and satchel, Hunter's hood and jerkin, Sorceress robe, Padded coat and mail shirt, Beggar's rags, Player's motley, Field tunic and hood, Smith's leather apron, Miner's hood and seat leather, Furred gown and wound hood, Doublet and hose, King's mantle and crown, Monk's habit, Mail and surcoat, Padded jack and kettle hat, Wizard's robe and pointed hat, Guild-cut town dress | Chain of office, Gold signet ring, Bronze seal ring, Clasped-hands ring, Ring brooch |
+| Lanternkin | Single back braid, Nape knot, Short crop, Long and loose | Hood, long sleeves and gloves | Cabochon stone ring, Blood-lamp vial |
+| Stillfaces | Single back braid, Nape knot, Short crop, Long and loose | Kirtle and apron, Sideless surcoat, High-belted gown, Queen's mantle, Nun's habit, Healer's gown and satchel, Hunter's hood and jerkin, Sorceress robe, Padded coat and mail shirt, Beggar's rags, Player's motley, Field tunic and hood, Smith's leather apron, Miner's hood and seat leather, Furred gown and wound hood, Doublet and hose, King's mantle and crown, Monk's habit, Mail and surcoat, Padded jack and kettle hat, Wizard's robe and pointed hat, Guild-cut town dress | Scented wrist cord |
+| Twofold | Oiled long hair | Wrapped cotton, saffron sash, Wrapped cotton, indigo sash | None |
+| Bitterbloods | Oiled slick-back | Bare-shouldered home wrap, Gloves and waxed skin | Plain hoop earrings, Cabochon stone ring |
+| Catfolk | Single back braid, Nape knot, Cropped short, Short crop, Long and loose | Beggar's rags, Loose tail-slit clothes, Hood and bound tail | Tooth and bone string, Cowrie shell string, Bronze upper-arm band, Open brass bangle |
+
+Open:
+
+- **The draw.** How the looks of a person are drawn in the Peopled stage: the purpose
+  numbers, the weight of each entry a person can wear, whether a person with a vocation
+  takes the dress of the vocation before any other, and how many accessories a person has.
+- **The colours of an outfit.** Whether they come from the favourite colours of the race,
+  from the colours of the faction of the household, or from both.
+- **Children.** The default lists are written for adults. What a child wears, and whether
+  the hairstyle of a person changes with its age, is open. So is the age at which hair
+  greys, which differs between the races: a Swiftborn of twenty-five is old, and an Elf
+  shows no age.
+- **Clashes.** Two components can repeat or contradict each other: a veil and a crown, a
+  hat in the outfit and a hairstyle that is a head wrap, a necklace under a beard. The note
+  lists them in its section 9.4. They are not data yet: only the kind of an accessory is.
+- **States.** Some dress follows a state of the person that the Stub does not hold: at
+  home or abroad (the Duskreaders, the Bitterbloods, the Catfolk), a feast day, a season.
+  Each person gets one outfit.
+- **Material.** Rank shows in cloth and metal more than in cut. An outfit and an accessory
+  name one material, and the wealth of the household does not change it.
+- **What else a portrait needs.** The build, the height and the shape of the face are in
+  the description of the race and in no list. Facial hair is part of four hairstyles and
+  not a component of its own.
+- Whether the texts give the same person in every picture is untested: no prompt was run.
 
 ---
 
@@ -2435,7 +2792,7 @@ when it stands in sections 1 to 9.
 | [research/vocations.md](research/vocations.md) | 51 vocations with their lore, resources, biomes, races and factions, the proposals for new resources, and a design note | Section 8 |
 | [research/heraldry-coat-of-arms-generation.md](research/heraldry-coat-of-arms-generation.md) | How coats of arms could be generated for factions, cities, towns and families: the parts of a coat, its rules, where the charges come from, and a proposal | Sections 4.9, 8.1 |
 | [tools-basis.md](tools-basis.md) | 146 real tools for the 51 vocations, each with a sourced description, lore and the fitting vocations. The default tool list is built from it: its names, its order and its fitting vocations | Sections 8.1, 9 |
-| [research/portrait-components.md](research/portrait-components.md) | Lists of hairstyles, outfits, colours, race markers and accessories for portraits. Written for the 32 races of the first version of races-basis.md and extended for the Catfolk: it still covers the five that were left out | Section 9 |
+| [research/portrait-components.md](research/portrait-components.md) | Lists of hairstyles, outfits, colours, race markers and accessories for portraits, each with its sources. The six default lists of the portrait components are built from it (section 9.6). Written for the 32 races of the first version of races-basis.md and extended for the Catfolk: it still covers the five that were left out | Section 9 |
 | [NameGenerator-Reuse.md](NameGenerator-Reuse.md) | The person-name generator, ported from an earlier project | Section 7 |
 | [city-and-town-names.md](city-and-town-names.md) | 50 invented city and town names for each of the 28 default races, with what the names of each race are built from. Material: no rule reads it, and the word lists of section 5.3 are built from its notes | Section 5.3 |
 | [research/city-and-town-naming.md](research/city-and-town-naming.md) | How settlement names are built in real place-names, in fantasy literature and in generators and games, and the rule it proposed for this generator | Section 5.3 |

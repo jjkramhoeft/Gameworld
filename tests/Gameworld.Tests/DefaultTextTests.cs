@@ -49,6 +49,39 @@ public class DefaultTextTests
     }
 
     [Fact]
+    public void Every_default_portrait_component_has_its_texts()
+    {
+        var p = ParameterSet.Default;
+        // A hairstyle, an outfit and an accessory have a description and a lore, and no two of a list the same.
+        Assert.All(p.Hairstyles, h => AssertWritten(h.Id, h.Description, h.Lore));
+        Assert.All(p.Outfits, o => AssertWritten(o.Id, o.Description, o.Lore));
+        Assert.All(p.Accessories, a => AssertWritten(a.Id, a.Description, a.Lore));
+        Assert.Equal(p.Hairstyles.Count, p.Hairstyles.Select(h => h.Description).Distinct().Count());
+        Assert.Equal(p.Hairstyles.Count, p.Hairstyles.Select(h => h.Lore).Distinct().Count());
+        Assert.Equal(p.Outfits.Count, p.Outfits.Select(o => o.Description).Distinct().Count());
+        Assert.Equal(p.Outfits.Count, p.Outfits.Select(o => o.Lore).Distinct().Count());
+        Assert.Equal(p.Accessories.Count, p.Accessories.Select(a => a.Description).Distinct().Count());
+        Assert.Equal(p.Accessories.Count, p.Accessories.Select(a => a.Lore).Distinct().Count());
+        Assert.StartsWith("Two braids wound around the head", p.Hairstyles.Single(h => h.Id == "crownBraid").Description);
+        Assert.StartsWith("A heavy gold ring on the little finger", p.Accessories.Single(a => a.Id == "goldSignetRing").Description);
+
+        // A colour of skin, eyes or hair has a description, written to be set into a sentence, and no lore.
+        Assert.All(p.SkinColours, c => { AssertDescribed(c.Id, c.Description); Assert.Contains("skin", c.Description); });
+        Assert.All(p.EyeColours, c => { AssertDescribed(c.Id, c.Description); Assert.Contains("eye", c.Description); });
+        Assert.All(p.HairColours, c => { AssertDescribed(c.Id, c.Description); Assert.Contains("hair", c.Description); });
+        Assert.Equal(p.SkinColours.Count, p.SkinColours.Select(c => c.Description).Distinct().Count());
+        Assert.Equal(p.EyeColours.Count, p.EyeColours.Select(c => c.Description).Distinct().Count());
+        Assert.Equal(p.HairColours.Count, p.HairColours.Select(c => c.Description).Distinct().Count());
+
+        // No text names a race that is not in the default list.
+        var texts = p.Hairstyles.SelectMany(h => new[] { h.Description, h.Lore })
+            .Concat(p.Outfits.SelectMany(o => new[] { o.Description, o.Lore }))
+            .Concat(p.Accessories.SelectMany(a => new[] { a.Description, a.Lore }));
+        foreach (var gone in new[] { "Tinefolk", "Hushfolk", "Longsleeper", "Eyrie folk", "Linemind" })
+            Assert.All(texts, text => Assert.DoesNotContain(gone, text));
+    }
+
+    [Fact]
     public void No_text_of_the_default_parameter_set_is_missing()
     {
         Assert.DoesNotContain(DefaultTexts.Missing, ParameterSet.Default.ToJson());

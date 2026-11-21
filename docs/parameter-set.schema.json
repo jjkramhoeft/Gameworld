@@ -2841,6 +2841,27 @@
               "type": "string"
             }
           },
+          "SkinColours": {
+            "description": "The ids of the skin colours a person of the race can have, the commonest first. Every id must be a skin colour of the SkinColours list. Left out, the looks of a person of the race hold no skin colour. No generation rule reads it yet; it is meant for the looks of a person (society §9.2).",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "EyeColours": {
+            "description": "The ids of the eye colours a person of the race can have, the commonest first. Every id must be an eye colour of the EyeColours list. Left out, the looks of a person of the race hold no eye colour. No generation rule reads it yet; it is meant for the looks of a person (society §9.2).",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "HairColours": {
+            "description": "The ids of the hair colours a person of the race can have before the hair greys, the commonest first. Every id must be a hair colour of the HairColours list. Left out, the looks of a person of the race hold no hair colour: a race without hair. No generation rule reads it yet; it is meant for the looks of a person (society §9.2).",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "Description": {
             "description": "What a person of the race looks like: build, skin, hair, eyes, dress and the marks that tell the race apart (society §2). A picture of it is drawn from this text, so an invented one needs it to look the same every time. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.",
             "type": "string"
@@ -3049,6 +3070,455 @@
           "Id",
           "Name",
           "Hex"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "SkinColours": {
+      "description": "The skin colours: the tones of skin a person can have. A race lists the skin colours of its persons by id. Nothing draws one yet: they are for the looks of a person (society §9.2). Add a skin colour by adding an entry. A file that gives this list replaces the whole default list.",
+      "type": "array",
+      "items": {
+        "description": "A skin colour: a tone of skin a person can have. A race lists the skin colours of its persons by id (society §9.2).",
+        "type": "object",
+        "properties": {
+          "Id": {
+            "description": "The id the generated data knows the skin colour by, in camelCase like goldenTan. Unique in the list; keep it when the name changes.",
+            "type": "string"
+          },
+          "Name": {
+            "description": "The name shown for the skin colour.",
+            "type": "string"
+          },
+          "Description": {
+            "description": "What a picture shows: the tone, the undertone and any marking of the skin itself, written to be set into a sentence about the person. A picture of the person is drawn from this text, word for word every time. No generation rule reads it.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "Id",
+          "Name",
+          "Description"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "EyeColours": {
+      "description": "The eye colours: the colours of the eyes a person can have, with the pupil where it is the mark of a race. A race lists the eye colours of its persons by id. Nothing draws one yet: they are for the looks of a person (society §9.2). A file that gives this list replaces the whole default list.",
+      "type": "array",
+      "items": {
+        "description": "An eye colour: the colour of the eyes of a person, and the pupil where it is the mark of a race. A race lists the eye colours of its persons by id (society §9.2).",
+        "type": "object",
+        "properties": {
+          "Id": {
+            "description": "The id the generated data knows the eye colour by, in camelCase like earthBrown. Unique in the list; keep it when the name changes.",
+            "type": "string"
+          },
+          "Name": {
+            "description": "The name shown for the eye colour.",
+            "type": "string"
+          },
+          "Description": {
+            "description": "What a picture shows: the colour of the eyes and what else sets them apart, written to be set into a sentence about the person. A picture of the person is drawn from this text, word for word every time. No generation rule reads it.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "Id",
+          "Name",
+          "Description"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "HairColours": {
+      "description": "The hair colours: the colours of the hair a person can have, and the colour each turns into as the person greys. A race lists the hair colours of its persons by id. Nothing draws one yet: they are for the looks of a person (society §9.2). A file that gives this list replaces the whole default list.",
+      "type": "array",
+      "items": {
+        "description": "A hair colour: the colour of the hair of a person. A race lists the hair colours of its persons by id (society §9.2).",
+        "type": "object",
+        "properties": {
+          "Id": {
+            "description": "The id the generated data knows the hair colour by, in camelCase like copperRed. Unique in the list; keep it when the name changes.",
+            "type": "string"
+          },
+          "Name": {
+            "description": "The name shown for the hair colour.",
+            "type": "string"
+          },
+          "Description": {
+            "description": "What a picture shows: the colour of the hair, written to be set into a sentence about the person. A picture of the person is drawn from this text, word for word every time. No generation rule reads it.",
+            "type": "string"
+          },
+          "Greying": {
+            "description": "The id of the hair colour this one turns into as the person greys: black turns to greying dark, greying dark to iron grey, iron grey to white. It must be another hair colour of the list, and the chain must end. Left out, the colour does not change with age (society §9.2).",
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "Id",
+          "Name",
+          "Description"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "Hairstyles": {
+      "description": "The hairstyles: how a person wears the hair, and who wears each: the sex, the races, the wealth, the vocations, the ages and whether married. Nothing draws one yet: they are for the looks of a person (society §9.3). A file that gives this list replaces the whole default list.",
+      "type": "array",
+      "items": {
+        "description": "A hairstyle: how a person wears the hair, with the beard or the head covering where that is the point of it, and who wears it (society §9.3).",
+        "type": "object",
+        "properties": {
+          "Id": {
+            "description": "The id the generated data knows the hairstyle by, in camelCase like crownBraid. Unique in the list; keep it when the name changes.",
+            "type": "string"
+          },
+          "Name": {
+            "description": "The name shown for the hairstyle.",
+            "type": "string"
+          },
+          "Enabled": {
+            "description": "Whether the hairstyle exists in the world. A hairstyle that is off is worn by nobody.",
+            "type": "boolean"
+          },
+          "WornBy": {
+            "description": "Who wears the hairstyle: the sex, the races, the wealth, the vocations, the ages and whether married. Left out, everybody can wear it (society §9.3).",
+            "type": "object",
+            "properties": {
+              "Sex": {
+                "description": "The sex it is worn by: Male or Female. Left out, both sexes wear it.",
+                "enum": [
+                  "Male",
+                  "Female",
+                  null
+                ]
+              },
+              "Races": {
+                "description": "The ids of the races that wear it. Every id must be a race of the Races list. Left out or empty, every race wears it.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "LowestWealth": {
+                "description": "The lowest wealth of the household of a person who wears it: Destitute, Poor, Common, Comfortable or Rich. Left out, Destitute.",
+                "enum": [
+                  "Destitute",
+                  "Poor",
+                  "Common",
+                  "Comfortable",
+                  "Rich"
+                ]
+              },
+              "HighestWealth": {
+                "description": "The highest wealth of the household of a person who wears it. Not below LowestWealth. Left out, Rich.",
+                "enum": [
+                  "Destitute",
+                  "Poor",
+                  "Common",
+                  "Comfortable",
+                  "Rich"
+                ]
+              },
+              "Vocations": {
+                "description": "The ids of the vocations it is the dress or the mark of: only a person with one of them wears it. Every id must be a vocation of the Vocations list. Left out or empty, the vocation does not matter.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "LowestAge": {
+                "description": "The lowest age it is worn at, in years. Left out, no lower limit.",
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 1000
+              },
+              "HighestAge": {
+                "description": "The highest age it is worn at, in years. Not below LowestAge. Left out, no upper limit.",
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 1000
+              },
+              "Married": {
+                "description": "Whether it is worn by the married only (true) or by the unmarried only (false). Married is a person whose husband or wife lives in the household. Left out, both wear it.",
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          "Description": {
+            "description": "What the hairstyle looks like: the cut, the length and how it is dressed (society §9.3). It names no hair colour: that is a component of its own. A picture of the person is drawn from this text, word for word every time. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.",
+            "type": "string"
+          },
+          "Lore": {
+            "description": "The lore of the hairstyle: who wears it, what it says of the wearer and what is told about it (society §9.3). No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "Id",
+          "Name",
+          "Enabled"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "Outfits": {
+      "description": "The outfits: what a person wears, and who wears each. The outfit of a person has a main and an accent colour of the Colours list, which an outfit can decide. Nothing draws one yet: they are for the looks of a person (society §9.4). A file that gives this list replaces the whole default list.",
+      "type": "array",
+      "items": {
+        "description": "An outfit: what a person wears, who wears it and, where the outfit decides them, its two colours (society §9.4).",
+        "type": "object",
+        "properties": {
+          "Id": {
+            "description": "The id the generated data knows the outfit by, in camelCase like kirtleAndApron. Unique in the list; keep it when the name changes.",
+            "type": "string"
+          },
+          "Name": {
+            "description": "The name shown for the outfit.",
+            "type": "string"
+          },
+          "Enabled": {
+            "description": "Whether the outfit exists in the world. An outfit that is off is worn by nobody.",
+            "type": "boolean"
+          },
+          "WornBy": {
+            "description": "Who wears the outfit: the sex, the races, the wealth, the vocations, the ages and whether married. Left out, everybody can wear it (society §9.3).",
+            "type": "object",
+            "properties": {
+              "Sex": {
+                "description": "The sex it is worn by: Male or Female. Left out, both sexes wear it.",
+                "enum": [
+                  "Male",
+                  "Female",
+                  null
+                ]
+              },
+              "Races": {
+                "description": "The ids of the races that wear it. Every id must be a race of the Races list. Left out or empty, every race wears it.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "LowestWealth": {
+                "description": "The lowest wealth of the household of a person who wears it: Destitute, Poor, Common, Comfortable or Rich. Left out, Destitute.",
+                "enum": [
+                  "Destitute",
+                  "Poor",
+                  "Common",
+                  "Comfortable",
+                  "Rich"
+                ]
+              },
+              "HighestWealth": {
+                "description": "The highest wealth of the household of a person who wears it. Not below LowestWealth. Left out, Rich.",
+                "enum": [
+                  "Destitute",
+                  "Poor",
+                  "Common",
+                  "Comfortable",
+                  "Rich"
+                ]
+              },
+              "Vocations": {
+                "description": "The ids of the vocations it is the dress or the mark of: only a person with one of them wears it. Every id must be a vocation of the Vocations list. Left out or empty, the vocation does not matter.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "LowestAge": {
+                "description": "The lowest age it is worn at, in years. Left out, no lower limit.",
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 1000
+              },
+              "HighestAge": {
+                "description": "The highest age it is worn at, in years. Not below LowestAge. Left out, no upper limit.",
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 1000
+              },
+              "Married": {
+                "description": "Whether it is worn by the married only (true) or by the unmarried only (false). Married is a person whose husband or wife lives in the household. Left out, both wear it.",
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          "MainColour": {
+            "description": "The id of the main colour of the outfit, where the outfit decides it: the black of a habit, the undyed grey of a peasant gown. It must be a colour of the Colours list. Left out, the main colour is picked for the person (society §9.4).",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "AccentColour": {
+            "description": "The id of the accent colour of the outfit, where the outfit decides it: the colour of its trim, its sash or its lining. It must be a colour of the Colours list. Left out, the accent colour is picked for the person (society §9.4).",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "Description": {
+            "description": "What the outfit looks like: what a head-and-shoulders picture shows first, and the rest after \"Below:\" (society §9.4). The marks {main} and {accent} stand for the main and the accent colour of the outfit of the person, and a picture is drawn from the text with the names of those two colours in their place. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.",
+            "type": "string"
+          },
+          "Lore": {
+            "description": "The lore of the outfit: who wears it, what it says of the wearer and what is told about it (society §9.4). No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "Id",
+          "Name",
+          "Enabled"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "Accessories": {
+      "description": "The accessories: the jewellery a person wears on the body or in the hair, of eight kinds, and who wears each. A person can have none, one or several. Nothing draws one yet: they are for the looks of a person (society §9.5). A file that gives this list replaces the whole default list.",
+      "type": "array",
+      "items": {
+        "description": "An accessory: a piece of jewellery worn on the body or in the hair, its kind and who wears it. A person can have none, one or several (society §9.5).",
+        "type": "object",
+        "properties": {
+          "Id": {
+            "description": "The id the generated data knows the accessory by, in camelCase like goldSignetRing. Unique in the list; keep it when the name changes.",
+            "type": "string"
+          },
+          "Name": {
+            "description": "The name shown for the accessory.",
+            "type": "string"
+          },
+          "Enabled": {
+            "description": "Whether the accessory exists in the world. An accessory that is off is worn by nobody.",
+            "type": "boolean"
+          },
+          "Kind": {
+            "description": "The kind of the accessory: Necklace, Earrings, Bracelet, Ring, Brooch, Crown, BodyJewellery or HairJewellery. It says where the piece sits, and a person wears at most one of a kind (society §9.5).",
+            "enum": [
+              "Necklace",
+              "Earrings",
+              "Bracelet",
+              "Ring",
+              "Brooch",
+              "Crown",
+              "BodyJewellery",
+              "HairJewellery"
+            ]
+          },
+          "WornBy": {
+            "description": "Who wears the accessory: the sex, the races, the wealth, the vocations, the ages and whether married. Left out, everybody can wear it (society §9.3).",
+            "type": "object",
+            "properties": {
+              "Sex": {
+                "description": "The sex it is worn by: Male or Female. Left out, both sexes wear it.",
+                "enum": [
+                  "Male",
+                  "Female",
+                  null
+                ]
+              },
+              "Races": {
+                "description": "The ids of the races that wear it. Every id must be a race of the Races list. Left out or empty, every race wears it.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "LowestWealth": {
+                "description": "The lowest wealth of the household of a person who wears it: Destitute, Poor, Common, Comfortable or Rich. Left out, Destitute.",
+                "enum": [
+                  "Destitute",
+                  "Poor",
+                  "Common",
+                  "Comfortable",
+                  "Rich"
+                ]
+              },
+              "HighestWealth": {
+                "description": "The highest wealth of the household of a person who wears it. Not below LowestWealth. Left out, Rich.",
+                "enum": [
+                  "Destitute",
+                  "Poor",
+                  "Common",
+                  "Comfortable",
+                  "Rich"
+                ]
+              },
+              "Vocations": {
+                "description": "The ids of the vocations it is the dress or the mark of: only a person with one of them wears it. Every id must be a vocation of the Vocations list. Left out or empty, the vocation does not matter.",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "LowestAge": {
+                "description": "The lowest age it is worn at, in years. Left out, no lower limit.",
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 1000
+              },
+              "HighestAge": {
+                "description": "The highest age it is worn at, in years. Not below LowestAge. Left out, no upper limit.",
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 1000
+              },
+              "Married": {
+                "description": "Whether it is worn by the married only (true) or by the unmarried only (false). Married is a person whose husband or wife lives in the household. Left out, both wear it.",
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              }
+            },
+            "additionalProperties": false
+          },
+          "Description": {
+            "description": "What the accessory looks like: its form, what it is made of and where it sits (society §9.5). A picture of the person is drawn from this text, word for word every time. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.",
+            "type": "string"
+          },
+          "Lore": {
+            "description": "The lore of the accessory: who gives it, when it comes off and what it means (society §9.5). No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "Id",
+          "Name",
+          "Enabled",
+          "Kind"
         ],
         "additionalProperties": false
       }

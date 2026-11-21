@@ -53,6 +53,7 @@ public sealed class World
         PersonRules = new PersonRules(foundation.Parameters, foundation.Seed.Value);
         FloraFaunaRules = new FloraFaunaRules(foundation.Parameters);
         VocationRules = new VocationRules(foundation.Parameters);
+        LooksRules = new LooksRules(foundation.Parameters);
         RiverBeds = new RiverBeds(this);
     }
 
@@ -74,6 +75,7 @@ public sealed class World
     public PersonRules PersonRules { get; }
     public FloraFaunaRules FloraFaunaRules { get; }
     public VocationRules VocationRules { get; }
+    public LooksRules LooksRules { get; }
 
     /// <summary>
     /// The river bed profiles of the height maps (map-generation.md section 12.2), cached per

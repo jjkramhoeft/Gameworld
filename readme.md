@@ -7,7 +7,7 @@ This readme defines the concepts of the world and is the source of every name. T
 | Subject | Document | Covers |
 | --- | --- | --- |
 | The map | [docs/map-generation.md](docs/map-generation.md) | Geography, climate, biomes, resources, Prospects and the travel network |
-| The society | [docs/society-generation.md](docs/society-generation.md) | Races, the potential population, factions, cities and towns, households, persons, vocations and looks |
+| The society | [docs/society-generation.md](docs/society-generation.md) | Races, the potential population, factions, cities and towns, households, persons, vocations, looks and the portrait components |
 
 Contents: [Overview](#overview) · [Concepts](#concepts) · [Documentation](#documentation) · [Build and run](#build-and-run)
 
@@ -44,7 +44,7 @@ The project is in phase 1.
 
 ### Status
 
-The map is generated through all its stages, from the cells to the travel network, with the flora and fauna of every patch. Of the society, the races of each region, their potential population, the factions of each region, the name of each region, and the cities and towns of each region with their names, their persons and their races are generated. The households of every city and town are generated, those of the factions first, and so are the persons of every household: each with a name, a sex, an age, a position in the household, family links and a vocation. The persons on the land are still a count per race. The person-name generator gives the names of the persons, the surnames of the households and some of the first parts of city and town names. The vocations of the countryside, the variant of a vocation and the tools are not drawn yet. The races, the vocations, the tools, the flora, the fauna and the resources carry a description and a lore in the Parameter Set, for the pictures to come, and so do the biomes and the variants of the vocations; every one of the default texts is written. Nothing is authored yet: no description, history or portrait of a person. There is no database either: the apps compute everything in memory.
+The map is generated through all its stages, from the cells to the travel network, with the flora and fauna of every patch. Of the society, the races of each region, their potential population, the factions of each region, the name of each region, and the cities and towns of each region with their names, their persons and their races are generated. The households of every city and town are generated, those of the factions first, and so are the persons of every household: each with a name, a sex, an age, a position in the household, family links and a vocation. The persons on the land are still a count per race. The person-name generator gives the names of the persons, the surnames of the households and some of the first parts of city and town names. The vocations of the countryside, the variant of a vocation and the tools are not drawn yet. The races, the vocations, the tools, the flora, the fauna and the resources carry a description and a lore in the Parameter Set, for the pictures to come, and so do the biomes and the variants of the vocations; every one of the default texts is written. The portrait components are in the Parameter Set too: the skin, eye and hair colours, the hairstyles, the outfits and the accessories that the looks of a person are to be picked from. The looks themselves are not drawn yet. Nothing is authored yet: no description, history or portrait of a person. There is no database either: the apps compute everything in memory.
 
 ## Concepts
 
@@ -66,7 +66,9 @@ Foundation = seed + generator version + Parameter Set
       ├─ City and town                  one on every Prospect on show, with a name and races
       ├─ Household, Person              a family and its servants; a person with a vocation and looks
       ├─ Vocation, Tool                 the work of a person, and the tools of the work
-      └─ Colour                         favourite colours of a race, the banner of a faction
+      ├─ Looks                          skin, eyes, hair, outfit and accessories of a person
+      ├─ Portrait component             the lists the looks are picked from
+      └─ Colour                         favourite colours of a race, the banner of a faction, the outfit of a person
 ```
 
 ### The world
@@ -85,7 +87,7 @@ Many foundations can coexist in storage, for one to compare maps side by side in
 
 The set of all map and world parameters. It is referenced by a foundation and is immutable after phase 1, like the foundation. It is a json file, or is exported to and loaded from one.
 
-The Parameter Set also holds the lists that are expected to change: the bedrock types, the races, the vocations, the tools, the colours, the flora, the fauna and the texts of the resources, of the biomes, of the elevation types, of the types and the forms of faction, of the city and the town and of the settlement tiers. A race, a vocation and each of its variants, a tool, a kind of flora or fauna, a resource and each of its variants, a biome, a bedrock type, an elevation type, a type and a form of faction, a kind of settlement and a settlement tier each have a description and a lore: the texts a picture of it is to be drawn from, so that an invented thing looks the same every time. No generation rule reads them. A text that is not written yet is `**missing description**`. A change to a list after phase 1 is a new Parameter Set, and with it a new foundation. Foundations that exist are not touched.
+The Parameter Set also holds the lists that are expected to change: the bedrock types, the races, the vocations, the tools, the colours, the six lists of portrait components (skin colours, eye colours, hair colours, hairstyles, outfits and accessories), the flora, the fauna and the texts of the resources, of the biomes, of the elevation types, of the types and the forms of faction, of the city and the town and of the settlement tiers. A race, a vocation and each of its variants, a tool, a kind of flora or fauna, a resource and each of its variants, a biome, a bedrock type, an elevation type, a type and a form of faction, a kind of settlement and a settlement tier each have a description and a lore: the texts a picture of it is to be drawn from, so that an invented thing looks the same every time. So do a hairstyle, an outfit and an accessory, and a skin, eye or hair colour has a description. No generation rule reads them. A text that is not written yet is `**missing description**`. A change to a list after phase 1 is a new Parameter Set, and with it a new foundation. Foundations that exist are not touched.
 
 #### Derived and authored data
 
@@ -252,13 +254,13 @@ Roads, river routes and sea lanes that connect the Prospects on show. The networ
 
 ### The society
 
-The peoples that live on the map. The Stub of every entity in this group is derived data, and its presentation is authored. The rules are in [docs/society-generation.md](docs/society-generation.md). The races, the potential population, the factions, the cities and towns, the households, the persons and the tools are specified there so far. Detailing the rest is a later task.
+The peoples that live on the map. The Stub of every entity in this group is derived data, and its presentation is authored. The rules are in [docs/society-generation.md](docs/society-generation.md). The races, the potential population, the factions, the cities and towns, the households, the persons, the tools and the portrait components are specified there so far. Detailing the rest is a later task.
 
 #### Race
 
 A people that can live in the world: Northmen, Elves, Dwarves and so on. Races are needed to generate factions, households and persons. Race is the only level: a race has no sub-races, and each human people is a race of its own, so there is no plain human race.
 
-The races are a list in the Parameter Set, not a fixed set in the code. Each race has an id, a name, a toggle (on or off), a mark for a human race, a name style (which of the three name models its names come from), a frequency for each biome, a height modifier, a leaning to each type of faction, two lists of other races (the races it appreciates and the races it hates), a list of favourite colours, a description (what a person of the race looks like) and a lore. The default list holds 28 races, all on: seven human races (Northmen, Midlanders, Saltroad folk, Sunlanders, Grass riders, Rainkeepers, Canal folk), five classic races (Elves, Dwarves, Halflings, Gnomes, Orcs) and sixteen new near-human races (docs/society-generation.md Appendix A). A faction has a lead race. A household has the race of its family, one of the races of its city or town, and a person of the family has that race. A servant can be of another race of the place.
+The races are a list in the Parameter Set, not a fixed set in the code. Each race has an id, a name, a toggle (on or off), a mark for a human race, a name style (which of the three name models its names come from), a frequency for each biome, a height modifier, a leaning to each type of faction, two lists of other races (the races it appreciates and the races it hates), a list of favourite colours, the skin, eye and hair colours its persons can have, a description (what a person of the race looks like) and a lore. The default list holds 28 races, all on: seven human races (Northmen, Midlanders, Saltroad folk, Sunlanders, Grass riders, Rainkeepers, Canal folk), five classic races (Elves, Dwarves, Halflings, Gnomes, Orcs) and sixteen new near-human races (docs/society-generation.md Appendix A). A faction has a lead race. A household has the race of its family, one of the races of its city or town, and a person of the family has that race. A servant can be of another race of the place.
 
 #### Main race and minority race
 
@@ -322,7 +324,7 @@ A house is the households of one faction of the type Family. They are one family
 
 An NPC in the game. Persons belong to the Peopled stage, and the identity of a person is its household and a slot in it. Every person of a household is generated as a Stub, so every person of a city or a town is an individual. The persons of the land are still a count per race.
 
-The Stub of a person holds name, sex, age, race, vocation, role, family links and its household. The household gives the person its home, its wealth and its faction. The role is the position in the household for now: head, spouse, child, parent, sibling or servant. The family links are the husband or wife, the father and the mother, where they live in the same household. The name is not authored: it comes from the name generator in the name style of the race, so a person has a name already as a Stub. The textual description, the history and the portrait are authored.
+The Stub of a person holds name, sex, age, race, vocation, role, family links and its household. The household gives the person its home, its wealth and its faction. The role is the position in the household for now: head, spouse, child, parent, sibling or servant. The family links are the husband or wife, the father and the mother, where they live in the same household. The name is not authored: it comes from the name generator in the name style of the race, so a person has a name already as a Stub. The Stub also has a place for the looks of the person, which are not drawn yet. The textual description, the history and the portrait are authored.
 
 #### Vocation
 
@@ -338,11 +340,37 @@ Nothing draws a tool yet. The coats of arms of houses, guilds and some cities ar
 
 #### Looks
 
-What a portrait of a person must show: the body and the face, the hair, the outfit and the accessories. Looks are not specified yet, apart from the colours.
+What a portrait of a person must show beyond its race: a skin colour, an eye colour, a hair colour, a hairstyle, an outfit with a main colour and an accent colour, and accessories. Each is a portrait component: the looks hold the id of one entry of each list, the two colours of the outfit, and the accessories, of which a person has none, one or several.
+
+The looks are derived data and part of the Stub of a person. They are to be drawn by the person generator, so that a person has its looks before any picture is made, and the portrait, which is authored, is to be drawn from them and from the description of the race. No rule draws the looks yet: a person has none so far.
+
+#### Portrait component
+
+One fixed piece of the looks of a person, picked from a list and repeated word for word in every picture of that person. There are six lists of them in the Parameter Set, so the code knows no component by name: skin colours, eye colours, hair colours, hairstyles, outfits and accessories. The default lists hold 32, 27, 23, 46, 72 and 51 entries (docs/society-generation.md section 9).
+
+#### Skin colour, eye colour and hair colour
+
+The colour of the skin, the eyes and the hair of a person. Each has an id, a name and a description: what a picture shows, as a part of a sentence. A colour is more than a hue where the mark of a race lies in the skin, the eye or the hair itself: the slit pupil of the Catfolk is in their eye colours. A race lists the colours its persons can have, and a race without hair lists no hair colour. A hair colour can name the colour it turns into as the person greys.
+
+#### Hairstyle
+
+How a person wears the hair, with the beard or the head covering where that is the point of it: a crown braid, a topknot, a veil and wimple. Each hairstyle has an id, a name, a toggle, who wears it, a description and a lore.
+
+Who wears a hairstyle, an outfit or an accessory is a set of limits: the sex, the races, the wealth of the household, the vocations, the ages and whether married. A person can wear the thing only when every limit holds, and a limit that is left out limits nothing.
+
+#### Outfit
+
+What a person wears, from the head covering to the shoes: a kirtle and apron, a wrapped riding coat, a monk's habit. Each outfit has an id, a name, a toggle, who wears it, a description and a lore.
+
+The outfit of a person has a main colour and an accent colour, two colours of the colour list: the body of the outfit, and its trim, sash or lining. An outfit either decides a colour, as a habit is black, or leaves it to the person. The description of an outfit marks where a colour that is left to the person stands.
+
+#### Accessory
+
+A piece of jewellery worn on the body or in the hair: a signet ring, a string of amber beads, a circlet. Each accessory has an id, a name, a toggle, a kind, who wears it, a description and a lore. The kind says where the piece sits, and there are eight: necklace, earrings, bracelet, ring, brooch, crown, body jewellery and hair jewellery. A person wears at most one of a kind.
 
 #### Colour
 
-A named colour of cloth, paint and banners: red, indigo, saffron. The colours are a list in the Parameter Set, like the races. Each colour has an id, a name and a value as #RRGGBB. The default list holds 24 colours. A race has favourite colours, and a faction has a main colour and a secondary colour. The colours of hair, skin and eyes are not in the list.
+A named colour of cloth, paint and banners: red, indigo, saffron. The colours are a list in the Parameter Set, like the races. Each colour has an id, a name and a value as #RRGGBB. The default list holds 24 colours. A race has favourite colours, a faction has a main colour and a secondary colour, and the outfit of a person has a main colour and an accent colour. The colours of skin, eyes and hair are not in the list: they are portrait components with lists of their own.
 
 ## Documentation
 
@@ -360,7 +388,7 @@ A named colour of cloth, paint and banners: red, indigo, saffron. The colours ar
 | [docs/races-and-worldbuilding.md](docs/races-and-worldbuilding.md) | A framework for building a near-human race: origin, anchor traits, culture and the relation to humans |
 | [docs/NameGenerator-Reuse.md](docs/NameGenerator-Reuse.md) | The person-name generator |
 | [docs/RegionNameGenerator-Reuse.md](docs/RegionNameGenerator-Reuse.md) | The region-name generator of an earlier project: the original and the corrected form that names the regions here |
-| [docs/research/](docs/research/) | 22 source notes: the map notes behind the research document, and research for the society and the living world (races, human races, factions, faction generation, vocations, portrait components, heraldry, flora and fauna, city and town naming), and three notes on sequential art for graphic short stories |
+| [docs/research/](docs/research/) | 22 source notes: the map notes behind the research document, and research for the society and the living world (races, human races, factions, faction generation, vocations, portrait components, heraldry, flora and fauna, city and town naming), and three notes on sequential art for graphic short stories. The default lists of the portrait components are built from the note on them |
 | [docs/plans/](docs/plans/) | Plans for changes, each with its status |
 | [braindump.md](braindump.md) | Notes and ideas in progress, not decided |
 

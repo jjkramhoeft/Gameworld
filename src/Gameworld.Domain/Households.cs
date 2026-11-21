@@ -136,6 +136,7 @@ public sealed record RegionHouseholds(IReadOnlyList<Household> Households)
 /// <param name="Spouse">The slot in the household of the husband or the wife. Null without one in the household.</param>
 /// <param name="Father">The slot in the household of the father. Null when he does not live in it.</param>
 /// <param name="Mother">The slot in the household of the mother. Null when she does not live in it.</param>
+/// <param name="Looks">The looks of the person: its portrait components (society-generation.md section 9). Null until they are drawn: no rule draws them yet.</param>
 public sealed record Person(
     int Household,
     int Slot,
@@ -148,7 +149,8 @@ public sealed record Person(
     string? Vocation,
     int? Spouse = null,
     int? Father = null,
-    int? Mother = null)
+    int? Mother = null,
+    Looks? Looks = null)
 {
     /// <summary>The given name and the surname.</summary>
     public string Name => GivenName + " " + Surname;
