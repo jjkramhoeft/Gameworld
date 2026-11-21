@@ -6,7 +6,7 @@ namespace Gameworld.Domain;
 
 // The portrait components (society-generation.md section 9): the lists the looks of a person
 // are picked from. Each component is one fixed piece of the description of a person, repeated
-// word for word in every picture of that person. Nothing draws them yet.
+// word for word in every picture of that person. The person generator draws them.
 
 /// <summary>
 /// A skin colour: one of the tones a person can have. The skin colours are a list in the
@@ -132,11 +132,11 @@ public sealed partial record OutfitParameters(
     [Description("Who wears the outfit: the sex, the races, the wealth, the vocations, the ages and whether married. Left out, everybody can wear it (society §9.3).")]
     public WearerParameters WornBy { get; init; } = new();
 
-    [Description("The id of the main colour of the outfit, where the outfit decides it: the black of a habit, the undyed grey of a peasant gown. It must be a colour of the Colours list. Left out, the main colour is picked for the person (society §9.4).")]
+    [Description("The id of the main colour of the outfit, where the outfit decides it: the black of a habit, the undyed grey of a peasant gown. It must be a colour of the Colours list. Left out, the main colour is drawn for the person (society §9.4 and §9.7).")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public string? MainColour { get; init; }
 
-    [Description("The id of the accent colour of the outfit, where the outfit decides it: the colour of its trim, its sash or its lining. It must be a colour of the Colours list. Left out, the accent colour is picked for the person (society §9.4).")]
+    [Description("The id of the accent colour of the outfit, where the outfit decides it: the colour of its trim, its sash or its lining. It must be a colour of the Colours list. Left out, the accent colour is drawn for the person (society §9.4 and §9.7).")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public string? AccentColour { get; init; }
 
@@ -221,7 +221,8 @@ public sealed partial record AccessoryParameters(
 /// </summary>
 /// <param name="SkinColour">The id of the skin colour. Null when the race of the person lists none.</param>
 /// <param name="EyeColour">The id of the eye colour. Null when the race of the person lists none.</param>
-/// <param name="HairColour">The id of the hair colour. Null when the race of the person lists none: a race without hair.</param>
+/// <param name="HairColour">The id of the hair colour a picture shows: the natural hair colour, or the colour it has turned into at the age of the person. Null when the race of the person lists none: a race without hair.</param>
+/// <param name="NaturalHairColour">The id of the hair colour before it greys: a colour of the race, and the one a child shares with its father or its mother. Null when the race of the person lists none.</param>
 /// <param name="Hairstyle">The id of the hairstyle. Null when no hairstyle of the list fits the person.</param>
 /// <param name="Outfit">The id of the outfit. Null when no outfit of the list fits the person.</param>
 /// <param name="OutfitMainColour">The id of the main colour of the outfit: a colour of the Colours list. Null without an outfit.</param>
@@ -231,6 +232,7 @@ public sealed record Looks(
     string? SkinColour,
     string? EyeColour,
     string? HairColour,
+    string? NaturalHairColour,
     string? Hairstyle,
     string? Outfit,
     string? OutfitMainColour,

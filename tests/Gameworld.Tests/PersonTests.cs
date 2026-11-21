@@ -12,7 +12,11 @@ public class PersonTests
     private static readonly HouseholdPlace Town = new(SettlementTier.Town, false);
     private static readonly HouseholdPlace Capital = new(SettlementTier.Capital, true);
 
-    private static PersonRules Rules(ParameterSet? parameters = null, uint seed = 7) => new(parameters ?? ParameterSet.Default, seed);
+    private static PersonRules Rules(ParameterSet? parameters = null, uint seed = 7)
+    {
+        var p = parameters ?? ParameterSet.Default;
+        return new PersonRules(p, new LooksRules(p, seed), seed);
+    }
 
     private static Household Home(
         int slot, int family, WealthLevel wealth = WealthLevel.Common, Sex sex = Sex.Male, int age = 40,
@@ -31,6 +35,7 @@ public class PersonTests
         Assert.All(persons, p => Assert.Equal(household.Slot, p.Household));
         Assert.All(persons, p => Assert.InRange(p.Age, 0, PersonRules.MaxAge));
         Assert.All(persons, p => Assert.False(string.IsNullOrWhiteSpace(p.GivenName)));
+        Assert.All(persons, p => Assert.NotNull(p.Looks));
 
         // The head is the one of the Stub, and the family is as large as the Stub says.
         var head = persons[0];
@@ -242,11 +247,12 @@ public class PersonTests
         Assert.Equal(1.2, rules.WeightIn(byId["sailor"], Capital));
 
         // Where no vocation fits the wealth, the nearest lower level gives one; with no vocation at all there is none.
-        var few = parameters with { Vocations = [byId["labourer"], byId["smith"]] };
+        // (What is worn names vocations of the list, so the short lists go without the dress.)
+        var few = parameters with { Vocations = [byId["labourer"], byId["smith"]], Hairstyles = [], Outfits = [], Accessories = [] };
         Assert.Equal("smith", Rules(few).FittingVocation(WealthLevel.Rich, Town, 0.5));
         Assert.Equal("labourer", Rules(few).FittingVocation(WealthLevel.Common, Town, 0.5));
         Assert.Equal("labourer", Rules(few).FittingVocation(WealthLevel.Destitute, Town, 0.5));
-        Assert.Null(Rules(parameters with { Vocations = [] }).FittingVocation(WealthLevel.Common, Town, 0.5));
+        Assert.Null(Rules(few with { Vocations = [] }).FittingVocation(WealthLevel.Common, Town, 0.5));
     }
 
     [Fact]

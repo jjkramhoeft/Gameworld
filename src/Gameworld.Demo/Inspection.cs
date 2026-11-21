@@ -266,8 +266,24 @@ internal sealed class Inspection
                 first.Slot, h.Kin!.Relation, _settled?.Places.Settlements.FirstOrDefault(s => s.Slot == first.Settlement)?.Name),
             _people?.Of(h).Select(p => new PersonLine(
                 p.Slot, p.GivenName, p.Surname, RaceName(p.Race), p.Sex, p.Age, p.Role,
-                p.Vocation is null ? null : VocationName(p.Vocation))).ToArray());
+                p.Vocation is null ? null : VocationName(p.Vocation), LooksOf(p.Looks))).ToArray());
     }).ToArray();
+
+    /// <summary>The looks of a person, by the names of its portrait components. Null for a person without looks.</summary>
+    private PersonLooks? LooksOf(Looks? looks)
+    {
+        if (looks is null) return null;
+        var p = _world.Parameters;
+        return new PersonLooks(
+            p.SkinColours.FirstOrDefault(c => c.Id == looks.SkinColour)?.Name,
+            p.EyeColours.FirstOrDefault(c => c.Id == looks.EyeColour)?.Name,
+            p.HairColours.FirstOrDefault(c => c.Id == looks.HairColour)?.Name,
+            looks.NaturalHairColour == looks.HairColour ? null : p.HairColours.FirstOrDefault(c => c.Id == looks.NaturalHairColour)?.Name,
+            p.Hairstyles.FirstOrDefault(h => h.Id == looks.Hairstyle)?.Name,
+            p.Outfits.FirstOrDefault(o => o.Id == looks.Outfit)?.Name,
+            Colour(looks.OutfitMainColour), Colour(looks.OutfitAccentColour),
+            looks.Accessories.Select(id => p.Accessories.FirstOrDefault(a => a.Id == id)?.Name ?? id).ToArray());
+    }
 
     // ───────────────────────── Zone ─────────────────────────
 
@@ -719,5 +735,15 @@ public sealed record HouseholdKinInfo(int Household, HouseholdRole Relation, str
 /// <summary>A person of a household (society-generation.md section 7).</summary>
 /// <param name="Race">The name of the race of the person.</param>
 /// <param name="Vocation">The name of the vocation. Null for a child and where no vocation fits.</param>
+/// <param name="Looks">The looks of the person. Null for a person without looks.</param>
 public sealed record PersonLine(
-    int Slot, string GivenName, string Surname, string Race, Sex Sex, int Age, HouseholdRole Role, string? Vocation);
+    int Slot, string GivenName, string Surname, string Race, Sex Sex, int Age, HouseholdRole Role, string? Vocation, PersonLooks? Looks);
+
+/// <summary>The looks of a person (society-generation.md section 9), by the names of its portrait components.</summary>
+/// <param name="Hair">The name of the hair colour a picture shows. Null for a person without hair.</param>
+/// <param name="NaturalHair">The name of the hair colour before it greyed. Null when the hair has not greyed.</param>
+/// <param name="OutfitMain">The main colour of the outfit. Null without an outfit.</param>
+/// <param name="OutfitAccent">The accent colour of the outfit. Null without an outfit.</param>
+public sealed record PersonLooks(
+    string? Skin, string? Eyes, string? Hair, string? NaturalHair, string? Hairstyle, string? Outfit,
+    ColourInfo? OutfitMain, ColourInfo? OutfitAccent, string[] Accessories);

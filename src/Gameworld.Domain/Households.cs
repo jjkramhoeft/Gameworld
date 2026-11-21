@@ -136,7 +136,7 @@ public sealed record RegionHouseholds(IReadOnlyList<Household> Households)
 /// <param name="Spouse">The slot in the household of the husband or the wife. Null without one in the household.</param>
 /// <param name="Father">The slot in the household of the father. Null when he does not live in it.</param>
 /// <param name="Mother">The slot in the household of the mother. Null when she does not live in it.</param>
-/// <param name="Looks">The looks of the person: its portrait components (society-generation.md section 9). Null until they are drawn: no rule draws them yet.</param>
+/// <param name="Looks">The looks of the person: its portrait components (society-generation.md section 9), drawn with the person. Null on a person that was not generated.</param>
 public sealed record Person(
     int Household,
     int Slot,

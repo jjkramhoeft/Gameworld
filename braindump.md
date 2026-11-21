@@ -41,3 +41,6 @@ More vulcanoes
 More warp on temp and humidity - to get 'thinner' belts of the same biomes.
 
 Perhaps less low temp.
+
+## Fix
+Children are dressed like adults. The default lists have almost no age limits, so a newborn can get a topknot and a thumb ring, or a Dwarf child the beard braids.

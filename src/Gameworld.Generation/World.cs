@@ -50,10 +50,10 @@ public sealed class World
         SettlementNameRules = new SettlementNameRules(foundation.Parameters, foundation.Seed.Value);
         SettlementRules = new SettlementRules(foundation.Parameters, PopulationRules);
         HouseholdRules = new HouseholdRules(foundation.Parameters, foundation.Seed.Value);
-        PersonRules = new PersonRules(foundation.Parameters, foundation.Seed.Value);
+        LooksRules = new LooksRules(foundation.Parameters, foundation.Seed.Value);
+        PersonRules = new PersonRules(foundation.Parameters, LooksRules, foundation.Seed.Value);
         FloraFaunaRules = new FloraFaunaRules(foundation.Parameters);
         VocationRules = new VocationRules(foundation.Parameters);
-        LooksRules = new LooksRules(foundation.Parameters);
         RiverBeds = new RiverBeds(this);
     }
 

@@ -173,8 +173,10 @@ What the race wears is not on the race. A hairstyle, an outfit and an accessory 
 the races that wear them, in `WornBy.Races` (section 9.3). So a new race gets its dress by
 being named there: in entries that exist, or in new entries of the `Hairstyles`, `Outfits`
 and `Accessories` lists written for it. A race that is named nowhere wears only the entries
-that name no race, and the default lists have none of those. No rule draws the looks of a
-person yet, so nothing shows of this in a world so far.
+that name no race, and the default lists have none of those. The looks of every person are
+drawn from these lists in the Peopled stage (section 9.7): a person of a race that is named
+nowhere has no hairstyle, no outfit and no accessory, and one whose race lists no colours
+has none. The favourite colours of the race are the commonest colours of its outfits.
 
 **What a new race does to the world.** Adding a race, or toggling one on, does not change
 how many persons the land could feed. It changes how the land is shared: the new race takes

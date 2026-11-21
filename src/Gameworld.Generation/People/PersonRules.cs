@@ -13,7 +13,7 @@ public readonly record struct HouseholdPlace(SettlementTier Tier, bool OnWater);
 /// <summary>
 /// The persons of the households of a region (society-generation.md section 7): for every
 /// household its head, the family around the head and the servants, each with a name, a sex, an
-/// age, a position in the household, family links and a vocation. A pure function of the
+/// age, a position in the household, family links, a vocation and looks. A pure function of the
 /// region's own households, factions, cities and towns; a household is drawn from a stream of
 /// its own, so no household depends on another.
 /// </summary>
@@ -57,15 +57,18 @@ public sealed class PersonRules
         new(Family: "noble", Race: "noble", Vocation: "merchant", Belief: "priest", Magic: "mage", Place: "official");
 
     private readonly PeopleParameters _parameters;
+    private readonly LooksRules _looks;
     private readonly VocationParameters[] _vocations;
     private readonly Dictionary<string, VocationParameters> _byId = new(StringComparer.Ordinal);
     private readonly Dictionary<string, NameStyle> _styles = new(StringComparer.Ordinal);
     private readonly uint _seed;
 
+    /// <param name="looks">The rules of the looks: they draw the looks of every person (section 9.7).</param>
     /// <param name="seed">The seed of the foundation: it gives the draws.</param>
-    public PersonRules(ParameterSet parameters, uint seed = 0)
+    public PersonRules(ParameterSet parameters, LooksRules looks, uint seed = 0)
     {
         _parameters = parameters.People;
+        _looks = looks;
         _vocations = parameters.Vocations.Where(v => v.Enabled).ToArray();
         foreach (var vocation in _vocations) _byId.TryAdd(vocation.Id, vocation);
         foreach (var race in parameters.Races) _styles.TryAdd(race.Id, race.NameStyle);
@@ -249,6 +252,10 @@ public sealed class PersonRules
             persons.Add(new Person(household.Slot, slot, name, surname, d.Race, d.Sex, d.Age, d.Role, d.Vocation,
                 SlotOf(d.Spouse), SlotOf(d.Father), SlotOf(d.Mother)));
         }
+
+        // The looks, each from a stream of its own: they read the persons and change nothing of them.
+        var looks = _looks.LooksOf(region, household, faction, persons);
+        for (var slot = 0; slot < persons.Count; slot++) persons[slot] = persons[slot] with { Looks = looks[slot] };
         return persons;
 
         int? SlotOf(Draft? other) => other == null ? null : drafts.IndexOf(other);

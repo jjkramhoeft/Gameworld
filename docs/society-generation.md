@@ -10,11 +10,11 @@ These steps are specified and implemented: the races (section 2), the races of a
 region with their potential population (section 3), the factions of a region (section 4)
 and its name (section 4.10), the races of a city or a town (section 5.1), the cities
 and towns of a region with their persons (section 5.2) and their names (section 5.3), the
-households of the cities and towns (section 6), the persons of the households (section 7)
-and the tools of the vocations (section 8.1). The portrait components of section 9 are
-specified and in the Parameter Set: the lists the looks of a person are picked from, and
-what the looks hold. No rule draws them yet. The rest of sections 8 and 9 holds what is
-decided and what is still open. Detailing it is a later task.
+households of the cities and towns (section 6), the persons of the households (section 7),
+the tools of the vocations (section 8.1) and the looks of the persons (section 9): the
+portrait components, which are the lists in the Parameter Set that the looks are picked
+from, and the draw of the looks of every person (section 9.7). The rest of sections 8 and 9
+holds what is decided and what is still open. Detailing it is a later task.
 
 Sections 2 and 3 and Appendix A were section 19 and Appendix E of map-generation.md until
 2026-11-15. The research notes cite them under those numbers.
@@ -50,10 +50,10 @@ and the travel network are its inputs.
 | The name of a region | Planned | Specified and implemented (section 4.10): from the region-name generator |
 | Cities and towns | Settled; their races and their names Planned | Specified and implemented: the races of a city or a town (section 5.1), which Prospects get one and how many persons live in each (section 5.2), and the name of each (section 5.3) |
 | Households | Housed | Specified and implemented (section 6): the households of the factions, then the others of the cities and the towns. The households of the land are not specified |
-| Persons | Peopled | Specified and implemented (section 7): the persons of every household, with name, sex, age, family relations and vocation. The persons of the land are not specified |
+| Persons | Peopled | Specified and implemented (section 7): the persons of every household, with name, sex, age, family relations, vocation and looks. The persons of the land are not specified |
 | Vocations | Peopled for the persons of the cities and towns; not decided for the countryside | The list is in the Parameter Set. A person of a city or a town gets a vocation (section 7). The rules of a place are decided in part and not specified (section 8) |
 | Tools | none: a list in the Parameter Set | Specified (section 8.1): the tools of each vocation and their emblem weights. Nothing draws a tool yet |
-| Looks | not decided | Not specified (section 9) |
+| Looks | Peopled; the portrait components none: lists in the Parameter Set | Specified and implemented (section 9): the six lists of portrait components, and the looks of every person of a household (section 9.7). A child has the skin, eye and hair colours of its father or its mother |
 
 ### 1.1 What holds for every step
 
@@ -88,7 +88,7 @@ Stub → Pending → Realised
 ```
 
 - A **Stub** holds every gameplay-relevant fact, and is derived data. For a person: name,
-  age, sex, vocation, role, family links, faction membership and home.
+  age, sex, vocation, role, family links, faction membership, home and looks.
 - **Pending** means the authoring by LLM or diffusion model is in flight. On failure the
   entity returns to Stub.
 - **Realised** adds the authored presentation only. For a person: the textual
@@ -1743,8 +1743,9 @@ every person of a city or a town is an individual: about 360 persons in the medi
 The persons of the land are a count per race (section 5.2). The Stub of a person holds
 name, sex, age, race, vocation, role, family links and its household. The household gives
 the home, the wealth and the faction. The role is the position in the household for now.
-The Stub also has a place for the looks of the person (section 9), which no rule fills
-yet. The textual description, the history and the portrait are authored (section 1.2).
+The Stub also holds the looks of the person (section 9): they are drawn with the person,
+by the rule of section 9.7. The textual description, the history and the portrait are
+authored (section 1.2).
 
 | Parameter | Default |
 |---|---|
@@ -1772,7 +1773,8 @@ The draws use the hash purposes 0x4e01 (the persons of a household: who they are
 ages and their vocations) and 0x4e02 (the name of a person), keyed as in section 6:
 `key(0x4e01, household slot, 0)` gives the stream of a household and
 `key(0x4e02, household slot, person slot)` the stream of the name of one person. So a
-household is drawn from a stream of its own, and no household depends on another.
+household is drawn from a stream of its own, and no household depends on another. The
+looks of the persons take the purposes 0x4e03 and 0x4e04 (section 9.7).
 
 **The head** has slot 0. Its sex and its age are those of the Stub of the household.
 
@@ -1877,6 +1879,7 @@ surname    = the surname of the household                      a person of the f
 | Role | Head, Spouse, Child, Parent, Sibling or Servant: the position in the household |
 | Vocation | The id of its vocation. None for a child, and where no vocation has a weight |
 | Spouse, father, mother | The slots of the husband or wife, the father and the mother, where they live in the household |
+| Looks | The portrait components of the person (section 9), drawn after the name (section 9.7) |
 
 The home of a person is the city or town of its household, and its faction and its wealth
 are those of its household.
@@ -2133,8 +2136,9 @@ Open:
 
 ## 9. Looks
 
-Stage: none yet. The lists and what the looks of a person hold are specified and in the
-Parameter Set since 2026-11-21. No rule draws the looks of a person yet.
+Stage: Peopled. The lists and what the looks of a person hold are specified and in the
+Parameter Set since 2026-11-21, and the looks of every person of a household are drawn
+since 2026-11-22 (section 9.7).
 
 The looks of a person are what a portrait must show beyond the race: the skin, the eyes,
 the hair, the outfit and the accessories. The portrait itself is authored by a diffusion
@@ -2163,21 +2167,22 @@ The colours of an outfit are not a list of their own: they are two colours of th
 `Colours` list of section 9.1.
 
 **The looks of a person.** `Looks` on the Stub of a person holds the id of one entry of
-each list, and the two colours of the outfit:
+each list, the hair colour before it greyed, and the two colours of the outfit:
 
 | Value | Meaning |
 |---|---|
 | `SkinColour` | The id of a skin colour. None when the race of the person lists none |
 | `EyeColour` | The id of an eye colour. None when the race lists none |
-| `HairColour` | The id of a hair colour. None when the race lists none: a race without hair |
+| `HairColour` | The id of the hair colour a picture shows: the natural colour, or the colour it has turned into at the age of the person (section 9.7). None when the race lists none: a race without hair |
+| `NaturalHairColour` | The id of the hair colour before it greys: a colour of the race, and the one a child shares with its father or its mother. None when the race lists none |
 | `Hairstyle` | The id of a hairstyle. None when no hairstyle fits the person |
 | `Outfit` | The id of an outfit. None when no outfit fits the person |
 | `OutfitMainColour` | The id of a colour of the `Colours` list: the body of the outfit. None without an outfit |
 | `OutfitAccentColour` | The id of a colour of the `Colours` list: the trim, the sash or the lining. None without an outfit |
 | `Accessories` | The ids of the accessories the person wears: none, one or several, at most one of a kind |
 
-A person has no looks until they are drawn, and no rule draws them yet: `Looks` is empty on
-every generated person.
+The looks are drawn with the person in the Peopled stage (section 9.7), so every generated
+person has them.
 
 **What a portrait is drawn from.** The description of the race (section 2) says what every
 person of the race looks like: the build, the face and the marks that tell the race apart,
@@ -2259,7 +2264,8 @@ Open:
 
 ### 9.2 Skin, eye and hair colours
 
-Stage: none, three lists in the Parameter Set. Nothing draws a colour yet.
+Stage: none, three lists in the Parameter Set. The colours of a person are drawn in the
+Peopled stage (section 9.7).
 
 The colour of the skin, the eyes and the hair of a person is one of the colours of its
 race. The three lists are `SkinColours`, `EyeColours` and `HairColours`. A colour holds:
@@ -2287,7 +2293,7 @@ component.
 the colours of age: black turns to greying dark, greying dark to iron grey, iron grey to
 white, and the fair and the red colours to greying fair and then to white. The colours
 that are the mark of a race and not of an age, such as the silver-white of the Elves of
-the cold woods, do not grey. At what age the hair of a person turns is not specified.
+the cold woods, do not grey. Section 9.7 says at what age the hair of a person turns.
 
 A Parameter Set is refused when a race lists a colour that is not in its list, when a hair
 colour greys into a colour that is not in the list, and when a chain of greying does not
@@ -2337,7 +2343,8 @@ colours in the table are a first assignment of this section.
 
 ### 9.3 Hairstyles, and who wears what
 
-Stage: none, a list in the Parameter Set. Nothing draws a hairstyle yet.
+Stage: none, a list in the Parameter Set. The hairstyle of a person is drawn in the Peopled
+stage (section 9.7).
 
 A hairstyle is how a person wears the hair. It carries the beard where the beard is the
 point (the ringed beard braids of the Dwarves) and the head covering where the hair is
@@ -2376,7 +2383,7 @@ vocations of a tool live on the tool (section 8.1). A new outfit touches one rec
 new race gets its dress by being named in the `Races` of what it wears.
 
 What a person can wear is every entry that is on and whose limits hold. Which of them the
-person gets is the draw that is not specified yet.
+person gets is the draw of section 9.7.
 
 A Parameter Set is refused when a `WornBy` names a race or a vocation that is not in its
 list, when its lowest wealth is above its highest, and when its ages are below 0 or run
@@ -2389,7 +2396,8 @@ section and starting values.
 
 ### 9.4 Outfits
 
-Stage: none, a list in the Parameter Set. Nothing draws an outfit yet.
+Stage: none, a list in the Parameter Set. The outfit of a person and its two colours are
+drawn in the Peopled stage (section 9.7).
 
 An outfit is what a person wears, from the head covering to the shoes. The list is
 `Outfits`. An outfit holds what a hairstyle holds, and its colours:
@@ -2422,9 +2430,8 @@ the marks, in small letters: "in sky blue". The colour an outfit decides is used
 the colour of the person, so `OutfitMainColour` of a person in a habit is black. An outfit
 can decide one colour and leave the other, and it can leave the accent colour unused.
 
-How the colours that are left to the person are picked is not specified: from the
-favourite colours of the race, from the colours of the faction of the household, or from
-both.
+The colours that are left to the person come from both the favourite colours of its race
+and the colours of the faction of its household (section 9.7).
 
 A Parameter Set is refused when an outfit names a colour that is not in the `Colours` list.
 
@@ -2436,7 +2443,8 @@ priest and the mail of the soldier.
 
 ### 9.5 Accessories
 
-Stage: none, a list in the Parameter Set. Nothing draws an accessory yet.
+Stage: none, a list in the Parameter Set. The accessories of a person are drawn in the
+Peopled stage (section 9.7).
 
 An accessory is a piece of jewellery worn on the body or in the hair. It differs from the
 other components in one way: a person can have none, one or several. The list is
@@ -2459,8 +2467,8 @@ other components in one way: a person can have none, one or several. The list is
 | `HairJewellery` | Worn in the hair | 4 |
 
 A person wears at most one accessory of a kind, so that no two pieces sit in the same
-place. How many a person wears is not specified. The note suggests none or one for most
-persons and two or three for the rich.
+place. How many a person wears follows the wealth of its household (section 9.7): none or
+one for most persons and two or three for the rich, as the note suggests.
 
 The description writes one material into each piece, so that the text stays fixed. Where
 the same piece is made cheaper or dearer, the lore says so.
@@ -2536,15 +2544,9 @@ What each default race wears:
 
 Open:
 
-- **The draw.** How the looks of a person are drawn in the Peopled stage: the purpose
-  numbers, the weight of each entry a person can wear, whether a person with a vocation
-  takes the dress of the vocation before any other, and how many accessories a person has.
-- **The colours of an outfit.** Whether they come from the favourite colours of the race,
-  from the colours of the faction of the household, or from both.
 - **Children.** The default lists are written for adults. What a child wears, and whether
-  the hairstyle of a person changes with its age, is open. So is the age at which hair
-  greys, which differs between the races: a Swiftborn of twenty-five is old, and an Elf
-  shows no age.
+  the hairstyle of a person changes with its age, is open. A child is drawn like everybody
+  else (section 9.7), among the entries whose ages let it in.
 - **Clashes.** Two components can repeat or contradict each other: a veil and a crown, a
   hat in the outfit and a hairstyle that is a head wrap, a necklace under a beard. The note
   lists them in its section 9.4. They are not data yet: only the kind of an accessory is.
@@ -2557,6 +2559,172 @@ Open:
   the description of the race and in no list. Facial hair is part of four hairstyles and
   not a component of its own.
 - Whether the texts give the same person in every picture is untested: no prompt was run.
+
+### 9.7 The draw
+
+Stage: Peopled. The looks of a person are drawn with the person (section 7), after its
+name. The draw reads the Stub of the person, the Stub of its household and the colours of
+the faction of the household, and changes none of them. It was adopted on 2026-11-22.
+
+The draws use the hash purposes 0x4e03 (the looks of a person) and 0x4e04 (the colours of a
+father or a mother who does not live in the household), keyed as in section 6:
+`key(0x4e03, household slot, person slot)` gives the stream of one person and
+`key(0x4e04, household slot, couple)` the stream of a couple. The stream of a person gives
+thirteen numbers, and every person takes all of them, in this order: skin, eyes, hair,
+greying age, hairstyle, outfit, livery, main colour, accent colour, one more accessory, and
+three for the accessories. So the name, the age and the vocation of a person do not move
+when a list of portrait components changes, and a change to one list moves only the
+component that is drawn from it.
+
+| Fixed number | Value |
+|---|---|
+| The weight of the k-th colour of a list of a race | 1 / k |
+| The hair starts to grey at an age of | 35 to 55 |
+| The hair takes a further step of its greying every | 12 years |
+| The weight of an entry that is the dress or the mark of the vocation of the person | 4. Any other entry weighs 1 |
+| The weight of the k-th favourite colour of the race, and of any other colour | 4 / k and 0.2 |
+| The lightness of the accent colour differs from that of the main colour by at least | 0.25 |
+| The chance that a person of a household of a faction wears the colours of the faction | 0.5 |
+| The accessories of a Destitute, Poor, Common, Comfortable and Rich person | 0, 0, 0, 1 and 2 |
+| The chance of one more accessory, by the same wealth | 0.1, 0.3, 0.5, 0.5 and 0.5 |
+
+**Skin, eyes and hair.** A child has the colours of its father and its mother.
+
+```
+of the race(race) = for each of the three lists of the race (section 9.2):
+                    one colour by weight, the k-th colour of the list weighs 1 / k
+                    none where the race lists none
+
+the couples of a household:
+    0   the father and the mother of the head: the parents of the head and of its siblings
+    1   the head and its husband or wife: the parents of the children of the head
+
+a father or a mother who does not live in the household:
+    of the race(race of the family), from the stream key(0x4e04, household slot, couple):
+    three numbers for the father, then three for the mother
+
+the head, a sibling and a child:
+    skin = that of its father if its number for the skin < 0.5, otherwise that of its mother
+    eyes and hair alike, each on its own number
+the husband or wife of the head, a parent of the head and a servant:
+    of the race(its race), on its three numbers
+```
+
+- So every colour of a person whose father and mother live in the household is the colour
+  of one of the two, with even chance. The three colours are picked apart, so a child can
+  have the skin of its mother and the eyes of its father.
+- A father or a mother who does not live in the household is one person all the same: the
+  colours are drawn once for the couple. So brothers and sisters share them, and the
+  children of a head who is alone take after the head and after one other parent.
+- A head with no parent in the household is the child of two such parents. That gives it
+  the colours of its race as a plain draw would, and gives its brothers and sisters the
+  same two parents.
+- The husband or the wife of the head marries in, the parents of the head have no parents
+  in the household, and a servant is of no family here: they have the colours of their race.
+- What is passed on is the colour of the hair before it greys. The child of a white-haired
+  father has the black his hair was.
+
+**Greying.** The natural hair colour is `NaturalHairColour`, and `HairColour` is what a
+picture shows at the age of the person.
+
+```
+greying age = even in [35, 55]
+steps       = 0                                        if age < greying age
+              1 + floor((age − greying age) / 12)      otherwise
+hair colour = the natural hair colour, taken that many steps along its greying (section 9.2),
+              to the end of the chain
+```
+
+Black hair that starts to turn at 40 is greying dark from 40, iron grey from 52 and white
+from 64. A colour that does not grey stays.
+
+**The hairstyle and the outfit.**
+
+```
+weight(entry) = 4    if WornBy of the entry names vocations: it is then the dress or the mark
+                     of the vocation of the person
+                1    otherwise
+hairstyle = one of the hairstyles the person can wear (section 9.3), by weight. None when there is none
+outfit    = one of the outfits the person can wear, by weight. None when there is none
+```
+
+The entries are walked in the order of the list, and a draw falls on the first entry where
+the running sum of the weights passes `u` times the total. A person with a vocation does
+not always take the dress of the vocation: a smith wears the apron four times as often as
+each of the other outfits he can wear.
+
+**The colours of the outfit.** They come from the favourite colours of the race (section 2)
+and from the colours of the faction of the household (section 4.9).
+
+```
+weight(c) = 4 / k    when c is the k-th favourite colour of the race of the person, k from 1
+          = 0.2      for every other colour
+livery    = the household is of a faction with a main colour, and the number for the livery < 0.5
+
+main   = the colour the outfit decides                        where it decides one (section 9.4)
+         the main colour of the faction                       in livery
+         one draw by weight(c) over all colours               otherwise
+accent = the colour the outfit decides                        where it decides one
+         the secondary colour of the faction                  in livery, unless it is the main colour of the person
+         one draw by weight(c) over the colours other than main
+         with |lightness(c) − lightness(main)| ≥ 0.25         otherwise
+```
+
+- When no colour stands out that much against the main colour, the accent colour is drawn
+  from all colours other than the main one. The lightness is that of section 4.9.
+- The livery holds for the family and the servants alike, each on a number of its own.
+- A person has an accent colour also where the description of its outfit does not use it.
+- A person without an outfit has no colours. With no colours in the Parameter Set the
+  outfit of a person has none, and with one colour it has a main colour only.
+
+**The accessories.**
+
+```
+count = 0, 0, 0, 1, 2    for a Destitute, Poor, Common, Comfortable or Rich household
+        one more         with the chance 0.1, 0.3, 0.5, 0.5, 0.5 by the same wealth
+that many times:
+    one of the accessories the person can wear (section 9.5), of a kind the person does not
+    wear yet, by weight(entry). The person wears fewer when none is left
+```
+
+The looks hold the accessories in the order they were drawn.
+
+**Measured** on the same 676 regions as section 7, 252,203 persons:
+
+| Fact | Value |
+|---|---|
+| Persons without a hairstyle or without an outfit | None |
+| Persons whose hair has greyed, of those with hair | 31.2 % |
+| Children with their father and their mother in the household | 48,755. Every colour of each is one of the two |
+| Of them, like neither the father nor the mother in all three colours | 27.5 % |
+| Persons with one of the two in the household | 40,053. 44.9 % have all three colours of that one |
+| Outfits that decide their main colour | 46.9 % of the persons |
+| A main colour that is left to the person and is a favourite colour of its race | 65.7 % |
+| Persons of a household of a faction, where the main colour is left to the person, in the main colour of the faction | 59.4 % |
+| Accessories of a Destitute, Poor, Common, Comfortable and Rich person, mean | 0.10, 0.29, 0.49, 1.47 and 2.34 |
+| Persons with no, one, two and three accessories | 42.7 %, 36.0 %, 17.2 % and 4.1 % |
+| The most worn hairstyles | Topknot 12.9 %, Pinned high knot 11.3 %, Short crop 6.7 %, Single back braid 6.7 % |
+| The most worn outfits | Crossed robe and sash 13.5 %, Field jacket and straw hat 7.7 %, Hide and won armour 5.5 %, Indigo wrapped cotton 5.4 % |
+
+Every default hairstyle, outfit and accessory is worn by somebody.
+
+Open:
+
+- **Children.** A child is drawn like an adult. The default lists hold few limits of age, so
+  a child of three can get the beard braids of the Dwarves or a signet ring (section 9.6).
+- **The ages of the races.** Every race greys as the human races do (section 7). A
+  Swiftborn of twenty-five is old, and an Elf shows no age.
+- **Kin in another household.** The head of a branch of a house is a child or a sibling of
+  the head of the first household (section 6). It does not take its colours from there: a
+  household is drawn on its own.
+- **A person of two races.** A family has one race. A child of a father and a mother of two
+  races has no rule.
+- **A colour that neither the father nor the mother has.** A child never has one. Real
+  children do: two dark-haired parents can have a fair child.
+- **The cost of a colour** (section 9.1): a beggar can be drawn crimson.
+- **One livery for a household.** Each person wears the colours of the faction on its own
+  number. Whether a household dresses alike, and its servants more than its family, is open.
+- The fixed numbers are first values.
 
 ---
 

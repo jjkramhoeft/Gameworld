@@ -2835,28 +2835,28 @@
             }
           },
           "FavouriteColours": {
-            "description": "The ids of the favourite colours of the race, the dearest first: the colours of its dress, its banners and its goods. Every id must be a colour of the Colours list. The main and the secondary colour of a faction are drawn mostly from the favourite colours of its lead race, the first ones most often. Left out, the race has no favourite colour and its factions draw from every colour alike (society §2 and §4.9).",
+            "description": "The ids of the favourite colours of the race, the dearest first: the colours of its dress, its banners and its goods. Every id must be a colour of the Colours list. The main and the secondary colour of a faction are drawn mostly from the favourite colours of its lead race, the first ones most often. So are the colours of the outfit of a person of the race, where the outfit leaves them to the person (society §9.7). Left out, the race has no favourite colour and its factions and its persons draw from every colour alike (society §2 and §4.9).",
             "type": "array",
             "items": {
               "type": "string"
             }
           },
           "SkinColours": {
-            "description": "The ids of the skin colours a person of the race can have, the commonest first. Every id must be a skin colour of the SkinColours list. Left out, the looks of a person of the race hold no skin colour. No generation rule reads it yet; it is meant for the looks of a person (society §9.2).",
+            "description": "The ids of the skin colours a person of the race can have, the commonest first. Every id must be a skin colour of the SkinColours list. Left out, the looks of a person of the race hold no skin colour. The colours of a person are drawn from it, the k-th of the list with the weight 1/k, and a child takes the colour of its father or its mother (society §9.2 and §9.7).",
             "type": "array",
             "items": {
               "type": "string"
             }
           },
           "EyeColours": {
-            "description": "The ids of the eye colours a person of the race can have, the commonest first. Every id must be an eye colour of the EyeColours list. Left out, the looks of a person of the race hold no eye colour. No generation rule reads it yet; it is meant for the looks of a person (society §9.2).",
+            "description": "The ids of the eye colours a person of the race can have, the commonest first. Every id must be an eye colour of the EyeColours list. Left out, the looks of a person of the race hold no eye colour. The colours of a person are drawn from it, the k-th of the list with the weight 1/k, and a child takes the colour of its father or its mother (society §9.2 and §9.7).",
             "type": "array",
             "items": {
               "type": "string"
             }
           },
           "HairColours": {
-            "description": "The ids of the hair colours a person of the race can have before the hair greys, the commonest first. Every id must be a hair colour of the HairColours list. Left out, the looks of a person of the race hold no hair colour: a race without hair. No generation rule reads it yet; it is meant for the looks of a person (society §9.2).",
+            "description": "The ids of the hair colours a person of the race can have before the hair greys, the commonest first. Every id must be a hair colour of the HairColours list. Left out, the looks of a person of the race hold no hair colour: a race without hair. The colours of a person are drawn from it, the k-th of the list with the weight 1/k, and a child takes the colour of its father or its mother (society §9.2 and §9.7).",
             "type": "array",
             "items": {
               "type": "string"
@@ -3047,7 +3047,7 @@
       }
     },
     "Colours": {
-      "description": "The colours: the named colours of cloth, paint and banners. A race lists its favourite colours by id, and a faction gets a main and a secondary colour from the list (society §4.9 and §9.1). Add a colour by adding an entry. A file that gives this list replaces the whole default list.",
+      "description": "The colours: the named colours of cloth, paint and banners. A race lists its favourite colours by id, a faction gets a main and a secondary colour from the list, and so does the outfit of a person (society §4.9, §9.1 and §9.7). Add a colour by adding an entry. A file that gives this list replaces the whole default list.",
       "type": "array",
       "items": {
         "description": "A colour: a named colour of cloth, paint and banners. Races point at their favourite colours and factions at their main and secondary colour (society §9.1).",
@@ -3075,7 +3075,7 @@
       }
     },
     "SkinColours": {
-      "description": "The skin colours: the tones of skin a person can have. A race lists the skin colours of its persons by id. Nothing draws one yet: they are for the looks of a person (society §9.2). Add a skin colour by adding an entry. A file that gives this list replaces the whole default list.",
+      "description": "The skin colours: the tones of skin a person can have. A race lists the skin colours of its persons by id. The looks of a person are drawn from them in the Peopled stage (society §9.2 and §9.7). Add a skin colour by adding an entry. A file that gives this list replaces the whole default list.",
       "type": "array",
       "items": {
         "description": "A skin colour: a tone of skin a person can have. A race lists the skin colours of its persons by id (society §9.2).",
@@ -3103,7 +3103,7 @@
       }
     },
     "EyeColours": {
-      "description": "The eye colours: the colours of the eyes a person can have, with the pupil where it is the mark of a race. A race lists the eye colours of its persons by id. Nothing draws one yet: they are for the looks of a person (society §9.2). A file that gives this list replaces the whole default list.",
+      "description": "The eye colours: the colours of the eyes a person can have, with the pupil where it is the mark of a race. A race lists the eye colours of its persons by id. The looks of a person are drawn from them in the Peopled stage (society §9.2 and §9.7). A file that gives this list replaces the whole default list.",
       "type": "array",
       "items": {
         "description": "An eye colour: the colour of the eyes of a person, and the pupil where it is the mark of a race. A race lists the eye colours of its persons by id (society §9.2).",
@@ -3131,7 +3131,7 @@
       }
     },
     "HairColours": {
-      "description": "The hair colours: the colours of the hair a person can have, and the colour each turns into as the person greys. A race lists the hair colours of its persons by id. Nothing draws one yet: they are for the looks of a person (society §9.2). A file that gives this list replaces the whole default list.",
+      "description": "The hair colours: the colours of the hair a person can have, and the colour each turns into as the person greys. A race lists the hair colours of its persons by id. The looks of a person are drawn from them in the Peopled stage (society §9.2 and §9.7). A file that gives this list replaces the whole default list.",
       "type": "array",
       "items": {
         "description": "A hair colour: the colour of the hair of a person. A race lists the hair colours of its persons by id (society §9.2).",
@@ -3166,7 +3166,7 @@
       }
     },
     "Hairstyles": {
-      "description": "The hairstyles: how a person wears the hair, and who wears each: the sex, the races, the wealth, the vocations, the ages and whether married. Nothing draws one yet: they are for the looks of a person (society §9.3). A file that gives this list replaces the whole default list.",
+      "description": "The hairstyles: how a person wears the hair, and who wears each: the sex, the races, the wealth, the vocations, the ages and whether married. The looks of a person are drawn from them in the Peopled stage (society §9.3 and §9.7). A file that gives this list replaces the whole default list.",
       "type": "array",
       "items": {
         "description": "A hairstyle: how a person wears the hair, with the beard or the head covering where that is the point of it, and who wears it (society §9.3).",
@@ -3276,7 +3276,7 @@
       }
     },
     "Outfits": {
-      "description": "The outfits: what a person wears, and who wears each. The outfit of a person has a main and an accent colour of the Colours list, which an outfit can decide. Nothing draws one yet: they are for the looks of a person (society §9.4). A file that gives this list replaces the whole default list.",
+      "description": "The outfits: what a person wears, and who wears each. The outfit of a person has a main and an accent colour of the Colours list, which an outfit can decide. The looks of a person are drawn from them in the Peopled stage (society §9.4 and §9.7). A file that gives this list replaces the whole default list.",
       "type": "array",
       "items": {
         "description": "An outfit: what a person wears, who wears it and, where the outfit decides them, its two colours (society §9.4).",
@@ -3369,14 +3369,14 @@
             "additionalProperties": false
           },
           "MainColour": {
-            "description": "The id of the main colour of the outfit, where the outfit decides it: the black of a habit, the undyed grey of a peasant gown. It must be a colour of the Colours list. Left out, the main colour is picked for the person (society §9.4).",
+            "description": "The id of the main colour of the outfit, where the outfit decides it: the black of a habit, the undyed grey of a peasant gown. It must be a colour of the Colours list. Left out, the main colour is drawn for the person (society §9.4 and §9.7).",
             "type": [
               "string",
               "null"
             ]
           },
           "AccentColour": {
-            "description": "The id of the accent colour of the outfit, where the outfit decides it: the colour of its trim, its sash or its lining. It must be a colour of the Colours list. Left out, the accent colour is picked for the person (society §9.4).",
+            "description": "The id of the accent colour of the outfit, where the outfit decides it: the colour of its trim, its sash or its lining. It must be a colour of the Colours list. Left out, the accent colour is drawn for the person (society §9.4 and §9.7).",
             "type": [
               "string",
               "null"
@@ -3400,7 +3400,7 @@
       }
     },
     "Accessories": {
-      "description": "The accessories: the jewellery a person wears on the body or in the hair, of eight kinds, and who wears each. A person can have none, one or several. Nothing draws one yet: they are for the looks of a person (society §9.5). A file that gives this list replaces the whole default list.",
+      "description": "The accessories: the jewellery a person wears on the body or in the hair, of eight kinds, and who wears each. A person can have none, one or several. The looks of a person are drawn from them in the Peopled stage (society §9.5 and §9.7). A file that gives this list replaces the whole default list.",
       "type": "array",
       "items": {
         "description": "An accessory: a piece of jewellery worn on the body or in the hair, its kind and who wears it. A person can have none, one or several (society §9.5).",

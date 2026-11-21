@@ -56,25 +56,25 @@ public sealed record ParameterSet
     [Description("The tools: the things the vocations work with. A tool lists the vocations that work with it by id, and its emblem weight says how well it serves as the emblem of a coat of arms. Tools are not drawn yet; the coats of arms of families, guilds and some cities are to take their charges from them (society §8.1). A file that gives this list replaces the whole default list.")]
     public IReadOnlyList<ToolParameters> Tools { get; init; } = ToolParameters.Defaults;
 
-    [Description("The colours: the named colours of cloth, paint and banners. A race lists its favourite colours by id, and a faction gets a main and a secondary colour from the list (society §4.9 and §9.1). Add a colour by adding an entry. A file that gives this list replaces the whole default list.")]
+    [Description("The colours: the named colours of cloth, paint and banners. A race lists its favourite colours by id, a faction gets a main and a secondary colour from the list, and so does the outfit of a person (society §4.9, §9.1 and §9.7). Add a colour by adding an entry. A file that gives this list replaces the whole default list.")]
     public IReadOnlyList<ColourParameters> Colours { get; init; } = ColourParameters.Defaults;
 
-    [Description("The skin colours: the tones of skin a person can have. A race lists the skin colours of its persons by id. Nothing draws one yet: they are for the looks of a person (society §9.2). Add a skin colour by adding an entry. A file that gives this list replaces the whole default list.")]
+    [Description("The skin colours: the tones of skin a person can have. A race lists the skin colours of its persons by id. The looks of a person are drawn from them in the Peopled stage (society §9.2 and §9.7). Add a skin colour by adding an entry. A file that gives this list replaces the whole default list.")]
     public IReadOnlyList<SkinColourParameters> SkinColours { get; init; } = SkinColourParameters.Defaults;
 
-    [Description("The eye colours: the colours of the eyes a person can have, with the pupil where it is the mark of a race. A race lists the eye colours of its persons by id. Nothing draws one yet: they are for the looks of a person (society §9.2). A file that gives this list replaces the whole default list.")]
+    [Description("The eye colours: the colours of the eyes a person can have, with the pupil where it is the mark of a race. A race lists the eye colours of its persons by id. The looks of a person are drawn from them in the Peopled stage (society §9.2 and §9.7). A file that gives this list replaces the whole default list.")]
     public IReadOnlyList<EyeColourParameters> EyeColours { get; init; } = EyeColourParameters.Defaults;
 
-    [Description("The hair colours: the colours of the hair a person can have, and the colour each turns into as the person greys. A race lists the hair colours of its persons by id. Nothing draws one yet: they are for the looks of a person (society §9.2). A file that gives this list replaces the whole default list.")]
+    [Description("The hair colours: the colours of the hair a person can have, and the colour each turns into as the person greys. A race lists the hair colours of its persons by id. The looks of a person are drawn from them in the Peopled stage (society §9.2 and §9.7). A file that gives this list replaces the whole default list.")]
     public IReadOnlyList<HairColourParameters> HairColours { get; init; } = HairColourParameters.Defaults;
 
-    [Description("The hairstyles: how a person wears the hair, and who wears each: the sex, the races, the wealth, the vocations, the ages and whether married. Nothing draws one yet: they are for the looks of a person (society §9.3). A file that gives this list replaces the whole default list.")]
+    [Description("The hairstyles: how a person wears the hair, and who wears each: the sex, the races, the wealth, the vocations, the ages and whether married. The looks of a person are drawn from them in the Peopled stage (society §9.3 and §9.7). A file that gives this list replaces the whole default list.")]
     public IReadOnlyList<HairstyleParameters> Hairstyles { get; init; } = HairstyleParameters.Defaults;
 
-    [Description("The outfits: what a person wears, and who wears each. The outfit of a person has a main and an accent colour of the Colours list, which an outfit can decide. Nothing draws one yet: they are for the looks of a person (society §9.4). A file that gives this list replaces the whole default list.")]
+    [Description("The outfits: what a person wears, and who wears each. The outfit of a person has a main and an accent colour of the Colours list, which an outfit can decide. The looks of a person are drawn from them in the Peopled stage (society §9.4 and §9.7). A file that gives this list replaces the whole default list.")]
     public IReadOnlyList<OutfitParameters> Outfits { get; init; } = OutfitParameters.Defaults;
 
-    [Description("The accessories: the jewellery a person wears on the body or in the hair, of eight kinds, and who wears each. A person can have none, one or several. Nothing draws one yet: they are for the looks of a person (society §9.5). A file that gives this list replaces the whole default list.")]
+    [Description("The accessories: the jewellery a person wears on the body or in the hair, of eight kinds, and who wears each. A person can have none, one or several. The looks of a person are drawn from them in the Peopled stage (society §9.5 and §9.7). A file that gives this list replaces the whole default list.")]
     public IReadOnlyList<AccessoryParameters> Accessories { get; init; } = AccessoryParameters.Defaults;
 
     [Description("The flora: the plants that can grow in the world. Every patch gets a few of the kinds that fit its biome (§13.4). A file that gives this list replaces the whole default list.")]
@@ -969,16 +969,16 @@ public sealed record RaceParameters(
     [Description("The ids of the other races this race hates: peoples it fears, fights or holds a grudge against. One-directional: the other race need not hate it back. Every id must be another race of the list, and no id may also stand in AppreciatedRaces. Left out, the race hates no race in particular. No generation rule reads it yet; it is meant for the factions of a region (society §2).")]
     public IReadOnlyList<string> HatedRaces { get; init; } = [];
 
-    [Description("The ids of the favourite colours of the race, the dearest first: the colours of its dress, its banners and its goods. Every id must be a colour of the Colours list. The main and the secondary colour of a faction are drawn mostly from the favourite colours of its lead race, the first ones most often. Left out, the race has no favourite colour and its factions draw from every colour alike (society §2 and §4.9).")]
+    [Description("The ids of the favourite colours of the race, the dearest first: the colours of its dress, its banners and its goods. Every id must be a colour of the Colours list. The main and the secondary colour of a faction are drawn mostly from the favourite colours of its lead race, the first ones most often. So are the colours of the outfit of a person of the race, where the outfit leaves them to the person (society §9.7). Left out, the race has no favourite colour and its factions and its persons draw from every colour alike (society §2 and §4.9).")]
     public IReadOnlyList<string> FavouriteColours { get; init; } = [];
 
-    [Description("The ids of the skin colours a person of the race can have, the commonest first. Every id must be a skin colour of the SkinColours list. Left out, the looks of a person of the race hold no skin colour. No generation rule reads it yet; it is meant for the looks of a person (society §9.2).")]
+    [Description("The ids of the skin colours a person of the race can have, the commonest first. Every id must be a skin colour of the SkinColours list. Left out, the looks of a person of the race hold no skin colour. The colours of a person are drawn from it, the k-th of the list with the weight 1/k, and a child takes the colour of its father or its mother (society §9.2 and §9.7).")]
     public IReadOnlyList<string> SkinColours { get; init; } = [];
 
-    [Description("The ids of the eye colours a person of the race can have, the commonest first. Every id must be an eye colour of the EyeColours list. Left out, the looks of a person of the race hold no eye colour. No generation rule reads it yet; it is meant for the looks of a person (society §9.2).")]
+    [Description("The ids of the eye colours a person of the race can have, the commonest first. Every id must be an eye colour of the EyeColours list. Left out, the looks of a person of the race hold no eye colour. The colours of a person are drawn from it, the k-th of the list with the weight 1/k, and a child takes the colour of its father or its mother (society §9.2 and §9.7).")]
     public IReadOnlyList<string> EyeColours { get; init; } = [];
 
-    [Description("The ids of the hair colours a person of the race can have before the hair greys, the commonest first. Every id must be a hair colour of the HairColours list. Left out, the looks of a person of the race hold no hair colour: a race without hair. No generation rule reads it yet; it is meant for the looks of a person (society §9.2).")]
+    [Description("The ids of the hair colours a person of the race can have before the hair greys, the commonest first. Every id must be a hair colour of the HairColours list. Left out, the looks of a person of the race hold no hair colour: a race without hair. The colours of a person are drawn from it, the k-th of the list with the weight 1/k, and a child takes the colour of its father or its mother (society §9.2 and §9.7).")]
     public IReadOnlyList<string> HairColours { get; init; } = [];
 
     [Description("What a person of the race looks like: build, skin, hair, eyes, dress and the marks that tell the race apart (society §2). A picture of it is drawn from this text, so an invented one needs it to look the same every time. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.")]

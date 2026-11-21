@@ -163,6 +163,8 @@
   .household .tbl td:nth-child(3) { width: 13%; }
   .household .tbl td:nth-child(4) { width: 8%; }
   .household .tbl td.wide { width: auto; }
+  .household .tbl tr.looks td { width: auto; white-space: normal; color: var(--muted); font-size: 11.5px; padding: 0 0 4px 10px; }
+  .household .tbl tr.looks .sw { margin: 0 0 0 4px; vertical-align: baseline; }
   .banner { width: 18px; height: 22px; margin-top: 2px; border: 4px solid var(--line); border-radius: 2px 2px 7px 7px; background: var(--field); }
   .grip { display: grid; grid-template-columns: 1fr 28px; gap: 6px; align-items: center; margin-top: 5px; font-size: 12.5px;
            font-variant-numeric: tabular-nums; text-align: right; }
@@ -817,7 +819,7 @@ const stageAdds = {
   Planned: 'Prospects, the potential population and the factions',
   Settled: 'the travel network, cities and towns',
   Housed: 'the households of the cities and towns, those of the factions first',
-  Peopled: 'the persons of every household: name, sex, age, vocation and family',
+  Peopled: 'the persons of every household: name, sex, age, vocation, family and looks',
 };
 const prospectColour = name => legendData?.Prospects.find(c => c.Class === name)?.Colour;
 const kindOf = p => p.ForCity ? '◆ City' : '● Town';
@@ -895,6 +897,20 @@ function placeTable(places) {
 const kinWords = { Head: ['head', 'head'], Spouse: ['husband', 'wife'], Child: ['son', 'daughter'], Parent: ['father', 'mother'],
   Sibling: ['brother', 'sister'], Servant: ['servant', 'servant'] };
 const kinWord = (role, sex) => kinWords[role]?.[sex === 'Male' ? 0 : 1] ?? esc(words(role).toLowerCase());
+// The looks of a person in one line: skin, eyes, hair and hairstyle, the outfit with its two colours, the accessories.
+function looksLine(l) {
+  if (!l) return '';
+  const low = s => esc(s.toLowerCase());
+  const parts = [];
+  if (l.Skin) parts.push(`${low(l.Skin)} skin`);
+  if (l.Eyes) parts.push(`${low(l.Eyes)} eyes`);
+  if (l.Hair) parts.push(`${low(l.Hair)} hair` + (l.NaturalHair ? ` (once ${low(l.NaturalHair)})` : ''));
+  if (l.Hairstyle) parts.push(low(l.Hairstyle));
+  if (l.Outfit) parts.push(low(l.Outfit) + [l.OutfitMain, l.OutfitAccent].filter(c => c)
+    .map(c => safeColour(c.Hex) ? `<i class="sw" title="${esc(c.Name)}" style="background:${c.Hex}"></i>` : ` ${low(c.Name)}`).join(''));
+  parts.push(...l.Accessories.map(low));
+  return parts.join(' · ');
+}
 function householdCard(h) {
   const notes = [];
   if (h.Faction) notes.push(`<b>${h.Faction.Role}</b> · ${esc(words(h.Faction.What))}`);
@@ -903,7 +919,8 @@ function householdCard(h) {
   const persons = h.Persons
     ? `<table class="tbl"><tbody>` + h.Persons.map(q =>
         `<tr><td>${esc(q.GivenName)} ${esc(q.Surname)}</td><td>${kinWord(q.Role, q.Sex)}</td><td>${q.Sex === 'Male' ? 'male' : 'female'}</td><td class="r">${q.Age}</td>` +
-        `<td class="wide">${q.Vocation ? esc(q.Vocation) : '–'}${q.Race !== h.Race ? ` · ${esc(q.Race)}` : ''}</td></tr>`).join('') + '</tbody></table>'
+        `<td class="wide">${q.Vocation ? esc(q.Vocation) : '–'}${q.Race !== h.Race ? ` · ${esc(q.Race)}` : ''}</td></tr>` +
+        (q.Looks ? `<tr class="looks"><td colspan="5">${looksLine(q.Looks)}</td></tr>` : '')).join('') + '</tbody></table>'
     : `<small>its head is a ${h.HeadSex === 'Male' ? 'man' : 'woman'} of ${h.HeadAge}</small>`;
   return `<div class="household"><div><b>${esc(h.Surname)}</b> <span class="muted">· household ${h.Slot}</span><small>${notes.join(' · ')}</small></div>${persons}</div>`;
 }
@@ -911,7 +928,7 @@ function householdList(list) {
   if (!list) return note('Households come with the Housed stage and their persons with the Peopled stage: the stage buttons of the region above.', 'after');
   if (!list.length) return '';
   const peopled = list.some(h => h.Persons);
-  return sub(`${count(list.length, 'household', 'households')}${peopled ? ', each with its persons: name, position, sex, age and vocation' : ' · their persons come with the Peopled stage'}`) +
+  return sub(`${count(list.length, 'household', 'households')}${peopled ? ', each with its persons: name, position, sex, age and vocation, and the looks below' : ' · their persons come with the Peopled stage'}`) +
     list.map(householdCard).join('');
 }
 
