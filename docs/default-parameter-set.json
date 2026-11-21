@@ -497,7 +497,9 @@
         "Lowland": 20,
         "Hills": 20,
         "Mountains": 10
-      }
+      },
+      "Description": "Mostly under flat land, lowland and hills. Gives granite, banded iron, lode gold in the hills, diamonds and kaolin.",
+      "Lore": "**missing description**"
     },
     {
       "Id": "foldBelt",
@@ -507,7 +509,9 @@
         "Lowland": 5,
         "Hills": 30,
         "Mountains": 40
-      }
+      },
+      "Description": "Mostly under hills and mountains. Gives slate, marble, silver, lode gold, garnet and emerald.",
+      "Lore": "**missing description**"
     },
     {
       "Id": "granite",
@@ -517,7 +521,9 @@
         "Lowland": 3,
         "Hills": 15,
         "Mountains": 20
-      }
+      },
+      "Description": "Mostly under hills and mountains. Gives granite, tin lodes, skarn iron, topaz and beryl, and kaolin.",
+      "Lore": "**missing description**"
     },
     {
       "Id": "volcanic",
@@ -527,7 +533,9 @@
         "Lowland": 2,
         "Hills": 10,
         "Mountains": 30
-      }
+      },
+      "Description": "Mostly under mountains. Gives basalt, obsidian, pumice, porphyry copper, gold, rock crystal, alum, sulphur and quicksilver.",
+      "Lore": "**missing description**"
     },
     {
       "Id": "basalt",
@@ -537,7 +545,9 @@
         "Lowland": 10,
         "Hills": 15,
         "Mountains": 5
-      }
+      },
+      "Description": "Mostly under flat land, lowland and hills. Gives basalt, native copper, agate and black sands.",
+      "Lore": "**missing description**"
     },
     {
       "Id": "ophiolite",
@@ -547,7 +557,9 @@
         "Lowland": 2,
         "Hills": 10,
         "Mountains": 15
-      }
+      },
+      "Description": "Mostly under hills and mountains. Gives soapstone, massive-sulfide copper and jade.",
+      "Lore": "**missing description**"
     },
     {
       "Id": "carbonate",
@@ -557,7 +569,9 @@
         "Lowland": 30,
         "Hills": 30,
         "Mountains": 15
-      }
+      },
+      "Description": "Mostly under lowland and hills. Gives limestone, chalk, flint, lead and zinc, skarn iron and cave saltpetre.",
+      "Lore": "**missing description**"
     },
     {
       "Id": "clastic",
@@ -567,7 +581,9 @@
         "Lowland": 40,
         "Hills": 20,
         "Mountains": 5
-      }
+      },
+      "Description": "Mostly under flat land and lowland. Gives sandstone, coal, lignite, red-bed copper, rock salt, amber, gypsum and alum shale.",
+      "Lore": "**missing description**"
     },
     {
       "Id": "alluvium",
@@ -577,7 +593,9 @@
         "Lowland": 40,
         "Hills": 0,
         "Mountains": 0
-      }
+      },
+      "Description": "Mostly under flat land and lowland. Gives field stone and clay only.",
+      "Lore": "**missing description**"
     }
   ],
   "Races": [
@@ -13642,6 +13660,220 @@
     {
       "Biome": "Volcano",
       "Name": "Volcano",
+      "Description": "**missing description**",
+      "Lore": "**missing description**"
+    }
+  ],
+  "ElevationTypes": [
+    {
+      "Kind": "Ocean",
+      "Name": "Ocean",
+      "Description": "**missing description**",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "FlatLand",
+      "Name": "Flat Land",
+      "Description": "**missing description**",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "Lowland",
+      "Name": "Lowland",
+      "Description": "**missing description**",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "Hills",
+      "Name": "Hills",
+      "Description": "**missing description**",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "Mountains",
+      "Name": "Mountains",
+      "Description": "**missing description**",
+      "Lore": "**missing description**"
+    }
+  ],
+  "FactionTypes": [
+    {
+      "Kind": "Family",
+      "Name": "Family",
+      "Description": "Bound by blood and marriage: a house and its household.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "Race",
+      "Name": "Race",
+      "Description": "Bound by a people: one race, its clans and its customs.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "Vocation",
+      "Name": "Vocation",
+      "Description": "Bound by work: a trade, its masters and its monopoly.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "Belief",
+      "Name": "Belief",
+      "Description": "Bound by a faith: a temple, an order, a sect.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "Magic",
+      "Name": "Magic",
+      "Description": "Bound by the arcane: a college, a circle, a cabal.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "Place",
+      "Name": "Place",
+      "Description": "Bound by a home: a town or a valley that rules itself.",
+      "Lore": "**missing description**"
+    }
+  ],
+  "FactionForms": [
+    {
+      "Kind": "Crown",
+      "Name": "Crown",
+      "Description": "A ruling house.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "House",
+      "Name": "House",
+      "Description": "A rival house in opposition, or a great house under the ruler.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "Horde",
+      "Name": "Horde",
+      "Description": "A herding people of open land.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "Clan",
+      "Name": "Clan",
+      "Description": "A people under its chiefs.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "Hold",
+      "Name": "Hold",
+      "Description": "A people in rough land with ore.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "Enclave",
+      "Name": "Enclave",
+      "Description": "A people that lives under the ruler of another.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "MerchantRepublic",
+      "Name": "Merchant republic",
+      "Description": "Rule by the guilds of the trading towns.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "Guild",
+      "Name": "Guild",
+      "Description": "A guild of one trade, in opposition or under the ruler.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "TempleState",
+      "Name": "Temple state",
+      "Description": "Rule by a faith.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "Sect",
+      "Name": "Sect",
+      "Description": "A faith of the poor against the ruler.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "Order",
+      "Name": "Order",
+      "Description": "A faith with a rule of its own, in opposition or under the ruler.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "Magocracy",
+      "Name": "Magocracy",
+      "Description": "Rule by the mages.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "Cabal",
+      "Name": "Cabal",
+      "Description": "The mages against the ruler.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "Circle",
+      "Name": "Circle",
+      "Description": "The mages under the ruler.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "FreeCity",
+      "Name": "Free city",
+      "Description": "Towns that rule themselves, as the ruler or against it.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "Commune",
+      "Name": "Commune",
+      "Description": "Free farmers that rule themselves, as the ruler or against it.",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "CharteredTown",
+      "Name": "Chartered town",
+      "Description": "A town with a charter of its own under the ruler.",
+      "Lore": "**missing description**"
+    }
+  ],
+  "SettlementKinds": [
+    {
+      "Kind": "Town",
+      "Name": "Town",
+      "Description": "**missing description**",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "City",
+      "Name": "City",
+      "Description": "**missing description**",
+      "Lore": "**missing description**"
+    }
+  ],
+  "SettlementTiers": [
+    {
+      "Kind": "Countryside",
+      "Name": "Countryside",
+      "Description": "**missing description**",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "Town",
+      "Name": "Town",
+      "Description": "**missing description**",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "City",
+      "Name": "City",
+      "Description": "**missing description**",
+      "Lore": "**missing description**"
+    },
+    {
+      "Kind": "Capital",
+      "Name": "Capital",
       "Description": "**missing description**",
       "Lore": "**missing description**"
     }

@@ -65,6 +65,21 @@ public sealed record ParameterSet
     [Description("The biomes: the name, the description and the lore of each biome (§13). The list only holds texts: which biome a patch gets is decided by the biome rules, and a biome that is left out has no texts. A file that gives this list replaces the whole default list.")]
     public IReadOnlyList<BiomeTextParameters> Biomes { get; init; } = BiomeTextParameters.Defaults;
 
+    [Description("The elevation types: the name, the description and the lore of Ocean, Flat Land, Lowland, Hills and Mountains (§5.1). The list only holds texts: no generation rule reads it, and a value that is left out has no texts. A file that gives this list replaces the whole default list.")]
+    public IReadOnlyList<KindTextParameters<ElevationType>> ElevationTypes { get; init; } = KindTexts.ElevationTypes;
+
+    [Description("The types of faction: the name, the description and the lore of each of the six (society §4.1). The list only holds texts: no generation rule reads it, and a value that is left out has no texts. A file that gives this list replaces the whole default list.")]
+    public IReadOnlyList<KindTextParameters<FactionType>> FactionTypes { get; init; } = KindTexts.FactionTypes;
+
+    [Description("The forms of faction: the name, the description and the lore of each form, such as the crown, the guild and the free city (society §4.2). The list only holds texts: no generation rule reads it, and a value that is left out has no texts. A file that gives this list replaces the whole default list.")]
+    public IReadOnlyList<KindTextParameters<FactionForm>> FactionForms { get; init; } = KindTexts.FactionForms;
+
+    [Description("The kinds of settlement: the name, the description and the lore of the city and of the town (society §5.2). The list only holds texts: no generation rule reads it, and a value that is left out has no texts. A file that gives this list replaces the whole default list.")]
+    public IReadOnlyList<KindTextParameters<SettlementKind>> SettlementKinds { get; init; } = KindTexts.SettlementKinds;
+
+    [Description("The tiers of a place: the name, the description and the lore of the countryside, the town, the city and the capital (society §8). The list only holds texts: no generation rule reads it, and a value that is left out has no texts. A file that gives this list replaces the whole default list.")]
+    public IReadOnlyList<KindTextParameters<SettlementTier>> SettlementTiers { get; init; } = KindTexts.SettlementTiers;
+
     public static ParameterSet Default => new();
 
     internal static readonly JsonSerializerOptions JsonOptions = new()
@@ -820,17 +835,24 @@ public sealed record BedrockParameters(
     [property: Description("The name shown for the bedrock.")] string Name,
     [property: Description("Relative weight of the bedrock under each elevation type. Whole numbers; 0 means never under that type.")] PerElevationType<int> Weights)
 {
+    [Description("What the bedrock is and what its land looks like: its rock, its landforms and what is dug from it (Appendix F). A picture of it is drawn from this text. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.")]
+    public string Description { get; init; } = DefaultTexts.Missing;
+
+    [Description("The lore of the bedrock: what the peoples of the world make of it and tell about it. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.")]
+    public string Lore { get; init; } = DefaultTexts.Missing;
+
+    // The descriptions are the columns "Mostly under" and "Gives" of map-generation.md Appendix F.
     public static IReadOnlyList<BedrockParameters> Defaults { get; } =
     [
-        new(BedrockIds.Shield, "Crystalline shield", new(20, 20, 20, 10)),
-        new(BedrockIds.FoldBelt, "Fold belt", new(0, 5, 30, 40)),
-        new(BedrockIds.Granite, "Granite intrusion", new(0, 3, 15, 20)),
-        new(BedrockIds.Volcanic, "Volcanic arc", new(0, 2, 10, 30)),
-        new(BedrockIds.Basalt, "Flood basalt", new(10, 10, 15, 5)),
-        new(BedrockIds.Ophiolite, "Ophiolite", new(0, 2, 10, 15)),
-        new(BedrockIds.Carbonate, "Carbonate platform", new(15, 30, 30, 15)),
-        new(BedrockIds.Clastic, "Clastic basin", new(40, 40, 20, 5)),
-        new(BedrockIds.Alluvium, "Unconsolidated cover", new(60, 40, 0, 0)),
+        new(BedrockIds.Shield, "Crystalline shield", new(20, 20, 20, 10)) { Description = "Mostly under flat land, lowland and hills. Gives granite, banded iron, lode gold in the hills, diamonds and kaolin." },
+        new(BedrockIds.FoldBelt, "Fold belt", new(0, 5, 30, 40)) { Description = "Mostly under hills and mountains. Gives slate, marble, silver, lode gold, garnet and emerald." },
+        new(BedrockIds.Granite, "Granite intrusion", new(0, 3, 15, 20)) { Description = "Mostly under hills and mountains. Gives granite, tin lodes, skarn iron, topaz and beryl, and kaolin." },
+        new(BedrockIds.Volcanic, "Volcanic arc", new(0, 2, 10, 30)) { Description = "Mostly under mountains. Gives basalt, obsidian, pumice, porphyry copper, gold, rock crystal, alum, sulphur and quicksilver." },
+        new(BedrockIds.Basalt, "Flood basalt", new(10, 10, 15, 5)) { Description = "Mostly under flat land, lowland and hills. Gives basalt, native copper, agate and black sands." },
+        new(BedrockIds.Ophiolite, "Ophiolite", new(0, 2, 10, 15)) { Description = "Mostly under hills and mountains. Gives soapstone, massive-sulfide copper and jade." },
+        new(BedrockIds.Carbonate, "Carbonate platform", new(15, 30, 30, 15)) { Description = "Mostly under lowland and hills. Gives limestone, chalk, flint, lead and zinc, skarn iron and cave saltpetre." },
+        new(BedrockIds.Clastic, "Clastic basin", new(40, 40, 20, 5)) { Description = "Mostly under flat land and lowland. Gives sandstone, coal, lignite, red-bed copper, rock salt, amber, gypsum and alum shale." },
+        new(BedrockIds.Alluvium, "Unconsolidated cover", new(60, 40, 0, 0)) { Description = "Mostly under flat land and lowland. Gives field stone and clay only." },
     ];
 }
 

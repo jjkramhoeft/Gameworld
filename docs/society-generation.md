@@ -447,6 +447,18 @@ The type of a faction is what binds its members. Each type rests on a fact of a 
 | **Magic** | the arcane: a college, a circle, a cabal | the supernatural vocations |
 | **Place** | a home: a town or a valley that rules itself | home |
 
+**The texts.** Four lists of the Parameter Set hold a `Kind`, a `Name`, a `Description`
+and a `Lore` for each value of a fixed set: `FactionTypes` (the six types above),
+`FactionForms` (the forms of section 4.2), `SettlementKinds` (the city and the town,
+section 5.2) and `SettlementTiers` (countryside, town, city and capital, section 8). The
+lists hold texts only: no rule reads them, and the rules alone decide the type and the
+form of a faction and what a place is. They are what a picture or a text of a faction or
+a place is made from. The default description of a type is its line "Bound by" above, and
+that of a form its one line in `src/Gameworld.Domain/Factions.cs` ("A ruling house" for
+the crown). The kinds of settlement and the tiers have no description, and nothing has a
+lore: those are `**missing description**`, the text that marks one that is not written
+yet. The defaults are in `src/Gameworld.Domain/KindTexts.cs`.
+
 Arms and crime are not types: a free company and a thieves' guild are bound by work. A
 cause is not a type: it is a role, the opposition.
 

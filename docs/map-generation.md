@@ -2496,6 +2496,18 @@ Appendix D.
 
 The table is an example and not binding yet.
 
+A bedrock has a `Description` and a `Lore` in the Parameter Set, beside its id, its name
+and its weights. No rule reads them: they are what a picture of the land is drawn from.
+The default description is the two last columns of the table below as a sentence
+("Mostly under hills and mountains. Gives slate, marble, ..."), which says what the
+bedrock yields and not yet what it looks like. No bedrock has a lore: it is
+`**missing description**`, the text that marks one that is not written yet.
+
+The elevation types have texts too: the list `ElevationTypes` of the Parameter Set holds a
+`Kind`, a `Name`, a `Description` and a `Lore` for Ocean, Flat Land, Lowland, Hills and
+Mountains. It holds texts only, and none of them is written yet
+(`src/Gameworld.Domain/KindTexts.cs`).
+
 | Id          | Name                 | Mostly under            | Gives                                                         |
 | ----------- | -------------------- | ----------------------- | ------------------------------------------------------------- |
 | `shield`    | Crystalline shield   | flat, lowland, hills    | Granite, banded iron, lode gold (hills), diamonds, kaolin     |

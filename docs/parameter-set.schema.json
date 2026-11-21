@@ -2284,6 +2284,14 @@
               "Mountains"
             ],
             "additionalProperties": false
+          },
+          "Description": {
+            "description": "What the bedrock is and what its land looks like: its rock, its landforms and what is dug from it (Appendix F). A picture of it is drawn from this text. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.",
+            "type": "string"
+          },
+          "Lore": {
+            "description": "The lore of the bedrock: what the peoples of the world make of it and tell about it. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.",
+            "type": "string"
           }
         },
         "required": [
@@ -3004,6 +3012,200 @@
         },
         "required": [
           "Biome",
+          "Name"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "ElevationTypes": {
+      "description": "The elevation types: the name, the description and the lore of Ocean, Flat Land, Lowland, Hills and Mountains (§5.1). The list only holds texts: no generation rule reads it, and a value that is left out has no texts. A file that gives this list replaces the whole default list.",
+      "type": "array",
+      "items": {
+        "description": "The name, the description and the lore of one value of a fixed set, such as an elevation type or a form of faction.",
+        "type": "object",
+        "properties": {
+          "Kind": {
+            "description": "The value the texts belong to.",
+            "enum": [
+              "Ocean",
+              "FlatLand",
+              "Lowland",
+              "Hills",
+              "Mountains"
+            ]
+          },
+          "Name": {
+            "description": "The name shown for it.",
+            "type": "string"
+          },
+          "Description": {
+            "description": "What it is and looks like. A picture of it is drawn from this text. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.",
+            "type": "string"
+          },
+          "Lore": {
+            "description": "Its lore: what the peoples of the world make of it and tell about it. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "Kind",
+          "Name"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "FactionTypes": {
+      "description": "The types of faction: the name, the description and the lore of each of the six (society §4.1). The list only holds texts: no generation rule reads it, and a value that is left out has no texts. A file that gives this list replaces the whole default list.",
+      "type": "array",
+      "items": {
+        "description": "The name, the description and the lore of one value of a fixed set, such as an elevation type or a form of faction.",
+        "type": "object",
+        "properties": {
+          "Kind": {
+            "description": "The value the texts belong to.",
+            "enum": [
+              "Family",
+              "Race",
+              "Vocation",
+              "Belief",
+              "Magic",
+              "Place"
+            ]
+          },
+          "Name": {
+            "description": "The name shown for it.",
+            "type": "string"
+          },
+          "Description": {
+            "description": "What it is and looks like. A picture of it is drawn from this text. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.",
+            "type": "string"
+          },
+          "Lore": {
+            "description": "Its lore: what the peoples of the world make of it and tell about it. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "Kind",
+          "Name"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "FactionForms": {
+      "description": "The forms of faction: the name, the description and the lore of each form, such as the crown, the guild and the free city (society §4.2). The list only holds texts: no generation rule reads it, and a value that is left out has no texts. A file that gives this list replaces the whole default list.",
+      "type": "array",
+      "items": {
+        "description": "The name, the description and the lore of one value of a fixed set, such as an elevation type or a form of faction.",
+        "type": "object",
+        "properties": {
+          "Kind": {
+            "description": "The value the texts belong to.",
+            "enum": [
+              "Crown",
+              "House",
+              "Horde",
+              "Clan",
+              "Hold",
+              "Enclave",
+              "MerchantRepublic",
+              "Guild",
+              "TempleState",
+              "Sect",
+              "Order",
+              "Magocracy",
+              "Cabal",
+              "Circle",
+              "FreeCity",
+              "Commune",
+              "CharteredTown"
+            ]
+          },
+          "Name": {
+            "description": "The name shown for it.",
+            "type": "string"
+          },
+          "Description": {
+            "description": "What it is and looks like. A picture of it is drawn from this text. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.",
+            "type": "string"
+          },
+          "Lore": {
+            "description": "Its lore: what the peoples of the world make of it and tell about it. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "Kind",
+          "Name"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "SettlementKinds": {
+      "description": "The kinds of settlement: the name, the description and the lore of the city and of the town (society §5.2). The list only holds texts: no generation rule reads it, and a value that is left out has no texts. A file that gives this list replaces the whole default list.",
+      "type": "array",
+      "items": {
+        "description": "The name, the description and the lore of one value of a fixed set, such as an elevation type or a form of faction.",
+        "type": "object",
+        "properties": {
+          "Kind": {
+            "description": "The value the texts belong to.",
+            "enum": [
+              "Town",
+              "City"
+            ]
+          },
+          "Name": {
+            "description": "The name shown for it.",
+            "type": "string"
+          },
+          "Description": {
+            "description": "What it is and looks like. A picture of it is drawn from this text. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.",
+            "type": "string"
+          },
+          "Lore": {
+            "description": "Its lore: what the peoples of the world make of it and tell about it. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "Kind",
+          "Name"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "SettlementTiers": {
+      "description": "The tiers of a place: the name, the description and the lore of the countryside, the town, the city and the capital (society §8). The list only holds texts: no generation rule reads it, and a value that is left out has no texts. A file that gives this list replaces the whole default list.",
+      "type": "array",
+      "items": {
+        "description": "The name, the description and the lore of one value of a fixed set, such as an elevation type or a form of faction.",
+        "type": "object",
+        "properties": {
+          "Kind": {
+            "description": "The value the texts belong to.",
+            "enum": [
+              "Countryside",
+              "Town",
+              "City",
+              "Capital"
+            ]
+          },
+          "Name": {
+            "description": "The name shown for it.",
+            "type": "string"
+          },
+          "Description": {
+            "description": "What it is and looks like. A picture of it is drawn from this text. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.",
+            "type": "string"
+          },
+          "Lore": {
+            "description": "Its lore: what the peoples of the world make of it and tell about it. No generation rule reads it. The text \"**missing description**\" marks one that is not written yet.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "Kind",
           "Name"
         ],
         "additionalProperties": false

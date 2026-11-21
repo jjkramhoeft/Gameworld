@@ -124,4 +124,34 @@ public class DefaultTextTests
         Assert.Equal(DefaultTexts.Missing, variants[0].Lore);
         Assert.Equal(DefaultTexts.Missing, variants[1].Description);
     }
+
+    [Fact]
+    public void The_fixed_sets_have_a_text_entry_for_every_value_in_order()
+    {
+        var p = ParameterSet.Default;
+        Assert.Equal(Enum.GetValues<ElevationType>(), p.ElevationTypes.Select(k => k.Kind));
+        Assert.Equal(Enum.GetValues<FactionType>(), p.FactionTypes.Select(k => k.Kind));
+        Assert.Equal(Enum.GetValues<FactionForm>(), p.FactionForms.Select(k => k.Kind));
+        Assert.Equal(Enum.GetValues<SettlementKind>(), p.SettlementKinds.Select(k => k.Kind));
+        Assert.Equal(Enum.GetValues<SettlementTier>(), p.SettlementTiers.Select(k => k.Kind));
+
+        // The types and the forms of faction have the line of the docs; the others have none yet.
+        Assert.All(p.FactionTypes, k => Assert.False(DefaultTexts.IsMissing(k.Description)));
+        Assert.All(p.FactionForms, k => Assert.False(DefaultTexts.IsMissing(k.Description)));
+        Assert.All(p.ElevationTypes, k => Assert.Equal(DefaultTexts.Missing, k.Description));
+        Assert.All(p.SettlementKinds, k => Assert.Equal(DefaultTexts.Missing, k.Description));
+        Assert.All(p.SettlementTiers, k => Assert.Equal(DefaultTexts.Missing, k.Description));
+        Assert.Equal("Merchant republic", p.FactionForms.Single(k => k.Kind == FactionForm.MerchantRepublic).Name);
+        Assert.Equal("Flat Land", p.ElevationTypes[1].Name);
+    }
+
+    [Fact]
+    public void Every_default_bedrock_has_a_description_and_no_lore_yet()
+    {
+        Assert.All(ParameterSet.Default.Bedrocks, b =>
+        {
+            Assert.StartsWith("Mostly under ", b.Description);
+            Assert.Equal(DefaultTexts.Missing, b.Lore);
+        });
+    }
 }
