@@ -107,7 +107,7 @@ foreach (var mode in options.Modes)
     if (mode == MapMode.Biomes && options.Stage < RegionStage.Detailed) continue;
     if (mode == MapMode.Height && options.Stage < RegionStage.Elevated) continue;
     var sw = Stopwatch.StartNew();
-    var modeLayers = mode == MapMode.Height ? layers with { Hillshade = true, Borders = false } : layers;
+    var modeLayers = mode == MapMode.Height ? layers with { Hillshade = true, MainBorders = false, OtherBorders = false } : layers;
     var file = Path.Combine(options.OutDir, $"{mode.ToString().ToLowerInvariant()}.png");
     File.WriteAllBytes(file, MapRenderer.Render(world, view, mode, modeLayers).ToPng());
     Console.WriteLine($"Wrote {file} ({pixels} × {pixels} px, {sw.ElapsedMilliseconds} ms)");

@@ -1857,7 +1857,9 @@ the pixel's world position with `cellAt` and colour it.
   in near-black (14, 20, 30); region borders as a dotted red line (235, 28, 36): a 3 px dot on every point of a 6 px
   lattice, anchored to world pixels, that the border passes within 3 px of;
   zone borders darken the pixel to 50 %, patch borders to 80 %. Zone and patch borders
-  are dropped when their cells get small on screen.
+  are dropped when their cells get small on screen. The borders are two layers: the main
+  borders (the coastline and the region borders) and the other borders (the zone and patch
+  borders).
 - **Height mode**: a hypsometric tint, linear between stops at 0 m (72, 128, 76), 60 m
   (104, 152, 84), 180 m (150, 176, 98), 400 m (206, 194, 122), 700 m (182, 142, 94),
   1100 m (150, 120, 98), 1600 m (168, 160, 156), 2400 m (246, 246, 246); the sea from

@@ -21,7 +21,10 @@ public enum MapMode
 /// <summary>The layers drawn on top of the base colour.</summary>
 public sealed record MapLayers
 {
-    public bool Borders { get; init; } = true;
+    /// <summary>The main borders: the coastline and the region borders.</summary>
+    public bool MainBorders { get; init; } = true;
+    /// <summary>The other borders: the zone borders and the patch borders.</summary>
+    public bool OtherBorders { get; init; } = true;
     public bool Rivers { get; init; } = true;
     public bool Lakes { get; init; } = true;
     public bool Prospects { get; init; } = false;
@@ -44,7 +47,7 @@ public sealed record MapLayers
         _ => false,
     };
 
-    public static MapLayers None { get; } = new() { Borders = false, Rivers = false, Lakes = false };
+    public static MapLayers None { get; } = new() { MainBorders = false, OtherBorders = false, Rivers = false, Lakes = false };
     public static MapLayers All { get; } = new() { Prospects = true, Travel = true };
 }
 
@@ -137,7 +140,8 @@ public static partial class MapRenderer
                 canvas.Set(x, y, colour);
             }
 
-        if (layers.Borders) DrawBorders(canvas, view, cells, info, bw, margin);
+        if (layers.MainBorders || layers.OtherBorders)
+            DrawBorders(canvas, view, cells, info, bw, margin, layers.MainBorders, layers.OtherBorders);
 
         // Rivers of a landlocked region can cross its neighbours, so look one ring further.
         // Travel needs the same ring: a link is drawn from the region that decides it, and its
@@ -179,11 +183,11 @@ public static partial class MapRenderer
         return ElevationColour(world.Cells.ZoneType(c.Zone)).Scale(Vary(4, c.Patch, 0.08));
     }
 
-    private static void DrawBorders(Canvas canvas, MapView view, CellMap cells, CellInfo[] info, int bw, int margin)
+    private static void DrawBorders(Canvas canvas, MapView view, CellMap cells, CellInfo[] info, int bw, int margin, bool main, bool other)
     {
         var mpp = view.MetresPerPixel;
-        var showZones = cells.ZoneSize / mpp >= 24;
-        var showPatches = cells.PatchSize / mpp >= 14;
+        var showZones = other && cells.ZoneSize / mpp >= 24;
+        var showPatches = other && cells.PatchSize / mpp >= 14;
         // Dots are anchored to world pixels so tiles join.
         var gx0 = (long)Math.Round(view.Left / mpp);
         var gy0 = (long)Math.Round(view.Top / mpp);
@@ -199,7 +203,8 @@ public static partial class MapRenderer
 
                 if (here.Ocean != left.Ocean || here.Ocean != up.Ocean)
                 {
-                    canvas.Set(x, y, CoastColour);
+                    // Without the main borders the coast stays as it is: no zone or patch border is drawn on it.
+                    if (main) canvas.Set(x, y, CoastColour);
                     continue;
                 }
                 if (here.Ocean) continue;
@@ -207,7 +212,7 @@ public static partial class MapRenderer
                 // Region border: a 3 px dot on every point of a 6 px lattice that the border passes.
                 var dx = DotOffset(gx0 + x);
                 var dy = DotOffset(gy0 + y);
-                if (Math.Abs(dx) <= 1 && Math.Abs(dy) <= 1 && RegionEdgeAround(info, bw, bx - dx, by - dy))
+                if (main && Math.Abs(dx) <= 1 && Math.Abs(dy) <= 1 && RegionEdgeAround(info, bw, bx - dx, by - dy))
                 {
                     canvas.Set(x, y, RegionBorderColour);
                     continue;

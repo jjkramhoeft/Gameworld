@@ -177,11 +177,12 @@ namespace Gameworld.Demo
 
         public static MapLayers ParseLayers(string? layers)
         {
-            var set = (layers ?? "borders,rivers,lakes").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            var set = (layers ?? "mainborders,otherborders,rivers,lakes").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
                 .ToHashSet(StringComparer.OrdinalIgnoreCase);
             return new MapLayers
             {
-                Borders = set.Contains("borders"),
+                MainBorders = set.Contains("mainborders"),
+                OtherBorders = set.Contains("otherborders"),
                 Rivers = set.Contains("rivers"),
                 Lakes = set.Contains("lakes"),
                 Prospects = set.Contains("prospects"),
