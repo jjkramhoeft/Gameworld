@@ -455,9 +455,10 @@ lists hold texts only: no rule reads them, and the rules alone decide the type a
 form of a faction and what a place is. They are what a picture or a text of a faction or
 a place is made from. The default description of a type is its line "Bound by" above, and
 that of a form its one line in `src/Gameworld.Domain/Factions.cs` ("A ruling house" for
-the crown). The kinds of settlement and the tiers have no description, and nothing has a
-lore: those are `**missing description**`, the text that marks one that is not written
-yet. The defaults are in `src/Gameworld.Domain/KindTexts.cs`.
+the crown). The descriptions of the kinds of settlement and of the tiers are written in
+the defaults: what the place looks like and what life in the tier is like. The lore of
+every value is written there too. A value that a Parameter Set file gives no text has
+`**missing description**`, the text that marks one that is not written yet. The defaults are in `src/Gameworld.Domain/KindTexts.cs`.
 
 Arms and crime are not types: a free company and a thieves' guild are bound by work. A
 cause is not a type: it is a role, the opposition.
@@ -1602,9 +1603,14 @@ The default `Description` and `Lore` are the opening paragraph and the line "Lor
 entry of the vocation in [research/vocations.md](research/vocations.md) section 3, without
 the citations (`src/Gameworld.Domain/DefaultTexts.Vocations.cs`). No rule reads them.
 A variant has the same two texts, so that a shepherd is not drawn as any herder. No doc
-describes a variant yet, so all 476 default variants have `**missing description**` for
-both; they are listed in `src/Gameworld.Domain/DefaultTexts.VocationVariants.cs`, keyed by
-"vocation id/variant name", to be written there. In a Parameter Set file a variant is an
+describes a variant, so the two texts of the 476 default variants are written in
+`src/Gameworld.Domain/DefaultTexts.VocationVariants.cs`, keyed by "vocation id/variant
+name": the work of the variant and what a picture of the person shows. A name that two
+vocations share has a text for each (the sawyer of the forester saws over a pit, that of
+the miller runs a sawmill). The lore is the standing, the customs and the quarrels of
+the variant, and names a race of [races-basis.md](races-basis.md) where one is known for
+the work. A variant that a Parameter Set file gives no text has
+`**missing description**`. In a Parameter Set file a variant is an
 object with a `Name`; until 2026-11-21 it was a plain name, and a file from before that
 must be changed to load.
 The defaults of `LowestTier`, `SharePercent`, `OnWater` and `Variants` are those of

@@ -44,7 +44,7 @@ The project is in phase 1.
 
 ### Status
 
-The map is generated through all its stages, from the cells to the travel network, with the flora and fauna of every patch. Of the society, the races of each region, their potential population, the factions of each region, the name of each region, and the cities and towns of each region with their names, their persons and their races are generated. The persons of a city or a town are a count per race so far. The person-name generator is in place, and for now it gives the surnames of the houses that name a region and some of the first parts of city and town names. The vocations and their tools are lists in the Parameter Set and are not drawn yet. The races, the vocations, the tools, the flora, the fauna and the resources carry a description and a lore in the Parameter Set, for the pictures to come, and so do the biomes and the variants of the vocations; those of the resources, of most of their variants and of the variants of the vocations are not written yet. Families and individual persons are defined below but not generated yet, and neither is there a database: the apps compute everything in memory.
+The map is generated through all its stages, from the cells to the travel network, with the flora and fauna of every patch. Of the society, the races of each region, their potential population, the factions of each region, the name of each region, and the cities and towns of each region with their names, their persons and their races are generated. The persons of a city or a town are a count per race so far. The person-name generator is in place, and for now it gives the surnames of the houses that name a region and some of the first parts of city and town names. The vocations and their tools are lists in the Parameter Set and are not drawn yet. The races, the vocations, the tools, the flora, the fauna and the resources carry a description and a lore in the Parameter Set, for the pictures to come, and so do the biomes and the variants of the vocations; every one of the default texts is written. Families and individual persons are defined below but not generated yet, and neither is there a database: the apps compute everything in memory.
 
 ## Concepts
 
@@ -218,7 +218,7 @@ The actual height of the land of a region. It is calculated in the Elevated stag
 
 The kind of nature of a land patch. It comes from the temperature of the patch (the Initial Temperature field cooled by the height) and its aridity (the precipitation relative to what the temperature demands). Mangrove is an override on warm, wet and low coasts. Volcano is an override on rare patches of the mountains, whatever their climate: about one region in nine has one.
 
-The Parameter Set holds a name, a description and a lore for every biome. The description is the real land the biome stands for; the lore is not written yet.
+The Parameter Set holds a name, a description and a lore for every biome. The description is the real land the biome stands for, and the lore is what the peoples of the world make of it.
 
 Biomes will eventually be a fixed set of 10-20 predetermined biomes. The current set, not binding yet, is 15 land biomes and the two overrides, Mangrove and Volcano:
 
@@ -234,7 +234,7 @@ A patch gets a few kinds of each (3 to 6 by default), drawn by frequency from th
 
 #### Resource
 
-What a patch holds for people to use. The generation gives every patch an amount for each of 27 raw resources, and a variant of each: rye is a variant of grain. One of them, the arcane materials, lies only where the Supernatural Field is high. A potential is what the land can yield. A deposit is a rare find that often needs to be mined. The Parameter Set holds a name, a description and a lore for every resource and every variant; most of them are not written yet.
+What a patch holds for people to use. The generation gives every patch an amount for each of 27 raw resources, and a variant of each: rye is a variant of grain. One of them, the arcane materials, lies only where the Supernatural Field is high. A potential is what the land can yield. A deposit is a rare find that often needs to be mined. The Parameter Set holds a name, a description and a lore for every resource and every variant.
 
 Resources are split in groups to make trade and needs manageable: Food, Materials, Fuel, Luxuries, Metals and Animals are found in patches, and Building, Tools, Gear, Weapons and Clothing are only produced. A product is produced from resources and is not generated with the map. Every generated resource has an abbreviation of three letters that no other resource has, with a capital at the start of each word: Grn is grain and IrO iron ore. The groups, the abbreviations and the catalogue of variants are in docs/map-generation.md Appendix G.
 

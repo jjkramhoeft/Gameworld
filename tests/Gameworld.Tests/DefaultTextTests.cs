@@ -11,17 +11,25 @@ public class DefaultTextTests
 {
     private static void AssertWritten(string what, string description, string lore)
     {
-        Assert.False(DefaultTexts.IsMissing(description), $"{what} has no description.");
+        AssertDescribed(what, description);
         Assert.False(DefaultTexts.IsMissing(lore), $"{what} has no lore.");
-        // The citations and the research remarks of the basis docs stay in the docs.
-        foreach (var text in new[] { description, lore })
-        {
-            Assert.DoesNotContain("http", text);
-            Assert.DoesNotContain("verified", text);
-            Assert.DoesNotContain("§", text);
-            Assert.DoesNotContain("\n ", text);
-            Assert.Equal(text.Trim(), text);
-        }
+        AssertClean(lore);
+    }
+
+    private static void AssertDescribed(string what, string description)
+    {
+        Assert.False(DefaultTexts.IsMissing(description), $"{what} has no description.");
+        AssertClean(description);
+    }
+
+    // The citations and the research remarks of the basis docs stay in the docs.
+    private static void AssertClean(string text)
+    {
+        Assert.DoesNotContain("http", text);
+        Assert.DoesNotContain("verified", text);
+        Assert.DoesNotContain("§", text);
+        Assert.DoesNotContain("\n ", text);
+        Assert.Equal(text.Trim(), text);
     }
 
     [Fact]
@@ -35,17 +43,15 @@ public class DefaultTextTests
     }
 
     [Fact]
-    public void Every_default_flora_but_the_giant_mushrooms_has_a_description_and_a_lore()
+    public void Every_default_flora_has_a_description_and_a_lore()
     {
-        foreach (var flora in ParameterSet.Default.Flora)
-        {
-            if (flora.Id == "giantMushrooms")
-            {
-                Assert.Equal(DefaultTexts.Missing, flora.Description);
-                Assert.Equal(DefaultTexts.Missing, flora.Lore);
-            }
-            else AssertWritten(flora.Id, flora.Description, flora.Lore);
-        }
+        Assert.All(ParameterSet.Default.Flora, f => AssertWritten(f.Id, f.Description, f.Lore));
+    }
+
+    [Fact]
+    public void No_text_of_the_default_parameter_set_is_missing()
+    {
+        Assert.DoesNotContain(DefaultTexts.Missing, ParameterSet.Default.ToJson());
     }
 
     [Fact]
@@ -67,6 +73,11 @@ public class DefaultTextTests
         {
             Assert.NotEmpty(r.Variants);
             Assert.Equal(r.Variants.Count, r.Variants.Select(v => v.Name).Distinct().Count());
+            // Every resource and every variant has both texts, and no two variants of a resource are alike.
+            AssertWritten(r.Name, r.Description, r.Lore);
+            Assert.All(r.Variants, v => AssertWritten($"{r.Name}: {v.Name}", v.Description, v.Lore));
+            Assert.Equal(r.Variants.Count, r.Variants.Select(v => v.Description).Distinct().Count());
+            Assert.Equal(r.Variants.Count, r.Variants.Select(v => v.Lore).Distinct().Count());
         });
         // The crops are variants of their resource, in table order.
         foreach (var resource in CropTables.CropResources)
@@ -88,22 +99,20 @@ public class DefaultTextTests
         Assert.Equal(frostLotus.Lore, arcane.Variant("frost-lotus")!.Lore);
         foreach (var name in new[] { "glowcap fungi", "elderwood", "sap of Elanor", "dreamleaf" })
             Assert.False(DefaultTexts.IsMissing(arcane.Variant(name)!.Description));
-        Assert.Equal(DefaultTexts.Missing, arcane.Variant("star metal")!.Description);
+        // The other nine have their texts in the list itself.
+        Assert.StartsWith("Iron that fell from the sky", arcane.Variant("star metal")!.Description);
+        Assert.False(DefaultTexts.IsMissing(arcane.Variant("star metal")!.Lore));
         Assert.Null(arcane.Variant("no such thing"));
         Assert.Null(arcane.Variant(null));
     }
 
     [Fact]
-    public void The_default_biomes_are_the_17_biomes_in_order_and_all_but_the_volcano_are_described()
+    public void The_default_biomes_are_the_17_biomes_in_order_and_all_have_both_texts()
     {
         var biomes = ParameterSet.Default.Biomes;
         Assert.Equal(Enum.GetValues<Biome>(), biomes.Select(b => b.Biome));
         Assert.Equal("Ice & snow", biomes[0].Name);
-        foreach (var biome in biomes)
-        {
-            Assert.Equal(biome.Biome == Biome.Volcano, DefaultTexts.IsMissing(biome.Description));
-            Assert.Equal(DefaultTexts.Missing, biome.Lore); // no biome has a lore yet
-        }
+        Assert.All(biomes, biome => AssertWritten(biome.Name, biome.Description, biome.Lore));
     }
 
     [Fact]
@@ -112,8 +121,14 @@ public class DefaultTextTests
         var p = ParameterSet.Default;
         Assert.Equal(476, p.Vocations.Sum(v => v.Variants.Count));
         var shepherd = p.Vocations.Single(v => v.Id == "herder").Variants.Single(v => v.Name == "shepherd");
-        Assert.Equal(DefaultTexts.Missing, shepherd.Description); // no variant is described yet
-        Assert.Equal(DefaultTexts.Missing, shepherd.Lore);
+        Assert.StartsWith("Minds a flock of sheep", shepherd.Description);
+        Assert.StartsWith("Alone for weeks with the flock", shepherd.Lore);
+
+        // Every variant has both texts, and no two of them the same.
+        var all = p.Vocations.SelectMany(v => v.Variants.Select(variant => (Id: $"{v.Id}/{variant.Name}", variant.Description, variant.Lore))).ToArray();
+        Assert.All(all, variant => AssertWritten(variant.Id, variant.Description, variant.Lore));
+        Assert.Equal(all.Length, all.Select(variant => variant.Description).Distinct().Count());
+        Assert.Equal(all.Length, all.Select(variant => variant.Lore).Distinct().Count());
 
         var set = ParameterSet.FromJson("""
             { "Vocations": [ { "Id": "herder", "Name": "Herder", "Enabled": true, "Sector": "LandAndWater", "LowestTier": "Countryside",
@@ -135,23 +150,23 @@ public class DefaultTextTests
         Assert.Equal(Enum.GetValues<SettlementKind>(), p.SettlementKinds.Select(k => k.Kind));
         Assert.Equal(Enum.GetValues<SettlementTier>(), p.SettlementTiers.Select(k => k.Kind));
 
-        // The types and the forms of faction have the line of the docs; the others have none yet.
-        Assert.All(p.FactionTypes, k => Assert.False(DefaultTexts.IsMissing(k.Description)));
-        Assert.All(p.FactionForms, k => Assert.False(DefaultTexts.IsMissing(k.Description)));
-        Assert.All(p.ElevationTypes, k => Assert.Equal(DefaultTexts.Missing, k.Description));
-        Assert.All(p.SettlementKinds, k => Assert.Equal(DefaultTexts.Missing, k.Description));
-        Assert.All(p.SettlementTiers, k => Assert.Equal(DefaultTexts.Missing, k.Description));
+        // Every value has a description and a lore.
+        Assert.All(p.FactionTypes, k => AssertWritten(k.Name, k.Description, k.Lore));
+        Assert.All(p.FactionForms, k => AssertWritten(k.Name, k.Description, k.Lore));
+        Assert.All(p.ElevationTypes, k => AssertWritten(k.Name, k.Description, k.Lore));
+        Assert.All(p.SettlementKinds, k => AssertWritten(k.Name, k.Description, k.Lore));
+        Assert.All(p.SettlementTiers, k => AssertWritten(k.Name, k.Description, k.Lore));
         Assert.Equal("Merchant republic", p.FactionForms.Single(k => k.Kind == FactionForm.MerchantRepublic).Name);
         Assert.Equal("Flat Land", p.ElevationTypes[1].Name);
     }
 
     [Fact]
-    public void Every_default_bedrock_has_a_description_and_no_lore_yet()
+    public void Every_default_bedrock_has_a_description_and_a_lore()
     {
         Assert.All(ParameterSet.Default.Bedrocks, b =>
         {
             Assert.StartsWith("Mostly under ", b.Description);
-            Assert.Equal(DefaultTexts.Missing, b.Lore);
+            AssertWritten(b.Id, b.Description, b.Lore);
         });
     }
 }

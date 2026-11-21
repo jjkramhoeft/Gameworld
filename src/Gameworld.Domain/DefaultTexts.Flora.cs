@@ -628,5 +628,9 @@ public static partial class DefaultTexts
         ["snareVine"] = (
             "A liana that tightens on what struggles in it and slackens on what holds still.",
             "Boughwalkers train it across the paths they do not want used. Children learn to hold still before they learn to climb."),
+        // Not in the note: an invented kind, described here.
+        ["giantMushrooms"] = (
+            "Mushrooms of tree height that stand where the trees should: pale stalks as thick as an oak, caps as wide as a barn roof, brown, red or violet above and gilled beneath. Under them it is dim, damp and still, the ground is soft with spores, and the gills glow faintly at night. The flesh cuts like cork and dries as hard as wood.",
+            "A wood of them springs up in one season where the trees fell sick, and no one sees it grow. Gnomes and Dwarves cut the caps for food and the stalks for beams, and count their rings as they would a tree's. Elves will not walk under them: they say the forest is being remembered wrongly."),
     };
 }

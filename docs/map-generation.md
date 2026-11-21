@@ -1157,9 +1157,11 @@ description is what a picture of the land is drawn from. The default description
 biome is the real land it stands for, from the column "Stands for" of
 [research/flora-and-fauna.md](research/flora-and-fauna.md) section 2: the taiga of
 Siberia, Scandinavia and Canada for the Boreal forest. It names places and does not yet
-say what the land looks like. The Volcano has no description and no biome has a lore:
-they are `**missing description**`, the text that marks one that is not written yet. The
-defaults are in `src/Gameworld.Domain/Biomes.Defaults.cs`.
+say what the land looks like. The Volcano is not in that table: its description is
+written in the defaults and says what the mountain looks like. The lore of a biome is
+what the peoples of [races-basis.md](races-basis.md) make of the land. A biome that a
+Parameter Set file gives no text has `**missing description**`, the text that marks one
+that is not written yet. The defaults are in `src/Gameworld.Domain/Biomes.Defaults.cs`.
 
 ### 13.1 Inputs
 
@@ -1289,7 +1291,8 @@ a monster and for an arcane plant. A monster and an arcane plant need a Supernat
 60, 75 or 90, by the tiers S1, S2 and S3 of the note. No other kind needs the field. The
 description and the lore of a kind are those of its entry in the note, without the
 citations: they are in `src/Gameworld.Domain/DefaultTexts.Flora.cs` and
-`DefaultTexts.Fauna.cs`. The giant mushrooms have neither yet. No rule reads the two
+`DefaultTexts.Fauna.cs`. The texts of the giant mushrooms are written there. No rule
+reads the two
 texts: they are what a picture of the kind is drawn from, so that an invented kind looks
 the same every time. So
 a monster is found on about a tenth of the map at the most (9, 14.1).
@@ -1380,10 +1383,13 @@ variant a patch gets is decided by the rules alone. The texts are what a picture
 resource is drawn from, so that an invented one such as star metal looks the same every
 time. The default list holds every variant the rules can give (a test checks it): the
 crops of Appendix B in table order, then the variants of Appendix D in the order of the
-rules. Only five variants have texts so far, the arcane materials that are a kind of the
-default flora: frost-lotus, glowcap fungi, elderwood, sap of Elanor and dreamleaf take
-the texts of that kind. Every other description and lore, of a resource or a variant, is
-`**missing description**`: the text that marks one that is not written yet. A new variant
+rules. Every resource and every variant has a description: what it is and looks like
+where it is won. Each has a lore too: what the peoples of
+[races-basis.md](races-basis.md) make of it. No doc holds them: they are written in the
+defaults. Five variants are a kind of the default flora and take both texts of that
+kind: frost-lotus, glowcap fungi, elderwood, sap of Elanor and dreamleaf. A resource or
+a variant that a Parameter Set file gives no text has `**missing description**`: the text
+that marks one that is not written yet. A new variant
 in the rules needs an entry in `src/Gameworld.Domain/Resources.Defaults.cs`.
 
 Reagents, herbs and arcane materials were added on 2026-11-15, for the vocations of
@@ -2500,12 +2506,14 @@ A bedrock has a `Description` and a `Lore` in the Parameter Set, beside its id, 
 and its weights. No rule reads them: they are what a picture of the land is drawn from.
 The default description is the two last columns of the table below as a sentence
 ("Mostly under hills and mountains. Gives slate, marble, ..."), which says what the
-bedrock yields and not yet what it looks like. No bedrock has a lore: it is
-`**missing description**`, the text that marks one that is not written yet.
+bedrock yields and not yet what it looks like. The default lore is what the peoples of
+the world, the Dwarves first, tell about the rock. A bedrock that a Parameter Set file
+gives no text has `**missing description**`, the text that marks one that is not written
+yet.
 
 The elevation types have texts too: the list `ElevationTypes` of the Parameter Set holds a
 `Kind`, a `Name`, a `Description` and a `Lore` for Ocean, Flat Land, Lowland, Hills and
-Mountains. It holds texts only, and none of them is written yet
+Mountains. It holds texts only: a description of what the land looks like, and a lore
 (`src/Gameworld.Domain/KindTexts.cs`).
 
 | Id          | Name                 | Mostly under            | Gives                                                         |
