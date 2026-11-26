@@ -51,3 +51,36 @@ Children are dressed like adults. The default lists have almost no age limits, s
 * 60% food
 * 20% production
 * 10% service
+
+## Character Stats
+
+### Base Treats
+
+DnD (Strength, Dexterity, Constitution, Intelligence, Wisdom, and Charisma)
+
+* Strength
+* Speed / Agility / Dexterity
+* Health Regain / Constetution / Max Hit Points
+* Willpower / Resolve
+* Inteligense
+* Wisdom / Animal Handling / Lore Affinity
+* Beauty / Charisma / Social
+* Magic Affinty
+* Humor
+
+For NPCs
+
+* Allignment / Good-Evil
+* Allignment / Lawfull-Chaotic
+* Sanity
+* Honor
+  
+### Current Values
+
+* Health / Hit Points
+* Stress
+* Hunger
+* Thirst
+* Wealth / Coins
+* Gear / Dress / Looks / Cleanliness
+* Heroism/Reputation
